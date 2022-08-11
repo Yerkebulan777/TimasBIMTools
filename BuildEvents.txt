@@ -1,0 +1,6 @@
+﻿ mkdir "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"
+
+copy /Y $(SolutionDir)$(TargetName).addin "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\"
+copy /Y $(TargetPath) "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"
+
+REM "C:\Program Files\Autodesk\Revit $(Configuration)\Revit.exe"

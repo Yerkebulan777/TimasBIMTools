@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Application">
+		<Name>RevitTimasBIMTools</Name>
+		<Assembly>.\RevitTimasBIMTools\RevitTimasBIMTools.dll</Assembly>
+		<AddInId>{2DBC6DCB-5FD8-49F4-A182-7A9123AB330D}</AddInId>
+		<FullClassName>RevitTimasBIMTools.Core.SmartToolController</FullClassName>
+		<VendorDescription>Autodesk, www.autodesk.com</VendorDescription>
+		<AllowLoadIntoExistingSession>true</AllowLoadIntoExistingSession>
+		<VendorId>TIMAS Develop</VendorId>
+		<Version>1.0.0.1</Version>
+	</AddIn>
+</RevitAddIns>

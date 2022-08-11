@@ -1,0 +1,47 @@
+﻿using System;
+using System.Drawing;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using RevitTimasBIMTools.Properties;
+
+
+namespace RevitTimasBIMTools.Core
+{
+    internal sealed class SmartToolGeneralHelper
+    {
+        public const string ApplicationName = "Smart BIM Tools";
+        public const string CutVoidToolName = "Cut Opening Manager";
+        public static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
+        public static readonly string AssemblyLocation = Path.GetFullPath(Assembly.Location);
+        public static readonly string AssemblyDirectory = Path.GetDirectoryName(AssemblyLocation);
+        public static readonly string AssemblyName = Path.GetFileNameWithoutExtension(AssemblyLocation);
+        public static readonly string DocumentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        public static readonly string LogPath = Path.Combine(DocumentPath, "RevitAsync.log");
+
+
+        #region IconConvertToImageSource
+        [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool DeleteObject([In] IntPtr hObject);
+        internal static ImageSource GetImageSource()
+        {
+            Bitmap bmp = Resources.baseIcon.ToBitmap();
+            IntPtr handle = bmp.GetHbitmap();
+            try
+            {
+                return Imaging.CreateBitmapSourceFromHBitmap(
+                    handle,
+                    IntPtr.Zero,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
+            }
+            finally { DeleteObject(handle); }
+        }
+        #endregion
+    }
+}

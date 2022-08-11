@@ -1,0 +1,28 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--Gradient and Color-->
+    <SolidColorBrush x:Key="ColorBrushPrimary" Color="OliveDrab"/>
+    <GradientStopCollection x:Key="GlassGradientStopsResource">
+        <GradientStop Color="WhiteSmoke" Offset="0.1" />
+        <GradientStop Color="Transparent" Offset="0.35" />
+        <GradientStop Color="WhiteSmoke" Offset="0.5" />
+        <GradientStop Color="Transparent" Offset="0.75" />
+        <GradientStop Color="WhiteSmoke" Offset="0.9" />
+        <GradientStop Color="Transparent" Offset="1" />
+    </GradientStopCollection>
+    <LinearGradientBrush x:Key="GlassBrushResource"
+    StartPoint="0,0" EndPoint="1,1" Opacity="0.7"
+    GradientStops="{StaticResource GlassGradientStopsResource}" />
+    <LinearGradientBrush x:Key="GrayBlueGradientBrush">
+        <GradientStop Color="DarkGray" Offset="0" />
+        <GradientStop Color="#FFE0E0FF" Offset="0.5" />
+        <GradientStop Color="DarkGray" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="FloralGradientBrush" Opacity="0.5">
+        <GradientStop Color="Khaki"/>
+        <GradientStop Color="LimeGreen" Offset="0.35"/>
+        <GradientStop Color="LightSeaGreen" Offset="0.75"/>
+        <GradientStop Color="DarkCyan" Offset="0.85"/>
+        <GradientStop Color="SeaGreen" Offset="1"/>
+    </LinearGradientBrush>
+</ResourceDictionary>

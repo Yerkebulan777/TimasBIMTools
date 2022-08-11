@@ -1,0 +1,117 @@
+﻿<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="Page" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels" 
+    xmlns:converter="clr-namespace:RevitTimasBIMTools.ViewConverters"
+    d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningViewModel}"
+    x:Class="RevitTimasBIMTools.Views.DockPanelPage" 
+    mc:Ignorable="d" Background="Silver">
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converter:SelectAllConverter x:Key="SelectAllConverter" />
+        </ResourceDictionary>
+    </Page.Resources>
+    <Border BorderThickness="2.5" BorderBrush="Gray">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            <DockPanel Grid.Row="0" Height="50" Background="White">
+                <Label Name="ActiveDocTitle" TextElement.FontSize="15" Margin="10">
+                    <Label.BitmapEffect>
+                        <DropShadowBitmapEffect/>
+                    </Label.BitmapEffect>
+                </Label>
+            </DockPanel>
+            <StackPanel Grid.Row="1" Background="WhiteSmoke">
+                <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13"/>
+                <Grid  Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <ComboBox Name="ComboDocs" Grid.Column="0" Margin="25,5" DisplayMemberPath="Title" Width="250" HorizontalAlignment="Left"/>
+                    <Button Name="SettingsCmd" Grid.Column="1" Content="Settings" Height="30" Width="120" Margin="25,5" Click="SettingsCmd_Click" HorizontalAlignment="Right"/>
+                </Grid>
+                <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
+                <Grid Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <CheckBox IsThreeState="True" Name="CheckSelectAll" Content="Select" 
+                                  HorizontalAlignment="Left" VerticalAlignment="Center" Margin="25,0"
+                                  IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                                  Command="{Binding SelectAllCommand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  CommandParameter="{Binding ElementName=CheckSelectAll,  Path=IsChecked, UpdateSourceTrigger=Explicit}"/>
+                    <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" Height="20" Margin="125,0" 
+                                 IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}" />
+                    <Button Name="SetFilter" Content="Search" Height="20" Width="75" Margin="25,0" HorizontalAlignment="Right"
+                            IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                            Command="{Binding SetFilterCommand, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}"
+                            CommandParameter="{Binding IsEnabled, ElementName=SetFilter, UpdateSourceTrigger=Explicit}" />
+                </Grid>
+            </StackPanel >
+            <ScrollViewer Grid.Row="2">
+                <DataGrid Name="dataGridView"
+                          SelectedItem="{Binding Path=SelectedModel, UpdateSourceTrigger=PropertyChanged}" 
+                          ItemsSource="{Binding ItemCollectionView, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                    <DataGrid.RowStyle>
+                        <Style TargetType="{x:Type DataGridRow}">
+                            <EventSetter Event="MouseDoubleClick" Handler="DataGrid_MouseDoubleClick"/>
+                        </Style>
+                    </DataGrid.RowStyle>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Width="50" Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              Checked ="CheckBox_Checked"  Unchecked="CheckBox_Unchecked"
+                                              IsThreeState="False" HorizontalAlignment="Center" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Width="150" Header="Symbol Name" Binding="{Binding SymbolName}">
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="IsReadOnly" Value="true"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Width="150" Header="Family Name" Binding="{Binding FamilyName}">
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="IsReadOnly" Value="true"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Width="200" Header="Description" Binding="{Binding Description}">
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="IsReadOnly" Value="true"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Width="100" Header="Category" Binding="{Binding CategoryName}">
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="IsReadOnly" Value="true"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </ScrollViewer>
+            <StackPanel  Grid.Row="3" Margin="5" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                <Button Name="UpdateCmd" Content="Snoop" Margin="5" Height="25" Width="90" 
+                        Command="{Binding SnoopCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
+                <Button Name="ApplyCmd" Content="Apply" Margin="5" Height="25" Width="90" 
+                        IsEnabled="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                        Command="{Binding ApplyCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                        CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}"/>
+                <Button Name="CancelCmd" Content="Close" Margin="5" Height="25" Width="90"
+                        Command="{Binding CancelCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Page>
