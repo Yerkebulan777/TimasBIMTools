@@ -12,12 +12,30 @@ namespace RevitTimasBIMTools.ViewModels
         public ObservableCollection<RevitElementModel> SimbolList
         {
             get => simbolList;
+            set => SetProperty(ref simbolList, value);
+        }
+
+
+        #region Element Property
+
+        private int minElementHight = 50;
+        public int MinElementHight
+        {
+            get => minElementHight;
             set
             {
-                SetProperty(ref simbolList, value);
+                if (value != minElementHight)
+                {
+                    minElementHight = NormilizeIntValue(value);
+                    OnPropertyChanged(nameof(MinElementHight));
+                }
             }
         }
 
+        #endregion
+
+
+        #region Opening Property
 
         private RevitElementModel rectangSymbolModel = null;
         public RevitElementModel RectangSimbolModel
@@ -38,7 +56,6 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-
         private RevitElementModel roundSymbolModel = null;
         public RevitElementModel RoundSimbolModel
         {
@@ -58,33 +75,25 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
+        #endregion
 
-        private int minElementHight = 50;
-        public int MinElementHight
-        {
-            get => minElementHight;
-            set
-            {
-                if (value != minElementHight)
-                {
-                    minElementHight = NormilizeIntValue(value);
-                    OnPropertyChanged(nameof(MinElementHight));
-                }
-            }
-        }
 
-        private static int NormilizeIntValue(int value)
+        #region Method Settings 
+        private static int NormilizeIntValue(int value, int maxVal = 100, int minVal = 0)
         {
-            if (value < 0)
+            if (value > maxVal)
             {
-                value = 0;
+                value = maxVal;
             }
-            if (value > 100)
+            if (value < minVal)
             {
-                value = 100;
+                value = minVal;
             }
             return value;
         }
+
+        #endregion
+
 
         public void Dispose()
         {
