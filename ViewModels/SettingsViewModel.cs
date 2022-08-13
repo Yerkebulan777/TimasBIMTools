@@ -84,7 +84,6 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-
         #endregion
 
 
@@ -159,7 +158,8 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Method Settings 
+        #region Methods
+
         private static int NormilizeIntValue(int value, int maxVal = 100, int minVal = 0)
         {
             if (value > maxVal)
