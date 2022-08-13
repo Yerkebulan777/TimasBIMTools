@@ -16,16 +16,18 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        #region Visibility Settings Property
+        #region Command Settings Property
 
-        public bool Visibility { get; private set; } = false;
+        public bool AdvancedSettingsVisibility { get; private set; } = false;
+
+        public bool SetApply { get; private set; } = false;
 
         #endregion
 
 
         #region Element Property
 
-        private int minElementHight = 50;
+        private int minElementHight = 30;
         public int MinElementHight
         {
             get => minElementHight;
@@ -33,16 +35,80 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != minElementHight)
                 {
-                    minElementHight = NormilizeIntValue(value);
+                    minElementHight = NormilizeIntValue(value, 100, 0);
                     OnPropertyChanged(nameof(MinElementHight));
                 }
             }
         }
 
+        private int minElementWidth = 30;
+        public int MinElementWidth
+        {
+            get => minElementWidth;
+            set
+            {
+                if (value != minElementWidth)
+                {
+                    minElementWidth = NormilizeIntValue(value, 100, 0);
+                    OnPropertyChanged(nameof(MinElementWidth));
+                }
+            }
+        }
+
+        private int maxElementHight = 500;
+        public int MaxElementHight
+        {
+            get => maxElementHight;
+            set
+            {
+                if (value != maxElementHight)
+                {
+                    maxElementHight = NormilizeIntValue(value, 1500, 100);
+                    OnPropertyChanged(nameof(MaxElementHight));
+                }
+            }
+        }
+
+        private int maxElementWidht = 500;
+        public int MaxElementWidth
+        {
+            get => maxElementWidht;
+            set
+            {
+                if (value != maxElementWidht)
+                {
+                    maxElementWidht = NormilizeIntValue(value, 1500, 100);
+                    OnPropertyChanged(nameof(MaxElementWidth));
+                }
+            }
+        }
+
+
+
         #endregion
 
 
-        #region Opening Property
+        #region Create Opening Property
+
+        private int cutOffset = 50;
+        public int CutOffset
+        {
+            get => cutOffset;
+            set => SetProperty(ref cutOffset, value);
+        }
+
+        private int ratio = 5;
+        public int RatioLimit
+        {
+            get => ratio;
+            set => SetProperty(ref ratio, value);
+        }
+
+
+        #endregion
+
+
+        #region FamilySymbol Property
 
         private RevitElementModel rectangSymbolModel = null;
         public RevitElementModel RectangSimbolModel
@@ -108,6 +174,12 @@ namespace RevitTimasBIMTools.ViewModels
 
         #endregion
 
+
+        #region MyRegion
+
+        #endregion
+
+        //StringFormat={}{0:n5}
 
         //StringFormat={}{0:n5}
 
