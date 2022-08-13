@@ -83,6 +83,48 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
+        private int minElementWidth = 30;
+        public int MinElementWidth
+        {
+            get => minElementWidth;
+            set
+            {
+                if (value != minElementWidth)
+                {
+                    minElementWidth = NormilizeIntValue(value, 100, 0);
+                    OnPropertyChanged(nameof(MinElementWidth));
+                }
+            }
+        }
+
+        private int maxElementHight = 500;
+        public int MaxElementHight
+        {
+            get => maxElementHight;
+            set
+            {
+                if (value != maxElementHight)
+                {
+                    maxElementHight = NormilizeIntValue(value, 1500, 100);
+                    OnPropertyChanged(nameof(MaxElementHight));
+                }
+            }
+        }
+
+        private int maxElementWidht = 500;
+        public int MaxElementWidth
+        {
+            get => maxElementWidht;
+            set
+            {
+                if (value != maxElementWidht)
+                {
+                    maxElementWidht = NormilizeIntValue(value, 1500, 100);
+                    OnPropertyChanged(nameof(MaxElementWidth));
+                }
+            }
+        }
+
 
 
         #endregion
@@ -108,7 +150,9 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region FamilySymbol Property
+        #region Create Opening Property
+
+        #region Opening Property
 
         private RevitElementModel rectangSymbolModel = null;
         public RevitElementModel RectangSimbolModel
@@ -147,13 +191,6 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
         }
-
-        #endregion
-
-
-        #region Visibility Settings Property
-
-        public bool AdvancedSettingsVisibility { get; private set; } = false;
 
         #endregion
 

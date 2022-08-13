@@ -148,8 +148,7 @@
         </DockPanel>
         <StackPanel Grid.Row="3" Orientation="Vertical" Height="300">
             <DockPanel Height="150" VerticalAlignment="Center" Background="White">
-                <GroupBox Header=" Project section " Margin="5" Padding="5">
-                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5">
+                <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5">
                         <Grid Margin="5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="175"/>
