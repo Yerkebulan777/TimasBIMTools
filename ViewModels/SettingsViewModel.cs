@@ -90,12 +90,21 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Create Opening Property
 
+        private int catIdInt = -1;
+        public int CategoryIdInt
+        {
+            get => catIdInt;
+            set => SetProperty(ref catIdInt, value);
+        }
+
+
         private int cutOffset = 50;
         public int CutOffset
         {
             get => cutOffset;
             set => SetProperty(ref cutOffset, value);
         }
+
 
         private int ratio = 5;
         public int RatioLimit
@@ -166,7 +175,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         #endregion
-
 
 
         //StringFormat={}{0:n5}
