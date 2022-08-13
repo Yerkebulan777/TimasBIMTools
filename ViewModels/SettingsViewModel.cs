@@ -113,7 +113,6 @@ namespace RevitTimasBIMTools.ViewModels
             set => SetProperty(ref ratio, value);
         }
 
-
         #endregion
 
 
