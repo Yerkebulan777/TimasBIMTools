@@ -190,6 +190,7 @@
                 </GroupBox>
             </DockPanel>
         </StackPanel>
+        
         <StackPanel Name="SettingCommand" Grid.Row="4" Height="65" Orientation="Horizontal" Background="Gainsboro" 
                     VerticalAlignment="Stretch" HorizontalAlignment="Right" >
             <Button Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10"/>
