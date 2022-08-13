@@ -16,6 +16,13 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        #region Visibility Settings Property
+
+        public bool Visibility { get; private set; } = false;
+
+        #endregion
+
+
         #region Element Property
 
         private int minElementHight = 50;
@@ -78,6 +85,13 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
+        #region Visibility Settings Property
+
+        public bool AdvancedSettingsVisibility { get; private set; } = false;
+
+        #endregion
+
+
         #region Method Settings 
         private static int NormilizeIntValue(int value, int maxVal = 100, int minVal = 0)
         {
@@ -94,6 +108,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         #endregion
 
+
+        //StringFormat={}{0:n5}
 
         public void Dispose()
         {

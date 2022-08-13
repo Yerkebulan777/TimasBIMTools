@@ -34,7 +34,7 @@ namespace RevitTimasBIMTools.Views
         //    if (item is RevitElementModel model)
         //    {
         //        Properties.Settings.Default.OpennigFamilyId = model.IdInt;
-        //        Properties.Settings.Default.Save();
+        //        Properties.Settings.Default.SaveSettings();
         //    }
         //}
 

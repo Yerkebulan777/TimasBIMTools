@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels"
              xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
-             d:DataContext="{d:DesignInstance Type=viewmodels:SettingsViewModel}"
              mc:Ignorable="d"  d:Background="Gainsboro"  d:Width="450">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -22,11 +21,11 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0" Background="Gainsboro" >
+        <DockPanel Name="SettingTitle" Grid.Row="0" Background="Gainsboro" >
             <TextBlock Name="SettingsTitle" Text="Cut opening setting" VerticalAlignment="Center" FontSize="15" Margin="15"/>
         </DockPanel>
-        <DockPanel Grid.Row="1" Height="250" VerticalAlignment="Center" Background="White" Visibility="Collapsed">
-            <!--#region Communication size settings -->
+        <DockPanel Name="CommunicationSizeSettings" Grid.Row="1" Height="250"
+                   Visibility="{Binding Path=}" VerticalAlignment="Center" Background="White">
             <GroupBox Header=" Intersect element size " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
@@ -90,10 +89,8 @@
                     </Border>
                 </StackPanel>
             </GroupBox>
-            <!--#endregion-->
         </DockPanel>
-        <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Background="White" Visibility="Collapsed">
-            <!--#region Opening size settings -->
+        <DockPanel Name="OpeningSizeSettings" Grid.Row="2" Height="150" VerticalAlignment="Center" Background="White" Visibility="Collapsed">
             <GroupBox Header=" Create opening settings " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
@@ -124,26 +121,23 @@
                     </Border>
                 </StackPanel>
             </GroupBox>
-            <!--#endregion-->
         </DockPanel>
-        <StackPanel Grid.Row="3" Orientation="Vertical" Height="300">
-            <DockPanel Height="150" VerticalAlignment="Center" Background="White">
-                <GroupBox Header=" Project section " Margin="5" Padding="5">
-                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5">
-                        <Grid Margin="5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Rectangular opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <ComboBox Name="ComboSection" Grid.Column="1" VerticalAlignment="Center" Margin="25,0"
+        <StackPanel Name="DefaultSettings"  Grid.Row="3" Orientation="Vertical" Height="250">
+            <DockPanel Height="100" VerticalAlignment="Center" Background="White">
+                <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="10" CornerRadius="3">
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="175"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Project section" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                        <ComboBox Name="ComboSection" Grid.Column="1" VerticalAlignment="Center" Margin="50,0"
                                           SelectedItem="{Binding RectangSimbolModel, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
-                        </Grid>
-                    </Border>
-                </GroupBox>
+                    </Grid>
+                </Border>
             </DockPanel>
             <DockPanel Height="150" VerticalAlignment="Center" Background="White">
-                <GroupBox Header=" Opening family " Margin="5" Padding="5">
+                <GroupBox Header=" Select opening family " Margin="5" Padding="5">
                     <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                         <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5">
                             <Grid Margin="5">
@@ -171,11 +165,11 @@
                 </GroupBox>
             </DockPanel>
         </StackPanel>
-        <StackPanel Grid.Row="4" Height="65" Orientation="Horizontal" Background="Gainsboro" 
+        <StackPanel Name="SettingCommand" Grid.Row="4" Height="65" Orientation="Horizontal" Background="Gainsboro" 
                     VerticalAlignment="Stretch" HorizontalAlignment="Right" >
             <Button Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10"/>
             <Button Name="SaveAsSettingCmd" Content="Save" Height="25" Width="90" Margin="10"/>
-            <Button Name="CloseSettingCmd" Content="Close" Height="25" Width="90" Margin="10,10,20,10"/>
+            <Button Name="CloseSettingCmd" Content="Apply" Height="25" Width="90" Margin="10,10,20,10"/>
         </StackPanel>
     </Grid>
 </UserControl>
