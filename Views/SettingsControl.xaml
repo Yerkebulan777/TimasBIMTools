@@ -197,5 +197,6 @@
             <Button Name="SaveAsSettingCmd" Content="Save" Height="25" Width="90" Margin="10"/>
             <Button Name="CloseSettingCmd" Content="Close" Height="25" Width="90" Margin="10,10,20,10"/>
         </StackPanel>
+        
     </Grid>
 </UserControl>
