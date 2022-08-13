@@ -149,7 +149,7 @@
         </DockPanel>
         <StackPanel Grid.Row="3" Orientation="Vertical" Height="250">
             <DockPanel Height="100" VerticalAlignment="Center" Background="White">
-                <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="10">
+                <Border BorderBrush="LightGray" BorderThickness="0.5" CornerRadius="3"  Margin="10">
                         <Grid Margin="5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="200"/>
