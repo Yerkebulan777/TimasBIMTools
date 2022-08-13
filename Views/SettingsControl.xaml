@@ -40,7 +40,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Minimum element hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                             <Slider Name="sliderMinSizeH" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
-                                    Value="{Binding Path=MinElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"/>
+                                    Value="{Binding Path=MinElementHight, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding Path=MinElementHight, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
                                 <TextBox.Resources>
@@ -60,7 +60,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Minimum element width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                             <Slider Name="sliderMinSizeW" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
-                                    Value="{Binding Path=MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"/>
+                                    Value="{Binding Path=MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding Path=MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
                                 <TextBox.Resources>
@@ -80,7 +80,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Maximum element hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                             <Slider Name="sliderMaxSizeH" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
-                                    Value="{Binding Path=MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"/>
+                                    Value="{Binding Path=MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding Path=MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
                                 <TextBox.Resources>
@@ -100,7 +100,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Maximum element width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                             <Slider Name="sliderMaxSizeW" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
-                                    Value="{Binding Path=MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"/>
+                                    Value="{Binding Path=MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding Path=MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
                                 <TextBox.Resources>
@@ -114,8 +114,7 @@
                 </StackPanel>
             </GroupBox>
         </DockPanel>
-        <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Background="White" Visibility="Collapsed" d:IsLocked="True">
-            <!--#region Opening size settings -->
+        <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Visibility="{Binding Path=AdvancedSettingsVisibility}"  Background="White" d:IsLocked="True">
             <GroupBox Header=" Create opening settings " Margin="5" Padding="5" d:IsLocked="True">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center" d:IsLocked="True">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5" d:IsLocked="True">
@@ -126,9 +125,16 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Cut offset" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
-                            <Slider Name="slCutOffset" Grid.Column="1"  Minimum="0" Value="50" Maximum="100" d:IsLocked="True" />
-                            <TextBox Name="tbCutOffset" Grid.Column="2" HorizontalAlignment="Center" 
-                                     Text="{Binding ElementName=slCutOffset, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource RoundCorner}" d:IsLocked="True"/>
+                            <Slider Name="sliderCutOffset" Grid.Column="1"  Minimum="0" Maximum="150" TickFrequency="5" 
+                                    Value="{Binding Path=CutOffset, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True" />
+                            <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
+                                     Text="{Binding Path=CutOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
+                                <TextBox.Resources>
+                                    <Style TargetType="{x:Type Border}">
+                                        <Setter Property="CornerRadius" Value="3"/>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
                         </Grid>
                     </Border>
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5" d:IsLocked="True">
@@ -139,9 +145,16 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Size ratio limit" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
-                            <Slider Name="slRatio" Grid.Column="1"  Minimum="1" Value="5" Maximum="9" TickFrequency="0.5" d:IsLocked="True"/>
-                            <TextBox Name="tbRatio" Grid.Column="2" HorizontalAlignment="Center" 
-                                     Text="{Binding ElementName=slRatio, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource RoundCorner}" d:IsLocked="True"/>
+                            <Slider Name="sliderRatio" Grid.Column="1"  Minimum="1" Maximum="10" TickFrequency="1" 
+                                    Value="{Binding Path=RatioLimit, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
+                            <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
+                                     Text="{Binding Path=RatioLimit, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
+                                <TextBox.Resources>
+                                    <Style TargetType="{x:Type Border}">
+                                        <Setter Property="CornerRadius" Value="3"/>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
                         </Grid>
                     </Border>
                 </StackPanel>
@@ -152,23 +165,23 @@
                 <Border BorderBrush="LightGray" BorderThickness="0.5" CornerRadius="3" Margin="15" d:IsLocked="True">
                     <Grid d:IsLocked="True">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="180"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text=" Category from target project " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
+                        <TextBlock Text=" Сommunication сategory " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                         <ComboBox Name="ComboSection" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" 
                                       SelectedItem="{Binding RectangSimbolModel, Mode=OneTime, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
                     </Grid>
                 </Border>
             </DockPanel>
             <DockPanel Height="150" VerticalAlignment="Center" Background="White" d:IsLocked="True">
-                <GroupBox Header=" Select opening family " Margin="5" Padding="5" d:IsLocked="True">
+                <GroupBox Header=" Select opening family " HorizontalAlignment="Center"  Margin="5" Padding="5" d:IsLocked="True">
                     <StackPanel Orientation="Vertical" VerticalAlignment="Center" d:IsLocked="True">
                         <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5" d:IsLocked="True">
                             <Grid Margin="5" d:IsLocked="True">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="200"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="180"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Rectangular opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                                 <ComboBox Name="ComboRectangSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0"
@@ -179,7 +192,7 @@
                             <Grid Margin="5" d:IsLocked="True">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="200"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="180"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Round opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                                 <ComboBox Name="ComboRoundSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0"
