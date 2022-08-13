@@ -25,7 +25,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Element Property
+        #region Communication Element Property
 
         private int minElementHight = 30;
         public int MinElementHight
@@ -108,7 +108,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Create Opening Property
+        #region FamilySimbol Property
 
         private RevitElementModel rectangSymbolModel = null;
         public RevitElementModel RectangSimbolModel

@@ -155,7 +155,7 @@
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Project section category " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <TextBlock Text=" Category from target project " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <ComboBox Name="ComboSection" Grid.Column="1" VerticalAlignment="Center" Margin="25,0"
                                           SelectedItem="{Binding RectangSimbolModel, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
                     </Grid>
