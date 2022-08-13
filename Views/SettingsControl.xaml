@@ -149,8 +149,8 @@
         </DockPanel>
         <StackPanel Grid.Row="3" Orientation="Vertical" Height="250">
             <DockPanel Height="100" VerticalAlignment="Center" Background="White">
-                <Border BorderBrush="LightGray" BorderThickness="0.5" CornerRadius="3"  Margin="10">
-                        <Grid Margin="5">
+                <Border BorderBrush="LightGray" BorderThickness="0.5" CornerRadius="3" Margin="15">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
@@ -190,12 +190,11 @@
                 </GroupBox>
             </DockPanel>
         </StackPanel>
-        
-        <StackPanel Name="SettingCommand" Grid.Row="4" Height="65" Orientation="Horizontal" Background="Gainsboro" 
-                    VerticalAlignment="Stretch" HorizontalAlignment="Right" >
+ 
+        <StackPanel Name="SettingCommands" Grid.Row="4" Height="65" 
+                    Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Right" >
             <Button Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10"/>
-            <Button Name="SaveAsSettingCmd" Content="Save" Height="25" Width="90" Margin="10"/>
-            <Button Name="CloseSettingCmd" Content="Close" Height="25" Width="90" Margin="10,10,20,10"/>
+            <Button Name="CloseSettingCmd" Content="Apply" Height="25" Width="90" Margin="10,10,20,10"/>
         </StackPanel>
         
     </Grid>
