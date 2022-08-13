@@ -16,6 +16,7 @@
     <UserControl.DataContext>
         <viewmodels:SettingsViewModel/>
     </UserControl.DataContext>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -146,15 +147,15 @@
                 </StackPanel>
             </GroupBox>
         </DockPanel>
-        <StackPanel Grid.Row="3" Orientation="Vertical" Height="300">
-            <DockPanel Height="150" VerticalAlignment="Center" Background="White">
-                <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5">
+        <StackPanel Grid.Row="3" Orientation="Vertical" Height="250">
+            <DockPanel Height="100" VerticalAlignment="Center" Background="White">
+                <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="10">
                         <Grid Margin="5">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="175"/>
+                                <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Rectangular opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <TextBlock Text="Project section category " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <ComboBox Name="ComboSection" Grid.Column="1" VerticalAlignment="Center" Margin="25,0"
                                           SelectedItem="{Binding RectangSimbolModel, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
                     </Grid>

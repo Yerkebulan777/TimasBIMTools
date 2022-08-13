@@ -41,47 +41,6 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-        private int minElementWidth = 30;
-        public int MinElementWidth
-        {
-            get => minElementWidth;
-            set
-            {
-                if (value != minElementWidth)
-                {
-                    minElementWidth = NormilizeIntValue(value, 100, 0);
-                    OnPropertyChanged(nameof(MinElementWidth));
-                }
-            }
-        }
-
-        private int maxElementHight = 500;
-        public int MaxElementHight
-        {
-            get => maxElementHight;
-            set
-            {
-                if (value != maxElementHight)
-                {
-                    maxElementHight = NormilizeIntValue(value, 1500, 100);
-                    OnPropertyChanged(nameof(MaxElementHight));
-                }
-            }
-        }
-
-        private int maxElementWidht = 500;
-        public int MaxElementWidth
-        {
-            get => maxElementWidht;
-            set
-            {
-                if (value != maxElementWidht)
-                {
-                    maxElementWidht = NormilizeIntValue(value, 1500, 100);
-                    OnPropertyChanged(nameof(MaxElementWidth));
-                }
-            }
-        }
 
         private int minElementWidth = 30;
         public int MinElementWidth
@@ -124,7 +83,6 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
         }
-
 
 
         #endregion
@@ -151,8 +109,6 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Create Opening Property
-
-        #region Opening Property
 
         private RevitElementModel rectangSymbolModel = null;
         public RevitElementModel RectangSimbolModel
@@ -212,13 +168,9 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region MyRegion
-
-        #endregion
 
         //StringFormat={}{0:n5}
 
-        //StringFormat={}{0:n5}
 
         public void Dispose()
         {
