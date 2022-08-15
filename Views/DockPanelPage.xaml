@@ -34,8 +34,12 @@
             <StackPanel Grid.Row="1" Background="WhiteSmoke">
                 <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13"/>
                 <Grid  Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                    <ComboBox Name="ComboDocs" Grid.Column="0" Margin="25,5" DisplayMemberPath="Title" Width="250" HorizontalAlignment="Left"/>
-                    <Button Name="SettingsCmd" Grid.Column="1" Content="Settings" Height="30" Width="120" Margin="25,5" Click="SettingsCmd_Click" HorizontalAlignment="Right"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="150"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Name="ComboDocs" Grid.Column="0" Margin="25,5" DisplayMemberPath="Title" />
+                    <Button Name="SettingsCmd" Grid.Column="1" Content="Settings" Height="30" Width="100" Margin="25,0" Click="SettingsCmd_Click"/>
                 </Grid>
                 <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
                 <Grid Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch">
@@ -85,7 +89,7 @@
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="200" Header="Description" Binding="{Binding Description}">
+                        <DataGridTextColumn Width="150" Header="Description" Binding="{Binding Description}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>

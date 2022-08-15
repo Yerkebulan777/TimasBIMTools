@@ -89,7 +89,7 @@
     <Reference Include="AdWindows">
       <HintPath>C:\Program Files\Autodesk\Revit 2019\AdWindows.dll</HintPath>
       <Private>False</Private>
-    </Reference>   
+    </Reference>
     <Reference Include="log4net">
       <HintPath>C:\Program Files\Autodesk\Revit 2019\log4net.dll</HintPath>
       <Private>False</Private>
@@ -296,11 +296,10 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
-if not exist "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)" md "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"
-copy /Y $(SolutionDir)$(TargetName).addin "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\"
-copy /Y $(TargetPath) "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"
+mkdir "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"
 
-REM "C:\Program Files\Autodesk\Revit $(Configuration)\Revit.exe"</PostBuildEvent>
+copy /Y $(SolutionDir)$(TargetName).addin "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\"
+copy /Y $(TargetDir) "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
