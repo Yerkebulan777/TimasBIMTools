@@ -39,7 +39,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Minimum element hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                             <Slider Name="sliderMinSizeH" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
-                                    Value="{Binding Path=MinElementHight, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
+                                    Value="{Binding Path=MinElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding Path=MinElementHight, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
                                 <TextBox.Resources>
@@ -59,7 +59,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Minimum element width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                             <Slider Name="sliderMinSizeW" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
-                                    Value="{Binding Path=MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
+                                    Value="{Binding Path=MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding Path=MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
                                 <TextBox.Resources>
@@ -79,7 +79,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Maximum element hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                             <Slider Name="sliderMaxSizeH" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
-                                    Value="{Binding Path=MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
+                                    Value="{Binding Path=MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding Path=MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
                                 <TextBox.Resources>
@@ -99,7 +99,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Maximum element width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                             <Slider Name="sliderMaxSizeW" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
-                                    Value="{Binding Path=MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
+                                    Value="{Binding Path=MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding Path=MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
                                 <TextBox.Resources>
@@ -125,7 +125,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Cut offset" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                             <Slider Name="sliderCutOffset" Grid.Column="1"  Minimum="0" Maximum="150" TickFrequency="5" 
-                                    Value="{Binding Path=CutOffset, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True" />
+                                    Value="{Binding Path=CutOffset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True" />
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding Path=CutOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
                                 <TextBox.Resources>
@@ -145,7 +145,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Size ratio limit" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
                             <Slider Name="sliderRatio" Grid.Column="1"  Minimum="1" Maximum="10" TickFrequency="1" 
-                                    Value="{Binding Path=RatioLimit, Mode=TwoWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
+                                    Value="{Binding Path=RatioLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding Path=RatioLimit, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
                                 <TextBox.Resources>
@@ -203,8 +203,8 @@
             </DockPanel>
         </StackPanel>
 
-        <StackPanel Name="SettingCommands" Grid.Row="4" Height="65" 
-                    Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Right" d:IsLocked="True" >
+        <StackPanel Name="SettingCommands" Grid.Row="4" Height="65" Orientation="Horizontal" 
+                    VerticalAlignment="Stretch" HorizontalAlignment="Right" d:IsLocked="True" >
             <Button Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" d:IsLocked="True"/>
             <Button Name="CloseSettingCmd" Content="Apply" Height="25" Width="90" Margin="10,10,20,10" d:IsLocked="True"/>
         </StackPanel>
