@@ -16,7 +16,6 @@
     <UserControl.DataContext>
         <viewmodels:SettingsViewModel/>
     </UserControl.DataContext>
-
     <Grid d:IsLocked="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
