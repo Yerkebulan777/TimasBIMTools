@@ -32,9 +32,9 @@
                 </Label>
             </DockPanel>
             <ScrollViewer Grid.Row="1">
-                <StackPanel Background="WhiteSmoke" Width="Auto" MinWidth="500" MaxWidth="1000">
+                <StackPanel Background="WhiteSmoke">
                     <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13"/>
-                    <Grid  Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <Grid  Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="Auto" MinWidth="500" MaxWidth="1000" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*"/>
                             <ColumnDefinition Width="*"/>
@@ -44,7 +44,7 @@
                                 Click="SettingsCmd_Click" VerticalAlignment="Center" HorizontalAlignment="Right"/>
                     </Grid>
                     <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
-                    <Grid Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <Grid Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="Auto" MinWidth="500" MaxWidth="1000" >
                         <CheckBox IsThreeState="True" Name="CheckSelectAll" Content="Select" 
                                   HorizontalAlignment="Left" VerticalAlignment="Center" Margin="25,0"
                                   IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
