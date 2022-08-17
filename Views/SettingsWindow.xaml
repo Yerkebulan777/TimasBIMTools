@@ -1,22 +1,23 @@
-﻿<UserControl x:Class="RevitTimasBIMTools.Views.SettingsControl"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels"
-             Width="450" Height="Auto" MinHeight="400" MaxHeight="800"
-             xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
-             mc:Ignorable="d"  d:Background="Gainsboro" >
-    <UserControl.Resources>
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
+        xmlns:ViewModels="clr-namespace:RevitTimasBIMTools.ViewModels" 
+        mc:Ignorable="d" Title="Cut opening setting" Height="Auto" Width="450"
+        x:Class="RevitTimasBIMTools.Views.SettingsWindow"
+        Background="Gainsboro">
+    <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </UserControl.Resources>
-    <UserControl.DataContext>
-        <viewmodels:SettingsViewModel/>
-    </UserControl.DataContext>
+    </Window.Resources>
+    <Window.DataContext>
+        <ViewModels:SettingsViewModel/>
+    </Window.DataContext>
     <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -25,10 +26,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DockPanel Name="SettingTitle" Grid.Row="0" Height="50"  Background="Gainsboro" >
-            <TextBlock Name="SettingsTitle" Text="Cut opening setting" VerticalAlignment="Center" FontSize="15" Margin="15"/>
-        </DockPanel>
-        <DockPanel Name="ElementSizeSettings" Grid.Row="1" Height="250" Visibility="{Binding Path=AdvancedSettingsVisibility}" VerticalAlignment="Center" Background="White">
+        <DockPanel x:Name="ElementSizeSettings" Grid.Row="1" Height="250" Visibility="{Binding AdvancedSettingsVisibility}" VerticalAlignment="Center" Background="White">
             <GroupBox Header=" Intersect element size " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
@@ -39,10 +37,10 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Minimum element hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider Name="sliderMinSizeH" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
-                                    Value="{Binding Path=MinElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Slider x:Name="sliderMinSizeH" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
+                                    Value="{Binding MinElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding Path=MinElementHight, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
+                                     Text="{Binding MinElementHight, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -59,10 +57,10 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Minimum element width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider Name="sliderMinSizeW" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
-                                    Value="{Binding Path=MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Slider x:Name="sliderMinSizeW" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
+                                    Value="{Binding MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding Path=MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
+                                     Text="{Binding MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -79,10 +77,10 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Maximum element hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider Name="sliderMaxSizeH" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
-                                    Value="{Binding Path=MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Slider x:Name="sliderMaxSizeH" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
+                                    Value="{Binding MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding Path=MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
+                                     Text="{Binding MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -99,10 +97,10 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Maximum element width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider Name="sliderMaxSizeW" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
-                                    Value="{Binding Path=MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Slider x:Name="sliderMaxSizeW" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
+                                    Value="{Binding MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding Path=MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
+                                     Text="{Binding MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -114,7 +112,7 @@
                 </StackPanel>
             </GroupBox>
         </DockPanel>
-        <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Visibility="{Binding Path=AdvancedSettingsVisibility}"  Background="White">
+        <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Visibility="{Binding AdvancedSettingsVisibility}"  Background="White">
             <GroupBox Header=" Create opening settings " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
@@ -125,10 +123,10 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Cut offset" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider Name="sliderCutOffset" Grid.Column="1"  Minimum="0" Maximum="150" TickFrequency="5" 
-                                    Value="{Binding Path=CutOffset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Slider x:Name="sliderCutOffset" Grid.Column="1"  Minimum="0" Maximum="150" TickFrequency="5" 
+                                    Value="{Binding CutOffset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding Path=CutOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
+                                     Text="{Binding CutOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -145,10 +143,10 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Size ratio limit" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider Name="sliderRatio" Grid.Column="1"  Minimum="1" Maximum="10" TickFrequency="1" 
-                                    Value="{Binding Path=RatioLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Slider x:Name="sliderRatio" Grid.Column="1"  Minimum="1" Maximum="10" TickFrequency="1" 
+                                    Value="{Binding RatioLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding Path=RatioLimit, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
+                                     Text="{Binding RatioLimit, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -169,7 +167,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text=" Сommunication сategory " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                        <ComboBox Name="ComboSection" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" 
+                        <ComboBox x:Name="ComboSection" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" 
                                       SelectedItem="{Binding RectangSimbolModel, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
                     </Grid>
                 </Border>
@@ -184,7 +182,7 @@
                                     <ColumnDefinition Width="180"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Rectangular opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                                <ComboBox Name="ComboRectangSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0"
+                                <ComboBox x:Name="ComboRectangSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0"
                                           SelectedItem="{Binding RectangSimbolModel, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
                             </Grid>
                         </Border>
@@ -195,7 +193,7 @@
                                     <ColumnDefinition Width="180"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Round opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                                <ComboBox Name="ComboRoundSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0"
+                                <ComboBox x:Name="ComboRoundSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0"
                                           SelectedItem="{Binding RoundSimbolModel, Mode=OneTime, UpdateSourceTrigger=Explicit}" />
                             </Grid>
                         </Border>
@@ -203,11 +201,11 @@
                 </GroupBox>
             </DockPanel>
         </StackPanel>
-        <StackPanel Name="SettingCommands" Grid.Row="4" Height="80" Orientation="Horizontal" 
+        <StackPanel x:Name="SettingCommands" Grid.Row="4" Height="80" Orientation="Horizontal" 
                     VerticalAlignment="Stretch" HorizontalAlignment="Right" >
-            <Button Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10"/>
-            <Button Name="CloseSettingCmd" Content="Apply" Height="25" Width="90" Margin="10,10,20,10"/>
+            <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10"/>
+            <Button x:Name="CloseSettingCmd" Content="Apply" Height="25" Width="90" Margin="10,10,20,10"/>
         </StackPanel>
 
     </Grid>
-</UserControl>
+</Window>

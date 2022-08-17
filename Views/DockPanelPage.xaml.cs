@@ -91,13 +91,8 @@ namespace RevitTimasBIMTools.Views
 
         private void SettingsCmd_Click(object sender, RoutedEventArgs e)
         {
-            SettingsControl settingsControl = new SettingsControl(familySymbolCollection);
-            Window wind = new Window
-            {
-                Content = settingsControl,
-                Width = 500,
-            };
-            wind.Show();
+            ProgressView settingsControl = new ProgressView();
+            settingsControl.Show();
         }
 
 
@@ -151,7 +146,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (sender is DataGridRow row && row.DataContext is RevitElementModel model)
             {
-                RevitTask.RunAsync(app =>
+                _ = RevitTask.RunAsync(app =>
                 {
                     UIDocument uidoc = app.ActiveUIDocument;
                     CurrentDocument = uidoc.Document;

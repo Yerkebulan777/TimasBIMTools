@@ -13,7 +13,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <converter:SelectAllConverter x:Key="SelectAllConverter" />
         </ResourceDictionary>
     </Page.Resources>
     <Border BorderThickness="2.5" BorderBrush="Gray">
