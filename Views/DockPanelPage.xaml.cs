@@ -91,13 +91,9 @@ namespace RevitTimasBIMTools.Views
 
         private void SettingsCmd_Click(object sender, RoutedEventArgs e)
         {
-            SettingsControl settingsControl = new SettingsControl(familySymbolCollection);
-            Window wind = new Window
-            {
-                Content = settingsControl,
-                Width = 500,
-            };
-            wind.Show();
+            var settingsControl = new SettingsControl(familySymbolCollection);
+
+            //wind.Show();
         }
 
 
