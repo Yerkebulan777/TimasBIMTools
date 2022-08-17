@@ -9,7 +9,6 @@ namespace RevitTimasBIMTools.RevitUtils
     internal class ProjectLoctionManager
     {
 
-
         public void ShowActiveProjectLocationUsage(Autodesk.Revit.DB.Document document)
         {
             // Get the project location handle 
