@@ -23,5 +23,11 @@ namespace RevitTimasBIMTools.Views
         {
             InitializeComponent();
         }
+
+        private void CloseSettingCmd_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+            this.Close();
+        }
     }
 }
