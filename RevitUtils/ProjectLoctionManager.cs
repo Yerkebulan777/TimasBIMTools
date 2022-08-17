@@ -2,9 +2,7 @@
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -46,5 +44,49 @@ namespace RevitTimasBIMTools.RevitUtils
 
             LogManager.Info(prompt);
         }
+
+
+        public ProjectLocation DuplicateLocation(Autodesk.Revit.DB.Document document, string newName)
+        {
+            ProjectLocation currentLocation = document.ActiveProjectLocation;
+            ProjectLocationSet locations = document.ProjectLocations;
+            foreach (ProjectLocation projectLocation in locations)
+            {
+                if (projectLocation.Name == newName)
+                {
+                    throw new Exception("The name is same as a project location's name, please change one.");
+                }
+            }
+            return currentLocation.Duplicate(newName);
+        }
+
+
+        public void DeleteLocation(Autodesk.Revit.DB.Document document)
+        {
+            ProjectLocation currentLocation = document.ActiveProjectLocation;
+            //There must be at least one project location in the project.
+            ProjectLocationSet locations = document.ProjectLocations;
+            if (1 == locations.Size)
+            {
+                return;
+            }
+
+            string name = "location";
+            if (name != currentLocation.Name)
+            {
+                foreach (ProjectLocation projectLocation in locations)
+                {
+                    if (projectLocation.Name == name)
+                    {
+                        ICollection<Autodesk.Revit.DB.ElementId> elemSet = document.Delete(projectLocation.Id);
+                        if (elemSet.Count > 0)
+                        {
+                            LogManager.Info("Project Location Deleted!");
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
