@@ -194,6 +194,7 @@
     <Compile Include="RevitModel\IRevitElementModel.cs" />
     <Compile Include="RevitModel\RevitHostConstruction.cs" />
     <Compile Include="RevitUtils\AnalyzingIntersectManager.cs" />
+    <Compile Include="RevitUtils\ProjectLoctionManager.cs" />
     <Compile Include="RevitUtils\RevitViewManager.cs" />
     <Compile Include="Services\LogManager.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
