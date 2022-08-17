@@ -31,31 +31,34 @@
                     </Label.BitmapEffect>
                 </Label>
             </DockPanel>
-            <StackPanel Grid.Row="1" Background="WhiteSmoke">
-                <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13"/>
-                <Grid  Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="150"/>
-                    </Grid.ColumnDefinitions>
-                    <ComboBox Name="ComboDocs" Grid.Column="0" Margin="25,5" DisplayMemberPath="Title" />
-                    <Button Name="SettingsCmd" Grid.Column="1" Content="Settings" Height="30" Width="100" Margin="25,0" Click="SettingsCmd_Click"/>
-                </Grid>
-                <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
-                <Grid Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                    <CheckBox IsThreeState="True" Name="CheckSelectAll" Content="Select" 
+            <ScrollViewer Grid.Row="1">
+                <StackPanel Background="WhiteSmoke" Width="Auto" MinWidth="300" MaxWidth="1000">
+                    <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13"/>
+                    <Grid  Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox Name="ComboDocs" Grid.Column="0" Margin="25,5" DisplayMemberPath="Title" />
+                        <Button Name="SettingsCmd" Grid.Column="1" Content="Settings" Height="30" Width="100" Margin="25,0" 
+                                Click="SettingsCmd_Click" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
+                    <Grid Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                        <CheckBox IsThreeState="True" Name="CheckSelectAll" Content="Select" 
                                   HorizontalAlignment="Left" VerticalAlignment="Center" Margin="25,0"
                                   IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                   Command="{Binding SelectAllCommand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   CommandParameter="{Binding ElementName=CheckSelectAll,  Path=IsChecked, UpdateSourceTrigger=Explicit}"/>
-                    <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" Height="20" Margin="125,0" 
+                        <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" Height="20" Margin="125,0" 
                                  IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}" />
-                    <Button Name="SetFilter" Content="Search" Height="20" Width="75" Margin="25,0" HorizontalAlignment="Right"
+                        <Button Name="SetFilter" Content="Search" Height="20" Width="75" Margin="25,0" HorizontalAlignment="Right"
                             IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                             Command="{Binding SetFilterCommand, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}"
                             CommandParameter="{Binding IsEnabled, ElementName=SetFilter, UpdateSourceTrigger=Explicit}" />
-                </Grid>
-            </StackPanel >
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
             <ScrollViewer Grid.Row="2">
                 <DataGrid Name="dataGridView"
                           SelectedItem="{Binding Path=SelectedModel, UpdateSourceTrigger=PropertyChanged}" 
