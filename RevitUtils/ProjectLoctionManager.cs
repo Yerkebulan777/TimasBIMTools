@@ -11,7 +11,6 @@ namespace RevitTimasBIMTools.RevitUtils
     internal class ProjectLoctionManager
     {
 
-
         public void ShowActiveProjectLocationUsage(Autodesk.Revit.DB.Document document)
         {
             // Get the project location handle 
@@ -45,6 +44,21 @@ namespace RevitTimasBIMTools.RevitUtils
             prompt += "\n\t\t" + "TimeZone: " + site.TimeZone;
 
             LogManager.Info(prompt);
+        }
+
+
+        public ProjectLocation DuplicateLocation(Autodesk.Revit.DB.Document document, string newName)
+        {
+            ProjectLocation currentLocation = document.ActiveProjectLocation;
+            ProjectLocationSet locations = document.ProjectLocations;
+            foreach (ProjectLocation projectLocation in locations)
+            {
+                if (projectLocation.Name == newName)
+                {
+                    throw new Exception("The name is same as a project location's name, please change one.");
+                }
+            }
+            return currentLocation.Duplicate(newName);
         }
     }
 }
