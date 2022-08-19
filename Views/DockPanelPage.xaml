@@ -39,7 +39,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <ComboBox Name="ComboDocs" Grid.Column="0" Margin="25,5" DisplayMemberPath="Title" />
-                        <Button Name="SettingsCmd" Grid.Column="1" Content="Settings" Height="30" Width="100" Margin="25,0" 
+                        <Button Name="SettingsCmd" Grid.Column="1" Content="Settings" Height="30" Width="75" Margin="25,0" 
                                 Click="SettingsCmd_Click" VerticalAlignment="Center" HorizontalAlignment="Right"/>
                     </Grid>
                     <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>

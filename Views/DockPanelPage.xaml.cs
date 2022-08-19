@@ -67,7 +67,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (DataHandler != null)
             {
-                DataHandler.Raise();
+                _ = DataHandler.Raise();
             }
         }
 
@@ -91,7 +91,7 @@ namespace RevitTimasBIMTools.Views
 
         private void SettingsCmd_Click(object sender, RoutedEventArgs e)
         {
-            ProgressView settingsControl = new ProgressView();
+            SettingsWindow settingsControl = new SettingsWindow();
             settingsControl.Show();
         }
 

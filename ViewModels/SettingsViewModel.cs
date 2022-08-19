@@ -17,6 +17,12 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        public SettingsViewModel()
+        {
+            //SetFilterCommand = new RelayCommand(SetFilterTextCommand);
+        }
+
+
         #region Main Settings Property
 
         private bool visibility = false;
@@ -145,7 +151,6 @@ namespace RevitTimasBIMTools.ViewModels
         private RevitElementModel roundSymbolModel = null;
 
 
-
         public RevitElementModel RoundSimbolModel
         {
             get => roundSymbolModel;
@@ -187,6 +192,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         //StringFormat={}{0:n5}
 
+        
 
         public void Dispose()
         {
