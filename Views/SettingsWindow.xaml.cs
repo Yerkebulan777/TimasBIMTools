@@ -28,6 +28,7 @@ namespace RevitTimasBIMTools.Views
         {
             Properties.Settings.Default.Save();
             this.Close();
+
         }
     }
 }
