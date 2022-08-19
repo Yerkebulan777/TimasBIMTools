@@ -1,4 +1,5 @@
 ﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Input;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using System;
@@ -16,9 +17,14 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        #region Command Settings Property
+        #region Main Settings Property
 
-        public bool AdvancedSettingsVisibility { get; private set; } = false;
+        private bool visibility = false;
+        public bool AdvancedSettingsVisibility
+        { 
+            get => visibility;
+            set => SetProperty(ref visibility, value);
+        } 
 
         public bool SetApply { get; private set; } = false;
 
@@ -137,6 +143,9 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         private RevitElementModel roundSymbolModel = null;
+
+
+
         public RevitElementModel RoundSimbolModel
         {
             get => roundSymbolModel;

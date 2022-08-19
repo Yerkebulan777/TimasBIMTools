@@ -4,6 +4,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Colors.xaml"/>
     </ResourceDictionary.MergedDictionaries>
+    <BooleanToVisibilityConverter x:Key="BoolToViz"/>
     <!--DropShadowEffect-->
     <DropShadowEffect x:Key="ShadowBlur" />
     <!--HeaderTextBox-->

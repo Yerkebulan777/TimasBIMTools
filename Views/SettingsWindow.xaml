@@ -18,6 +18,7 @@
     <Window.DataContext>
         <ViewModels:SettingsViewModel/>
     </Window.DataContext>
+    
     <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -26,7 +27,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DockPanel x:Name="ElementSizeSettings" Grid.Row="1" Height="250" Visibility="{Binding AdvancedSettingsVisibility}" VerticalAlignment="Center" Background="White">
+        <DockPanel x:Name="ElementSizeSettings" Grid.Row="1" Height="250" VerticalAlignment="Center" Background="White"
+                   Visibility="{Binding AdvancedSettingsVisibility, Converter={StaticResource BoolToViz}, FallbackValue=Hidden}">
             <GroupBox Header=" Intersect element size " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
@@ -112,7 +114,8 @@
                 </StackPanel>
             </GroupBox>
         </DockPanel>
-        <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Visibility="{Binding AdvancedSettingsVisibility}"  Background="White">
+        <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Background="White"
+                   Visibility="{Binding AdvancedSettingsVisibility, Converter={StaticResource BoolToViz}, FallbackValue=Hidden}">
             <GroupBox Header=" Create opening settings " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
@@ -203,7 +206,8 @@
         </StackPanel>
         <StackPanel x:Name="SettingCommands" Grid.Row="4" Height="80" Orientation="Horizontal" 
                     VerticalAlignment="Stretch" HorizontalAlignment="Right" >
-            <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10"/>
+ 
+            <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" />
             <Button x:Name="CloseSettingCmd" Content="Apply" Height="25" Width="90" Margin="10,10,20,10" Click="CloseSettingCmd_Click"/>
         </StackPanel>
 

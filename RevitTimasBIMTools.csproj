@@ -243,7 +243,6 @@
     <Compile Include="ViewConverters\ElementIdConverter.cs" />
     <Compile Include="ViewConverters\SelectAllConverter.cs" />
     <Compile Include="ViewConverters\StatusConverter.cs" />
-    <Compile Include="ViewModelConverters\BooleanToVisibilityConverter.cs" />
     <Compile Include="ViewModels\CutOpeningViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
@@ -293,6 +292,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\baseIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ViewModelConverters\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
