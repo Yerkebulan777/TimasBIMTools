@@ -24,14 +24,24 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Main Settings Property
 
-        private bool visibility = false;
+        private int catIdInt = -1;
+        public int CategoryIdInt
+        {
+            get => catIdInt;
+            set => SetProperty(ref catIdInt, value);
+        }
+
+        private bool visibility = true;
         public bool AdvancedSettingsVisibility
-        { 
+        {
             get => visibility;
             set => SetProperty(ref visibility, value);
-        } 
+        }
 
         public bool SetApply { get; private set; } = false;
+
+
+
 
         #endregion
 
@@ -100,14 +110,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Create Opening Property
 
-        private int catIdInt = -1;
-        public int CategoryIdInt
-        {
-            get => catIdInt;
-            set => SetProperty(ref catIdInt, value);
-        }
-
-
         private int cutOffset = 50;
         public int CutOffset
         {
@@ -116,7 +118,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private int ratio = 5;
+        private int ratio = 3;
         public int RatioLimit
         {
             get => ratio;
@@ -136,7 +138,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    SetProperty(ref rectangSymbolModel, value);
+                    _ = SetProperty(ref rectangSymbolModel, value);
                     if (rectangSymbolModel is RevitElementModel model)
                     {
                         Properties.Settings.Default.RectangOpeningSimbolIdInt = model.IdInt;
@@ -157,7 +159,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    SetProperty(ref roundSymbolModel, value);
+                    _ = SetProperty(ref roundSymbolModel, value);
                     if (roundSymbolModel is RevitElementModel model)
                     {
                         Properties.Settings.Default.RoundOpeningSimbolIdInt = model.IdInt;
@@ -191,7 +193,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         //StringFormat={}{0:n5}
 
-        
+
 
         public void Dispose()
         {

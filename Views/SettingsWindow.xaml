@@ -19,8 +19,7 @@
     <Window.DataContext>
         <ViewModels:SettingsViewModel/>
     </Window.DataContext>
-
-    <Grid Height="Auto" MinHeight="350" MaxHeight="750">
+    <Grid Height="Auto" MinHeight="350" MaxHeight="750" Width="450" >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -30,16 +29,16 @@
         </Grid.RowDefinitions>
         <DockPanel x:Name="ElementSizeSettings" Grid.Row="1" Height="250" VerticalAlignment="Center" Background="White"
                    Visibility="{Binding AdvancedSettingsVisibility, Converter={StaticResource BoolToViz}, FallbackValue=Hidden}">
-            <GroupBox Header=" Intersect element size " Margin="5" Padding="5">
+            <GroupBox Header=" Element size " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Minimum element hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <TextBlock Text="Minimum hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderMinSizeH" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
                                     Value="{Binding MinElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
@@ -55,11 +54,11 @@
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Minimum element width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <TextBlock Text="Minimum width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderMinSizeW" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
                                     Value="{Binding MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
@@ -75,11 +74,11 @@
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Maximum element hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <TextBlock Text="Maximum hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderMaxSizeH" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
                                     Value="{Binding MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
@@ -95,11 +94,11 @@
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Maximum element width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <TextBlock Text="Maximum width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderMaxSizeW" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
                                     Value="{Binding MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
@@ -117,14 +116,14 @@
         </DockPanel>
         <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Background="White"
                    Visibility="{Binding AdvancedSettingsVisibility, Converter={StaticResource BoolToViz}, FallbackValue=Hidden}">
-            <GroupBox Header=" Create opening settings " Margin="5" Padding="5">
+            <GroupBox Header=" Opening settings " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Cut offset" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderCutOffset" Grid.Column="1"  Minimum="0" Maximum="150" TickFrequency="5" 
@@ -142,12 +141,12 @@
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="175"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Size ratio limit" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider x:Name="sliderRatio" Grid.Column="1"  Minimum="1" Maximum="10" TickFrequency="1" 
+                            <Slider x:Name="sliderRatio" Grid.Column="1"  Minimum="1" Maximum="7" TickFrequency="1" 
                                     Value="{Binding RatioLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding RatioLimit, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
@@ -207,9 +206,6 @@
         </StackPanel>
         <StackPanel x:Name="SettingCommands" Grid.Row="4" Height="80" Orientation="Horizontal" 
                     VerticalAlignment="Stretch" HorizontalAlignment="Right" >
-
-
-            <Button Content="Default" Height="25" Width="90" Margin="10" />
             <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" />
             <Button x:Name="CloseSettingCmd" Content="Apply" Height="25" Width="90" Margin="10,10,20,10" Click="CloseSettingCmd_Click"/>
         </StackPanel>
