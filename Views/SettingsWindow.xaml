@@ -207,7 +207,8 @@
         </StackPanel>
         <StackPanel x:Name="SettingCommands" Grid.Row="4" Height="80" Orientation="Horizontal" 
                     VerticalAlignment="Stretch" HorizontalAlignment="Right" >
- 
+            <RadioButton/>
+
             <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" />
             <Button x:Name="CloseSettingCmd" Content="Apply" Height="25" Width="90" Margin="10,10,20,10" Click="CloseSettingCmd_Click"/>
         </StackPanel>
