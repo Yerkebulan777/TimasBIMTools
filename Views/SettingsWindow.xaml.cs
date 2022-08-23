@@ -2,11 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
-using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace RevitTimasBIMTools.Views
