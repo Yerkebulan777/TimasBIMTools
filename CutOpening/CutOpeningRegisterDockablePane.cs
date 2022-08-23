@@ -1,9 +1,10 @@
 ﻿using Autodesk.Revit.UI;
+using RevitTimasBIMTools.Core;
 using System;
 using System.Text;
 using System.Windows;
 
-namespace RevitTimasBIMTools.Core
+namespace RevitTimasBIMTools.CutOpening
 {
     internal sealed class CutOpeningRegisterDockablePane
     {

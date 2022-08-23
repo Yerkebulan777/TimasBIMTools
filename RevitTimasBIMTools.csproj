@@ -185,7 +185,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\CutOpening\CutOpeningSettingsHandler.cs" />
+    <Compile Include="CutOpening\CutOpeningSettingsHandler.cs" />
     <Compile Include="Core\SmartToolController.cs" />
     <Compile Include="RevitUtils\CutOpeningManager.cs" />
     <Compile Include="RevitUtils\ElementDataDictionary.cs" />
@@ -194,15 +194,15 @@
     <Compile Include="RevitModel\ElementTypeData.cs" />
     <Compile Include="RevitModel\IRevitElementModel.cs" />
     <Compile Include="RevitModel\RevitHostConstruction.cs" />
-    <Compile Include="RevitUtils\AnalyzingIntersectManager.cs" />
+    <Compile Include="CutOpening\CutOpeningIntersectManager.cs" />
     <Compile Include="RevitUtils\ProjectLoctionManager.cs" />
     <Compile Include="RevitUtils\RevitViewManager.cs" />
     <Compile Include="Services\LogManager.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
     <Compile Include="Services\ManifestFileManager.cs" />
-    <Compile Include="Core\CutOpening\CutOpeningRegisterDockablePane.cs" />
-    <Compile Include="Core\CutOpening\CutOpeningBaseHandler.cs" />
-    <Compile Include="Core\CutOpening\CutOpeningShowPanelCmd.cs" />
+    <Compile Include="CutOpening\CutOpeningRegisterDockablePane.cs" />
+    <Compile Include="CutOpening\CutOpeningBaseHandler.cs" />
+    <Compile Include="CutOpening\CutOpeningShowPanelCmd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

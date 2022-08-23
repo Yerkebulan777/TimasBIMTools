@@ -6,7 +6,7 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 
 
-namespace RevitTimasBIMTools.Core
+namespace RevitTimasBIMTools.CutOpening
 {
     public sealed class CutOpeningBaseHandler : IExternalEventHandler
     {
