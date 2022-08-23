@@ -19,9 +19,6 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 return;
             }
-
-
-
         }
 
 
