@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Document = Autodesk.Revit.DB.Document;
 
-namespace RevitTimasBIMTools.Core
+namespace RevitTimasBIMTools.CutOpening
 {
     internal class CutOpeningSettingsHandler : IExternalEventHandler
     {
@@ -19,6 +19,11 @@ namespace RevitTimasBIMTools.Core
             {
                 return;
             }
+
+
+
+
+
         }
 
 

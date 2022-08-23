@@ -6,14 +6,15 @@ using System.Text;
 using System.Threading;
 using Autodesk.Revit.DB;
 using RevitTimasBIMTools.RevitModel;
+using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
 using Document = Autodesk.Revit.DB.Document;
 
-namespace RevitTimasBIMTools.RevitUtils
+namespace RevitTimasBIMTools.CutOpening
 {
-    internal sealed class AnalyzingIntersectManager : IDisposable
+    internal sealed class CutOpeningIntersectManager : IDisposable
     {
         #region Static members
         private static Units units = null;
@@ -362,7 +363,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     string name = definition.Name;
                     string[] strArray = name.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-                    if (strArray.Contains<string>(paramName, StringComparer.CurrentCultureIgnoreCase))
+                    if (strArray.Contains(paramName, StringComparer.CurrentCultureIgnoreCase))
                     {
                         int tmp = param.IsShared ? name.Length : name.Length + strArray.Length;
                         if (tolerance > tmp && UnitFormatUtils.TryParse(units, UnitType.UT_Length, param.AsValueString(), out value))
@@ -434,7 +435,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         private double RoundSize(double value, int digit = 5)
         {
-            return Math.Round((value * footToMm) / digit, MidpointRounding.AwayFromZero) * digit / footToMm;
+            return Math.Round(value * footToMm / digit, MidpointRounding.AwayFromZero) * digit / footToMm;
         }
 
 

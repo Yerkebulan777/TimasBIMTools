@@ -7,7 +7,7 @@ using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using Revit.Async.Interfaces;
-using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
@@ -37,7 +37,7 @@ namespace RevitTimasBIMTools.Core
 
             services.AddTransient<IDockablePaneProvider, DockPanelPage>();
             services.AddTransient<CutOpeningViewModel>();
-            services.AddTransient<AnalyzingIntersectManager>();
+            services.AddTransient<CutOpeningIntersectManager>();
 
             return services.BuildServiceProvider();
         }

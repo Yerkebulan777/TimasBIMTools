@@ -2,11 +2,12 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
+using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
 
 
-namespace RevitTimasBIMTools.Core
+namespace RevitTimasBIMTools.CutOpening
 {
     [Transaction(TransactionMode.ReadOnly)]
     [Regeneration(RegenerationOption.Manual)]

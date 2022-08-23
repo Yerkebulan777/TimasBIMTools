@@ -5,6 +5,7 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
+using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
@@ -36,7 +37,7 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly int roundOpeningId = Properties.Settings.Default.RoundOpeningSimbolIdInt;
         private readonly int rectangOpeningId = Properties.Settings.Default.RectangOpeningSimbolIdInt;
         private readonly StringCollection stringCollection = Properties.Settings.Default.HostElementIdCollection;
-        private readonly AnalyzingIntersectManager manager = SmartToolController.Services.GetRequiredService<AnalyzingIntersectManager>();
+        private readonly CutOpeningIntersectManager manager = SmartToolController.Services.GetRequiredService<CutOpeningIntersectManager>();
 
 
         public CutOpeningViewModel()
