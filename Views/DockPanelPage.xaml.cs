@@ -24,18 +24,21 @@ namespace RevitTimasBIMTools.Views
 
         private bool disposedValue = false;
 
+        private RevitDocumenModel revitDocumentModel;
         public static Document CurrentDocument = null;
-        private IList<RevitElementModel> familySymbolCollection = null;
         private IList<RevitDocumenModel> revitDocumentCollection = null;
         private readonly CutOpeningViewModel dataViewModel = ViewModelLocator.DataViewModel;
-        private readonly SettingsViewModel settingsViewModel = ViewModelLocator.SettingsViewModel;
-        private readonly IExternalEventHandler cashExternalHandler = SmartToolController.Services.GetRequiredService<IExternalEventHandler>();
-
+        private readonly IExternalEventHandler openingViewHandler = SmartToolController.Services.GetRequiredService<CutOpeningBaseHandler>();
 
         public DockPanelPage()
         {
             InitializeComponent();
-            Loaded += OnLoadedDockPanelPage;
+            DataContext = dataViewModel;
+            dataViewModel.DockPanelView = this;
+            if (openingViewHandler is CutOpeningBaseHandler handler)
+            {
+                handler.Completed += OnContextViewHandlerCompleted;
+            }
         }
 
 
@@ -50,16 +53,20 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void OnLoadedDockPanelPage(object sender, RoutedEventArgs e)
+        private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs e)
         {
-            DataContext = dataViewModel;
-            Loaded -= OnLoadedDockPanelPage;
-            dataViewModel.DockPanelView = this;
-            ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
-            if (cashExternalHandler is CutOpeningBaseHandler cashHandler)
+            if (openingViewHandler is CutOpeningBaseHandler handler)
             {
-                cashHandler.Completed += OnContextSettingCompleted;
-                dataViewModel.CurrentDocument = CurrentDocument;
+                revitDocumentCollection = e.Documents;
+                revitDocumentModel = revitDocumentCollection.FirstOrDefault();
+                if (CurrentDocument == null && revitDocumentCollection.Count > 0)
+                {
+                    CurrentDocument = revitDocumentModel.Document;
+                    dataViewModel.CurrentDocument = CurrentDocument;
+                    ComboDocs.ItemsSource = revitDocumentCollection;
+                    ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
+                    handler.Completed -= OnContextViewHandlerCompleted;
+                }
             }
         }
 
@@ -73,30 +80,6 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void OnContextSettingCompleted(object sender, BaseCompletedEventArgs e)
-        {
-            if (cashExternalHandler is CutOpeningBaseHandler cashHandler)
-            {
-                cashHandler.Completed -= OnContextSettingCompleted;
-                revitDocumentCollection = e.Documents;
-                familySymbolCollection = e.Elements;
-                if (revitDocumentCollection != null)
-                {
-                    settingsViewModel.SimbolList = familySymbolCollection.ToObservableCollection();
-                    CurrentDocument = revitDocumentCollection[0].Document;
-                    ComboDocs.ItemsSource = revitDocumentCollection;
-                }
-            }
-        }
-
-
-        private void SettingsCmd_Click(object sender, RoutedEventArgs e)
-        {
-            SettingsWindow settingsControl = new SettingsWindow();
-            settingsControl.Show();
-        }
-
-
         private void ComboDocs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             object item = ComboDocs.SelectedItem;
@@ -105,6 +88,13 @@ namespace RevitTimasBIMTools.Views
                 Properties.Settings.Default.TargetDocumentName = model.Title;
                 Properties.Settings.Default.Save();
             }
+        }
+
+
+        private void SettingsCmd_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow settingsControl = new SettingsWindow();
+            settingsControl.Show();
         }
 
 

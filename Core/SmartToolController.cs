@@ -28,12 +28,13 @@ namespace RevitTimasBIMTools.Core
         {
             IServiceCollection services = new ServiceCollection();
 
+            services.AddScoped<CutOpeningBaseHandler>();
+            services.AddScoped<CutOpeningSettingsHandler>();
+
             services.AddSingleton<SettingsViewModel>();
             services.AddSingleton<IRevitTask, RevitTask>();
             services.AddSingleton<SmartToolGeneralHelper>();
             services.AddSingleton<CutOpeningRegisterDockablePane>();
-
-            services.AddScoped<IExternalEventHandler, CutOpeningBaseHandler>();
 
             services.AddTransient<IDockablePaneProvider, DockPanelPage>();
             services.AddTransient<CutOpeningViewModel>();
@@ -45,7 +46,7 @@ namespace RevitTimasBIMTools.Core
         [STAThread]
         public Result OnStartup(UIControlledApplication cntrapp)
         {
-            LogManager.InitMainLogger(typeof(SmartToolController));
+            Logger.InitMainLogger(typeof(SmartToolController));
             SmartToolSetupUIPanel uiface = new SmartToolSetupUIPanel();
             RevitTask.Initialize(cntrapp);
             uiface.Initialize(cntrapp);

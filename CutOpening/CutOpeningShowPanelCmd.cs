@@ -14,13 +14,12 @@ namespace RevitTimasBIMTools.CutOpening
     internal sealed class CutOpeningShowPanelCmd : IExternalCommand, IExternalCommandAvailability
     {
         private DockablePane dockpane = null;
-        private IExternalEventHandler cashExternalHandler = null;
         private readonly DockablePaneId dockpid = SmartToolController.DockPaneId;
+        private IExternalEventHandler externalHandler = SmartToolController.Services.GetRequiredService<CutOpeningBaseHandler>();
         private readonly IDockablePaneProvider provider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            cashExternalHandler = SmartToolController.Services.GetRequiredService<IExternalEventHandler>();
             return Execute(commandData.Application, ref message);
         }
 
@@ -41,22 +40,22 @@ namespace RevitTimasBIMTools.CutOpening
                         }
                         catch (System.Exception exc)
                         {
-                            LogManager.Error("Show panel error:\t" + exc.Message);
+                            Logger.Error("Show panel error:\t" + exc.Message);
                         }
                     }
                     else
                     {
-                        if (cashExternalHandler is CutOpeningBaseHandler cashHandler)
+                        if (externalHandler is CutOpeningBaseHandler handler)
                         {
                             try
                             {
-                                view.DataHandler = ExternalEvent.Create(cashHandler);
+                                view.DataHandler = ExternalEvent.Create(handler);
                                 view.UpdateContext();
                                 dockpane.Show();
                             }
                             catch (System.Exception exc)
                             {
-                                LogManager.Error("Show panel error:\t" + exc.Message);
+                                Logger.Error("Show panel error:\t" + exc.Message);
                             }
                         }
                     }

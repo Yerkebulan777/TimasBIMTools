@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,6 +111,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #endregion // Filtered Element Collector
 
+
         #region Advance Filtered Element Collector
         public static FamilySymbol FindFamilySymbol(Document doc, string familyName, string symbolName)
         {
@@ -185,6 +187,36 @@ namespace RevitTimasBIMTools.RevitUtils
             FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(View3D));
             return collector.Cast<View3D>().First(v3 => !v3.IsTemplate);
         }
+        #endregion
+
+
+        #region Category filter
+
+        public IList<BuiltInCategory> GetFitrableCategories(Document document)
+        {
+            List<BuiltInCategory> output = new List<BuiltInCategory>();
+            foreach (ElementId catId in ParameterFilterUtilities.GetAllFilterableCategories())
+            {
+                try
+                {
+                    Category category = Category.GetCategory(document, catId);
+                    if (category != null && category.AllowsBoundParameters)
+                    {
+                        if (category.CategoryType == CategoryType.Model)
+                        {
+                            output.Add((BuiltInCategory)catId.IntegerValue);
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    Logger.Error(exc.Message);
+                }
+            }
+
+            return output;
+        }
+
         #endregion
 
     }

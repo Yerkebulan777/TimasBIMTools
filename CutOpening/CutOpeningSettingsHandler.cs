@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using RevitTimasBIMTools.Services;
+using RevitTimasBIMTools.RevitUtils;
 using System;
 using System.Collections.Generic;
 using Document = Autodesk.Revit.DB.Document;
@@ -10,6 +10,18 @@ namespace RevitTimasBIMTools.CutOpening
     internal class CutOpeningSettingsHandler : IExternalEventHandler
     {
         public event EventHandler<SettingsCompletedEventArgs> Completed;
+        private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
+        {
+            BuiltInCategory.OST_Conduit,
+            BuiltInCategory.OST_Furniture,
+            BuiltInCategory.OST_CableTray,
+            BuiltInCategory.OST_PipeCurves,
+            BuiltInCategory.OST_DuctCurves,
+            BuiltInCategory.OST_GenericModel,
+            BuiltInCategory.OST_MechanicalEquipment
+        };
+
+
         public void Execute(UIApplication uiapp)
         {
             UIDocument uidoc = uiapp.ActiveUIDocument;
@@ -20,33 +32,46 @@ namespace RevitTimasBIMTools.CutOpening
                 return;
             }
 
+            FilteredElementCollector collector;
+            BuiltInCategory bic = BuiltInCategory.OST_GenericModel;
+            IList<FamilySymbol> elements = new List<FamilySymbol>();
+            IList<Category> categories = GetCategoriesByBuiltIn(doc, builtInCats);
+            collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), bic);
+            foreach (FamilySymbol symbol in collector)
+            {
+                Family family = symbol.Family;
+                if (family.IsValidObject && family.IsEditable)
+                {
+                    if (family.FamilyPlacementType.Equals(FamilyPlacementType.OneLevelBasedHosted))
+                    {
+                        elements.Add(symbol);
+                    }
+                }
+            }
 
+            OnCompleted(new SettingsCompletedEventArgs(categories, elements));
 
         }
 
 
-        public IList<BuiltInCategory> GetFitrableCategories(Document document)
+        private IList<Category> GetCategoriesByBuiltIn(Document doc, IList<BuiltInCategory> bics)
         {
-            List<BuiltInCategory> output = new List<BuiltInCategory>();
-            foreach (ElementId catId in ParameterFilterUtilities.GetAllFilterableCategories())
+            IList<Category> output = new List<Category>();
+            foreach (BuiltInCategory catId in bics)
             {
+                Category cat = null;
                 try
                 {
-                    Category category = Category.GetCategory(document, catId);
-                    if (category != null && category.AllowsBoundParameters)
+                    cat = Category.GetCategory(doc, catId);
+                }
+                finally
+                {
+                    if (cat != null)
                     {
-                        if (category.CategoryType == CategoryType.Model)
-                        {
-                            output.Add((BuiltInCategory)catId.IntegerValue);
-                        }
+                        output.Add(cat);
                     }
                 }
-                catch (Exception exc)
-                {
-                    LogManager.Error(exc.Message);
-                }
             }
-
             return output;
         }
 
@@ -68,11 +93,11 @@ namespace RevitTimasBIMTools.CutOpening
     public class SettingsCompletedEventArgs : EventArgs
     {
         public IList<Category> Categories { get; }
-        public IList<Element> Elements { get; }
-        public SettingsCompletedEventArgs(IList<Category> categories, IList<Element> elements)
+        public IList<FamilySymbol> Symbols { get; }
+        public SettingsCompletedEventArgs(IList<Category> categories, IList<FamilySymbol> symbols)
         {
             Categories = categories;
-            Elements = elements;
+            Symbols = symbols;
         }
     }
 

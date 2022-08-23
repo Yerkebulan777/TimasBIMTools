@@ -4,11 +4,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
-    xmlns:ViewModels="clr-namespace:RevitTimasBIMTools.ViewModels" 
-    mc:Ignorable="d" Title="Cut opening setting" 
-    Height="Auto" MinHeight="350" MaxHeight="750" Width="450"
+    xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels" 
+    mc:Ignorable="d" Height="Auto" MinHeight="350" MaxHeight="750" Width="450"
     x:Class="RevitTimasBIMTools.Views.SettingsWindow"
+    Title="Cut opening setting" 
     Background="Gainsboro">
+    
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,9 +17,8 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <Window.DataContext>
-        <ViewModels:SettingsViewModel/>
-    </Window.DataContext>
+
+    
     <Grid Height="Auto" MinHeight="350" MaxHeight="750" Width="450" >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -206,7 +206,6 @@
         </StackPanel>
         <StackPanel x:Name="SettingCommands" Grid.Row="4" Height="80" Orientation="Horizontal" 
                     VerticalAlignment="Stretch" HorizontalAlignment="Right" >
-
 
             <Button Content="Default" Height="25" Width="90" Margin="10" />
             <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" />

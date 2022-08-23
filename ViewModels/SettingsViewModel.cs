@@ -1,28 +1,20 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using Autodesk.Revit.DB;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.ObjectModel;
 
+
 namespace RevitTimasBIMTools.ViewModels
 {
     public class SettingsViewModel : ObservableObject, IDisposable
     {
-        private ObservableCollection<RevitElementModel> simbolList = new ObservableCollection<RevitElementModel>();
-        public ObservableCollection<RevitElementModel> SimbolList
-        {
-            get => simbolList;
-            set => SetProperty(ref simbolList, value);
-        }
-
-
         public SettingsViewModel()
         {
-            //SetFilterCommand = new RelayCommand(SetFilterTextCommand);
         }
 
-
-        #region Main Settings Property
+        #region Collections
 
         private int catIdInt = -1;
         public int CategoryIdInt
@@ -30,6 +22,29 @@ namespace RevitTimasBIMTools.ViewModels
             get => catIdInt;
             set => SetProperty(ref catIdInt, value);
         }
+
+
+        private ObservableCollection<Category> catList = new ObservableCollection<Category>();
+        public ObservableCollection<Category> Categories
+        {
+            get => catList;
+            set => SetProperty(ref catList, value);
+        }
+
+
+        private ObservableCollection<FamilySymbol> simbolList = new ObservableCollection<FamilySymbol>();
+        public ObservableCollection<FamilySymbol> SimbolList
+        {
+            get => simbolList;
+            set => SetProperty(ref simbolList, value);
+        }
+
+        #endregion
+
+
+        #region Main Settings Property
+
+
 
         private bool visibility = true;
         public bool AdvancedSettingsVisibility
@@ -143,7 +158,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         Properties.Settings.Default.RectangOpeningSimbolIdInt = model.IdInt;
                         Properties.Settings.Default.Save();
-                        LogManager.Info(model.SymbolName);
+                        Logger.Info(model.SymbolName);
                     }
                 }
             }
@@ -164,7 +179,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         Properties.Settings.Default.RoundOpeningSimbolIdInt = model.IdInt;
                         Properties.Settings.Default.Save();
-                        LogManager.Info(model.SymbolName);
+                        Logger.Info(model.SymbolName);
                     }
                 }
             }

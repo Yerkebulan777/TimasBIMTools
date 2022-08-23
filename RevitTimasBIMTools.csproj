@@ -197,7 +197,7 @@
     <Compile Include="CutOpening\CutOpeningIntersectManager.cs" />
     <Compile Include="RevitUtils\ProjectLoctionManager.cs" />
     <Compile Include="RevitUtils\RevitViewManager.cs" />
-    <Compile Include="Services\LogManager.cs" />
+    <Compile Include="Services\Logger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
     <Compile Include="Services\ManifestFileManager.cs" />
     <Compile Include="CutOpening\CutOpeningRegisterDockablePane.cs" />

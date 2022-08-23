@@ -53,7 +53,7 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             catch (Exception exc)
             {
-                LogManager.Error(exc.Message);
+                Logger.Error(exc.Message);
             }
             finally
             {
@@ -82,7 +82,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 catch (Exception exc)
                 {
-                    LogManager.Error(exc.Message);
+                    Logger.Error(exc.Message);
                 }
                 finally { Task.Delay(100).Wait(); }
             }

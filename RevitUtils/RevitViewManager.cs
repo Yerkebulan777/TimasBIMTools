@@ -29,7 +29,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 catch (System.Exception exc)
                 {
                     t.RollBack();
-                    LogManager.Error(string.Format("Error create 3Dview {0}", exc.Message));
+                    Logger.Error(string.Format("Error create 3Dview {0}", exc.Message));
                 }
                 finally
                 {
@@ -96,7 +96,7 @@ namespace RevitTimasBIMTools.RevitUtils
                         catch (System.Exception exc)
                         {
                             t.RollBack();
-                            LogManager.Error(exc.Message);
+                            Logger.Error(exc.Message);
                         }
                         finally
                         {

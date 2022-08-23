@@ -21,22 +21,8 @@ namespace RevitTimasBIMTools.CutOpening
                 return;
             }
 
-            BuiltInCategory bic = BuiltInCategory.OST_GenericModel;
-            IList<RevitElementModel> elements = new List<RevitElementModel>();
             IList<RevitDocumenModel> documents = RevitDocumentManager.GetDocumentCollection(doc);
-            FilteredElementCollector collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), bic);
-            foreach (FamilySymbol symbol in collector)
-            {
-                Family family = symbol.Family;
-                if (family.IsValidObject && family.IsEditable)
-                {
-                    if (family.FamilyPlacementType.Equals(FamilyPlacementType.OneLevelBasedHosted))
-                    {
-                        elements.Add(new RevitElementModel(symbol));
-                    }
-                }
-            }
-            OnCompleted(new BaseCompletedEventArgs(documents, elements));
+            OnCompleted(new BaseCompletedEventArgs(documents));
         }
 
 
@@ -56,11 +42,9 @@ namespace RevitTimasBIMTools.CutOpening
     public class BaseCompletedEventArgs : EventArgs
     {
         public IList<RevitDocumenModel> Documents { get; }
-        public IList<RevitElementModel> Elements { get; }
-        public BaseCompletedEventArgs(IList<RevitDocumenModel> documents, IList<RevitElementModel> elements)
+        public BaseCompletedEventArgs(IList<RevitDocumenModel> documents)
         {
             Documents = documents;
-            Elements = elements;
         }
     }
 }
