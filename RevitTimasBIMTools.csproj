@@ -194,14 +194,14 @@
     <Compile Include="RevitModel\ElementTypeData.cs" />
     <Compile Include="RevitModel\IRevitElementModel.cs" />
     <Compile Include="RevitModel\RevitHostConstruction.cs" />
-    <Compile Include="CutOpening\CutOpeningIntersectManager.cs" />
+    <Compile Include="CutOpening\CutOpeningCollisionDetection.cs" />
     <Compile Include="RevitUtils\ProjectLoctionManager.cs" />
     <Compile Include="RevitUtils\RevitViewManager.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
     <Compile Include="Services\ManifestFileManager.cs" />
     <Compile Include="CutOpening\CutOpeningRegisterDockablePane.cs" />
-    <Compile Include="CutOpening\CutOpeningBaseHandler.cs" />
+    <Compile Include="CutOpening\CutOpeningMainHandler.cs" />
     <Compile Include="CutOpening\CutOpeningShowPanelCmd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

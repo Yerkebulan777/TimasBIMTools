@@ -17,7 +17,6 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-
     
     <Grid Height="Auto" MinHeight="350" MaxHeight="750" Width="450" >
         <Grid.RowDefinitions>

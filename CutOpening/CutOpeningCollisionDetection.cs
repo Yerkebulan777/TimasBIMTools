@@ -14,7 +14,7 @@ using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.CutOpening
 {
-    internal sealed class CutOpeningIntersectManager : IDisposable
+    internal sealed class CutOpeningCollisionDetection : IDisposable
     {
         #region Static members
         private static Units units = null;

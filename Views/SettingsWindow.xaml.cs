@@ -16,12 +16,12 @@ namespace RevitTimasBIMTools.Views
 
         private ObservableCollection<Category> categories = null;
         private readonly SettingsViewModel settingsViewModel = ViewModelLocator.SettingsViewModel;
-        private readonly IExternalEventHandler settingsViewHandler = SmartToolController.Services.GetRequiredService<CutOpeningBaseHandler>();
+        private readonly IExternalEventHandler settingsViewHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
         public SettingsWindow()
         {
             InitializeComponent();
             DataContext = settingsViewModel;
-            if (settingsViewHandler is CutOpeningBaseHandler handler)
+            if (settingsViewHandler is CutOpeningMainHandler handler)
             {
                 handler.Completed += OnContextViewHandlerCompleted;
                 settingsViewModel.Categories = categories;
@@ -31,7 +31,11 @@ namespace RevitTimasBIMTools.Views
 
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs e)
         {
-            throw new NotImplementedException();
+            if (settingsViewHandler is CutOpeningSettingsHandler handler)
+            {
+
+            }
+
         }
 
 

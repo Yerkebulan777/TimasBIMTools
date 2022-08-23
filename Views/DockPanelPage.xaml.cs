@@ -19,23 +19,22 @@ namespace RevitTimasBIMTools.Views
     /// <summary> Логика взаимодействия для DockPanelPage.xaml </summary>
     public partial class DockPanelPage : Page, IDisposable, IDockablePaneProvider
     {
-        public bool canceled = false;
-        public ExternalEvent DataHandler;
-
+        public bool Canceled = false;
         private bool disposedValue = false;
+        public ExternalEvent ViewExternalEvent = null;
 
         private RevitDocumenModel revitDocumentModel;
         public static Document CurrentDocument = null;
         private IList<RevitDocumenModel> revitDocumentCollection = null;
         private readonly CutOpeningViewModel dataViewModel = ViewModelLocator.DataViewModel;
-        private readonly IExternalEventHandler openingViewHandler = SmartToolController.Services.GetRequiredService<CutOpeningBaseHandler>();
+        private readonly IExternalEventHandler mainViewHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
 
         public DockPanelPage()
         {
             InitializeComponent();
             DataContext = dataViewModel;
             dataViewModel.DockPanelView = this;
-            if (openingViewHandler is CutOpeningBaseHandler handler)
+            if (mainViewHandler is CutOpeningMainHandler handler)
             {
                 handler.Completed += OnContextViewHandlerCompleted;
             }
@@ -55,17 +54,17 @@ namespace RevitTimasBIMTools.Views
 
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs e)
         {
-            if (openingViewHandler is CutOpeningBaseHandler handler)
+            if (mainViewHandler is CutOpeningMainHandler handler)
             {
                 revitDocumentCollection = e.Documents;
                 revitDocumentModel = revitDocumentCollection.FirstOrDefault();
                 if (CurrentDocument == null && revitDocumentCollection.Count > 0)
                 {
+                    handler.Completed -= OnContextViewHandlerCompleted;
                     CurrentDocument = revitDocumentModel.Document;
                     dataViewModel.CurrentDocument = CurrentDocument;
                     ComboDocs.ItemsSource = revitDocumentCollection;
                     ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
-                    handler.Completed -= OnContextViewHandlerCompleted;
                 }
             }
         }
@@ -73,9 +72,9 @@ namespace RevitTimasBIMTools.Views
 
         public void UpdateContext()
         {
-            if (DataHandler != null)
+            if (ViewExternalEvent != null)
             {
-                _ = DataHandler.Raise();
+                ViewExternalEvent.Raise();
             }
         }
 
@@ -137,7 +136,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (sender is DataGridRow row && row.DataContext is RevitElementModel model)
             {
-                _ = RevitTask.RunAsync(app =>
+                System.Threading.Tasks.Task task = RevitTask.RunAsync(app =>
                 {
                     UIDocument uidoc = app.ActiveUIDocument;
                     CurrentDocument = uidoc.Document;
@@ -162,9 +161,9 @@ namespace RevitTimasBIMTools.Views
                     Content = null;
                     DataContext = null;
                     dataViewModel.Dispose();
-                    if (DataHandler != null)
+                    if (ViewExternalEvent != null)
                     {
-                        DataHandler.Dispose();
+                        ViewExternalEvent.Dispose();
                     }
                     // TODO: освободить управляемое состояние (управляемые объекты)
                 }

@@ -15,7 +15,7 @@ namespace RevitTimasBIMTools.CutOpening
     {
         private DockablePane dockpane = null;
         private readonly DockablePaneId dockpid = SmartToolController.DockPaneId;
-        private IExternalEventHandler externalHandler = SmartToolController.Services.GetRequiredService<CutOpeningBaseHandler>();
+        private IExternalEventHandler externalHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
         private readonly IDockablePaneProvider provider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
@@ -45,11 +45,11 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                     else
                     {
-                        if (externalHandler is CutOpeningBaseHandler handler)
+                        if (externalHandler is CutOpeningMainHandler handler)
                         {
                             try
                             {
-                                view.DataHandler = ExternalEvent.Create(handler);
+                                view.ViewExternalEvent = ExternalEvent.Create(handler);
                                 view.UpdateContext();
                                 dockpane.Show();
                             }

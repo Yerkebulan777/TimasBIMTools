@@ -28,7 +28,7 @@ namespace RevitTimasBIMTools.Core
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddScoped<CutOpeningBaseHandler>();
+            services.AddScoped<CutOpeningMainHandler>();
             services.AddScoped<CutOpeningSettingsHandler>();
 
             services.AddSingleton<SettingsViewModel>();
@@ -38,7 +38,7 @@ namespace RevitTimasBIMTools.Core
 
             services.AddTransient<IDockablePaneProvider, DockPanelPage>();
             services.AddTransient<CutOpeningViewModel>();
-            services.AddTransient<CutOpeningIntersectManager>();
+            services.AddTransient<CutOpeningCollisionDetection>();
 
             return services.BuildServiceProvider();
         }
