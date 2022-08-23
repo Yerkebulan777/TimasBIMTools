@@ -25,18 +25,25 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         private ObservableCollection<Category> catList = new ObservableCollection<Category>();
-        public ObservableCollection<Category> Categories
+        public ObservableCollection<Category> RevitCategories
         {
             get => catList;
-            set => SetProperty(ref catList, value);
+            set
+            {
+                if (value != null)
+                {
+                    SetProperty(ref catList, value);
+                    RevitLogger.Info($"{catList.Count}");
+                }
+            }
         }
 
 
-        private ObservableCollection<FamilySymbol> simbolList = new ObservableCollection<FamilySymbol>();
-        public ObservableCollection<FamilySymbol> SimbolList
+        private ObservableCollection<FamilySymbol> simbols = new ObservableCollection<FamilySymbol>();
+        public ObservableCollection<FamilySymbol> RevitFamilySimbols
         {
-            get => simbolList;
-            set => SetProperty(ref simbolList, value);
+            get => simbols;
+            set => SetProperty(ref simbols, value);
         }
 
         #endregion
@@ -158,7 +165,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         Properties.Settings.Default.RectangOpeningSimbolIdInt = model.IdInt;
                         Properties.Settings.Default.Save();
-                        Logger.Info(model.SymbolName);
+                        RevitLogger.Info(model.SymbolName);
                     }
                 }
             }
@@ -179,7 +186,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         Properties.Settings.Default.RoundOpeningSimbolIdInt = model.IdInt;
                         Properties.Settings.Default.Save();
-                        Logger.Info(model.SymbolName);
+                        RevitLogger.Info(model.SymbolName);
                     }
                 }
             }

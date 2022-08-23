@@ -35,7 +35,7 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             else
             {
-                Logger.Error(exc.Message);
+                RevitLogger.Error(exc.Message);
             }
             smartThreadPool.Shutdown();
         }

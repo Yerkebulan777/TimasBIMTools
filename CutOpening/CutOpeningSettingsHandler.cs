@@ -10,6 +10,7 @@ namespace RevitTimasBIMTools.CutOpening
     internal class CutOpeningSettingsHandler : IExternalEventHandler
     {
         public event EventHandler<SettingsCompletedEventArgs> Completed;
+
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
             BuiltInCategory.OST_Conduit,

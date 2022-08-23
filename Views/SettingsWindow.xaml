@@ -4,7 +4,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
-    xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels" 
+    xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels" 
+    d:DataContext="{d:DesignInstance Type=viewmodels:SettingsViewModel}"
     mc:Ignorable="d" Height="Auto" MinHeight="350" MaxHeight="750" Width="450"
     x:Class="RevitTimasBIMTools.Views.SettingsWindow"
     Title="Cut opening setting" 
@@ -26,8 +27,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DockPanel x:Name="ElementSizeSettings" Grid.Row="1" Height="250" VerticalAlignment="Center" Background="White"
-                   Visibility="{Binding AdvancedSettingsVisibility, Converter={StaticResource BoolToViz}, FallbackValue=Hidden}">
+        <DockPanel x:Name="ElementSizeSettings" Grid.Row="1" Height="250" VerticalAlignment="Center" Background="White" >
+            <!--Visibility="{Binding AdvancedSettingsVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToViz}, FallbackValue=Hidden}"-->
             <GroupBox Header=" Element size " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
@@ -113,8 +114,8 @@
                 </StackPanel>
             </GroupBox>
         </DockPanel>
-        <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Background="White"
-                   Visibility="{Binding AdvancedSettingsVisibility, Converter={StaticResource BoolToViz}, FallbackValue=Hidden}">
+        <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Background="White">
+            <!--Visibility="{Binding AdvancedSettingsVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToViz}, FallbackValue=Hidden}"-->
             <GroupBox Header=" Opening settings " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
@@ -169,8 +170,9 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text=" Сommunication сategory " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                        <ComboBox x:Name="ComboSection" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" 
-                                      SelectedItem="{Binding RectangSimbolModel, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
+                        <ComboBox x:Name="ComboCats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" 
+                                  ItemsSource="{Binding Path=RevitCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  DisplayMemberPath="Name"/>
                     </Grid>
                 </Border>
             </DockPanel>
@@ -185,7 +187,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Rectangular opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                                 <ComboBox x:Name="ComboRectangSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0"
-                                          SelectedItem="{Binding RectangSimbolModel, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
+                                          ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
                         </Border>
                         <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5" >
@@ -196,7 +198,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Round opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                                 <ComboBox x:Name="ComboRoundSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0"
-                                          SelectedItem="{Binding RoundSimbolModel, Mode=OneTime, UpdateSourceTrigger=Explicit}" />
+                                          ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                             </Grid>
                         </Border>
                     </StackPanel>

@@ -46,7 +46,7 @@ namespace RevitTimasBIMTools.Core
         [STAThread]
         public Result OnStartup(UIControlledApplication cntrapp)
         {
-            Logger.InitMainLogger(typeof(SmartToolController));
+            RevitLogger.InitMainLogger(typeof(SmartToolController));
             SmartToolSetupUIPanel uiface = new SmartToolSetupUIPanel();
             RevitTask.Initialize(cntrapp);
             uiface.Initialize(cntrapp);

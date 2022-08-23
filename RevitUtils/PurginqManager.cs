@@ -22,7 +22,7 @@ namespace RevitTimasBIMTools.RevitUtils
                      .OfClass(typeof(ElementType)).Cast<ElementType>()
                      .Where(q => q.Category != null && categoriesToPurge.Contains(q.Category.Id.IntegerValue)))
             {
-                // if there are no simbolList with this type, add it to the list for deletion
+                // if there are no simbols with this type, add it to the list for deletion
                 if (new FilteredElementCollector(doc).WhereElementIsNotElementType()
                     .Where(q => q.GetTypeId() == et.Id).Count() == 0)
                 {

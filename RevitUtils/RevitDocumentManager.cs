@@ -31,7 +31,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                     catch (System.Exception exc)
                     {
-                        Logger.Error("linkInstance: " + exc.Message);
+                        RevitLogger.Error("linkInstance: " + exc.Message);
                     }
                 }
             }

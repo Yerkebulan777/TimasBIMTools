@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
-
+using System;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -15,7 +15,8 @@ namespace RevitTimasBIMTools.CutOpening
     {
         private DockablePane dockpane = null;
         private readonly DockablePaneId dockpid = SmartToolController.DockPaneId;
-        private IExternalEventHandler externalHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
+        private readonly CutOpeningMainHandler dockpaneHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
+        private readonly CutOpeningSettingsHandler settingsHandler = SmartToolController.Services.GetRequiredService<CutOpeningSettingsHandler>();
         private readonly IDockablePaneProvider provider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
@@ -23,40 +24,42 @@ namespace RevitTimasBIMTools.CutOpening
             return Execute(commandData.Application, ref message);
         }
 
+        [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
-            if (DockablePane.PaneIsRegistered(dockpid))
+            ExternalEvent dockpaneExtEvent = ExternalEvent.Create(dockpaneHandler);
+            ExternalEvent settingsExtEvent = ExternalEvent.Create(settingsHandler);
+
+            if (dockpid != null && DockablePane.PaneIsRegistered(dockpid))
             {
                 dockpane = dockpane ?? uiapp.GetDockablePane(dockpid);
-                if (dockpane != null && provider is DockPanelPage view)
+                if (dockpane != null && provider is DockPanelPage viewpane)
                 {
                     if (dockpane.IsShown())
                     {
                         try
                         {
-                            view?.Dispose();
                             dockpane.Hide();
                             dockpane.Dispose();
+                            viewpane.Dispose();
+                            dockpaneExtEvent?.Dispose();
                         }
                         catch (System.Exception exc)
                         {
-                            Logger.Error("Show panel error:\t" + exc.Message);
+                            RevitLogger.Error("Show panel error:\t" + exc.Message);
                         }
                     }
                     else
                     {
-                        if (externalHandler is CutOpeningMainHandler handler)
+                        try
                         {
-                            try
-                            {
-                                view.ViewExternalEvent = ExternalEvent.Create(handler);
-                                view.UpdateContext();
-                                dockpane.Show();
-                            }
-                            catch (System.Exception exc)
-                            {
-                                Logger.Error("Show panel error:\t" + exc.Message);
-                            }
+                            dockpaneExtEvent?.Raise();
+                            settingsExtEvent?.Raise();
+                            dockpane.Show();
+                        }
+                        catch (System.Exception exc)
+                        {
+                            RevitLogger.Error("Show panel error:\t" + exc.Message);
                         }
                     }
                 }
@@ -68,12 +71,9 @@ namespace RevitTimasBIMTools.CutOpening
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
         {
             UIDocument uidoc = uiapp.ActiveUIDocument;
-            if (uidoc != null)
-            {
-                return !uidoc.Document.IsFamilyDocument;
-            }
-            return false;
+            return uidoc != null && !uidoc.Document.IsFamilyDocument;
         }
+
 
         public static string GetPath()
         {

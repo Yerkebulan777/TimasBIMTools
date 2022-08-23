@@ -41,7 +41,7 @@ namespace RevitTimasBIMTools.RevitUtils
             prompt += "\n\t\t" + "Longitude: " + site.Longitude / angleRatio + degreeSymbol;
             prompt += "\n\t\t" + "TimeZone: " + site.TimeZone;
 
-            Logger.Info(prompt);
+            RevitLogger.Info(prompt);
         }
 
 
@@ -80,7 +80,7 @@ namespace RevitTimasBIMTools.RevitUtils
                         ICollection<Autodesk.Revit.DB.ElementId> elemSet = document.Delete(projectLocation.Id);
                         if (elemSet.Count > 0)
                         {
-                            Logger.Info("Project Location Deleted!");
+                            RevitLogger.Info("Project Location Deleted!");
                         }
                     }
                 }

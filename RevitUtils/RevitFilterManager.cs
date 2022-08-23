@@ -210,7 +210,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(exc.Message);
+                    RevitLogger.Error(exc.Message);
                 }
             }
 

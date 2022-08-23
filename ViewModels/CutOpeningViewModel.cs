@@ -170,7 +170,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (CancelToken.IsCancellationRequested)
                     {
-                        Task.Delay(1000).ContinueWith((action) => Logger.Warning("Task cansceled"));
+                        Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
                     }
                 }
                 finally
@@ -218,7 +218,7 @@ namespace RevitTimasBIMTools.ViewModels
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(exc.Message);
+                    RevitLogger.Error(exc.Message);
                 }
             }
         }
@@ -238,7 +238,7 @@ namespace RevitTimasBIMTools.ViewModels
                 CurrentDocument = app.ActiveUIDocument.Document;
                 manager.InitializeActiveDocument(CurrentDocument);
                 collection = manager.GetCollisionCommunicateElements();
-                Logger.Info($"Found collision {collection.Count()}");
+                RevitLogger.Info($"Found collision {collection.Count()}");
                 ActivateFamilySimbol(rectangOpeningId);
                 ActivateFamilySimbol(roundOpeningId);
                 return collection.ToObservableCollection();
@@ -297,7 +297,7 @@ namespace RevitTimasBIMTools.ViewModels
                                 {
                                     UIDocument uidoc = app.ActiveUIDocument;
                                     CurrentDocument = uidoc.Document;
-                                    Logger.Info("continue");
+                                    RevitLogger.Info("continue");
                                 });
                                 collection.Remove(model);
                                 break;

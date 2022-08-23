@@ -36,7 +36,7 @@ namespace RevitTimasBIMTools.RevitCommads
 
             uidoc.Selection.SetElementIds(selSet.Select(q => q.Id).ToList());
 
-            TaskDialog.Show("Select Intersecting", selSet.Count + " intersecting simbolList found");
+            TaskDialog.Show("Select Intersecting", selSet.Count + " intersecting simbols found");
 
             uidoc.RefreshActiveView();
 

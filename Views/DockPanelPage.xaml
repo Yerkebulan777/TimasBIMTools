@@ -15,60 +15,60 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
-    <Border BorderThickness="2.5" BorderBrush="Gray">
-        <Grid>
+    <Border BorderThickness="2.5" BorderBrush="Gray" d:IsLocked="True">
+        <Grid x:Name="PageMainGrid" d:IsLocked="True">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
-            <DockPanel Grid.Row="0" Height="50" Background="White">
-                <Label Name="ActiveDocTitle" TextElement.FontSize="15" Margin="10">
+            <DockPanel Grid.Row="0" Height="50" Background="White" d:IsLocked="True">
+                <Label Name="ActiveDocTitle" TextElement.FontSize="15" Margin="10" d:IsLocked="True">
                     <Label.BitmapEffect>
                         <DropShadowBitmapEffect/>
                     </Label.BitmapEffect>
                 </Label>
             </DockPanel>
-            <ScrollViewer Grid.Row="1">
-                <StackPanel Background="WhiteSmoke">
-                    <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13"/>
-                    <Grid  Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="Auto" MinWidth="500" MaxWidth="1000" >
+            <ScrollViewer Grid.Row="1" d:IsLocked="True">
+                <StackPanel Background="WhiteSmoke" d:IsLocked="True">
+                    <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13" d:IsLocked="True"/>
+                    <Grid  Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="Auto" MinWidth="500" MaxWidth="1000" d:IsLocked="True" >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <ComboBox Name="ComboDocs" Grid.Column="0" Margin="25,5" DisplayMemberPath="Title" />
+                        <ComboBox Name="ComboDocs" Grid.Column="0" Margin="25,5" DisplayMemberPath="Title" d:IsLocked="True" />
                         <Button Name="SettingsCmd" Grid.Column="1" Content="Settings" Height="30" Width="75" Margin="25,0" 
-                                Click="SettingsCmd_Click" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                Click="SettingsCmd_Click" VerticalAlignment="Center" HorizontalAlignment="Right" d:IsLocked="True"/>
                     </Grid>
-                    <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
-                    <Grid Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="Auto" MinWidth="500" MaxWidth="1000" >
+                    <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13" d:IsLocked="True"/>
+                    <Grid Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="Auto" MinWidth="500" MaxWidth="1000" d:IsLocked="True" >
                         <CheckBox IsThreeState="True" Name="CheckSelectAll" Content="Select" 
                                   HorizontalAlignment="Left" VerticalAlignment="Center" Margin="25,0"
                                   IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                   Command="{Binding SelectAllCommand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  CommandParameter="{Binding ElementName=CheckSelectAll,  Path=IsChecked, UpdateSourceTrigger=Explicit}"/>
+                                  CommandParameter="{Binding ElementName=CheckSelectAll,  Path=IsChecked, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
                         <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" Height="20" Margin="125,0" 
-                                 IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}" />
+                                 IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}" d:IsLocked="True" />
                         <Button Name="SetFilter" Content="Search" Height="20" Width="75" Margin="25,0" HorizontalAlignment="Right"
                             IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                             Command="{Binding SetFilterCommand, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}"
-                            CommandParameter="{Binding IsEnabled, ElementName=SetFilter, UpdateSourceTrigger=Explicit}" />
+                            CommandParameter="{Binding IsEnabled, ElementName=SetFilter, UpdateSourceTrigger=Explicit}" d:IsLocked="True" />
                     </Grid>
                 </StackPanel>
             </ScrollViewer>
-            <ScrollViewer Grid.Row="2">
+            <ScrollViewer Grid.Row="2" d:IsLocked="True">
                 <DataGrid Name="dataGridView" Width="Auto" MinWidth="500" MaxWidth="1000"
                           SelectedItem="{Binding Path=SelectedModel, UpdateSourceTrigger=PropertyChanged}" 
-                          ItemsSource="{Binding ItemCollectionView, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                          ItemsSource="{Binding ItemCollectionView, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True" >
                     <DataGrid.RowStyle>
                         <Style TargetType="{x:Type DataGridRow}">
                             <EventSetter Event="MouseDoubleClick" Handler="DataGrid_MouseDoubleClick"/>
                         </Style>
                     </DataGrid.RowStyle>
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Width="50" Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}">
+                        <DataGridTemplateColumn Width="50" Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}" d:IsLocked="True">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <CheckBox IsChecked="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -77,28 +77,28 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Width="150" Header="Symbol Name" Binding="{Binding SymbolName}">
+                        <DataGridTextColumn Width="150" Header="Symbol Name" Binding="{Binding SymbolName}" d:IsLocked="True">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="150" Header="Family Name" Binding="{Binding FamilyName}">
+                        <DataGridTextColumn Width="150" Header="Family Name" Binding="{Binding FamilyName}" d:IsLocked="True">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="150" Header="Description" Binding="{Binding Description}">
+                        <DataGridTextColumn Width="150" Header="Description" Binding="{Binding Description}" d:IsLocked="True">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="100" Header="Category" Binding="{Binding CategoryName}">
+                        <DataGridTextColumn Width="100" Header="Category" Binding="{Binding CategoryName}" d:IsLocked="True">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
@@ -108,15 +108,15 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </ScrollViewer>
-            <StackPanel  Grid.Row="3" Margin="5" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <StackPanel  Grid.Row="3" Margin="5" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" d:IsLocked="True">
                 <Button Name="UpdateCmd" Content="Snoop" Margin="5" Height="25" Width="90" 
-                        Command="{Binding SnoopCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
+                        Command="{Binding SnoopCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
                 <Button Name="ApplyCmd" Content="Apply" Margin="5" Height="25" Width="90" 
                         IsEnabled="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                         Command="{Binding ApplyCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
-                        CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}"/>
+                        CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}" d:IsLocked="True"/>
                 <Button Name="CancelCmd" Content="Close" Margin="5" Height="25" Width="90"
-                        Command="{Binding CancelCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
+                        Command="{Binding CancelCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
             </StackPanel>
         </Grid>
     </Border>
