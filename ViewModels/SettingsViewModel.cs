@@ -1,18 +1,24 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Revit.Async;
+using Revit.Async.ExternalEvents;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.ObjectModel;
-
+using System.IO;
 
 namespace RevitTimasBIMTools.ViewModels
 {
     public class SettingsViewModel : ObservableObject, IDisposable
     {
+        private Document document { get; set; }
+
         public SettingsViewModel()
         {
         }
+
 
         #region Collections
 
@@ -197,6 +203,11 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
+        private string RaiseExternalEvent()
+        {
+            return RevitTask.RaiseGlobal<TestExternalEventHandler, Document, string>(document).Result;
+        }
+
         private static int NormilizeIntValue(int value, int maxVal = 100, int minVal = 0)
         {
             if (value > maxVal)
@@ -216,10 +227,30 @@ namespace RevitTimasBIMTools.ViewModels
         //StringFormat={}{0:n5}
 
 
-
         public void Dispose()
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class TestExternalEventHandler : SyncGenericExternalEventHandler<Document, string>
+    {
+        public override object Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string GetName()
+        {
+            return "TestExternalEventHandler";
+        }
+
+        protected override string Handle(UIApplication app, Document parameter)
+        {
+            //write sync logic here
+            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            string path = Path.Combine(desktop, $"{parameter.Title}");
+            return path;
         }
     }
 }
