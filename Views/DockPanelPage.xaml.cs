@@ -55,7 +55,7 @@ namespace RevitTimasBIMTools.Views
             Loaded -= OnLoadedDockPanelPage;
             dataViewModel.DockPanelView = this;
             ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
-            if (cashExternalHandler is CutOpeningCashHandler cashHandler)
+            if (cashExternalHandler is CutOpeningBaseHandler cashHandler)
             {
                 cashHandler.Completed += OnContextSettingCompleted;
                 dataViewModel.CurrentDocument = CurrentDocument;
@@ -74,7 +74,7 @@ namespace RevitTimasBIMTools.Views
 
         private void OnContextSettingCompleted(object sender, DataGroupCompletedEventArgs e)
         {
-            if (cashExternalHandler is CutOpeningCashHandler cashHandler)
+            if (cashExternalHandler is CutOpeningBaseHandler cashHandler)
             {
                 cashHandler.Completed -= OnContextSettingCompleted;
                 revitDocumentCollection = e.Documents;

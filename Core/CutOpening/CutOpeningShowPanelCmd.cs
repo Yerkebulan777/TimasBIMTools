@@ -45,7 +45,7 @@ namespace RevitTimasBIMTools.Core
                     }
                     else
                     {
-                        if (cashExternalHandler is CutOpeningCashHandler cashHandler)
+                        if (cashExternalHandler is CutOpeningBaseHandler cashHandler)
                         {
                             try
                             {

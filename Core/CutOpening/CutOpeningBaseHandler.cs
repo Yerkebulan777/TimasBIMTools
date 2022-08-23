@@ -7,7 +7,7 @@ using RevitTimasBIMTools.RevitUtils;
 
 namespace RevitTimasBIMTools.Core
 {
-    public sealed class CutOpeningCashHandler : IExternalEventHandler
+    public sealed class CutOpeningBaseHandler : IExternalEventHandler
     {
         public event EventHandler<DataGroupCompletedEventArgs> Completed;
         public void Execute(UIApplication uiapp)
@@ -45,7 +45,7 @@ namespace RevitTimasBIMTools.Core
 
         public string GetName()
         {
-            return nameof(CutOpeningCashHandler);
+            return nameof(CutOpeningBaseHandler);
         }
     }
 

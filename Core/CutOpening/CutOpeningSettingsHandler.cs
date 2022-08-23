@@ -8,5 +8,6 @@ namespace RevitTimasBIMTools.Core
 {
     internal class CutOpeningSettingsHandler
     {
+
     }
 }

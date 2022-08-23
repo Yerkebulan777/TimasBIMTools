@@ -33,7 +33,7 @@ namespace RevitTimasBIMTools.Core
             services.AddSingleton<SmartToolGeneralHelper>();
             services.AddSingleton<CutOpeningRegisterDockablePane>();
 
-            services.AddScoped<IExternalEventHandler, CutOpeningCashHandler>();
+            services.AddScoped<IExternalEventHandler, CutOpeningBaseHandler>();
 
             services.AddTransient<IDockablePaneProvider, DockPanelPage>();
             services.AddTransient<CutOpeningViewModel>();
