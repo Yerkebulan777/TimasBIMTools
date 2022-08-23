@@ -16,6 +16,7 @@ namespace RevitTimasBIMTools.Views
         private Element element { get; set; } = null;
         private readonly SettingsViewModel settingsViewModel = ViewModelLocator.SettingsViewModel;
         private readonly CutOpeningSettingsHandler settingsHandler = SmartToolController.Services.GetRequiredService<CutOpeningSettingsHandler>();
+
         public SettingsWindow()
         {
             InitializeComponent();
@@ -23,12 +24,14 @@ namespace RevitTimasBIMTools.Views
             Loaded += SettingsWindow_Loaded;
             settingsHandler.Completed += OnContextViewHandlerCompleted;
         }
-                
+
+
         private void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
         {
 
         }
         
+
         private void OnContextViewHandlerCompleted(object sender, SettingsCompletedEventArgs e)
         {
             settingsViewModel.RevitCategories = new ObservableCollection<Category>(e.Categories);
