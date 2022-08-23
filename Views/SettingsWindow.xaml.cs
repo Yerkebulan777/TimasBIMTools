@@ -23,31 +23,18 @@ namespace RevitTimasBIMTools.Views
             Loaded += SettingsWindow_Loaded;
             settingsHandler.Completed += OnContextViewHandlerCompleted;
         }
-                settingsViewModel.Categories = categories;
+                
         private void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+
         }
-            
-        }
-            if (settingsViewHandler is CutOpeningSettingsHandler handler)
+        
         private void OnContextViewHandlerCompleted(object sender, SettingsCompletedEventArgs e)
         {
             settingsViewModel.RevitCategories = new ObservableCollection<Category>(e.Categories);
             settingsViewModel.RevitFamilySimbols = new ObservableCollection<FamilySymbol>(e.Symbols);
             //Task.Delay(100).ContinueWith(task => RevitLogger.Info($"Categories = {e.Categories.Count}"));
         }
-
-            }
-            if (settingsViewHandler is CutOpeningSettingsHandler handler)
-        }
-
-            }
-            if (settingsViewHandler is CutOpeningSettingsHandler handler)
-        }
-
-            }
-
-        }
-
 
 
         private void CloseSettingCmd_Click(object sender, RoutedEventArgs e)
