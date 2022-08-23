@@ -72,7 +72,7 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void OnContextSettingCompleted(object sender, DataGroupCompletedEventArgs e)
+        private void OnContextSettingCompleted(object sender, BaseCompletedEventArgs e)
         {
             if (cashExternalHandler is CutOpeningBaseHandler cashHandler)
             {

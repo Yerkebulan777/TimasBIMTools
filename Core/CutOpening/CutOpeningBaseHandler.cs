@@ -5,11 +5,12 @@ using Autodesk.Revit.UI;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 
+
 namespace RevitTimasBIMTools.Core
 {
     public sealed class CutOpeningBaseHandler : IExternalEventHandler
     {
-        public event EventHandler<DataGroupCompletedEventArgs> Completed;
+        public event EventHandler<BaseCompletedEventArgs> Completed;
         public void Execute(UIApplication uiapp)
         {
             UIDocument uidoc = uiapp.ActiveUIDocument;
@@ -35,13 +36,15 @@ namespace RevitTimasBIMTools.Core
                     }
                 }
             }
-            OnCompleted(new DataGroupCompletedEventArgs(documents, elements));
+            OnCompleted(new BaseCompletedEventArgs(documents, elements));
         }
 
-        private void OnCompleted(DataGroupCompletedEventArgs e)
+
+        private void OnCompleted(BaseCompletedEventArgs e)
         {
             Completed?.Invoke(this, e);
         }
+
 
         public string GetName()
         {
@@ -49,11 +52,12 @@ namespace RevitTimasBIMTools.Core
         }
     }
 
-    public class DataGroupCompletedEventArgs : EventArgs
+
+    public class BaseCompletedEventArgs : EventArgs
     {
         public IList<RevitDocumenModel> Documents { get; }
         public IList<RevitElementModel> Elements { get; }
-        public DataGroupCompletedEventArgs(IList<RevitDocumenModel> documents, IList<RevitElementModel> elements)
+        public BaseCompletedEventArgs(IList<RevitDocumenModel> documents, IList<RevitElementModel> elements)
         {
             Documents = documents;
             Elements = elements;
