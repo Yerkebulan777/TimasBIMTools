@@ -61,7 +61,6 @@ namespace RevitTimasBIMTools.Core
 
     }
 
-
     public class SettingsCompletedEventArgs : EventArgs
     {
         public IList<Category> Categories { get; }
