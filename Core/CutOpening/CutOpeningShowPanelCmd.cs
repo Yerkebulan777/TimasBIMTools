@@ -10,7 +10,7 @@ namespace RevitTimasBIMTools.Core
 {
     [Transaction(TransactionMode.ReadOnly)]
     [Regeneration(RegenerationOption.Manual)]
-    internal sealed class CutVoidShowPanelCmd : IExternalCommand, IExternalCommandAvailability
+    internal sealed class CutOpeningShowPanelCmd : IExternalCommand, IExternalCommandAvailability
     {
         private DockablePane dockpane = null;
         private IExternalEventHandler cashExternalHandler = null;
@@ -45,7 +45,7 @@ namespace RevitTimasBIMTools.Core
                     }
                     else
                     {
-                        if (cashExternalHandler is CutVoidBaseCashHandler cashHandler)
+                        if (cashExternalHandler is CutOpeningCashHandler cashHandler)
                         {
                             try
                             {
@@ -77,7 +77,7 @@ namespace RevitTimasBIMTools.Core
 
         public static string GetPath()
         {
-            return typeof(CutVoidShowPanelCmd).FullName;
+            return typeof(CutOpeningShowPanelCmd).FullName;
         }
     }
 }

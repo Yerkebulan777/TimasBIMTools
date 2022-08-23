@@ -5,7 +5,7 @@ using System.Windows;
 
 namespace RevitTimasBIMTools.Core
 {
-    internal sealed class CutVoidRegisterDockablePane
+    internal sealed class CutOpeningRegisterDockablePane
     {
         public void RegisterDockablePane(UIControlledApplication uicontrol, IDockablePaneProvider view, DockablePaneId paneId)
         {

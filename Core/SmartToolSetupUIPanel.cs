@@ -8,7 +8,7 @@ namespace RevitTimasBIMTools.Core
     {
         public readonly string AppDirectory = $@"{commonAppData}\Autodesk\Revit\Addins\2019\RevitTimasBIMTools";
         private static readonly string commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-        private readonly string voidPanePath = CutVoidShowPanelCmd.GetPath();
+        private readonly string voidPanePath = CutOpeningShowPanelCmd.GetPath();
         private const string buttomText = SmartToolGeneralHelper.CutVoidToolName;
         private const string ribbonPanelName = "Automation";
         private const string buttomName = "BtnVoidManager";

@@ -20,7 +20,7 @@ namespace RevitTimasBIMTools.Core
         private UIControlledApplication controller = null;
         public static IServiceProvider Services = CreateServiceProvider();
         public static readonly DockablePaneId DockPaneId = new DockablePaneId(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
-        private readonly CutVoidRegisterDockablePane dockManager = Services.GetRequiredService<CutVoidRegisterDockablePane>();
+        private readonly CutOpeningRegisterDockablePane dockManager = Services.GetRequiredService<CutOpeningRegisterDockablePane>();
         private readonly IDockablePaneProvider provider = Services.GetRequiredService<IDockablePaneProvider>();
 
         [STAThread]
@@ -31,9 +31,9 @@ namespace RevitTimasBIMTools.Core
             services.AddSingleton<SettingsViewModel>();
             services.AddSingleton<IRevitTask, RevitTask>();
             services.AddSingleton<SmartToolGeneralHelper>();
-            services.AddSingleton<CutVoidRegisterDockablePane>();
+            services.AddSingleton<CutOpeningRegisterDockablePane>();
 
-            services.AddScoped<IExternalEventHandler, CutVoidBaseCashHandler>();
+            services.AddScoped<IExternalEventHandler, CutOpeningCashHandler>();
 
             services.AddTransient<IDockablePaneProvider, DockPanelPage>();
             services.AddTransient<CutOpeningViewModel>();

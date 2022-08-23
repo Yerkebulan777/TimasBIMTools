@@ -185,6 +185,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\CutOpening\CutOpeningSettingsHandler.cs" />
     <Compile Include="Core\SmartToolController.cs" />
     <Compile Include="RevitUtils\CutOpeningManager.cs" />
     <Compile Include="RevitUtils\ElementDataDictionary.cs" />
@@ -199,9 +200,9 @@
     <Compile Include="Services\LogManager.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
     <Compile Include="Services\ManifestFileManager.cs" />
-    <Compile Include="Core\CutVoidRegisterDockablePane.cs" />
-    <Compile Include="Core\CutVoidBaseCashHandler.cs" />
-    <Compile Include="Core\CutVoidShowPanelCmd.cs" />
+    <Compile Include="Core\CutOpening\CutOpeningRegisterDockablePane.cs" />
+    <Compile Include="Core\CutOpening\CutOpeningCashHandler.cs" />
+    <Compile Include="Core\CutOpening\CutOpeningShowPanelCmd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
