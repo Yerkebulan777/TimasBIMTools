@@ -201,7 +201,7 @@
     <Compile Include="RevitUtils\UnitManager.cs" />
     <Compile Include="Services\ManifestFileManager.cs" />
     <Compile Include="Core\CutOpening\CutOpeningRegisterDockablePane.cs" />
-    <Compile Include="Core\CutOpening\CutOpeningCashHandler.cs" />
+    <Compile Include="Core\CutOpening\CutOpeningBaseHandler.cs" />
     <Compile Include="Core\CutOpening\CutOpeningShowPanelCmd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -238,6 +238,7 @@
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Services\ThreadService.cs" />
     <Compile Include="Services\Timer.cs" />
+    <Compile Include="Temp\Converter.cs" />
     <Compile Include="ViewConverters\BitmapSourceConverter.cs" />
     <Compile Include="ViewConverters\BitmapToImageSourceConverter.cs" />
     <Compile Include="ViewConverters\ComponentOptionConverter.cs" />
