@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Visual;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
@@ -7,7 +8,9 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RevitTimasBIMTools.ViewModels
@@ -17,7 +20,6 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
             BuiltInCategory.OST_Conduit,
-            BuiltInCategory.OST_Furniture,
             BuiltInCategory.OST_CableTray,
             BuiltInCategory.OST_PipeCurves,
             BuiltInCategory.OST_DuctCurves,
@@ -230,7 +232,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 Document doc = app.ActiveUIDocument.Document;
                 IList<Category> output = GetCategories(doc, builtInCats);
-                return new ObservableCollection<Category>(output);
+                return new ObservableCollection<Category>(output.OrderBy(i => i.Name).ToList());
             });
         }
 
@@ -255,7 +257,7 @@ namespace RevitTimasBIMTools.ViewModels
                         }
                     }
                 }
-                return new ObservableCollection<FamilySymbol>(output);
+                return new ObservableCollection<FamilySymbol>(output.OrderBy(i => i.Name).ToList());
             });
         }
 
