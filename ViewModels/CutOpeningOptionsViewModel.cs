@@ -8,15 +8,21 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Configuration;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 
+
+
 namespace RevitTimasBIMTools.ViewModels
 {
     public class CutOpeningOptionsViewModel : ObservableObject, IDisposable
     {
+
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
             BuiltInCategory.OST_Conduit,
@@ -26,6 +32,8 @@ namespace RevitTimasBIMTools.ViewModels
             BuiltInCategory.OST_GenericModel,
             BuiltInCategory.OST_MechanicalEquipment
         };
+
+
 
         public CutOpeningOptionsViewModel()
         {
@@ -102,6 +110,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     minElementHight = NormilizeIntValue(value, 100, 0);
                     OnPropertyChanged(nameof(MinElementHight));
+
                 }
             }
         }
@@ -158,7 +167,11 @@ namespace RevitTimasBIMTools.ViewModels
         public int CutOffset
         {
             get => cutOffset;
-            set => SetProperty(ref cutOffset, value);
+            set
+            {
+                SetProperty(ref cutOffset, value);
+                Properties.Settings.Default.CutOffsetInMm = cutOffset;
+            }
         }
 
 
@@ -174,41 +187,35 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region FamilySimbol Property
 
-        private RevitElementModel rectangSymbolModel = null;
-        public RevitElementModel RectangSimbolModel
+        private FamilySymbol rectangSymbolModel = null;
+        public FamilySymbol RectangSimbolModel
         {
             get => rectangSymbolModel;
             set
             {
                 if (value != null)
                 {
-                    _ = SetProperty(ref rectangSymbolModel, value);
-                    if (rectangSymbolModel is RevitElementModel model)
+                    SetProperty(ref rectangSymbolModel, value);
+                    if (rectangSymbolModel is FamilySymbol fam)
                     {
-                        Properties.Settings.Default.RectangOpeningSimbolIdInt = model.IdInt;
-                        Properties.Settings.Default.Save();
-                        RevitLogger.Info(model.SymbolName);
+                        Properties.Settings.Default.RectanOpeningSimbolIdInt = fam.Id.IntegerValue;
                     }
                 }
             }
         }
 
-        private RevitElementModel roundSymbolModel = null;
-
-
-        public RevitElementModel RoundSimbolModel
+        private FamilySymbol roundSymbolModel = null;
+        public FamilySymbol RoundSimbolModel
         {
             get => roundSymbolModel;
             set
             {
                 if (value != null)
                 {
-                    _ = SetProperty(ref roundSymbolModel, value);
-                    if (roundSymbolModel is RevitElementModel model)
+                    SetProperty(ref roundSymbolModel, value);
+                    if (roundSymbolModel is FamilySymbol fam)
                     {
-                        Properties.Settings.Default.RoundOpeningSimbolIdInt = model.IdInt;
-                        Properties.Settings.Default.Save();
-                        RevitLogger.Info(model.SymbolName);
+                        Properties.Settings.Default.RoundOpeningSimbolIdInt = fam.Id.IntegerValue;
                     }
                 }
             }
@@ -221,8 +228,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         public void RaiseExternalEvent()
         {
-            var task01 = GetTargetCategories();
-            var task02 = GetOpeningFamilySymbols();
+            _ = GetTargetCategories();
+            _ = GetOpeningFamilySymbols();
         }
 
         private async Task GetTargetCategories()

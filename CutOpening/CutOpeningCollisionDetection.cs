@@ -22,7 +22,7 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly Options options = GetGeometryOptions();
         private static readonly char[] delimiters = new[] { ' ', '_', '-' };
         private static readonly ParameterType lenParamType = ParameterType.Length;
-        private static readonly int sizeReserveInMm = Properties.Settings.Default.SizeReserveInMm;
+        private static readonly int sizeReserveInMm = Properties.Settings.Default.CutOffsetInMm;
         private static readonly ElementMulticategoryFilter multicategoryFilter = GetMulticategoryFilter();
         private static CancellationToken cancelToken = CutOpeningDataViewModel.CancelToken;
 
