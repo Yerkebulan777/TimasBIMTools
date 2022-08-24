@@ -8,9 +8,10 @@ using System.ComponentModel;
 using System.Threading;
 using System.Windows.Input;
 
+
 namespace RevitTimasBIMTools.ViewModels
 {
-    public sealed class MainViewModel : ObservableObject
+    public sealed class WorkerViewModel : ObservableObject
     {
         private readonly BackgroundWorker worker;
         public static IMessenger Messenger { get; } = new WeakReferenceMessenger();
@@ -52,7 +53,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        public MainViewModel()
+        public WorkerViewModel()
         {
             Items = new ObservableCollection<RevitElementModel>();
             worker = new BackgroundWorker();

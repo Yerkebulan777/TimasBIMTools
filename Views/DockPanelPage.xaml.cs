@@ -25,7 +25,7 @@ namespace RevitTimasBIMTools.Views
 
         private RevitDocumenModel revitDocumentModel;
         private IList<RevitDocumenModel> revitDocumentModeList = null;
-        private readonly CutOpeningViewModel dataViewModel = ViewModelLocator.DataViewModel;
+        private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningMainHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
 
         public DockPanelPage()

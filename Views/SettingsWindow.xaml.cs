@@ -12,7 +12,7 @@ namespace RevitTimasBIMTools.Views
     public partial class SettingsWindow : Window
     {
         private Element element { get; set; } = null;
-        private readonly SettingsViewModel settingsViewModel = ViewModelLocator.SettingsViewModel;
+        private readonly CutOpeningSettingsViewModel settingsViewModel = ViewModelLocator.SettingsViewModel;
         private readonly CutOpeningSettingsHandler settingsHandler = SmartToolController.Services.GetRequiredService<CutOpeningSettingsHandler>();
         public SettingsWindow()
         {

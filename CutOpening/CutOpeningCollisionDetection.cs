@@ -24,7 +24,7 @@ namespace RevitTimasBIMTools.CutOpening
         private static readonly ParameterType lenParamType = ParameterType.Length;
         private static readonly int sizeReserveInMm = Properties.Settings.Default.SizeReserveInMm;
         private static readonly ElementMulticategoryFilter multicategoryFilter = GetMulticategoryFilter();
-        private static CancellationToken cancelToken = CutOpeningViewModel.CancelToken;
+        private static CancellationToken cancelToken = CutOpeningDataViewModel.CancelToken;
 
         private static Document currentDocument = DockPanelPage.CurrentDocument;
 

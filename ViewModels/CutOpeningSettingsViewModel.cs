@@ -1,21 +1,21 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Revit.Async;
-using Revit.Async.ExternalEvents;
+using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
+
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public class SettingsViewModel : ObservableObject, IDisposable
+    public class CutOpeningSettingsViewModel : ObservableObject, IDisposable
     {
         private Document document { get; set; }
 
-        public SettingsViewModel()
+        public CutOpeningSettingsViewModel()
         {
         }
 
@@ -38,7 +38,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    SetProperty(ref catList, value);
+                    _ = SetProperty(ref catList, value);
                     RevitLogger.Info($"{catList.Count}");
                 }
             }
@@ -203,10 +203,16 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        private string RaiseExternalEvent()
+
+
+        private void RaiseExternalEvent( List<FamilySymbol> simbols)
         {
-            return RevitTask.RaiseGlobal<TestExternalEventHandler, Document, string>(document).Result;
+            
+            RevitFamilySimbols = new ObservableCollection<FamilySymbol>(simbols);
+            IList<Category> cats = RevitTask.RaiseGlobal<CutOpeningCategoriesHandler, Document, IList<Category>>(document).Result;
+            RevitCategories = new ObservableCollection<Category>(cats);
         }
+
 
         private static int NormilizeIntValue(int value, int maxVal = 100, int minVal = 0)
         {
@@ -230,27 +236,6 @@ namespace RevitTimasBIMTools.ViewModels
         public void Dispose()
         {
             throw new NotImplementedException();
-        }
-    }
-
-    public class TestExternalEventHandler : SyncGenericExternalEventHandler<Document, string>
-    {
-        public override object Clone()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string GetName()
-        {
-            return "TestExternalEventHandler";
-        }
-
-        protected override string Handle(UIApplication app, Document parameter)
-        {
-            //write sync logic here
-            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            string path = Path.Combine(desktop, $"{parameter.Title}");
-            return path;
         }
     }
 }

@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels" 
-    d:DataContext="{d:DesignInstance Type=viewmodels:SettingsViewModel}"
+    d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningSettingsViewModel}"
     mc:Ignorable="d" Height="Auto" MinHeight="350" MaxHeight="750" Width="450"
     x:Class="RevitTimasBIMTools.Views.SettingsWindow"
     Title="Cut opening setting" 

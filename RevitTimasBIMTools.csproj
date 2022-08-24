@@ -245,9 +245,10 @@
     <Compile Include="ViewConverters\ElementIdConverter.cs" />
     <Compile Include="ViewConverters\SelectAllConverter.cs" />
     <Compile Include="ViewConverters\StatusConverter.cs" />
-    <Compile Include="ViewModels\CutOpeningViewModel.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
+    <Compile Include="ViewModels\WorkerViewModel.cs" />
+    <Compile Include="ViewModels\CutOpeningSettingsViewModel.cs" />
+    <Compile Include="CutOpening\CutOpeningCategoriesHandler.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\DockPanelPage.xaml.cs">
       <DependentUpon>DockPanelPage.xaml</DependentUpon>
