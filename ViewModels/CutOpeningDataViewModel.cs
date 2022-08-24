@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
@@ -83,7 +82,6 @@ namespace RevitTimasBIMTools.ViewModels
             get => collectionView;
             set
             {
-
                 SetProperty(ref collectionView, value);
                 ItemCollectionView.SortDescriptions.Clear();
                 ItemCollectionView.GroupDescriptions.Clear();
@@ -169,7 +167,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (CancelToken.IsCancellationRequested)
                     {
-                        Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
+                        _ = Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
                     }
                 }
                 finally
@@ -205,7 +203,7 @@ namespace RevitTimasBIMTools.ViewModels
                             {
                                 lock (collection.SyncRoot)
                                 {
-                                    collection.Add(model.IdInt.ToString());
+                                    _ = collection.Add(model.IdInt.ToString());
                                     num++;
                                 }
                             }
@@ -238,8 +236,8 @@ namespace RevitTimasBIMTools.ViewModels
                 manager.InitializeActiveDocument(CurrentDocument);
                 collection = manager.GetCollisionCommunicateElements();
                 RevitLogger.Info($"Found collision {collection.Count()}");
-                ActivateFamilySimbol(rectangOpeningId);
-                ActivateFamilySimbol(roundOpeningId);
+                _ = ActivateFamilySimbol(rectangOpeningId);
+                _ = ActivateFamilySimbol(roundOpeningId);
                 return collection.ToObservableCollection();
             });
         }
@@ -275,37 +273,27 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteApplyCommandAsync()
         {
-            if (stringCollection != null && stringCollection.Count > 0)
+            ProgressView popView = new ProgressView();
+            await RevitTask.RunAsync(app =>
             {
-                StringCollection tempCollection = stringCollection;
-                foreach (string elementIdStr in tempCollection)
+                CurrentDocument = app.ActiveUIDocument.Document;
+                View3D view = RevitViewManager.Get3dView(CurrentDocument);
+                while (collection.Count > 0)
                 {
-                    if (canceled) { break; }
-                    stringCollection.Remove(elementIdStr);
-                    Properties.Settings.Default.Upgrade();
-                    if (int.TryParse(elementIdStr, out int elementIdInt))
+                    popView.Show();
+                    popView.Activate();
+                    Task.Delay(1000).Wait();
+                    if (collection.First() is RevitElementModel model)
                     {
-                        elementId = new ElementId(elementIdInt);
-                        View3D view = RevitViewManager.Get3dView(doc);
+                        elementId = new ElementId(model.IdInt);
                         Element elem = CurrentDocument.GetElement(elementId);
-                        foreach (RevitElementModel model in collection)
-                        {
-                            if (elementIdInt == model.IdInt)
-                            {
-                                await RevitTask.RunAsync(app =>
-                                {
-                                    UIDocument uidoc = app.ActiveUIDocument;
-                                    CurrentDocument = uidoc.Document;
-                                    RevitLogger.Info("continue");
-                                });
-                                collection.Remove(model);
-                                break;
-                            }
-                        }
+                        collection.Remove(model);
+                        popView.Close();
                     }
                 }
-            }
+            });
         }
+
         #endregion
 
 
@@ -316,5 +304,6 @@ namespace RevitTimasBIMTools.ViewModels
             ElementList.Clear();
             FilterText = string.Empty;
         }
+
     }
 }

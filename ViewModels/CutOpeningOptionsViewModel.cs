@@ -1,19 +1,13 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Visual;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Revit.Async;
-using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 
@@ -22,7 +16,6 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public class CutOpeningOptionsViewModel : ObservableObject, IDisposable
     {
-
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
             BuiltInCategory.OST_Conduit,
@@ -32,7 +25,6 @@ namespace RevitTimasBIMTools.ViewModels
             BuiltInCategory.OST_GenericModel,
             BuiltInCategory.OST_MechanicalEquipment
         };
-
 
 
         public CutOpeningOptionsViewModel()
@@ -163,7 +155,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Create Opening Property
 
-        private int cutOffset = 50;
+        private int cutOffset = Properties.Settings.Default.CutOffsetInMm;
         public int CutOffset
         {
             get => cutOffset;
