@@ -3,11 +3,13 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
+using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
 using System;
 
-namespace RevitTimasBIMTools.CutOpening
+
+namespace RevitTimasBIMTools.RevitCommads
 {
     [Transaction(TransactionMode.ReadOnly)]
     [Regeneration(RegenerationOption.Manual)]
@@ -16,7 +18,6 @@ namespace RevitTimasBIMTools.CutOpening
         private DockablePane dockpane = null;
         private readonly DockablePaneId dockpid = SmartToolController.DockPaneId;
         private readonly CutOpeningMainHandler dockpaneHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
-        private readonly CutOpeningSettingsHandler settingsHandler = SmartToolController.Services.GetRequiredService<CutOpeningSettingsHandler>();
         private readonly IDockablePaneProvider provider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
@@ -27,9 +28,8 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
+            SmartToolController.CurrentDocument = uiapp.ActiveUIDocument.Document;
             ExternalEvent dockpaneExtEvent = ExternalEvent.Create(dockpaneHandler);
-            ExternalEvent settingsExtEvent = ExternalEvent.Create(settingsHandler);
-
             if (dockpid != null && DockablePane.PaneIsRegistered(dockpid))
             {
                 dockpane = dockpane ?? uiapp.GetDockablePane(dockpid);
@@ -44,7 +44,7 @@ namespace RevitTimasBIMTools.CutOpening
                             viewpane.Dispose();
                             dockpaneExtEvent?.Dispose();
                         }
-                        catch (System.Exception exc)
+                        catch (Exception exc)
                         {
                             RevitLogger.Error("Show panel error:\t" + exc.Message);
                         }
@@ -54,10 +54,9 @@ namespace RevitTimasBIMTools.CutOpening
                         try
                         {
                             dockpaneExtEvent?.Raise();
-                            settingsExtEvent?.Raise();
                             dockpane.Show();
                         }
-                        catch (System.Exception exc)
+                        catch (Exception exc)
                         {
                             RevitLogger.Error("Show panel error:\t" + exc.Message);
                         }

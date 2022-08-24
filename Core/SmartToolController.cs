@@ -2,6 +2,7 @@
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,7 @@ namespace RevitTimasBIMTools.Core
     public class SmartToolController : IExternalApplication
     {
         private UIControlledApplication controller = null;
+        public static Document CurrentDocument { get; set; } = null;
         public static IServiceProvider Services = CreateServiceProvider();
         public static readonly DockablePaneId DockPaneId = new DockablePaneId(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
         private readonly CutOpeningRegisterDockablePane dockManager = Services.GetRequiredService<CutOpeningRegisterDockablePane>();
@@ -29,15 +31,14 @@ namespace RevitTimasBIMTools.Core
             IServiceCollection services = new ServiceCollection();
 
             services.AddScoped<CutOpeningMainHandler>();
-            services.AddScoped<CutOpeningSettingsHandler>();
 
-            services.AddSingleton<SettingsViewModel>();
             services.AddSingleton<IRevitTask, RevitTask>();
             services.AddSingleton<SmartToolGeneralHelper>();
+            services.AddSingleton<CutOpeningOptionsViewModel>();
             services.AddSingleton<CutOpeningRegisterDockablePane>();
 
             services.AddTransient<IDockablePaneProvider, DockPanelPage>();
-            services.AddTransient<CutOpeningViewModel>();
+            services.AddTransient<CutOpeningDataViewModel>();
             services.AddTransient<CutOpeningCollisionDetection>();
 
             return services.BuildServiceProvider();

@@ -1,37 +1,24 @@
-﻿using Autodesk.Revit.DB;
-using Microsoft.Extensions.DependencyInjection;
-using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.CutOpening;
-using RevitTimasBIMTools.ViewModels;
+﻿using RevitTimasBIMTools.ViewModels;
 using System;
-using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace RevitTimasBIMTools.Views
 {
     public partial class SettingsWindow : Window
     {
-        private Element element { get; set; } = null;
-        private readonly SettingsViewModel settingsViewModel = ViewModelLocator.SettingsViewModel;
-        private readonly CutOpeningSettingsHandler settingsHandler = SmartToolController.Services.GetRequiredService<CutOpeningSettingsHandler>();
+        private readonly CutOpeningOptionsViewModel settingsViewModel = ViewModelLocator.OptionsViewModel;
         public SettingsWindow()
         {
             InitializeComponent();
             DataContext = settingsViewModel;
             Loaded += SettingsWindow_Loaded;
-            settingsHandler.Completed += OnContextViewHandlerCompleted;
         }
-                
+
+
         private void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
         {
-
-        }
-        
-        private void OnContextViewHandlerCompleted(object sender, SettingsCompletedEventArgs e)
-        {
-            settingsViewModel.RevitCategories = new ObservableCollection<Category>(e.Categories);
-            settingsViewModel.RevitFamilySimbols = new ObservableCollection<FamilySymbol>(e.Symbols);
-            //Task.Delay(100).ContinueWith(task => RevitLogger.Info($"Categories = {e.Categories.Count}"));
+            Loaded -= SettingsWindow_Loaded;
+            settingsViewModel.RaiseExternalEvent();
         }
 
 

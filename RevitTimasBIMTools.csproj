@@ -185,7 +185,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CutOpening\CutOpeningSettingsHandler.cs" />
+    <Compile Include="CutOpening\CutOpeningFamilyHandler.cs" />
     <Compile Include="Core\SmartToolController.cs" />
     <Compile Include="RevitUtils\CutOpeningManager.cs" />
     <Compile Include="RevitUtils\ElementDataDictionary.cs" />
@@ -202,7 +202,7 @@
     <Compile Include="Services\ManifestFileManager.cs" />
     <Compile Include="CutOpening\CutOpeningRegisterDockablePane.cs" />
     <Compile Include="CutOpening\CutOpeningMainHandler.cs" />
-    <Compile Include="CutOpening\CutOpeningShowPanelCmd.cs" />
+    <Compile Include="RevitCommads\CutOpeningShowPanelCmd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -245,9 +245,10 @@
     <Compile Include="ViewConverters\ElementIdConverter.cs" />
     <Compile Include="ViewConverters\SelectAllConverter.cs" />
     <Compile Include="ViewConverters\StatusConverter.cs" />
-    <Compile Include="ViewModels\CutOpeningViewModel.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
+    <Compile Include="ViewModels\WorkerViewModel.cs" />
+    <Compile Include="ViewModels\CutOpeningOptionsViewModel.cs" />
+    <Compile Include="CutOpening\CutOpeningCategoriesHandler.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\DockPanelPage.xaml.cs">
       <DependentUpon>DockPanelPage.xaml</DependentUpon>

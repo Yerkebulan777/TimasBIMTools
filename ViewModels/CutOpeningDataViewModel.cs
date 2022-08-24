@@ -24,7 +24,7 @@ using System.Windows.Input;
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public sealed class CutOpeningViewModel : ObservableObject, IDisposable
+    public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
         public DockPanelPage DockPanelView { get; set; } = null;
         public static CancellationToken CancelToken = CancellationToken.None;
@@ -40,7 +40,7 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly CutOpeningCollisionDetection manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionDetection>();
 
 
-        public CutOpeningViewModel()
+        public CutOpeningDataViewModel()
         {
             CloseCommand = new RelayCommand(CancelCallbackLogic);
             SetFilterCommand = new RelayCommand(SetFilterTextCommand);

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Autodesk.Revit.DB;
+using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
@@ -24,9 +25,7 @@ namespace RevitTimasBIMTools.CutOpening
         private static readonly ParameterType lenParamType = ParameterType.Length;
         private static readonly int sizeReserveInMm = Properties.Settings.Default.SizeReserveInMm;
         private static readonly ElementMulticategoryFilter multicategoryFilter = GetMulticategoryFilter();
-        private static CancellationToken cancelToken = CutOpeningViewModel.CancelToken;
-
-        private static Document currentDocument = DockPanelPage.CurrentDocument;
+        private static CancellationToken cancelToken = CutOpeningDataViewModel.CancelToken;
 
         private static Options GetGeometryOptions()
         {
@@ -66,6 +65,7 @@ namespace RevitTimasBIMTools.CutOpening
         private Transform linkDocTransform = null;
         private RevitLinkInstance linkInstance = null;
         private FilteredElementCollector collector = null;
+        private Document currentDocument = SmartToolController.CurrentDocument;
 
         private readonly ElementId invalId = ElementId.InvalidElementId;
         private readonly Transform identityTransform = Transform.Identity;

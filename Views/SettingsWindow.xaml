@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels" 
-    d:DataContext="{d:DesignInstance Type=viewmodels:SettingsViewModel}"
+    d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningOptionsViewModel}"
     mc:Ignorable="d" Height="Auto" MinHeight="350" MaxHeight="750" Width="450"
     x:Class="RevitTimasBIMTools.Views.SettingsWindow"
     Title="Cut opening setting" 
@@ -169,9 +169,8 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text=" Сommunication сategory " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                        <ComboBox x:Name="ComboCats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" 
-                                  ItemsSource="{Binding Path=RevitCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  DisplayMemberPath="Name"/>
+                        <ComboBox x:Name="ComboCats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Name"
+                                  ItemsSource="{Binding Path=RevitCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
                 </Border>
             </DockPanel>
@@ -185,7 +184,7 @@
                                     <ColumnDefinition Width="180"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Rectangular opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                                <ComboBox x:Name="ComboRectangSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0"
+                                <ComboBox x:Name="ComboRectangSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0" DisplayMemberPath="Name"
                                           ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
                         </Border>
@@ -196,7 +195,7 @@
                                     <ColumnDefinition Width="180"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Round opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                                <ComboBox x:Name="ComboRoundSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0"
+                                <ComboBox x:Name="ComboRoundSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0" DisplayMemberPath="Name"
                                           ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                             </Grid>
                         </Border>

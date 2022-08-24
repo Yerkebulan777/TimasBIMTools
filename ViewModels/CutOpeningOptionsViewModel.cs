@@ -1,21 +1,20 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Revit.Async;
-using Revit.Async.ExternalEvents;
+using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
+using System.Threading.Tasks;
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public class SettingsViewModel : ObservableObject, IDisposable
+    public class CutOpeningOptionsViewModel : ObservableObject, IDisposable
     {
-        private Document document { get; set; }
-
-        public SettingsViewModel()
+        public Document CurrentDocument { get; set; } = null;
+        public CutOpeningOptionsViewModel()
         {
         }
 
@@ -34,14 +33,7 @@ namespace RevitTimasBIMTools.ViewModels
         public ObservableCollection<Category> RevitCategories
         {
             get => catList;
-            set
-            {
-                if (value != null)
-                {
-                    SetProperty(ref catList, value);
-                    RevitLogger.Info($"{catList.Count}");
-                }
-            }
+            set => SetProperty(ref catList, value);
         }
 
 
@@ -203,10 +195,18 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        private string RaiseExternalEvent()
+        public void RaiseExternalEvent()
         {
-            return RevitTask.RaiseGlobal<TestExternalEventHandler, Document, string>(document).Result;
+            if (CurrentDocument != null)
+            {
+                Document doc = CurrentDocument;
+                Task<IList<Category>> catsTask = RevitTask.RaiseGlobal<CutOpeningCategoriesHandler, Document, IList<Category>>(doc);
+                Task<IList<FamilySymbol>> simbsTask = RevitTask.RaiseGlobal<CutOpeningFamilyHandler, Document, IList<FamilySymbol>>(doc);
+                RevitFamilySimbols = new ObservableCollection<FamilySymbol>(simbsTask.Result);
+                RevitCategories = new ObservableCollection<Category>(catsTask.Result);
+            }
         }
+
 
         private static int NormilizeIntValue(int value, int maxVal = 100, int minVal = 0)
         {
@@ -230,27 +230,6 @@ namespace RevitTimasBIMTools.ViewModels
         public void Dispose()
         {
             throw new NotImplementedException();
-        }
-    }
-
-    public class TestExternalEventHandler : SyncGenericExternalEventHandler<Document, string>
-    {
-        public override object Clone()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string GetName()
-        {
-            return "TestExternalEventHandler";
-        }
-
-        protected override string Handle(UIApplication app, Document parameter)
-        {
-            //write sync logic here
-            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            string path = Path.Combine(desktop, $"{parameter.Title}");
-            return path;
         }
     }
 }

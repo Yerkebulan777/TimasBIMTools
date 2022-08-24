@@ -19,13 +19,13 @@ namespace RevitTimasBIMTools.Views
     /// <summary> Логика взаимодействия для DockPanelPage.xaml </summary>
     public partial class DockPanelPage : Page, IDisposable, IDockablePaneProvider
     {
-        public bool Canceled = false;
-        private bool disposedValue = false;
-        public static Document CurrentDocument = null;
+        public Document CurrentDocument { get; set; } = null;
 
+        private bool disposedValue = false;
         private RevitDocumenModel revitDocumentModel;
         private IList<RevitDocumenModel> revitDocumentModeList = null;
-        private readonly CutOpeningViewModel dataViewModel = ViewModelLocator.DataViewModel;
+        private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
+        private readonly CutOpeningOptionsViewModel optViewModel = ViewModelLocator.OptionsViewModel;
         private readonly CutOpeningMainHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
 
         public DockPanelPage()
@@ -56,6 +56,7 @@ namespace RevitTimasBIMTools.Views
             if (CurrentDocument == null && revitDocumentModeList.Count > 0)
             {
                 dataViewModel.CurrentDocument = revitDocumentModel.Document;
+                optViewModel.CurrentDocument = revitDocumentModel.Document;
                 ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
                 ComboDocs.ItemsSource = revitDocumentModeList;
@@ -139,6 +140,7 @@ namespace RevitTimasBIMTools.Views
 
         private void Dispatcher_ShutdownStarted(object sender, EventArgs e)
         {
+            Dispatcher.ShutdownStarted -= Dispatcher_ShutdownStarted;
             Dispose();
         }
 
