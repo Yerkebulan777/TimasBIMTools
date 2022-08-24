@@ -185,7 +185,6 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CutOpening\CutOpeningFamilyHandler.cs" />
     <Compile Include="Core\SmartToolController.cs" />
     <Compile Include="RevitUtils\CutOpeningManager.cs" />
     <Compile Include="RevitUtils\ElementDataDictionary.cs" />
@@ -248,7 +247,6 @@
     <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
     <Compile Include="ViewModels\WorkerViewModel.cs" />
     <Compile Include="ViewModels\CutOpeningOptionsViewModel.cs" />
-    <Compile Include="CutOpening\CutOpeningCategoriesHandler.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\DockPanelPage.xaml.cs">
       <DependentUpon>DockPanelPage.xaml</DependentUpon>
@@ -304,8 +302,9 @@
     <PostBuildEvent>
 mkdir "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"
 
-copy /Y $(SolutionDir)$(TargetName).addin "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\"
-copy /Y $(TargetDir) "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"</PostBuildEvent>
+copy /Y $(SolutionDir)$(TargetName).addin   "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\"
+copy /Y $(TargetDir)$(TargetFileName)   "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"
+</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

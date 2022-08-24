@@ -71,7 +71,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     doc = value;
                     OnPropertyChanged(nameof(CurrentDocument));
-                    DockPanelView.ActiveDocTitle.Content = doc.Title.ToUpper();
                     CommandManager.InvalidateRequerySuggested();
                 };
             }

@@ -55,6 +55,7 @@ namespace RevitTimasBIMTools.Views
             revitDocumentModel = revitDocumentModeList.FirstOrDefault();
             if (CurrentDocument == null && revitDocumentModeList.Count > 0)
             {
+                ActiveDocTitle.Content = revitDocumentModel.Document.Title.ToUpper();
                 dataViewModel.CurrentDocument = revitDocumentModel.Document;
                 optViewModel.CurrentDocument = revitDocumentModel.Document;
                 ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
@@ -79,6 +80,7 @@ namespace RevitTimasBIMTools.Views
         private void SettingsCmd_Click(object sender, RoutedEventArgs e)
         {
             SettingsWindow settingsControl = new SettingsWindow();
+            optViewModel.RaiseExternalEvent();
             settingsControl.Show();
         }
 

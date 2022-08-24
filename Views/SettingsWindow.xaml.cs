@@ -11,14 +11,6 @@ namespace RevitTimasBIMTools.Views
         {
             InitializeComponent();
             DataContext = settingsViewModel;
-            Loaded += SettingsWindow_Loaded;
-        }
-
-
-        private void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            Loaded -= SettingsWindow_Loaded;
-            settingsViewModel.RaiseExternalEvent();
         }
 
 
