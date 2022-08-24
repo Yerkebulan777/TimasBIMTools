@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
-using RevitTimasBIMTools.Views;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
 using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.CutOpening
