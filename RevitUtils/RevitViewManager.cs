@@ -44,17 +44,16 @@ namespace RevitTimasBIMTools.RevitUtils
         /// <summary>
         /// Retrieve a suitable 3D view3d from document. 
         /// </summary>
-        public static View3D Get3dView(Document doc, string viewName = "Isometric3DView")
+        public static View3D Get3dView(UIDocument uidoc, string viewName = "Isometric3DView")
         {
-            FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(View3D));
-            foreach (View3D v in collector)
+            foreach (View3D v in new FilteredElementCollector(uidoc.Document).OfClass(typeof(View3D)))
             {
                 if (!v.IsTemplate && v.Name.Equals(viewName))
                 {
                     return v;
                 }
             }
-            return CreateNew3DView(doc, viewName);
+            return CreateNew3DView(uidoc, viewName);
         }
 
 

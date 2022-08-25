@@ -57,7 +57,7 @@ namespace RevitTimasBIMTools.ViewModels
                 var uidoc = app.ActiveUIDocument;
                 int count = RevitElementModelList.Count;
                 document = app.ActiveUIDocument.Document;
-                View3D view3d = RevitViewManager.Get3dView(document);
+                View3D view3d = RevitViewManager.Get3dView(uidoc);
                 while (view.IsEnabled)
                 {
                     Task.Delay(1000).Wait();

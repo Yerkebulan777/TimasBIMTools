@@ -28,7 +28,6 @@ namespace RevitTimasBIMTools.ViewModels
         public DockPanelPage DockPanelView { get; set; } = null;
         public static CancellationToken CancelToken = CancellationToken.None;
 
-        private readonly Element element = null;
         private readonly object syncLocker = new object();
         private readonly ElementId elementId = ElementId.InvalidElementId;
         private IList<RevitElementModel> collection = new List<RevitElementModel>(150);
