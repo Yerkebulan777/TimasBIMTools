@@ -29,9 +29,9 @@ namespace RevitTimasBIMTools.ViewModels
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
         public DockPanelPage DockPanelView { get; set; } = null;
-        public CutOpeningWindows CutOpeningView { get; set; } = null;
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
+        private CutOpeningWindows openingView = null;
         private readonly object syncLocker = new object();
         private readonly ElementId elementId = ElementId.InvalidElementId;
         private IList<RevitElementModel> collection = new List<RevitElementModel>(150);
@@ -262,24 +262,23 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteApplyCommandAsync()
         {
-            if (!CutOpeningView.IsEnabled)
+            await RevitTask.RunAsync(app =>
             {
-                await RevitTask.RunAsync(app =>
+                CurrentDocument = app.ActiveUIDocument.Document;
+                openingView = SmartToolController.Services.GetRequiredService<CutOpeningWindows>();
+                try
                 {
-                    CurrentDocument = app.ActiveUIDocument.Document;
-                    try
+                    bool? dialog = openingView.ShowDialog();
+                    if (dialog is true && openingView.Activate())
                     {
-                        if ((bool)CutOpeningView.ShowDialog() && CutOpeningView.Activate())
-                        {
-                            CutOpeningView.RevitViewContent = GetContent(app.ActiveUIDocument);
-                        }
+                        openingView.RevitViewContent = GetContent(app.ActiveUIDocument);
                     }
-                    catch (Exception ex)
-                    {
-                        RevitLogger.Error(ex.Message);
-                    }
-                });
-            }
+                }
+                catch (Exception ex)
+                {
+                    RevitLogger.Error(ex.Message);
+                }
+            });
         }
 
 
@@ -308,7 +307,6 @@ namespace RevitTimasBIMTools.ViewModels
             }
             return content;
         }
-
         #endregion
 
 
