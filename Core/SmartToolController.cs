@@ -30,19 +30,22 @@ namespace RevitTimasBIMTools.Core
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddScoped<CutOpeningMainHandler>();
-
             services.AddSingleton<IRevitTask, RevitTask>();
             services.AddSingleton<SmartToolGeneralHelper>();
-            services.AddSingleton<CutOpeningOptionsViewModel>();
             services.AddSingleton<CutOpeningRegisterDockablePane>();
 
+            services.AddScoped<CutOpeningMainHandler>();
+
             services.AddTransient<IDockablePaneProvider, DockPanelPage>();
-            services.AddTransient<CutOpeningDataViewModel>();
             services.AddTransient<CutOpeningCollisionDetection>();
+            services.AddTransient<CutOpeningOptionsViewModel>();
+            services.AddTransient<CutOpeningDataViewModel>();
+            services.AddTransient<CutOpeningWindows>();
+            services.AddTransient<SettingsWindow>();
 
             return services.BuildServiceProvider();
         }
+
 
         [STAThread]
         public Result OnStartup(UIControlledApplication cntrapp)
@@ -107,11 +110,11 @@ namespace RevitTimasBIMTools.Core
             //    PreviewControl prewiew;
             //    presenter = new Window();
 
-            //    Document CurrentDocument = args.Document;
+            //    Document document = args.Document;
 
             //    DispatcherTimer dispatcherTimer;
 
-            //    FilteredElementCollector viewCollector = new FilteredElementCollector(CurrentDocument);
+            //    FilteredElementCollector viewCollector = new FilteredElementCollector(document);
             //    viewCollector.OfClass(typeof(Autodesk.Revit.DB.DockPanelView));
 
             //    presenter.WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -124,7 +127,7 @@ namespace RevitTimasBIMTools.Core
             //        {
             //            if (vw.IsValidObject && !vw.IsTemplate && vw is ViewPlan)
             //            {
-            //                prewiew = new PreviewControl(CurrentDocument, vw.IdInt as ElementId)
+            //                prewiew = new PreviewControl(document, vw.IdInt as ElementId)
             //                {
             //                    IsManipulationEnabled = true
             //                };

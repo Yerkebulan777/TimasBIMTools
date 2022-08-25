@@ -300,18 +300,6 @@ namespace RevitTimasBIMTools.ViewModels
             });
         }
 
-        private UserControl content;
-        public UserControl ContentWindow
-        {
-            get => content;
-            set => SetProperty(ref content, value);
-        }
-
-        internal void SetNewContent(UserControl content)
-        {
-            ContentWindow = content;
-        }
-
         #endregion
 
 

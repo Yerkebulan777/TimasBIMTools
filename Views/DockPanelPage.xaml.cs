@@ -10,6 +10,7 @@ using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -26,6 +27,7 @@ namespace RevitTimasBIMTools.Views
         private IList<RevitDocumenModel> revitDocumentModeList = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningOptionsViewModel optViewModel = ViewModelLocator.OptionsViewModel;
+        private readonly SettingsWindow settingsControl = SmartToolController.Services.GetRequiredService<SettingsWindow>();
         private readonly CutOpeningMainHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
 
         public DockPanelPage()
@@ -77,13 +79,16 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void SettingsCmd_Click(object sender, RoutedEventArgs e)
+        private async void SettingsCmd_ClickAsync(object sender, RoutedEventArgs e)
         {
-            SettingsWindow settingsControl = new SettingsWindow();
-            optViewModel.RaiseExternalEventAsync();
-            settingsControl.Show();
+            await optViewModel.RaiseExternalEventAsync();
+            ShowSettingsWindow(settingsControl);
         }
 
+        private void ShowSettingsWindow(SettingsWindow settingsControl)
+        {
+            settingsControl.Show();
+        }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {

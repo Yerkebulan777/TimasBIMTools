@@ -245,6 +245,7 @@
     <Compile Include="ViewConverters\SelectAllConverter.cs" />
     <Compile Include="ViewConverters\StatusConverter.cs" />
     <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
+    <Compile Include="ViewModels\CutOpeningViewModel.cs" />
     <Compile Include="ViewModels\WorkerViewModel.cs" />
     <Compile Include="ViewModels\CutOpeningOptionsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />

@@ -18,7 +18,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Row="0" Grid.Column="0" Margin="10">
-            <local:CutOpeningView x:Name="Header" />
+            <ContentControl Content="{Binding}"/>
         </Grid>
     </Grid>
 </Window>

@@ -40,7 +40,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
         /// <summary>
-        /// Retrieve a suitable 3D view3d from CurrentDocument. 
+        /// Retrieve a suitable 3D view3d from document. 
         /// </summary>
         public static View3D Get3dView(Document doc, string viewName = "Isometric3DView")
         {
