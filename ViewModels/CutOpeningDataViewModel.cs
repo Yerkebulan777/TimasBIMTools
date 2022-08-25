@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
@@ -17,8 +18,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using Document = Autodesk.Revit.DB.Document;
 
 
 namespace RevitTimasBIMTools.ViewModels
@@ -99,10 +102,12 @@ namespace RevitTimasBIMTools.ViewModels
             get => elemList;
             set
             {
-                _ = SetProperty(ref elemList, value);
-                DockPanelView.CheckSelectAll.IsEnabled = elemList.Count != 0;
-                ItemCollectionView = CollectionViewSource.GetDefaultView(value);
-                IsEnabled = !ItemCollectionView.IsEmpty;
+                if(SetProperty(ref elemList, value))
+                {
+                    DockPanelView.CheckSelectAll.IsEnabled = elemList.Count != 0;
+                    ItemCollectionView = CollectionViewSource.GetDefaultView(value);
+                    IsEnabled = !ItemCollectionView.IsEmpty;
+                }
             }
         }
         #endregion
@@ -266,7 +271,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if ((bool)openingView.ShowDialog() && openingView.Activate())
                         {
-                            
+                            openingView.RevitViewContent = GetContent(app.ActiveUIDocument);
                         }
                     }
                     catch (Exception ex)
@@ -276,6 +281,34 @@ namespace RevitTimasBIMTools.ViewModels
                 });
             }
         }
+
+
+        private ContentControl GetContent(UIDocument uidoc)
+        {
+            ContentControl content = null;
+            Document document = uidoc.Document;
+            View3D view3d = RevitViewManager.Get3dView(uidoc);
+            while (RevitElementModels.Count != 0)
+            {
+                try
+                {
+                    Task.Delay(1000).Wait();
+                    RevitElementModel model = RevitElementModels.First();
+                    Element elem = document.GetElement(new ElementId(model.IdInt));
+                    if (RevitElementModels.Remove(model) && elem.IsValidObject)
+                    {
+                        view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
+                        content = new PreviewControl(document, view3d.Id);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    RevitLogger.Error(ex.Message);
+                }
+            }
+            return content;
+        }
+
         #endregion
 
 

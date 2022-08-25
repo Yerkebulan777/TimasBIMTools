@@ -1,5 +1,4 @@
-﻿using RevitTimasBIMTools.ViewModels;
-using System.Windows;
+﻿using System.Windows;
 
 namespace RevitTimasBIMTools.Views
 {
