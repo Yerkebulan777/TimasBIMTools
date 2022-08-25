@@ -23,6 +23,6 @@
         </Style>
     </UserControl.Style>
     <StackPanel Background="AliceBlue">
-        
+            
     </StackPanel>
 </UserControl>

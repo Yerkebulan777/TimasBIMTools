@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -28,7 +29,7 @@ namespace RevitTimasBIMTools.ViewModels
         public DockPanelPage DockPanelView { get; set; } = null;
         public static CancellationToken CancelToken = CancellationToken.None;
 
-        Element element = null;
+        private Element element = null;
         private readonly object syncLocker = new object();
         private ElementId elementId = ElementId.InvalidElementId;
         private IList<RevitElementModel> collection = new List<RevitElementModel>(150);
@@ -80,7 +81,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => collectionView;
             set
             {
-                SetProperty(ref collectionView, value);
+                _ = SetProperty(ref collectionView, value);
                 ItemCollectionView.SortDescriptions.Clear();
                 ItemCollectionView.GroupDescriptions.Clear();
                 ItemCollectionView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(RevitElementModel.CategoryName)));
@@ -97,7 +98,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => elemList;
             set
             {
-                SetProperty(ref elemList, value);
+                _ = SetProperty(ref elemList, value);
                 DockPanelView.CheckSelectAll.IsEnabled = elemList.Count != 0;
                 ItemCollectionView = CollectionViewSource.GetDefaultView(value);
                 IsEnabled = !ItemCollectionView.IsEmpty;
@@ -164,7 +165,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (CancelToken.IsCancellationRequested)
                     {
-                        Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
+                        _ = Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
                     }
                 }
             }
@@ -228,8 +229,8 @@ namespace RevitTimasBIMTools.ViewModels
                 manager.InitializeActiveDocument(CurrentDocument);
                 collection = manager.GetCollisionCommunicateElements();
                 RevitLogger.Info($"Found collision {collection.Count()}");
-                ActivateFamilySimbol(rectangOpeningId);
-                ActivateFamilySimbol(roundOpeningId);
+                _ = ActivateFamilySimbol(rectangOpeningId);
+                _ = ActivateFamilySimbol(roundOpeningId);
                 return collection.ToObservableCollection();
             });
         }
@@ -247,7 +248,7 @@ namespace RevitTimasBIMTools.ViewModels
                         symbol.Activate();
                         result = true;
                     }
-                    catch 
+                    catch
                     {
                         result = false;
                     }
@@ -267,26 +268,27 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                var openingView = new CutOpeningWindows();
                 CurrentDocument = app.ActiveUIDocument.Document;
+                CutOpeningWindows openingView = new CutOpeningWindows();
                 View3D view = RevitViewManager.Get3dView(CurrentDocument);
-                openingView.ShowDialog();
-                while (true)
+                while (true == openingView.ShowDialog())
                 {
+                    RevitElementModel model = null;
                     if (collection.Count == 0)
                     {
-                        break;
+                        openingView.Close();
                     }
-                    else
+                    else if (openingView.Activate())
                     {
                         try
                         {
-                            openingView.Activate();
-                            var model = collection.First();
+                            model = collection.First();
                             elementId = new ElementId(model.IdInt);
                             element = CurrentDocument.GetElement(elementId);
-                            collection.Remove(model);
-                            Task.Delay(1000).Wait();
+                            if (collection.Remove(model))
+                            {
+                                Task.Delay(1000).Wait();
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -296,6 +298,18 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                 }
             });
+        }
+
+        private UserControl content;
+        public UserControl ContentWindow
+        {
+            get => content;
+            set => SetProperty(ref content, value);
+        }
+
+        internal void SetNewContent(UserControl content)
+        {
+            ContentWindow = content;
         }
 
         #endregion
