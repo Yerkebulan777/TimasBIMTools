@@ -17,7 +17,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -29,12 +28,13 @@ namespace RevitTimasBIMTools.ViewModels
         public DockPanelPage DockPanelView { get; set; } = null;
         public static CancellationToken CancelToken = CancellationToken.None;
 
-        private Element element = null;
+        private readonly Element element = null;
         private readonly object syncLocker = new object();
-        private ElementId elementId = ElementId.InvalidElementId;
+        private readonly ElementId elementId = ElementId.InvalidElementId;
         private IList<RevitElementModel> collection = new List<RevitElementModel>(150);
         private readonly int roundOpeningId = Properties.Settings.Default.RoundOpeningSimbolIdInt;
         private readonly int rectangOpeningId = Properties.Settings.Default.RectanOpeningSimbolIdInt;
+        private readonly CutOpeningWindows openingView = SmartToolController.Services.GetRequiredService<CutOpeningWindows>();
         private readonly CutOpeningCollisionDetection manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionDetection>();
 
 
@@ -266,36 +266,23 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteApplyCommandAsync()
         {
+            if (!openingView.IsActive)
+            {
+
+            }
             await RevitTask.RunAsync(app =>
             {
                 CurrentDocument = app.ActiveUIDocument.Document;
-                CutOpeningWindows openingView = new CutOpeningWindows();
-                View3D view = RevitViewManager.Get3dView(CurrentDocument);
-                while (true == openingView.ShowDialog())
+                try
                 {
-                    RevitElementModel model = null;
-                    if (collection.Count == 0)
+                    if (true == openingView.ShowDialog())
                     {
-                        openingView.Close();
+                        _ = openingView.Activate();
                     }
-                    else if (openingView.Activate())
-                    {
-                        try
-                        {
-                            model = collection.First();
-                            elementId = new ElementId(model.IdInt);
-                            element = CurrentDocument.GetElement(elementId);
-                            if (collection.Remove(model))
-                            {
-                                Task.Delay(1000).Wait();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            openingView.Close();
-                            RevitLogger.Error(ex.Message);
-                        }
-                    }
+                }
+                catch (Exception ex)
+                {
+                    RevitLogger.Error(ex.Message);
                 }
             });
         }

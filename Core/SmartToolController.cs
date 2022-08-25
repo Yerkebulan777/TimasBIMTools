@@ -40,6 +40,7 @@ namespace RevitTimasBIMTools.Core
             services.AddTransient<CutOpeningCollisionDetection>();
             services.AddTransient<CutOpeningOptionsViewModel>();
             services.AddTransient<CutOpeningDataViewModel>();
+            services.AddTransient<CutOpeningViewModel>();
             services.AddTransient<CutOpeningWindows>();
             services.AddTransient<SettingsWindow>();
 
@@ -63,6 +64,7 @@ namespace RevitTimasBIMTools.Core
             return Result.Succeeded;
         }
 
+
         [STAThread]
         public Result OnShutdown(UIControlledApplication cntrapp)
         {
@@ -71,6 +73,7 @@ namespace RevitTimasBIMTools.Core
             Properties.Settings.Default.Reset();
             return Result.Succeeded;
         }
+
 
         [STAThread]
         private void DockablePaneRegisters(object sender, ApplicationInitializedEventArgs e)
@@ -81,6 +84,7 @@ namespace RevitTimasBIMTools.Core
             }
             dockManager.RegisterDockablePane(controller, provider, DockPaneId);
         }
+
 
         [STAThread]
         private void DocumentOpened(object sender, DocumentOpenedEventArgs args)
