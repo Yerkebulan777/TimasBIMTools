@@ -23,10 +23,10 @@ namespace RevitTimasBIMTools.Views
 
         private bool disposedValue = false;
         private RevitDocumenModel revitDocumentModel;
+        private SettingsWindow settingsControl = null;
         private IList<RevitDocumenModel> revitDocumentModeList = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningOptionsViewModel optViewModel = ViewModelLocator.OptionsViewModel;
-        private readonly SettingsWindow settingsControl = SmartToolController.Services.GetRequiredService<SettingsWindow>();
         private readonly CutOpeningMainHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
 
         public DockPanelPage()
@@ -80,13 +80,16 @@ namespace RevitTimasBIMTools.Views
 
         private async void SettingsCmd_ClickAsync(object sender, RoutedEventArgs e)
         {
-            await optViewModel.RaiseExternalEventAsync();
-            ShowSettingsWindow(settingsControl);
+            if (ShowSettingsWindow())
+            {
+                await optViewModel.RaiseExternalEventAsync();
+            }
         }
 
-        private void ShowSettingsWindow(SettingsWindow settingsControl)
+        private bool ShowSettingsWindow()
         {
-            settingsControl.Show();
+            settingsControl = SmartToolController.Services.GetRequiredService<SettingsWindow>();
+            return settingsControl.ShowDialog() is true;
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)

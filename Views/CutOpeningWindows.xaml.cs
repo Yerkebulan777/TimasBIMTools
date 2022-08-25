@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using RevitTimasBIMTools.ViewModels;
+using System.Windows;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -7,9 +8,11 @@ namespace RevitTimasBIMTools.Views
     /// </summary>
     public partial class CutOpeningWindows : Window
     {
+        private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         public CutOpeningWindows()
         {
             InitializeComponent();
+            dataViewModel.CutOpeningView = this;
         }
 
         //private void StartCloseTimer(double delay)

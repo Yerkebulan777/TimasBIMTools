@@ -8,6 +8,7 @@
     d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningOptionsViewModel}"
     mc:Ignorable="d" Height="Auto" MinHeight="350" MaxHeight="750" Width="460"
     x:Class="RevitTimasBIMTools.Views.SettingsWindow"
+    WindowStartupLocation="CenterScreen"
     Title="Cut opening setting" 
     Background="Gainsboro">
 

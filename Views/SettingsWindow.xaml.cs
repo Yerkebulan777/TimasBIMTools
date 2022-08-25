@@ -17,7 +17,7 @@ namespace RevitTimasBIMTools.Views
         private void CloseSettingCmd_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.Save();
-            Close();
+            Visibility = Visibility.Hidden;
         }
 
 
