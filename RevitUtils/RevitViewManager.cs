@@ -65,24 +65,25 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void GetSectionBoxView(UIDocument uidoc, Element elem, View3D view3d)
+        public static View3D GetSectionBoxView(UIDocument uidoc, Element elem, View3D view3d)
         {
             BoundingBoxXYZ bbox = elem.get_BoundingBox(view3d);
-            List<ElementId> ids = new List<ElementId>();
             if (bbox != null && bbox.Enabled)
             {
-                try
+                uidoc.RequestViewChange(view3d);
+                using (Transaction t = new Transaction(uidoc.Document, "GetSectionBoxIn3DView"))
                 {
-                    ids.Add(elem.Id);
-                    uidoc.RequestViewChange(view3d);
-                    view3d.SetSectionBox(bbox);
-                    uidoc.ShowElements(ids);
-                }
-                catch (System.Exception ex)
-                {
-                    RevitLogger.Error(ex.Message);
+                    if (TransactionStatus.Started == t.Start())
+                    {
+                        view3d.SetSectionBox(bbox);
+                    }
+                    if (TransactionStatus.Committed == t.Commit())
+                    {
+                        uidoc.ShowElements(elem.Id);
+                    }
                 }
             }
+            return view3d;
         }
 
 
@@ -93,7 +94,6 @@ namespace RevitTimasBIMTools.RevitUtils
                 if (view3d is Autodesk.Revit.DB.View view)
                 {
                     uidoc.RequestViewChange(view);
-                    List<ElementId> ids = new List<ElementId>();
                     if (TransactionStatus.Started == t.Start())
                     {
                         try
@@ -111,18 +111,19 @@ namespace RevitTimasBIMTools.RevitUtils
                                 view.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
                             }
                             view.IsolateElementTemporary(elem.Id);
-                            _ = t.Commit();
+                            if (TransactionStatus.Committed == t.Commit())
+                            {
+                                uidoc.ShowElements(elem.Id);
+                            }
                         }
                         catch (System.Exception ex)
                         {
-                            _ = t.RollBack();
-                            RevitLogger.Error(ex.Message);
+                            if (TransactionStatus.RolledBack == t.RollBack())
+                            {
+                                RevitLogger.Error(ex.Message);
+                            }
                         }
-                        finally
-                        {
-                            ids.Add(elem.Id);
-                            uidoc.ShowElements(ids);
-                        }
+
                     }
                 }
             }
