@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
@@ -19,7 +20,7 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public class CutOpeningViewModel : ObservableObject
     {
-        private Element element = null;
+        private Element elem = null;
         private RevitElementModel model = null;
 
         private Document document { get; set; } = null;
@@ -53,9 +54,10 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
+                var uidoc = app.ActiveUIDocument;
                 int count = RevitElementModelList.Count;
                 document = app.ActiveUIDocument.Document;
-                View3D revitView = RevitViewManager.Get3dView(document);
+                View3D view3d = RevitViewManager.Get3dView(document);
                 while (view.IsEnabled)
                 {
                     Task.Delay(1000).Wait();
@@ -64,10 +66,11 @@ namespace RevitTimasBIMTools.ViewModels
                         try
                         {
                             model = RevitElementModelList.First();
-                            element = document.GetElement(new ElementId(model.IdInt));
-                            if (RevitElementModelList.Remove(model) && element.IsValidObject)
+                            elem = document.GetElement(new ElementId(model.IdInt));
+                            if (RevitElementModelList.Remove(model) && elem.IsValidObject)
                             {
-                                ContentViewControl = new PreviewControl(document, revitView.Id);
+                                view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
+                                ContentViewControl = new PreviewControl(document, view3d.Id);
                                 count = RevitElementModelList.Count;
                             }
                         }
