@@ -80,7 +80,7 @@ namespace RevitTimasBIMTools.Views
         private void SettingsCmd_Click(object sender, RoutedEventArgs e)
         {
             SettingsWindow settingsControl = new SettingsWindow();
-            optViewModel.RaiseExternalEvent();
+            optViewModel.RaiseExternalEventAsync();
             settingsControl.Show();
         }
 

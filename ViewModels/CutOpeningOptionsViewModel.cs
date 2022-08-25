@@ -218,10 +218,10 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        public void RaiseExternalEvent()
+        public async Task RaiseExternalEventAsync()
         {
-            _ = GetTargetCategories();
-            _ = GetOpeningFamilySymbols();
+            await GetTargetCategories();
+            await GetOpeningFamilySymbols();
         }
 
         private async Task GetTargetCategories()
