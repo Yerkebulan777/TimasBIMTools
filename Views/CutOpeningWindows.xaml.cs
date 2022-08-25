@@ -8,11 +8,9 @@ namespace RevitTimasBIMTools.Views
     /// </summary>
     public partial class CutOpeningWindows : Window
     {
-        private readonly CutOpeningViewModel openingViewModel = ViewModelLocator.OpeningViewModel;
         public CutOpeningWindows()
         {
             InitializeComponent();
-            DataContext = openingViewModel;
         }
 
         //private void StartCloseTimer(double delay)

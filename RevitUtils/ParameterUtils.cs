@@ -25,7 +25,7 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             else
             {
-                value = ((System.Collections.IEnumerable)stp.GetProperty("ElementList").GetValue(uidoc.Selection, null)).Cast<Element>().ToList();
+                value = ((System.Collections.IEnumerable)stp.GetProperty("RevitElementModels").GetValue(uidoc.Selection, null)).Cast<Element>().ToList();
             }
             return value.OrderBy(x => x.Name).ToList();
         }

@@ -31,6 +31,7 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly object syncLocker = new object();
         private readonly ElementId elementId = ElementId.InvalidElementId;
         private IList<RevitElementModel> collection = new List<RevitElementModel>(150);
+        private readonly CutOpeningViewModel openingViewModel = ViewModelLocator.OpeningViewModel;
         private readonly int roundOpeningId = Properties.Settings.Default.RoundOpeningSimbolIdInt;
         private readonly int rectangOpeningId = Properties.Settings.Default.RectanOpeningSimbolIdInt;
         private readonly CutOpeningWindows openingView = SmartToolController.Services.GetRequiredService<CutOpeningWindows>();
@@ -80,19 +81,21 @@ namespace RevitTimasBIMTools.ViewModels
             get => collectionView;
             set
             {
-                _ = SetProperty(ref collectionView, value);
-                ItemCollectionView.SortDescriptions.Clear();
-                ItemCollectionView.GroupDescriptions.Clear();
-                ItemCollectionView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(RevitElementModel.CategoryName)));
-                ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(RevitElementModel.SymbolName), ListSortDirection.Ascending));
-                ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(RevitElementModel.FamilyName), ListSortDirection.Ascending));
-                ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(RevitElementModel.Description), ListSortDirection.Ascending));
+                if (SetProperty(ref collectionView, value))
+                {
+                    ItemCollectionView.SortDescriptions.Clear();
+                    ItemCollectionView.GroupDescriptions.Clear();
+                    ItemCollectionView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(RevitElementModel.CategoryName)));
+                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(RevitElementModel.SymbolName), ListSortDirection.Ascending));
+                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(RevitElementModel.FamilyName), ListSortDirection.Ascending));
+                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(RevitElementModel.Description), ListSortDirection.Ascending));
+                }
             }
         }
 
 
         private ObservableCollection<RevitElementModel> elemList = new ObservableCollection<RevitElementModel>();
-        public ObservableCollection<RevitElementModel> ElementList
+        public ObservableCollection<RevitElementModel> RevitElementModels
         {
             get => elemList;
             set
@@ -220,40 +223,30 @@ namespace RevitTimasBIMTools.ViewModels
         public ICommand SnoopCommand { get; private set; }
         private async Task ExecuteSnoopCommandAsync()
         {
-            ElementList.Clear();
-            ElementList = await RevitTask.RunAsync(app =>
+            RevitElementModels.Clear();
+            RevitElementModels = await RevitTask.RunAsync(app =>
             {
                 DockPanelView.CheckSelectAll.IsChecked = false;
                 CurrentDocument = app.ActiveUIDocument.Document;
                 manager.InitializeActiveDocument(CurrentDocument);
                 collection = manager.GetCollisionCommunicateElements();
                 RevitLogger.Info($"Found collision {collection.Count()}");
-                _ = ActivateFamilySimbol(rectangOpeningId);
-                _ = ActivateFamilySimbol(roundOpeningId);
+                ActivateFamilySimbol(rectangOpeningId);
+                ActivateFamilySimbol(roundOpeningId);
                 return collection.ToObservableCollection();
             });
         }
 
-        private bool ActivateFamilySimbol(int simbolIdInt)
+        private void ActivateFamilySimbol(int simbolIdInt)
         {
-            bool result = false;
-            if (0 < simbolIdInt)
+            if (simbolIdInt != 0)
             {
                 Element element = CurrentDocument.GetElement(new ElementId(simbolIdInt));
                 if (element is FamilySymbol symbol && !symbol.IsActive)
                 {
-                    try
-                    {
-                        symbol.Activate();
-                        result = true;
-                    }
-                    catch
-                    {
-                        result = false;
-                    }
+                    symbol.Activate();
                 }
             }
-            return result;
         }
 
         #endregion
@@ -265,27 +258,25 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteApplyCommandAsync()
         {
-            if (!openingView.IsActive)
+            if (!openingView.IsEnabled)
             {
-
-            }
-            await RevitTask.RunAsync(app =>
-            {
-                CurrentDocument = app.ActiveUIDocument.Document;
-                try
+                await RevitTask.RunAsync(app =>
                 {
-                    if (true == openingView.ShowDialog())
+                    CurrentDocument = app.ActiveUIDocument.Document;
+                    try
                     {
-                        _ = openingView.Activate();
+                        if ((bool)openingView.ShowDialog() && openingView.Activate())
+                        {
+                            openingViewModel.RevitElementModels = RevitElementModels;
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    RevitLogger.Error(ex.Message);
-                }
-            });
+                    catch (Exception ex)
+                    {
+                        RevitLogger.Error(ex.Message);
+                    }
+                });
+            }
         }
-
         #endregion
 
 
@@ -293,7 +284,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             manager?.Dispose();
             collection.Clear();
-            ElementList.Clear();
+            RevitElementModels.Clear();
             FilterText = string.Empty;
         }
     }

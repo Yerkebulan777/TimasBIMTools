@@ -24,7 +24,7 @@ namespace RevitTimasBIMTools.ViewModels
         private RevitElementModel model = null;
 
         private Document document { get; set; } = null;
-        public IList<RevitElementModel> RevitElementModelList { get; set; } = null;
+        public IList<RevitElementModel> RevitElementModels { get; set; } = null;
 
         private readonly CutOpeningWindows view = SmartToolController.Services.GetRequiredService<CutOpeningWindows>();
 
@@ -49,13 +49,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         #endregion
 
-
+ 
         private async Task ExecuteApplyCommandAsync()
         {
             await RevitTask.RunAsync(app =>
             {
                 var uidoc = app.ActiveUIDocument;
-                int count = RevitElementModelList.Count;
+                int count = RevitElementModels.Count;
                 document = app.ActiveUIDocument.Document;
                 View3D view3d = RevitViewManager.Get3dView(uidoc);
                 while (view.IsEnabled)
@@ -65,13 +65,13 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         try
                         {
-                            model = RevitElementModelList.First();
+                            model = RevitElementModels.First();
                             elem = document.GetElement(new ElementId(model.IdInt));
-                            if (RevitElementModelList.Remove(model) && elem.IsValidObject)
+                            if (RevitElementModels.Remove(model) && elem.IsValidObject)
                             {
                                 view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
                                 ContentViewControl = new PreviewControl(document, view3d.Id);
-                                count = RevitElementModelList.Count;
+                                count = RevitElementModels.Count;
                             }
                         }
                         catch (Exception ex)
