@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using RevitTimasBIMTools.Services;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -19,16 +19,16 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 try
                 {
-                    t.Start();
+                    _ = t.Start();
                     view = View3D.CreateIsometric(doc, vft3d.Id);
-                    view.get_Parameter(BuiltInParameter.VIEW_DETAIL_LEVEL).Set(3);
-                    view.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE).Set(6);
+                    _ = view.get_Parameter(BuiltInParameter.VIEW_DETAIL_LEVEL).Set(3);
+                    _ = view.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE).Set(6);
                     view.Name = viewName;
-                    t.Commit();
+                    _ = t.Commit();
                 }
                 catch (System.Exception exc)
                 {
-                    t.RollBack();
+                    _ = t.RollBack();
                     RevitLogger.Error(string.Format("Error create 3Dview {0}", exc.Message));
                 }
                 finally
@@ -56,12 +56,33 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void ZoomView(UIDocument uidoc, View3D view)
+        public static void ZoomView(UIDocument uidoc, View3D view3d)
         {
-            uidoc.ActiveView = view;
+            uidoc.ActiveView = view3d;
             uidoc.RefreshActiveView();
-            UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(q => q.ViewId == view.Id);
+            UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(q => q.ViewId == view3d.Id);
             uiview.ZoomToFit();
+        }
+
+
+        public static void GetViewBox(UIDocument uidoc, Element elem, View3D view3d)
+        {
+            BoundingBoxXYZ bbox = elem.get_BoundingBox(view3d);
+            List<ElementId> ids = new List<ElementId>();
+            if (bbox != null && bbox.Enabled)
+            {
+                try
+                {
+                    ids.Add(elem.Id);
+                    uidoc.RequestViewChange(view3d);
+                    view3d.SetSectionBox(bbox);
+                    uidoc.ShowElements(ids);
+                }
+                catch (System.Exception ex)
+                {
+                    RevitLogger.Error(ex.Message);
+                }
+            }
         }
 
 
@@ -71,7 +92,6 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 if (view3d is Autodesk.Revit.DB.View view)
                 {
-
                     uidoc.RequestViewChange(view);
                     List<ElementId> ids = new List<ElementId>();
                     if (TransactionStatus.Started == t.Start())
@@ -91,17 +111,16 @@ namespace RevitTimasBIMTools.RevitUtils
                                 view.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
                             }
                             view.IsolateElementTemporary(elem.Id);
-                            t.Commit();
+                            _ = t.Commit();
                         }
-                        catch (System.Exception exc)
+                        catch (System.Exception ex)
                         {
-                            t.RollBack();
-                            RevitLogger.Error(exc.Message);
+                            _ = t.RollBack();
+                            RevitLogger.Error(ex.Message);
                         }
                         finally
                         {
                             ids.Add(elem.Id);
-                            ZoomView(uidoc, view3d);
                             uidoc.ShowElements(ids);
                         }
                     }
