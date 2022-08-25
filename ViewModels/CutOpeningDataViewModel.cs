@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using Document = Autodesk.Revit.DB.Document;
 
 
@@ -266,17 +267,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 CurrentDocument = app.ActiveUIDocument.Document;
                 openingView = SmartToolController.Services.GetRequiredService<CutOpeningWindows>();
-                try
+                if (openingView.ShowDialog() is true && openingView.Activate())
                 {
-                    bool? dialog = openingView.ShowDialog();
-                    if (dialog is true && openingView.Activate())
-                    {
-                        openingView.RevitViewContent = GetContent(app.ActiveUIDocument);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    RevitLogger.Error(ex.Message);
+                    openingView.RevitViewContent = GetContent(app.ActiveUIDocument);
                 }
             });
         }
