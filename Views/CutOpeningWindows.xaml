@@ -19,7 +19,7 @@
         </Grid.ColumnDefinitions>
         <Grid Grid.Row="0" Grid.Column="0" Margin="10">
             <local:CutOpeningView x:Name="Header" />
-        </Grid>
+            </Grid>
 
     </Grid>
 </Window>
