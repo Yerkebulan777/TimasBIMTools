@@ -28,14 +28,12 @@ namespace RevitTimasBIMTools.ViewModels
         public DockPanelPage DockPanelView { get; set; } = null;
         public static CancellationToken CancelToken = CancellationToken.None;
 
-        private static bool canceled = false;
+        Element element = null;
         private readonly object syncLocker = new object();
         private ElementId elementId = ElementId.InvalidElementId;
         private IList<RevitElementModel> collection = new List<RevitElementModel>(150);
-
         private readonly int roundOpeningId = Properties.Settings.Default.RoundOpeningSimbolIdInt;
         private readonly int rectangOpeningId = Properties.Settings.Default.RectanOpeningSimbolIdInt;
-        private readonly StringCollection stringCollection = Properties.Settings.Default.HostElementIdCollection;
         private readonly CutOpeningCollisionDetection manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionDetection>();
 
 
@@ -159,20 +157,15 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 try
                 {
-                    cts.Cancel();
+                    cts.Cancel(true);
                     CancelToken = cts.Token;
-                    canceled = CancelToken.IsCancellationRequested;
                 }
                 catch (AggregateException)
                 {
                     if (CancelToken.IsCancellationRequested)
                     {
-                        _ = Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
+                        Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
                     }
-                }
-                finally
-                {
-                    cts.Dispose();
                 }
             }
         }
@@ -228,7 +221,6 @@ namespace RevitTimasBIMTools.ViewModels
         private async Task ExecuteSnoopCommandAsync()
         {
             ElementList.Clear();
-            Properties.Settings.Default.Upgrade();
             ElementList = await RevitTask.RunAsync(app =>
             {
                 DockPanelView.CheckSelectAll.IsChecked = false;
@@ -236,12 +228,11 @@ namespace RevitTimasBIMTools.ViewModels
                 manager.InitializeActiveDocument(CurrentDocument);
                 collection = manager.GetCollisionCommunicateElements();
                 RevitLogger.Info($"Found collision {collection.Count()}");
-                _ = ActivateFamilySimbol(rectangOpeningId);
-                _ = ActivateFamilySimbol(roundOpeningId);
+                ActivateFamilySimbol(rectangOpeningId);
+                ActivateFamilySimbol(roundOpeningId);
                 return collection.ToObservableCollection();
             });
         }
-
 
         private bool ActivateFamilySimbol(int simbolIdInt)
         {
@@ -254,10 +245,11 @@ namespace RevitTimasBIMTools.ViewModels
                     try
                     {
                         symbol.Activate();
-                    }
-                    finally
-                    {
                         result = true;
+                    }
+                    catch 
+                    {
+                        result = false;
                     }
                 }
             }
@@ -273,22 +265,34 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteApplyCommandAsync()
         {
-            ProgressView popView = new ProgressView();
             await RevitTask.RunAsync(app =>
             {
+                var openingView = new CutOpeningWindows();
                 CurrentDocument = app.ActiveUIDocument.Document;
                 View3D view = RevitViewManager.Get3dView(CurrentDocument);
-                while (collection.Count > 0)
+                openingView.ShowDialog();
+                while (true)
                 {
-                    popView.Show();
-                    popView.Activate();
-                    Task.Delay(1000).Wait();
-                    if (collection.First() is RevitElementModel model)
+                    if (collection.Count == 0)
                     {
-                        elementId = new ElementId(model.IdInt);
-                        Element elem = CurrentDocument.GetElement(elementId);
-                        collection.Remove(model);
-                        popView.Close();
+                        break;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            openingView.Activate();
+                            var model = collection.First();
+                            elementId = new ElementId(model.IdInt);
+                            element = CurrentDocument.GetElement(elementId);
+                            collection.Remove(model);
+                            Task.Delay(1000).Wait();
+                        }
+                        catch (Exception ex)
+                        {
+                            openingView.Close();
+                            RevitLogger.Error(ex.Message);
+                        }
                     }
                 }
             });
@@ -304,6 +308,5 @@ namespace RevitTimasBIMTools.ViewModels
             ElementList.Clear();
             FilterText = string.Empty;
         }
-
     }
 }

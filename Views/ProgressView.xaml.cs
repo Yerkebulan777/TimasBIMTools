@@ -20,6 +20,7 @@ namespace RevitTimasBIMTools.Views
             InitializeComponent();
         }
 
+
         public void SetProgress(string textVal, double i, double maxvalue = double.NaN, bool invokeRequired = false)
         {
             if (invokeRequired)

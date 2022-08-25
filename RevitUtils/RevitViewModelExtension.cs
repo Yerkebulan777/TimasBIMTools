@@ -33,13 +33,12 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> source)
         {
-            ObservableCollection<T> newSource = new ObservableCollection<T>();
-            foreach (T t in source)
-            {
-                newSource.Add(t);
-            }
+            return new ObservableCollection<T>(source);
+        }
 
-            return newSource;
+        public static ObservableCollection<T> ToObservableCollection<T>(this IList<T> source)
+        {
+            return new ObservableCollection<T>(source);
         }
     }
 }
