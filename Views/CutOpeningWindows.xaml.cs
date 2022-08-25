@@ -1,7 +1,5 @@
 ﻿using RevitTimasBIMTools.ViewModels;
-using System;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -15,23 +13,22 @@ namespace RevitTimasBIMTools.Views
         {
             InitializeComponent();
             DataContext = openingViewModel;
-            StartCloseTimer(5);
         }
 
-        private void StartCloseTimer(double delay)
-        {
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMinutes(delay);
-            timer.Tick += TimerTick;
-            timer.Start();
-        }
+        //private void StartCloseTimer(double delay)
+        //{
+        //    DispatcherTimer timer = new DispatcherTimer();
+        //    timer.Interval = TimeSpan.FromMinutes(delay);
+        //    timer.Tick += TimerTick;
+        //    timer.Start();
+        //}
 
-        private void TimerTick(object sender, EventArgs e)
-        {
-            DispatcherTimer timer = (DispatcherTimer)sender;
-            timer.Tick -= TimerTick;
-            timer.Stop();
-            Close();
-        }
+        //private void TimerTick(object sender, EventArgs e)
+        //{
+        //    DispatcherTimer timer = (DispatcherTimer)sender;
+        //    timer.Tick -= TimerTick;
+        //    timer.Stop();
+        //    Close();
+        //}
     }
 }
