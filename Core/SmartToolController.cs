@@ -31,16 +31,14 @@ namespace RevitTimasBIMTools.Core
             IServiceCollection services = new ServiceCollection();
 
             services.AddSingleton<IRevitTask, RevitTask>();
+            services.AddSingleton<CutOpeningMainHandler>();
             services.AddSingleton<SmartToolGeneralHelper>();
             services.AddSingleton<CutOpeningRegisterDockablePane>();
-
-            services.AddScoped<CutOpeningMainHandler>();
 
             services.AddTransient<IDockablePaneProvider, DockPanelPage>();
             services.AddTransient<CutOpeningCollisionDetection>();
             services.AddTransient<CutOpeningOptionsViewModel>();
             services.AddTransient<CutOpeningDataViewModel>();
-            services.AddTransient<CutOpeningViewModel>();
             services.AddTransient<CutOpeningWindows>();
             services.AddTransient<SettingsWindow>();
 

@@ -3,9 +3,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
-    xmlns:viewModels="clr-namespace:RevitTimasBIMTools.ViewModels"
-    d:DataContext="{d:DesignInstance Type=viewModels:CutOpeningViewModel}"
     x:Class="RevitTimasBIMTools.Views.CutOpeningWindows"
     mc:Ignorable="d" WindowStartupLocation="CenterScreen"
     Title="CutOpeningWindows" Height="500" Width="900" 
@@ -21,7 +18,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Row="0" Grid.Column="0" Margin="10">
-            <ContentControl Content="{Binding Path=ContentViewControl, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <ContentControl  Name="RevitViewContent"/>
         </Grid>
     </Grid>
 </Window>

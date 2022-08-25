@@ -249,9 +249,6 @@
     <Compile Include="ViewModels\WorkerViewModel.cs" />
     <Compile Include="ViewModels\CutOpeningOptionsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
-    <Compile Include="Views\CutOpeningView.xaml.cs">
-      <DependentUpon>CutOpeningView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\CutOpeningWindows.xaml.cs">
       <DependentUpon>CutOpeningWindows.xaml</DependentUpon>
     </Compile>
@@ -284,10 +281,6 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\CutOpeningView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\CutOpeningWindows.xaml">
       <SubType>Designer</SubType>

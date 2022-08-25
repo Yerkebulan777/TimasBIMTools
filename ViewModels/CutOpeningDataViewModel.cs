@@ -31,7 +31,6 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly object syncLocker = new object();
         private readonly ElementId elementId = ElementId.InvalidElementId;
         private IList<RevitElementModel> collection = new List<RevitElementModel>(150);
-        private readonly CutOpeningViewModel openingViewModel = ViewModelLocator.OpeningViewModel;
         private readonly int roundOpeningId = Properties.Settings.Default.RoundOpeningSimbolIdInt;
         private readonly int rectangOpeningId = Properties.Settings.Default.RectanOpeningSimbolIdInt;
         private readonly CutOpeningWindows openingView = SmartToolController.Services.GetRequiredService<CutOpeningWindows>();
@@ -267,7 +266,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if ((bool)openingView.ShowDialog() && openingView.Activate())
                         {
-                            openingViewModel.RevitElementModels = RevitElementModels;
+                            
                         }
                     }
                     catch (Exception ex)

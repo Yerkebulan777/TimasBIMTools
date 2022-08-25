@@ -14,7 +14,5 @@ namespace RevitTimasBIMTools.ViewModels
 
         public static CutOpeningDataViewModel DataViewModel => services.GetRequiredService<CutOpeningDataViewModel>();
 
-        public static CutOpeningViewModel OpeningViewModel => services.GetRequiredService<CutOpeningViewModel>();
-
     }
 }
