@@ -186,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\SmartToolController.cs" />
+    <Compile Include="CutOpening\CutOpeningShowDialogCmd.cs" />
     <Compile Include="RevitUtils\CutOpeningManager.cs" />
     <Compile Include="RevitUtils\ElementDataDictionary.cs" />
     <Compile Include="Core\SmartToolGeneralHelper.cs" />
@@ -201,7 +202,7 @@
     <Compile Include="Services\ManifestFileManager.cs" />
     <Compile Include="CutOpening\CutOpeningRegisterDockablePane.cs" />
     <Compile Include="CutOpening\CutOpeningMainHandler.cs" />
-    <Compile Include="RevitCommads\CutOpeningShowPanelCmd.cs" />
+    <Compile Include="CutOpening\CutOpeningShowPanelCmd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

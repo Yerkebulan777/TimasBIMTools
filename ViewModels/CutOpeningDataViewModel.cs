@@ -21,7 +21,6 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using Document = Autodesk.Revit.DB.Document;
 
 
@@ -32,7 +31,7 @@ namespace RevitTimasBIMTools.ViewModels
         public DockPanelPage DockPanelView { get; set; } = null;
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
-        private CutOpeningWindows openingView = null;
+        private readonly CutOpeningWindows openingView = null;
         private readonly object syncLocker = new object();
         private readonly ElementId elementId = ElementId.InvalidElementId;
         private IList<RevitElementModel> collection = new List<RevitElementModel>(150);
@@ -263,14 +262,16 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteApplyCommandAsync()
         {
+            //openingView = SmartToolController.Services.GetRequiredService<CutOpeningWindows>();
+            UserControl presenter = new UserControl
+            {
+                Height = 300,
+                Width = 500
+            };
             await RevitTask.RunAsync(app =>
             {
                 CurrentDocument = app.ActiveUIDocument.Document;
-                openingView = SmartToolController.Services.GetRequiredService<CutOpeningWindows>();
-                if (openingView.ShowDialog() is true && openingView.Activate())
-                {
-                    openingView.RevitViewContent = GetContent(app.ActiveUIDocument);
-                }
+                presenter.Content = GetContent(app.ActiveUIDocument);
             });
         }
 
@@ -280,23 +281,20 @@ namespace RevitTimasBIMTools.ViewModels
             ContentControl content = null;
             Document document = uidoc.Document;
             View3D view3d = RevitViewManager.Get3dView(uidoc);
-            while (RevitElementModels.Count != 0)
+            try
             {
-                try
+                Task.Delay(3000).Wait();
+                RevitElementModel model = RevitElementModels.First();
+                Element elem = document.GetElement(new ElementId(model.IdInt));
+                if (RevitElementModels.Remove(model) && elem.IsValidObject)
                 {
-                    Task.Delay(1000).Wait();
-                    RevitElementModel model = RevitElementModels.First();
-                    Element elem = document.GetElement(new ElementId(model.IdInt));
-                    if (RevitElementModels.Remove(model) && elem.IsValidObject)
-                    {
-                        view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
-                        content = new PreviewControl(document, view3d.Id);
-                    }
+                    view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
+                    content = new PreviewControl(document, view3d.Id);
                 }
-                catch (Exception ex)
-                {
-                    RevitLogger.Error(ex.Message);
-                }
+            }
+            catch (Exception ex)
+            {
+                RevitLogger.Error(ex.Message);
             }
             return content;
         }

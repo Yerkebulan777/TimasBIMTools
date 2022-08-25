@@ -3,13 +3,12 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
 using System;
 
 
-namespace RevitTimasBIMTools.RevitCommads
+namespace RevitTimasBIMTools.CutOpening
 {
     [Transaction(TransactionMode.ReadOnly)]
     [Regeneration(RegenerationOption.Manual)]
