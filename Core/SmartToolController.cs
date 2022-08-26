@@ -1,8 +1,4 @@
-﻿using System;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Threading;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +8,10 @@ using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
+using System;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 
 namespace RevitTimasBIMTools.Core
@@ -30,17 +30,18 @@ namespace RevitTimasBIMTools.Core
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddSingleton<IRevitTask, RevitTask>();
-            services.AddSingleton<CutOpeningMainHandler>();
-            services.AddSingleton<SmartToolGeneralHelper>();
-            services.AddSingleton<CutOpeningRegisterDockablePane>();
-
-            services.AddTransient<IDockablePaneProvider, DockPanelPage>();
-            services.AddTransient<CutOpeningCollisionDetection>();
-            services.AddTransient<CutOpeningOptionsViewModel>();
-            services.AddTransient<CutOpeningDataViewModel>();
-            services.AddTransient<CutOpeningWindows>();
+            services = services.AddSingleton<IRevitTask, RevitTask>();
+            services = services.AddSingleton<CutOpeningMainHandler>();
+            services = services.AddSingleton<SmartToolGeneralHelper>();
+            services = services.AddSingleton<CutOpeningRegisterDockablePane>();
  
+            services = services.AddTransient<IDockablePaneProvider, DockPanelPage>();
+            services = services.AddTransient<CutOpeningCollisionDetection>();
+            services = services.AddTransient<CutOpeningOptionsViewModel>();
+            services = services.AddTransient<CutOpeningDataViewModel>();
+            services = services.AddTransient<CutOpeningWindows>();
+            services = services.AddTransient<SettingsWindow>();
+
             return services.BuildServiceProvider();
         }
 
