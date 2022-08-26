@@ -74,8 +74,9 @@ namespace RevitTimasBIMTools.CutOpening
         private const double minSideSize = 50 / footToMm;
         private const double maxSideSize = 500 / footToMm;
         private const double minWidthSize = 150 / footToMm;
-        private readonly IList<RevitElementModel> output = new List<RevitElementModel>(150);
-        private readonly double thresholdAngle = Math.Round(Math.Cos(75 * Math.PI / 180), 5);
+        private readonly IList<ElementId> hostIdList = new List<ElementId>(500);
+        private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
+        private readonly IList<RevitElementModel> modelList = new List<RevitElementModel>(250);
         private readonly string linkDocumentTitle = Properties.Settings.Default.TargetDocumentName;
         private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
 
@@ -117,7 +118,7 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public IList<RevitElementModel> GetCollisionCommunicateElements()
         {
-            output.Clear();
+            modelList.Clear();
             collector = ValidWallCollector();
             foreach (Element host in collector)
             {
@@ -131,12 +132,13 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         foreach (RevitElementModel model in GetIntersectionElementModels(currentDocument))
                         {
-                            output.Add(model);
+                            hostIdList.Add(host.Id);
+                            modelList.Add(model);
                         }
                     }
                 }
             }
-            return output;
+            return modelList;
         }
 
 
@@ -553,7 +555,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public void Dispose()
         {
-            output.Clear();
+            modelList.Clear();
             transform?.Dispose();
             collector?.Dispose();
             stringBuilder.Clear();

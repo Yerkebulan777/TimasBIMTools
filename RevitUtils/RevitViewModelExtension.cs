@@ -12,7 +12,7 @@ namespace RevitTimasBIMTools.RevitUtils
         //{
         //    int idValue;
         //    int invalidId = -1;
-        //    ObservableCollection<RevitElementModel> output = new ObservableCollection<RevitElementModel>();
+        //    ObservableCollection<RevitElementModel> modelList = new ObservableCollection<RevitElementModel>();
         //    foreach (Element elem in collector)
         //    {
         //        idValue = elem.Id.IntegerValue;
@@ -23,11 +23,11 @@ namespace RevitTimasBIMTools.RevitUtils
         //            {
         //                string catName = cat == null ? elem.Category.Name : cat;
         //                ElementType etype = elem.Document.GetElement(typeId) as ElementType;
-        //                output.Add(new RevitElementModel(idValue, etype.Name, etype.FamilyName, catName));
+        //                modelList.Add(new RevitElementModel(idValue, etype.Name, etype.FamilyName, catName));
         //            }
         //        }
         //    };
-        //    return output;
+        //    return modelList;
         //}
 
 

@@ -35,7 +35,6 @@ namespace RevitTimasBIMTools.RevitModel
 
         public string SymbolName { get; private set; }
         public string FamilyName { get; private set; }
-
         public string Description { get; set; }
 
         private bool selected = false;
@@ -45,7 +44,6 @@ namespace RevitTimasBIMTools.RevitModel
             set => SetProperty(ref selected, value);
         }
 
-        int IRevitElementModel.IdInt => throw new NotImplementedException();
 
         public override string ToString()
         {

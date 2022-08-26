@@ -37,7 +37,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     using (Transaction t = new Transaction(doc, "delete type"))
                     {
-                        // Do not delete type if it would output in error such as
+                        // Do not delete type if it would modelList in error such as
                         // "Last type in system family "Stacked Wall" cannot be deleted."
                         FailureHandlingOptions failOpt = t.GetFailureHandlingOptions();
                         failOpt.SetClearAfterRollback(true);
