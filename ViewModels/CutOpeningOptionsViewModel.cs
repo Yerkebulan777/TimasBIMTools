@@ -144,11 +144,18 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private int ratio = 3;
+        private int ratio = Properties.Settings.Default.Ratio;
         public int RatioLimit
         {
             get => ratio;
-            set => SetProperty(ref ratio, value);
+            set
+            {
+                value = NormilizeIntValue(value, 1, 7);
+                if (SetProperty(ref ratio, value))
+                {
+                    Properties.Settings.Default.Ratio = ratio;
+                }
+            }
         }
 
         #endregion

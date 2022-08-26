@@ -105,5 +105,17 @@ namespace RevitTimasBIMTools.Properties {
                 this["MaxSideSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int Ratio {
+            get {
+                return ((int)(this["Ratio"]));
+            }
+            set {
+                this["Ratio"] = value;
+            }
+        }
     }
 }
