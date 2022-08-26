@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels" 
     d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningOptionsViewModel}"
-    mc:Ignorable="d" Height="Auto" MinHeight="350" MaxHeight="750" Width="460"
+    mc:Ignorable="d" Height="650" Width="460"
     x:Class="RevitTimasBIMTools.Views.SettingsWindow"
     WindowStartupLocation="CenterScreen"
     Title="Cut opening setting" 
@@ -27,7 +27,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="1" Height="250" VerticalAlignment="Center" Background="White" >
+        <DockPanel Grid.Row="1" Height="150" VerticalAlignment="Center" Background="White" >
             <!--Visibility="{Binding AdvancedSettingsVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToViz}, FallbackValue=Hidden}"-->
             <GroupBox Header=" Element size " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
@@ -106,7 +106,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Size ratio limit" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider x:Name="sliderRatio" Grid.Column="1"  Minimum="1" Maximum="7" TickFrequency="1" 
+                            <Slider x:Name="sliderRatio" Grid.Column="1"  Minimum="1" Maximum="5" TickFrequency="1" 
                                     Value="{Binding RatioLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding RatioLimit, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
@@ -164,9 +164,7 @@
                 </GroupBox>
             </DockPanel>
         </StackPanel>
-        <StackPanel x:Name="SettingCommands" Grid.Row="4" Height="80" Orientation="Horizontal" 
-                    VerticalAlignment="Stretch" HorizontalAlignment="Right" >
-
+        <StackPanel x:Name="SettingCommands" Grid.Row="4" Height="80" Orientation="Horizontal"  HorizontalAlignment="Right" >
             <Button Content="Default" Height="25" Width="90" Margin="10" />
             <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" />
             <Button x:Name="CloseSettingCmd" Content="Apply" Height="25" Width="90" Margin="10,10,20,10" Click="CloseSettingCmd_Click"/>

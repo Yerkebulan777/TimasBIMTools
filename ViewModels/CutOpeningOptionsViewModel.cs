@@ -150,7 +150,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => ratio;
             set
             {
-                value = NormilizeIntValue(value, 1, 7);
+                value = NormilizeIntValue(value, 1, 5);
                 if (SetProperty(ref ratio, value))
                 {
                     Properties.Settings.Default.Ratio = ratio;
