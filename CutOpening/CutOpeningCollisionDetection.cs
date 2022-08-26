@@ -129,7 +129,7 @@ namespace RevitTimasBIMTools.CutOpening
                     hostSolid = host.GetElementCenterSolid(options, identityTransform, centroidPoint);
                     if (hostSolid != null)
                     {
-                        foreach (RevitElementModel model in GetIntersections(currentDocument))
+                        foreach (RevitElementModel model in GetIntersectionElementModels(currentDocument))
                         {
                             output.Add(model);
                         }
@@ -181,7 +181,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private IEnumerable<RevitElementModel> GetIntersections(Document doc)
+        private IEnumerable<RevitElementModel> GetIntersectionElementModels(Document doc)
         {
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new LogicalAndFilter(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
@@ -279,7 +279,7 @@ namespace RevitTimasBIMTools.CutOpening
                 //{
                 //    return structData;
                 //}
-                //structData = GetSizeByParameter(host, etype);
+                //structData = GetSizeByParameter(hostInstance, etype);
                 //if (structData.IsValidDataObject && dictDatabase.TryAdd(uniqueKey.Normalize(), structData))
                 //{
                 //    return structData;

@@ -4,7 +4,6 @@
     {
         int IdInt { get; }
         string SymbolName { get; }
-        string CategoryName { get; }
         string Description { get; set; }
     }
 }

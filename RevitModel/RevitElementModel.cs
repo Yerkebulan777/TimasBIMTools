@@ -1,15 +1,17 @@
-﻿using System;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using System;
 
 
 namespace RevitTimasBIMTools.RevitModel
 {
     public sealed class RevitElementModel : ObservableObject, IRevitElementModel
     {
-        private const double footToMm = 304.8;
+        public readonly int IdInt = 0;
+        public readonly int LevelId = 0;
         private readonly Element instance = null;
         private readonly ElementTypeData elemTypeData;
+        public readonly string CategoryName = string.Empty;
         //private readonly string date = DateTime.Today.Date.ToShortDateString();
         public RevitElementModel(Element elem, ElementTypeData data, string description = null)
         {
@@ -19,9 +21,9 @@ namespace RevitTimasBIMTools.RevitModel
                 elemTypeData = data;
                 IdInt = instance.Id.IntegerValue;
                 LevelId = instance.LevelId.IntegerValue;
+                CategoryName = instance.Category.Name;
                 SymbolName = elemTypeData.SymbolName;
                 FamilyName = elemTypeData.FamilyName;
-                CategoryName = instance.Category.Name;
                 Description = GetSizeDataToString();
                 if (!string.IsNullOrEmpty(description))
                 {
@@ -31,29 +33,9 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        public RevitElementModel(FamilySymbol symbol, string description = null)
-        {
-            instance = symbol;
-            if (symbol.IsValidObject)
-            {
-                SymbolName = symbol.Name.Trim();
-                FamilyName = symbol.Family.Name;
-                CategoryName = symbol.Category.Name;
-                LevelId = symbol.LevelId.IntegerValue;
-                IdInt = symbol.Id.IntegerValue;
-                if (!string.IsNullOrEmpty(description))
-                {
-                    Description = description;
-                }
-            }
-        }
+        public string SymbolName { get; private set; }
+        public string FamilyName { get; private set; }
 
-
-        public int IdInt { get; }
-        public int LevelId { get; }
-        public string SymbolName { get; set; }
-        public string FamilyName { get; set; }
-        public string CategoryName { get; set; }
         public string Description { get; set; }
 
         private bool selected = false;
@@ -63,6 +45,7 @@ namespace RevitTimasBIMTools.RevitModel
             set => SetProperty(ref selected, value);
         }
 
+        int IRevitElementModel.IdInt => throw new NotImplementedException();
 
         public override string ToString()
         {
@@ -74,8 +57,8 @@ namespace RevitTimasBIMTools.RevitModel
         {
             if (elemTypeData.IsValidObject)
             {
-                int h = (int)Math.Round(elemTypeData.Height * footToMm);
-                int w = (int)Math.Round(elemTypeData.Width * footToMm);
+                int h = (int)Math.Round(elemTypeData.Height * 304.8);
+                int w = (int)Math.Round(elemTypeData.Width * 304.8);
                 return $"{w}x{h}(h)".Trim().Normalize();
             }
             return string.Empty;
