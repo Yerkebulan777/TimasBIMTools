@@ -61,10 +61,10 @@ namespace RevitTimasBIMTools.CutOpening
         private const string heightParamName = "высота";
 
         private Document linkDocument = null;
+        private Document currentDocument = null;
         private Transform linkDocTransform = null;
         private RevitLinkInstance linkInstance = null;
         private FilteredElementCollector collector = null;
-        private Document currentDocument = SmartToolController.CurrentDocument;
 
         private readonly ElementId invalId = ElementId.InvalidElementId;
         private readonly Transform identityTransform = Transform.Identity;
@@ -74,9 +74,9 @@ namespace RevitTimasBIMTools.CutOpening
         private const double minSideSize = 50 / footToMm;
         private const double maxSideSize = 500 / footToMm;
         private const double minWidthSize = 150 / footToMm;
-        private readonly IList<ElementId> hostIdList = new List<ElementId>(500);
+        private readonly IList<ElementId> hostIdList = new List<ElementId>(150);
         private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
-        private readonly IList<RevitElementModel> modelList = new List<RevitElementModel>(250);
+        private readonly IList<RevitElementModel> modelList = new List<RevitElementModel>(300);
         private readonly string linkDocumentTitle = Properties.Settings.Default.TargetDocumentName;
         private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
 
@@ -108,6 +108,7 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public void InitializeActiveDocument(Document document)
         {
+            currentDocument = document;
             units = document.GetUnits();
             GetTargetRevitLinkInstance(document);
             Properties.Settings.Default.Upgrade();
@@ -139,6 +140,13 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
             return modelList;
+        }
+
+
+        public bool CutOpening(IList<ElementId> hostIds)
+        {
+
+            return false;
         }
 
 
