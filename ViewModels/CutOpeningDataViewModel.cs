@@ -22,7 +22,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
-
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace RevitTimasBIMTools.ViewModels
 {
@@ -261,7 +261,6 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteApplyCommandAsync()
         {
-            //openingView = SmartToolController.Services.GetRequiredService<CutOpeningWindows>();
             UserControl presenter = new UserControl
             {
                 Height = 300,
@@ -289,11 +288,12 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
                     content = new PreviewControl(document, view3d.Id);
+                    RevitViewManager.SetColorElement(uidoc, elem);
                 }
             }
             catch (Exception ex)
             {
-                RevitLogger.Error(ex.Message);
+                RevitLogger.Log(ex.Message);
             }
             return content;
         }

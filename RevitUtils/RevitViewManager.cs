@@ -40,7 +40,6 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             return view;
         }
-
         /// <summary>
         /// Retrieve a suitable 3D view3d from document. 
         /// </summary>
@@ -66,31 +65,55 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static View3D GetSectionBoxView(UIDocument uidoc, Element elem, View3D view3d)
+        public static BoundingBoxXYZ GetBoundingBox(Element elem, View view = null, double factor = 0.5)
         {
-            BoundingBoxXYZ result = new BoundingBoxXYZ();
-            BoundingBoxXYZ bbox = elem.get_BoundingBox(view3d);
-            double size = (bbox.Max - bbox.Min).GetLength();
-            XYZ vector = new XYZ(size, size, size) * 0.25;
-            result.Transform = Transform.Identity;
-            result.Min = bbox.Min - vector;
-            result.Max = bbox.Min + vector;
+            BoundingBoxXYZ bbox = elem.get_BoundingBox(view);
             if (bbox != null && bbox.Enabled)
             {
-                uidoc.RequestViewChange(view3d);
-                using (Transaction t = new Transaction(uidoc.Document, "GetSectionBoxIn3DView"))
+                double sizeX = bbox.Max.X - bbox.Min.X;
+                double sizeY = bbox.Max.Y - bbox.Min.Y;
+                double sizeZ = bbox.Max.Z - bbox.Min.Z;
+                double size = new double[] { sizeX, sizeY, sizeZ }.Min();
+                XYZ vector = new XYZ(size, size, size) * factor;
+                bbox.Min -= vector;
+                bbox.Max += vector;
+            }
+            return bbox;
+        }
+
+
+        public static View3D GetSectionBoxView(UIDocument uidoc, Element elem, View3D view3d)
+        {
+            ElementId elemId = elem.Id;
+            uidoc.ShowElements(elemId);
+            uidoc.RequestViewChange(view3d);
+            BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
+            using (Transaction t = new Transaction(uidoc.Document, "GetSectionBoxView"))
+            {
+                uidoc.ActiveView = view3d;
+                if (TransactionStatus.Started == t.Start())
                 {
-                    if (TransactionStatus.Started == t.Start())
-                    {
-                        view3d.SetSectionBox(result);
-                    }
-                    if (TransactionStatus.Committed == t.Commit())
-                    {
-                        uidoc.ShowElements(elem.Id);
-                    }
+                    view3d.SetSectionBox(bbox);
+                }
+                if (TransactionStatus.Committed == t.Commit())
+                {
+                    uidoc.Selection.SetElementIds(new List<ElementId> { elemId });
+                    ZoomView(uidoc, view3d);
                 }
             }
             return view3d;
+        }
+
+
+        public static void SetColorElement(UIDocument uidoc, Element elem, byte blue = 0, byte red = 0, byte green = 0)
+        {
+            OverrideGraphicSettings ogs = new OverrideGraphicSettings();
+            Color color = uidoc.Application.Application.Create.NewColor();
+            color.Blue = blue;
+            color.Red = red;
+            color.Green = green;
+            ogs = ogs.SetProjectionLineColor(color);
+            uidoc.ActiveView.SetElementOverrides(elem.Id, ogs);
         }
 
 

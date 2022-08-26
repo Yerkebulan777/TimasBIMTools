@@ -86,11 +86,13 @@ namespace RevitTimasBIMTools.Views
             }
         }
 
+
         private bool ShowSettingsWindow()
         {
             settingsControl = SmartToolController.Services.GetRequiredService<SettingsWindow>();
             return settingsControl.ShowDialog() is true;
         }
+
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
