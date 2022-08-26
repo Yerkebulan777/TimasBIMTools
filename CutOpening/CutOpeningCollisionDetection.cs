@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
@@ -71,10 +70,12 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly StringBuilder stringBuilder = new StringBuilder(25);
         private readonly CopyPasteOptions copyOptions = new CopyPasteOptions();
 
-        private const double minSideSize = 50 / footToMm;
-        private const double maxSideSize = 500 / footToMm;
+        
         private const double minWidthSize = 150 / footToMm;
         private readonly IList<ElementId> hostIdList = new List<ElementId>(150);
+
+        private readonly double minSideSize = Properties.Settings.Default.MinSideSize;
+        private readonly double maxSideSize = Properties.Settings.Default.MaxSideSize;
         private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
         private readonly IList<RevitElementModel> modelList = new List<RevitElementModel>(300);
         private readonly string linkDocumentTitle = Properties.Settings.Default.TargetDocumentName;
@@ -83,15 +84,15 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Templory properties
 
-        private readonly XYZ originPoint = XYZ.Zero;
         private XYZ centroidPoint = XYZ.Zero;
         private XYZ commDirection = XYZ.BasisZ;
         private XYZ hostDirection = XYZ.BasisZ;
 
+
         private Solid hostSolid = null;
         private Solid intersectSolid = null;
         private string uniqueKey = string.Empty;
-
+        private ElementId elemId = ElementId.InvalidElementId;
         private BoundingBoxXYZ hostBbox = new BoundingBoxXYZ();
         private Transform transform = Transform.Identity;
 
@@ -133,7 +134,11 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         foreach (RevitElementModel model in GetIntersectionElementModels(currentDocument))
                         {
-                            hostIdList.Add(host.Id);
+                            elemId = host.Id;
+                            if (!hostIdList.Contains(elemId))
+                            {
+                                hostIdList.Add(elemId);
+                            }
                             modelList.Add(model);
                         }
                     }
@@ -298,7 +303,7 @@ namespace RevitTimasBIMTools.CutOpening
                 //stringBuilder.AppendLine($"Solid volume {hostSolid.Volume} {hostDirection} {commDirection}");
                 if (result is ElementTypeData data && data.IsValidObject)
                 {
-                    dictDatabase.TryAdd(uniqueKey, data);
+                    _ = dictDatabase.TryAdd(uniqueKey, data);
                     return data;
                 }
             }
@@ -389,7 +394,7 @@ namespace RevitTimasBIMTools.CutOpening
         private object GetSizeByGeometry(ElementType etype, Element elem, XYZ direction)
         {
             object result = null;
-            stringBuilder.Clear();
+            _ = stringBuilder.Clear();
             transform = identityTransform;
             direction = ResetDirectionToPositive(direction);
             angleHorisontDegrees = ConvertRadiansToDegrees(GetHorizontAngleRadiansByNormal(direction));
@@ -455,16 +460,16 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 try
                 {
-                    trans.Start();
+                    _ = trans.Start();
                     DirectShape ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_GenericModel));
                     ds.ApplicationDataId = elem.UniqueId;
                     ds.Name = "Intersection by " + elem.Name;
                     ds.SetShape(new GeometryObject[] { solid });
-                    trans.Commit();
+                    _ = trans.Commit();
                 }
                 catch (Exception exc)
                 {
-                    trans.RollBack();
+                    _ = trans.RollBack();
                     RevitLogger.Error(exc.Message);
                 }
             }
@@ -485,7 +490,7 @@ namespace RevitTimasBIMTools.CutOpening
                 Document doc = fi.Document;
                 using (Transaction transaction = new Transaction(doc))
                 {
-                    transaction.Start("Create Temporary Sketch Plane");
+                    _ = transaction.Start("Create Temporary Sketch Plane");
                     try
                     {
                         SketchPlane sketch = SketchPlane.Create(doc, reference);
@@ -499,7 +504,7 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                     finally
                     {
-                        transaction.RollBack();
+                        _ = transaction.RollBack();
                     }
                 }
             }
@@ -566,7 +571,7 @@ namespace RevitTimasBIMTools.CutOpening
             modelList.Clear();
             transform?.Dispose();
             collector?.Dispose();
-            stringBuilder.Clear();
+            _ = stringBuilder.Clear();
             linkInstance?.Dispose();
             linkDocument?.Dispose();
             intersectSolid?.Dispose();

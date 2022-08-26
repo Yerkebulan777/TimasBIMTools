@@ -38,7 +38,7 @@
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Minimum hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <TextBlock Text="Minimum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderMinSizeH" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
                                     Value="{Binding MinElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
@@ -58,51 +58,11 @@
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Minimum width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider x:Name="sliderMinSizeW" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
-                                    Value="{Binding MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding MinElementWidth, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
-                                <TextBox.Resources>
-                                    <Style TargetType="{x:Type Border}">
-                                        <Setter Property="CornerRadius" Value="3"/>
-                                    </Style>
-                                </TextBox.Resources>
-                            </TextBox>
-                        </Grid>
-                    </Border>
-                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Maximum hight" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <TextBlock Text="Maximum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderMaxSizeH" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
                                     Value="{Binding MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding MaxElementHight, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
-                                <TextBox.Resources>
-                                    <Style TargetType="{x:Type Border}">
-                                        <Setter Property="CornerRadius" Value="3"/>
-                                    </Style>
-                                </TextBox.Resources>
-                            </TextBox>
-                        </Grid>
-                    </Border>
-                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Maximum width" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider x:Name="sliderMaxSizeW" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
-                                    Value="{Binding MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding MaxElementWidth, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>

@@ -16,6 +16,7 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public class CutOpeningOptionsViewModel : ObservableObject, IDisposable
     {
+        private const double footToMm = 304.8;
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
             BuiltInCategory.OST_Conduit,
@@ -29,6 +30,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutOpeningOptionsViewModel()
         {
+            Properties.Settings.Default.MinSideSize = minSize / footToMm;
+            Properties.Settings.Default.MaxSideSize = maxSize / footToMm;
         }
 
 
@@ -90,62 +93,33 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Communication Element Property
+        #region Element Size Property
 
-        private int minElementHight = 30;
-        public int MinElementHight
+        private int minSize = 30;
+        public int MinElementSize
         {
-            get => minElementHight;
+            get => minSize;
             set
             {
-                if (value != minElementHight)
+                value = NormilizeIntValue(value, 0, 100);
+                if (SetProperty(ref minSize, value))
                 {
-                    minElementHight = NormilizeIntValue(value, 100, 0);
-                    OnPropertyChanged(nameof(MinElementHight));
-
+                    Properties.Settings.Default.MinSideSize = minSize / footToMm;
                 }
             }
         }
 
 
-        private int minElementWidth = 30;
-        public int MinElementWidth
+        private int maxSize = 500;
+        public int MaxElementSize
         {
-            get => minElementWidth;
+            get => maxSize;
             set
             {
-                if (value != minElementWidth)
+                value = NormilizeIntValue(value, 100, 1500);
+                if (SetProperty(ref maxSize, value))
                 {
-                    minElementWidth = NormilizeIntValue(value, 100, 0);
-                    OnPropertyChanged(nameof(MinElementWidth));
-                }
-            }
-        }
-
-        private int maxElementHight = 500;
-        public int MaxElementHight
-        {
-            get => maxElementHight;
-            set
-            {
-                if (value != maxElementHight)
-                {
-                    maxElementHight = NormilizeIntValue(value, 1500, 100);
-                    OnPropertyChanged(nameof(MaxElementHight));
-                }
-            }
-        }
-
-        private int maxElementWidht = 500;
-        public int MaxElementWidth
-        {
-            get => maxElementWidht;
-            set
-            {
-                if (value != maxElementWidht)
-                {
-                    maxElementWidht = NormilizeIntValue(value, 1500, 100);
-                    OnPropertyChanged(nameof(MaxElementWidth));
+                    Properties.Settings.Default.MinSideSize = maxSize / footToMm;
                 }
             }
         }
@@ -161,8 +135,11 @@ namespace RevitTimasBIMTools.ViewModels
             get => cutOffset;
             set
             {
-                SetProperty(ref cutOffset, value);
-                Properties.Settings.Default.CutOffsetInMm = cutOffset;
+                value = NormilizeIntValue(value, 0, 150);
+                if (SetProperty(ref cutOffset, value))
+                {
+                    Properties.Settings.Default.CutOffsetInMm = cutOffset;
+                }
             }
         }
 
@@ -187,7 +164,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    SetProperty(ref rectangSymbolModel, value);
+                    _ = SetProperty(ref rectangSymbolModel, value);
                     if (rectangSymbolModel is FamilySymbol fam)
                     {
                         Properties.Settings.Default.RectanOpeningSimbolIdInt = fam.Id.IntegerValue;
@@ -204,7 +181,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    SetProperty(ref roundSymbolModel, value);
+                    _ = SetProperty(ref roundSymbolModel, value);
                     if (roundSymbolModel is FamilySymbol fam)
                     {
                         Properties.Settings.Default.RoundOpeningSimbolIdInt = fam.Id.IntegerValue;
@@ -283,15 +260,15 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private static int NormilizeIntValue(int value, int maxVal = 100, int minVal = 0)
+        private static int NormilizeIntValue(int value, int minVal = 0, int maxVal = 100)
         {
-            if (value > maxVal)
-            {
-                value = maxVal;
-            }
             if (value < minVal)
             {
                 value = minVal;
+            }
+            if (value > maxVal)
+            {
+                value = maxVal;
             }
             return value;
         }
