@@ -40,8 +40,7 @@ namespace RevitTimasBIMTools.Core
             services.AddTransient<CutOpeningOptionsViewModel>();
             services.AddTransient<CutOpeningDataViewModel>();
             services.AddTransient<CutOpeningWindows>();
-            services.AddTransient<SettingsWindow>();
-
+ 
             return services.BuildServiceProvider();
         }
 

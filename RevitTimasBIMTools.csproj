@@ -246,7 +246,6 @@
     <Compile Include="ViewConverters\SelectAllConverter.cs" />
     <Compile Include="ViewConverters\StatusConverter.cs" />
     <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
-    <Compile Include="ViewModels\WorkerViewModel.cs" />
     <Compile Include="ViewModels\CutOpeningOptionsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\CutOpeningWindows.xaml.cs">
@@ -254,9 +253,6 @@
     </Compile>
     <Compile Include="Views\DockPanelPage.xaml.cs">
       <DependentUpon>DockPanelPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ProgressView.xaml.cs">
-      <DependentUpon>ProgressView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
@@ -289,10 +285,6 @@
     <Page Include="Views\DockPanelPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ProgressView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SettingsWindow.xaml">
       <SubType>Designer</SubType>

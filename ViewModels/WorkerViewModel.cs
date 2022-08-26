@@ -17,32 +17,26 @@ namespace RevitTimasBIMTools.ViewModels
         public static IMessenger Messenger { get; } = new WeakReferenceMessenger();
 
         private ICommand startCmd;
-        public ICommand StartCommand
-        {
-            get
-            {
-                return startCmd ?? (startCmd = new RelayCommand(() => worker.RunWorkerAsync(), () => !worker.IsBusy));
-            }
-        }
+        public ICommand StartCommand => startCmd ?? (startCmd = new RelayCommand(() => worker.RunWorkerAsync(), () => !worker.IsBusy));
 
         private int progress;
         public int ProgressValue
         {
-            get { return progress; }
-            private set { SetProperty(ref progress, value); }
+            get => progress;
+            private set => SetProperty(ref progress, value);
         }
 
         private bool visibility;
         public bool ProgressVisibility
         {
-            get { return visibility; }
-            set { SetProperty(ref visibility, value); }
+            get => visibility;
+            set => SetProperty(ref visibility, value);
         }
 
         private ObservableCollection<RevitElementModel> items;
         public ObservableCollection<RevitElementModel> Items
         {
-            get { return items; }
+            get => items;
             set
             {
                 if (SetProperty(ref items, value))

@@ -71,10 +71,10 @@ namespace RevitTimasBIMTools.RevitUtils
             BoundingBoxXYZ result = new BoundingBoxXYZ();
             BoundingBoxXYZ bbox = elem.get_BoundingBox(view3d);
             double size = (bbox.Max - bbox.Min).GetLength();
-            XYZ point = new XYZ(size, size, size);
+            XYZ vector = new XYZ(size, size, size) * 0.25;
             result.Transform = Transform.Identity;
-            result.Min = bbox.Min - (point * 0.5);
-            result.Max = bbox.Min + (point * 0.5);
+            result.Min = bbox.Min - vector;
+            result.Max = bbox.Min + vector;
             if (bbox != null && bbox.Enabled)
             {
                 uidoc.RequestViewChange(view3d);
