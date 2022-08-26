@@ -10,7 +10,8 @@
     x:Class="RevitTimasBIMTools.Views.SettingsWindow"
     WindowStartupLocation="CenterScreen"
     Title="Cut opening setting" 
-    Background="Gainsboro">
+    Background="Gainsboro"
+    Topmost="True">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -19,6 +20,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
+    
     <Grid Height="Auto" MinHeight="350" MaxHeight="750" Width="450" >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
