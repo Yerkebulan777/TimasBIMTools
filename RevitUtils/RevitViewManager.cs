@@ -68,7 +68,13 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static View3D GetSectionBoxView(UIDocument uidoc, Element elem, View3D view3d)
         {
+            BoundingBoxXYZ result = new BoundingBoxXYZ();
             BoundingBoxXYZ bbox = elem.get_BoundingBox(view3d);
+            double size = (bbox.Max - bbox.Min).GetLength();
+            XYZ point = new XYZ(size, size, size);
+            result.Transform = Transform.Identity;
+            result.Min = bbox.Min - (point * 0.5);
+            result.Max = bbox.Min + (point * 0.5);
             if (bbox != null && bbox.Enabled)
             {
                 uidoc.RequestViewChange(view3d);
@@ -76,7 +82,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     if (TransactionStatus.Started == t.Start())
                     {
-                        view3d.SetSectionBox(bbox);
+                        view3d.SetSectionBox(result);
                     }
                     if (TransactionStatus.Committed == t.Commit())
                     {
