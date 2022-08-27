@@ -33,7 +33,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-
         #region General Property
 
         private Document doc = null;
@@ -50,8 +49,6 @@ namespace RevitTimasBIMTools.ViewModels
                 };
             }
         }
-
-        public bool SetApply { get; private set; } = false;
 
 
         private string rectangSymbolId;
