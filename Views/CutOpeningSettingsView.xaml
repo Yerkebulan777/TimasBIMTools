@@ -41,7 +41,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Minimum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider x:Name="sliderMinSizeH" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" Margin="10"
+                            <Slider x:Name="sliderMinSizeH" Grid.Column="1"  Minimum="5" Maximum="100" TickFrequency="5" Margin="10"
                                     Value="{Binding MinElementSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding MinElementSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">

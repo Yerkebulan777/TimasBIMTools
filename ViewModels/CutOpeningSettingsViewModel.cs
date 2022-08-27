@@ -124,7 +124,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => minSize;
             set
             {
-                value = NormilizeIntValue(value, 0, 100);
+                value = NormilizeIntValue(value, 5, 100);
                 if (SetProperty(ref minSize, value))
                 {
                     Properties.Settings.Default.MinSideSize = minSize;
