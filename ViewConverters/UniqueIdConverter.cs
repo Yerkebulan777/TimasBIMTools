@@ -9,12 +9,12 @@ namespace RevitTimasBIMTools.ViewConverters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value != null && value is Element elem ? elem.UniqueId : (object)null;
+            return value is string val && !string.IsNullOrEmpty(val) ? val : (object)null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is string val && !string.IsNullOrEmpty(val) ? val : (object)null;
+            return value != null && value is Element elem ? elem.UniqueId : (object)null;
         }
     }
 }
