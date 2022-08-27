@@ -3,30 +3,30 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace TimasBIMTools.ViewConverters
+namespace RevitTimasBIMTools.ViewConverters
 {
     public class ElementIdConverter : IValueConverter
     {
+        private readonly ElementId invalidId = ElementId.InvalidElementId;
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is ElementId)
+            if (value != null && value is ElementId id)
             {
-                return (value as ElementId).IntegerValue;
+                return  id != invalidId ? id.IntegerValue : invalidId.IntegerValue;
             }
-            else if (value is int) { return (int)value; }
-            return -1;
+            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is string)
+            if (value is string val && !string.IsNullOrEmpty(val))
             {
-                if (int.TryParse(value as string, out int id))
+                if (int.TryParse(val, out int id))
                 {
                     return new ElementId(id);
                 }
             }
-            return ElementId.InvalidElementId;
+            return invalidId;
         }
     }
 }

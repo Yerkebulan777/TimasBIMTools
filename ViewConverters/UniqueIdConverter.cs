@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace RevitTimasBIMTools.ViewConverters
 {
-    internal class ElementToUniqueIdConverter : IValueConverter
+    internal class UniqueIdConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
