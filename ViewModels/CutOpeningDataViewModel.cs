@@ -23,6 +23,7 @@ using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
 using UserControl = System.Windows.Controls.UserControl;
 
+
 namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable

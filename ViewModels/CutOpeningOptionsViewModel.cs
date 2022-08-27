@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 
 
-
 namespace RevitTimasBIMTools.ViewModels
 {
     public class CutOpeningOptionsViewModel : ObservableObject, IDisposable
@@ -158,7 +157,6 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Methods
-
         public async Task RaiseExternalEventAsync()
         {
             await GetTargetCategories();
