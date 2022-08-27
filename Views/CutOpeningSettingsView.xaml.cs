@@ -6,10 +6,10 @@ using System.Windows.Controls;
 
 namespace RevitTimasBIMTools.Views
 {
-    public partial class SettingsWindow : Window
+    public partial class CutOpeningSettingsView : Window
     {
         private readonly CutOpeningOptionsViewModel settingsViewModel = ViewModelLocator.OptionsViewModel;
-        public SettingsWindow()
+        public CutOpeningSettingsView()
         {
             InitializeComponent();
             DataContext = settingsViewModel;

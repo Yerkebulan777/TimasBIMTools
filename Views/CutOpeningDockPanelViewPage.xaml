@@ -6,7 +6,7 @@
     xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels" 
     xmlns:converter="clr-namespace:RevitTimasBIMTools.ViewConverters"
     d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningDataViewModel}"
-    x:Class="RevitTimasBIMTools.Views.DockPanelPage" 
+    x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelViewPage" 
     mc:Ignorable="d" Background="Silver">
     <Page.Resources>
         <ResourceDictionary>

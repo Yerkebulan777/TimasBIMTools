@@ -16,20 +16,20 @@ using System.Windows.Controls;
 
 namespace RevitTimasBIMTools.Views
 {
-    /// <summary> Логика взаимодействия для DockPanelPage.xaml </summary>
-    public partial class DockPanelPage : Page, IDisposable, IDockablePaneProvider
+    /// <summary> Логика взаимодействия для CutOpeningDockPanelViewPage.xaml </summary>
+    public partial class CutOpeningDockPanelViewPage : Page, IDisposable, IDockablePaneProvider
     {
         public Document CurrentDocument { get; set; } = null;
 
         private bool disposedValue = false;
         private RevitDocumenModel revitDocumentModel;
-        private SettingsWindow settingsControl = null;
+        private CutOpeningSettingsView settingsControl = null;
         private IList<RevitDocumenModel> revitDocumentModeList = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningOptionsViewModel optViewModel = ViewModelLocator.OptionsViewModel;
         private readonly CutOpeningMainHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
 
-        public DockPanelPage()
+        public CutOpeningDockPanelViewPage()
         {
             InitializeComponent();
             DataContext = dataViewModel;
@@ -80,7 +80,7 @@ namespace RevitTimasBIMTools.Views
 
         private async void SettingsCmd_ClickAsync(object sender, RoutedEventArgs e)
         {
-            settingsControl = SmartToolController.Services.GetRequiredService<SettingsWindow>();
+            settingsControl = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
             if (settingsControl.ShowDialog() is true)
             {
                 await optViewModel.RaiseExternalEventAsync();

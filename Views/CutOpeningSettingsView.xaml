@@ -7,7 +7,7 @@
     xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels" 
     d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningOptionsViewModel}"
     mc:Ignorable="d" Height="650" Width="455"
-    x:Class="RevitTimasBIMTools.Views.SettingsWindow"
+    x:Class="RevitTimasBIMTools.Views.CutOpeningSettingsView"
     WindowStartupLocation="CenterScreen"
     Title="Cut opening setting" 
     Background="Gainsboro"

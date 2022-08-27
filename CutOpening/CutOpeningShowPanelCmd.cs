@@ -32,7 +32,7 @@ namespace RevitTimasBIMTools.CutOpening
             if (dockpid != null && DockablePane.PaneIsRegistered(dockpid))
             {
                 dockpane = dockpane ?? uiapp.GetDockablePane(dockpid);
-                if (dockpane != null && provider is DockPanelPage viewpane)
+                if (dockpane != null && provider is CutOpeningDockPanelViewPage viewpane)
                 {
                     if (dockpane.IsShown())
                     {
