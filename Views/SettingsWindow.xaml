@@ -133,7 +133,8 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text=" Сommunication сategory " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                         <ComboBox x:Name="ComboCats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Name"
-                                  ItemsSource="{Binding Path=RevitCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                  ItemsSource="{Binding Path=RevitCategories, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                                  SelectionChanged="ComboCats_SelectionChanged"/>
                     </Grid>
                 </Border>
             </DockPanel>
@@ -148,8 +149,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Rectangular opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                                 <ComboBox x:Name="ComboRectangSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0" DisplayMemberPath="Name"
-                                          ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                          SelectedItem=""/>
+                                          ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                                          SelectionChanged="ComboRectangSymbol_SelectionChanged"/>
                             </Grid>
                         </Border>
                         <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5" >
@@ -160,7 +161,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Round opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                                 <ComboBox x:Name="ComboRoundSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0" DisplayMemberPath="Name"
-                                          ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                          ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                                          SelectionChanged="ComboRoundSymbol_SelectionChanged"/>
                             </Grid>
                         </Border>
                     </StackPanel>

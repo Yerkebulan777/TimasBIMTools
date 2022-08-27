@@ -36,7 +36,7 @@ namespace RevitTimasBIMTools.Core
             services = services.AddSingleton<CutOpeningRegisterDockablePane>();
  
             services = services.AddTransient<IDockablePaneProvider, DockPanelPage>();
-            services = services.AddTransient<CutOpeningCollisionDetection>();
+            services = services.AddTransient<CutOpeningCollisionManager>();
             services = services.AddTransient<CutOpeningOptionsViewModel>();
             services = services.AddTransient<CutOpeningDataViewModel>();
             services = services.AddTransient<CutOpeningWindows>();

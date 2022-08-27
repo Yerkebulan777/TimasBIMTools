@@ -106,5 +106,17 @@ namespace RevitTimasBIMTools.Properties {
                 this["Ratio"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int СommunCatIdInt {
+            get {
+                return ((int)(this["СommunCatIdInt"]));
+            }
+            set {
+                this["СommunCatIdInt"] = value;
+            }
+        }
     }
 }

@@ -36,7 +36,7 @@ namespace RevitTimasBIMTools.ViewModels
         private IList<RevitElementModel> resultCollection = new List<RevitElementModel>(150);
         private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
         private readonly string rectangOpeningId = Properties.Settings.Default.RectangSymbolUniqueId;
-        private readonly CutOpeningCollisionDetection manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionDetection>();
+        private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
 
 
         public CutOpeningDataViewModel()

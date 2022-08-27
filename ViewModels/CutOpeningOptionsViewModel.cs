@@ -50,19 +50,45 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private string rectangSymbolId;
-        public string RectangSymbolUniqueId
+        private int commCatIdInt = Properties.Settings.Default.СommunCatIdInt;
+        public int СommunCatIdInt
         {
-            get => rectangSymbolId;
-            set => SetProperty(ref rectangSymbolId, value);
+            get => commCatIdInt;
+            set
+            {
+                if (SetProperty(ref commCatIdInt, value))
+                {
+                    Properties.Settings.Default.СommunCatIdInt = value;
+                }
+            }
         }
 
 
-        private string roundSymbolId;
+        private string rectangSymbolId = Properties.Settings.Default.RectangSymbolUniqueId;
+        public string RectangSymbolUniqueId
+        {
+            get => rectangSymbolId;
+            set
+            {
+                if (SetProperty(ref rectangSymbolId, value))
+                {
+                    Properties.Settings.Default.RectangSymbolUniqueId = value;
+                }
+            }
+        }
+
+
+        private string roundSymbolId = Properties.Settings.Default.RoundSymbolUniqueId;
         public string RoundSymbolUniqueId
         {
             get => roundSymbolId;
-            set => SetProperty(ref roundSymbolId, value);
+            set
+            {
+                if (SetProperty(ref roundSymbolId, value))
+                {
+                    Properties.Settings.Default.RoundSymbolUniqueId = value;
+                }
+            }
         }
 
         #endregion
