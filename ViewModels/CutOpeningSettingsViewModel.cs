@@ -8,13 +8,16 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public class CutOpeningOptionsViewModel : ObservableObject, IDisposable
+    public class CutOpeningSettingsViewModel : ObservableObject, IDisposable
     {
+        public Window SettingsView { get; set; } = null;
+
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
             BuiltInCategory.OST_Conduit,
@@ -26,9 +29,8 @@ namespace RevitTimasBIMTools.ViewModels
         };
 
 
-        public CutOpeningOptionsViewModel()
+        public CutOpeningSettingsViewModel()
         {
-
         }
 
 
@@ -114,7 +116,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Element Size Property
+        #region Size Property
 
         private int minSize = Properties.Settings.Default.MinSideSize;
         public int MinElementSize
@@ -131,7 +133,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private int maxSize = Properties.Settings.Default.MinSideSize;
+        private int maxSize = Properties.Settings.Default.MaxSideSize;
         public int MaxElementSize
         {
             get => maxSize;
@@ -140,7 +142,7 @@ namespace RevitTimasBIMTools.ViewModels
                 value = NormilizeIntValue(value, 100, 1500);
                 if (SetProperty(ref maxSize, value))
                 {
-                    Properties.Settings.Default.MinSideSize = maxSize;
+                    Properties.Settings.Default.MaxSideSize = maxSize;
                 }
             }
         }

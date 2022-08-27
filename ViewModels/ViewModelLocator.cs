@@ -8,7 +8,7 @@ namespace RevitTimasBIMTools.ViewModels
     {
         private static readonly IServiceProvider services = SmartToolController.Services;
 
-        public static CutOpeningOptionsViewModel OptionsViewModel => services.GetRequiredService<CutOpeningOptionsViewModel>();
+        public static CutOpeningSettingsViewModel SettingsViewModel => services.GetRequiredService<CutOpeningSettingsViewModel>();
 
         public static CutOpeningDataViewModel DataViewModel => services.GetRequiredService<CutOpeningDataViewModel>();
 

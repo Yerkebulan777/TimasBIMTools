@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using RevitTimasBIMTools.ViewModels;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -8,23 +7,12 @@ namespace RevitTimasBIMTools.Views
 {
     public partial class CutOpeningSettingsView : Window
     {
-        private readonly CutOpeningOptionsViewModel settingsViewModel = ViewModelLocator.OptionsViewModel;
+        private readonly CutOpeningSettingsViewModel optViewModel = ViewModelLocator.SettingsViewModel;
         public CutOpeningSettingsView()
         {
             InitializeComponent();
-            DataContext = settingsViewModel;
-        }
-
-
-        private void CloseSettingCmd_Click(object sender, RoutedEventArgs e)
-        {
-            Properties.Settings.Default.Save();
-        }
-
-
-        private void advanceViz_Checked(object sender, RoutedEventArgs e)
-        {
-            Console.WriteLine("YES");
+            DataContext = optViewModel;
+            optViewModel.SettingsView = this;
         }
 
 
@@ -34,7 +22,7 @@ namespace RevitTimasBIMTools.Views
             {
                 if (cbx.SelectionBoxItem is Category cat)
                 {
-                    settingsViewModel.СommunCatIdInt = cat.Id.IntegerValue;
+                    optViewModel.СommunCatIdInt = cat.Id.IntegerValue;
                 }
             }
         }
@@ -45,7 +33,7 @@ namespace RevitTimasBIMTools.Views
             {
                 if (cbx.SelectionBoxItem is Element elem)
                 {
-                    settingsViewModel.RectangSymbolUniqueId = elem.UniqueId;
+                    optViewModel.RectangSymbolUniqueId = elem.UniqueId;
                 }
             }
         }
@@ -56,13 +44,15 @@ namespace RevitTimasBIMTools.Views
             {
                 if (cbx.SelectionBoxItem is Element elem)
                 {
-                    settingsViewModel.RoundSymbolUniqueId = elem.UniqueId;
+                    optViewModel.RoundSymbolUniqueId = elem.UniqueId;
                 }
             }
         }
 
-
+        private void ApplySettingCmd_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+            Hide();
+        }
     }
-
-
 }

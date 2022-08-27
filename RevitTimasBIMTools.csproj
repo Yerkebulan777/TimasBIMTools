@@ -244,7 +244,7 @@
     <Compile Include="ViewConverters\SelectAllConverter.cs" />
     <Compile Include="ViewConverters\StatusConverter.cs" />
     <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
-    <Compile Include="ViewModels\CutOpeningOptionsViewModel.cs" />
+    <Compile Include="ViewModels\CutOpeningSettingsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\CutOpeningDockPanelView.xaml.cs">
       <DependentUpon>CutOpeningDockPanelView.xaml</DependentUpon>
