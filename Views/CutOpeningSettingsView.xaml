@@ -109,9 +109,9 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Size ratio limit" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderRatio" Grid.Column="1"  Minimum="1" Maximum="5" TickFrequency="1" 
-                                    Value="{Binding RatioLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    Value="{Binding Ratio, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding RatioLimit, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
+                                     Text="{Binding Ratio, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -169,10 +169,11 @@
                 </GroupBox>
             </DockPanel>
         </StackPanel>
-        <ToolBarPanel x:Name="SettingCommands" Grid.Row="4" Orientation="Horizontal"
-                      VerticalAlignment="Center" HorizontalAlignment="Right" Margin="20" >
-            <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" Click="DefaultSettingCmd_Click"/>
-            <Button x:Name="ApplySettingCmd" Content="Apply" Height="25" Width="90" Margin="10" Click="ApplySettingCmd_Click" />
+        <ToolBarPanel x:Name="SettingCommands" Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" >
+            <StackPanel Orientation="Horizontal" Margin="20" >
+                <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" Click="DefaultSettingCmd_Click"/>
+                <Button x:Name="ApplySettingCmd" Content="Apply" Height="25" Width="90" Margin="10" Click="ApplySettingCmd_Click" />
+            </StackPanel>
         </ToolBarPanel>
     </Grid>
 </Window>

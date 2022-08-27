@@ -103,63 +103,6 @@ namespace RevitTimasBIMTools.Core
             {
                 throw;
             }
-
-            #region  Is PreviewControl Sample
-            //dispatch.Invoke(() =>
-            //{
-            //    Task.Delay(500);
-            //    Window presenter;
-            //    PreviewControl prewiew;
-            //    presenter = new Window();
-
-            //    Document document = args.Document;
-
-            //    DispatcherTimer dispatcherTimer;
-
-            //    FilteredElementCollector viewCollector = new FilteredElementCollector(document);
-            //    viewCollector.OfClass(typeof(Autodesk.Revit.DB.DockPanelView));
-
-            //    presenter.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            //    presenter.Height = 500;
-            //    presenter.Width = 500;
-
-            //    try
-            //    {
-            //        foreach (Autodesk.Revit.DB.DockPanelView vw in viewCollector)
-            //        {
-            //            if (vw.IsValidObject && !vw.IsTemplate && vw is ViewPlan)
-            //            {
-            //                prewiew = new PreviewControl(document, vw.IdInt as ElementId)
-            //                {
-            //                    IsManipulationEnabled = true
-            //                };
-            //                presenter.Content = prewiew;
-            //                presenter.Title = vw.SymbolName;
-            //                break;
-            //            }
-            //        }
-            //    }
-            //    catch (Exception exc)
-            //    {
-            //        SendMessageManager.ErrorMsg(exc.Message);
-            //    }
-            //    finally
-            //    {
-            //        presenter.ShowDialog();
-            //        dispatcherTimer = new DispatcherTimer
-            //        {
-            //            Interval = TimeSpan.FromMinutes(0.5)
-            //        };
-            //        dispatcherTimer.Tick += (s, e) =>
-            //        {
-            //            presenter.Close();
-            //            dispatcherTimer.Stop();
-            //        };
-            //        dispatcherTimer.Start();
-            //        viewCollector.Dispose();
-            //    }
-            //});
-            #endregion
         }
     }
 }
