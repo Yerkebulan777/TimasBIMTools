@@ -246,8 +246,8 @@
     <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
     <Compile Include="ViewModels\CutOpeningOptionsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
-    <Compile Include="Views\CutOpeningDockPanelViewPage.xaml.cs">
-      <DependentUpon>CutOpeningDockPanelViewPage.xaml</DependentUpon>
+    <Compile Include="Views\CutOpeningDockPanelView.xaml.cs">
+      <DependentUpon>CutOpeningDockPanelView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CutOpeningSettingsView.xaml.cs">
       <DependentUpon>CutOpeningSettingsView.xaml</DependentUpon>
@@ -273,7 +273,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\CutOpeningDockPanelViewPage.xaml">
+    <Page Include="Views\CutOpeningDockPanelView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

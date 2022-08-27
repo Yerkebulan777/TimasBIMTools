@@ -16,8 +16,8 @@ using System.Windows.Controls;
 
 namespace RevitTimasBIMTools.Views
 {
-    /// <summary> Логика взаимодействия для CutOpeningDockPanelViewPage.xaml </summary>
-    public partial class CutOpeningDockPanelViewPage : Page, IDisposable, IDockablePaneProvider
+    /// <summary> Логика взаимодействия для CutOpeningDockPanelView.xaml </summary>
+    public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
         public Document CurrentDocument { get; set; } = null;
 
@@ -29,7 +29,7 @@ namespace RevitTimasBIMTools.Views
         private readonly CutOpeningOptionsViewModel optViewModel = ViewModelLocator.OptionsViewModel;
         private readonly CutOpeningMainHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
 
-        public CutOpeningDockPanelViewPage()
+        public CutOpeningDockPanelView()
         {
             InitializeComponent();
             DataContext = dataViewModel;

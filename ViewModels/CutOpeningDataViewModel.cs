@@ -28,7 +28,7 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
-        public CutOpeningDockPanelViewPage DockPanelView { get; set; } = null;
+        public CutOpeningDockPanelView DockPanelView { get; set; } = null;
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
         private readonly object syncLocker = new object();
