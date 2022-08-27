@@ -236,7 +236,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private void ActivateFamilySimbol(string simbolId)
         {
-            if (string.IsNullOrEmpty(simbolId))
+            if (!string.IsNullOrEmpty(simbolId))
             {
                 Element element = CurrentDocument.GetElement(simbolId);
                 if (element is FamilySymbol symbol && !symbol.IsActive)

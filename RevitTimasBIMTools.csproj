@@ -240,10 +240,12 @@
     <Compile Include="Temp\Converter.cs" />
     <Compile Include="ViewConverters\BitmapSourceConverter.cs" />
     <Compile Include="ViewConverters\BitmapToImageSourceConverter.cs" />
+    <Compile Include="ViewConverters\ElementIdConverter_1.cs" />
     <Compile Include="ViewConverters\ComponentOptionConverter.cs" />
     <Compile Include="ViewConverters\ElementIdConverter.cs" />
     <Compile Include="ViewConverters\SelectAllConverter.cs" />
     <Compile Include="ViewConverters\StatusConverter.cs" />
+    <Compile Include="ViewConverters\ElementToUniqueIdConverter.cs" />
     <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
     <Compile Include="ViewModels\CutOpeningOptionsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
