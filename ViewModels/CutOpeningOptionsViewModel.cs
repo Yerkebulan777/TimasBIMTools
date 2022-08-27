@@ -16,7 +16,6 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public class CutOpeningOptionsViewModel : ObservableObject, IDisposable
     {
-        private const double footToMm = 304.8;
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
             BuiltInCategory.OST_Conduit,
@@ -30,20 +29,50 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutOpeningOptionsViewModel()
         {
-            Properties.Settings.Default.MinSideSize = minSize / footToMm;
-            Properties.Settings.Default.MaxSideSize = maxSize / footToMm;
+
         }
 
 
-        #region Collections
 
-        private int catIdInt = -1;
-        public int CategoryIdInt
+        #region General Property
+
+        private Document doc = null;
+        public Document CurrentDocument
         {
-            get => catIdInt;
-            set => SetProperty(ref catIdInt, value);
+            get => doc;
+            set
+            {
+                if (value != null)
+                {
+                    doc = value;
+                    OnPropertyChanged(nameof(CurrentDocument));
+                    CommandManager.InvalidateRequerySuggested();
+                };
+            }
         }
 
+        public bool SetApply { get; private set; } = false;
+
+
+        private string rectangSymbolId;
+        public string RectangSymbolUniqueId
+        {
+            get => rectangSymbolId;
+            set => SetProperty(ref rectangSymbolId, value);
+        }
+
+
+        private string roundSymbolId;
+        public string RoundSymbolUniqueId
+        {
+            get => roundSymbolId;
+            set => SetProperty(ref roundSymbolId, value);
+        }
+
+        #endregion
+
+
+        #region ObservableCollection
 
         private ObservableCollection<Category> catList = null;
         public ObservableCollection<Category> RevitCategories
@@ -63,39 +92,9 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Main Settings Property
-
-        private Document doc = null;
-        public Document CurrentDocument
-        {
-            get => doc;
-            set
-            {
-                if (value != null)
-                {
-                    doc = value;
-                    OnPropertyChanged(nameof(CurrentDocument));
-                    CommandManager.InvalidateRequerySuggested();
-                };
-            }
-        }
-
-
-        private bool visibility = true;
-        public bool AdvancedSettingsVisibility
-        {
-            get => visibility;
-            set => SetProperty(ref visibility, value);
-        }
-
-        public bool SetApply { get; private set; } = false;
-
-        #endregion
-
-
         #region Element Size Property
 
-        private int minSize = 30;
+        private int minSize = Properties.Settings.Default.MinSideSize;
         public int MinElementSize
         {
             get => minSize;
@@ -104,13 +103,13 @@ namespace RevitTimasBIMTools.ViewModels
                 value = NormilizeIntValue(value, 0, 100);
                 if (SetProperty(ref minSize, value))
                 {
-                    Properties.Settings.Default.MinSideSize = minSize / footToMm;
+                    Properties.Settings.Default.MinSideSize = minSize;
                 }
             }
         }
 
 
-        private int maxSize = 500;
+        private int maxSize = Properties.Settings.Default.MinSideSize;
         public int MaxElementSize
         {
             get => maxSize;
@@ -119,7 +118,7 @@ namespace RevitTimasBIMTools.ViewModels
                 value = NormilizeIntValue(value, 100, 1500);
                 if (SetProperty(ref maxSize, value))
                 {
-                    Properties.Settings.Default.MinSideSize = maxSize / footToMm;
+                    Properties.Settings.Default.MinSideSize = maxSize;
                 }
             }
         }
@@ -154,45 +153,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref ratio, value))
                 {
                     Properties.Settings.Default.Ratio = ratio;
-                }
-            }
-        }
-
-        #endregion
-
-
-        #region FamilySimbol Property
-
-        private FamilySymbol rectangSymbolModel = null;
-        public FamilySymbol RectangSimbolModel
-        {
-            get => rectangSymbolModel;
-            set
-            {
-                if (value != null)
-                {
-                    _ = SetProperty(ref rectangSymbolModel, value);
-                    if (rectangSymbolModel is FamilySymbol fam)
-                    {
-                        Properties.Settings.Default.RectanOpeningSimbolIdInt = fam.Id.IntegerValue;
-                    }
-                }
-            }
-        }
-
-        private FamilySymbol roundSymbolModel = null;
-        public FamilySymbol RoundSimbolModel
-        {
-            get => roundSymbolModel;
-            set
-            {
-                if (value != null)
-                {
-                    _ = SetProperty(ref roundSymbolModel, value);
-                    if (roundSymbolModel is FamilySymbol fam)
-                    {
-                        Properties.Settings.Default.RoundOpeningSimbolIdInt = fam.Id.IntegerValue;
-                    }
                 }
             }
         }

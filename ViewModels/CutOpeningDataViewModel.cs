@@ -13,7 +13,6 @@ using RevitTimasBIMTools.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
@@ -33,9 +32,9 @@ namespace RevitTimasBIMTools.ViewModels
 
         private readonly object syncLocker = new object();
         private readonly ElementId elementId = ElementId.InvalidElementId;
-        private IList<RevitElementModel> collection = new List<RevitElementModel>(150);
-        private readonly int roundOpeningId = Properties.Settings.Default.RoundOpeningSimbolIdInt;
-        private readonly int rectangOpeningId = Properties.Settings.Default.RectanOpeningSimbolIdInt;
+        private IList<RevitElementModel> resultCollection = new List<RevitElementModel>(150);
+        private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
+        private readonly string rectangOpeningId = Properties.Settings.Default.RectangSymbolUniqueId;
         private readonly CutOpeningCollisionDetection manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionDetection>();
 
 
@@ -182,35 +181,29 @@ namespace RevitTimasBIMTools.ViewModels
         public ICommand SelectAllCommand { get; private set; }
         public void HandleSelectAllCommand(bool? isChecked)
         {
-            int num = 0;
             bool checkedHasValue = isChecked.HasValue;
             bool boolean = checkedHasValue && isChecked.Value;
-            StringCollection collection = new StringCollection();
             if (ItemCollectionView != null)
             {
                 try
                 {
                     foreach (object item in ItemCollectionView)
                     {
-                        if (item is RevitElementModel model)
+                        lock (syncLocker)
                         {
-                            if (checkedHasValue)
+                            if (item is RevitElementModel model)
                             {
-                                model.IsSelected = boolean;
-                            }
-                            if (model.IsSelected == true)
-                            {
-                                lock (collection.SyncRoot)
+                                if (checkedHasValue)
                                 {
-                                    _ = collection.Add(model.IdInt.ToString());
-                                    num++;
+                                    model.IsSelected = boolean;
+                                }
+                                if (model.IsSelected == true)
+                                {
+                                    resultCollection.Add(model);
                                 }
                             }
                         }
                     }
-                    Properties.Settings.Default.HostElementIdCollection = collection;
-                    DockPanelView.CheckSelectAll.IsChecked = isChecked;
-                    Properties.Settings.Default.Save();
                 }
                 catch (Exception exc)
                 {
@@ -232,19 +225,19 @@ namespace RevitTimasBIMTools.ViewModels
                 DockPanelView.CheckSelectAll.IsChecked = false;
                 CurrentDocument = app.ActiveUIDocument.Document;
                 manager.InitializeActiveDocument(CurrentDocument);
-                collection = manager.GetCollisionCommunicateElements();
-                RevitLogger.Info($"Found collision {collection.Count()}");
+                resultCollection = manager.GetCollisionCommunicateElements();
+                RevitLogger.Info($"Found collision {resultCollection.Count()}");
                 ActivateFamilySimbol(rectangOpeningId);
                 ActivateFamilySimbol(roundOpeningId);
-                return collection.ToObservableCollection();
+                return resultCollection.ToObservableCollection();
             });
         }
 
-        private void ActivateFamilySimbol(int simbolIdInt)
+        private void ActivateFamilySimbol(string simbolId)
         {
-            if (simbolIdInt != 0)
+            if (string.IsNullOrEmpty(simbolId))
             {
-                Element element = CurrentDocument.GetElement(new ElementId(simbolIdInt));
+                Element element = CurrentDocument.GetElement(simbolId);
                 if (element is FamilySymbol symbol && !symbol.IsActive)
                 {
                     symbol.Activate();
@@ -303,7 +296,7 @@ namespace RevitTimasBIMTools.ViewModels
         public void Dispose()
         {
             manager?.Dispose();
-            collection.Clear();
+            resultCollection.Clear();
             RevitElementModels.Clear();
             FilterText = string.Empty;
         }

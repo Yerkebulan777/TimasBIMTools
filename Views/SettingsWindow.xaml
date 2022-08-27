@@ -148,7 +148,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Rectangular opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                                 <ComboBox x:Name="ComboRectangSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0" DisplayMemberPath="Name"
-                                          ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                          ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedItem=""/>
                             </Grid>
                         </Border>
                         <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5" >

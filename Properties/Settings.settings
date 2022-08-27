@@ -2,25 +2,22 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="RevitTimasBIMTools.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="HostElementIdCollection" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="TargetDocumentName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="RectanOpeningSimbolIdInt" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="RectangSymbolUniqueId" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="RoundOpeningSimbolIdInt" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="RoundSymbolUniqueId" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="CutOffsetInMm" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="MinSideSize" Type="System.Double" Scope="User">
+    <Setting Name="MinSideSize" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="MaxSideSize" Type="System.Double" Scope="User">
+    <Setting Name="MaxSideSize" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="Ratio" Type="System.Int32" Scope="User">

@@ -25,17 +25,6 @@ namespace RevitTimasBIMTools.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection HostElementIdCollection {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["HostElementIdCollection"]));
-            }
-            set {
-                this["HostElementIdCollection"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string TargetDocumentName {
             get {
@@ -48,25 +37,25 @@ namespace RevitTimasBIMTools.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int RectanOpeningSimbolIdInt {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RectangSymbolUniqueId {
             get {
-                return ((int)(this["RectanOpeningSimbolIdInt"]));
+                return ((string)(this["RectangSymbolUniqueId"]));
             }
             set {
-                this["RectanOpeningSimbolIdInt"] = value;
+                this["RectangSymbolUniqueId"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int RoundOpeningSimbolIdInt {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RoundSymbolUniqueId {
             get {
-                return ((int)(this["RoundOpeningSimbolIdInt"]));
+                return ((string)(this["RoundSymbolUniqueId"]));
             }
             set {
-                this["RoundOpeningSimbolIdInt"] = value;
+                this["RoundSymbolUniqueId"] = value;
             }
         }
         
@@ -85,9 +74,9 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double MinSideSize {
+        public int MinSideSize {
             get {
-                return ((double)(this["MinSideSize"]));
+                return ((int)(this["MinSideSize"]));
             }
             set {
                 this["MinSideSize"] = value;
@@ -97,9 +86,9 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public double MaxSideSize {
+        public int MaxSideSize {
             get {
-                return ((double)(this["MaxSideSize"]));
+                return ((int)(this["MaxSideSize"]));
             }
             set {
                 this["MaxSideSize"] = value;

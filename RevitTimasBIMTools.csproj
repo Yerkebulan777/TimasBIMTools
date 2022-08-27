@@ -219,7 +219,6 @@
     <Compile Include="RevitCommads\AutorizedCommand.cs" />
     <Compile Include="RevitCommads\CmdChangeElementColor.cs" />
     <Compile Include="RevitCommads\CmdParameterUnitConverter.cs" />
-    <Compile Include="RevitCommads\SelectIntersectingCommand.cs" />
     <Compile Include="RevitModel\IRevitStructuralModel.cs" />
     <Compile Include="RevitUtils\IntersectionExtension.cs" />
     <Compile Include="RevitModel\RevitDocumenModel.cs" />

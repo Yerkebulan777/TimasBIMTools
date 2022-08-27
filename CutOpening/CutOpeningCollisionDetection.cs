@@ -69,13 +69,12 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly Transform identityTransform = Transform.Identity;
         private readonly StringBuilder stringBuilder = new StringBuilder(25);
         private readonly CopyPasteOptions copyOptions = new CopyPasteOptions();
-
-        
+                
         private const double minWidthSize = 150 / footToMm;
         private readonly IList<ElementId> hostIdList = new List<ElementId>(150);
 
-        private readonly double minSideSize = Properties.Settings.Default.MinSideSize;
-        private readonly double maxSideSize = Properties.Settings.Default.MaxSideSize;
+        private readonly int minSideSize = Properties.Settings.Default.MinSideSize;
+        private readonly int maxSideSize = Properties.Settings.Default.MaxSideSize;
         private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
         private readonly IList<RevitElementModel> modelList = new List<RevitElementModel>(300);
         private readonly string linkDocumentTitle = Properties.Settings.Default.TargetDocumentName;
@@ -150,7 +149,6 @@ namespace RevitTimasBIMTools.CutOpening
 
         public bool CutOpening(IList<ElementId> hostIds)
         {
-
             return false;
         }
 
@@ -202,18 +200,18 @@ namespace RevitTimasBIMTools.CutOpening
             LogicalAndFilter intersectFilter = new LogicalAndFilter(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter);
             collector = collector.WherePasses(multicategoryFilter);
-            foreach (Element communication in collector)
+            foreach (Element elem in collector)
             {
-                if (communication.IsValidObject && VerifyElementByLenght(communication))
+                if (elem.IsValidObject && VerifyElementByLenght(elem))
                 {
-                    if (GetElementDirection(communication, out commDirection) && IsParallel(hostDirection, commDirection))
+                    if (GetElementDirection(elem, out commDirection) && IsParallel(hostDirection, commDirection))
                     {
-                        intersectSolid = GetIntersectSolid(hostSolid, communication, linkDocTransform);
+                        intersectSolid = GetIntersectSolid(hostSolid, elem, linkDocTransform);
                         if (intersectSolid != null && intersectSolid.Volume > toleranceVolume)
                         {
                             centroidPoint = intersectSolid.ComputeCentroid();
-                            ElementTypeData sizeData = DefineElementSize(communication);
-                            yield return new RevitElementModel(communication, sizeData, stringBuilder.ToString());
+                            ElementTypeData sizeData = DefineElementSize(elem);
+                            yield return new RevitElementModel(elem, sizeData, stringBuilder.ToString());
                         }
                     }
                 }
@@ -571,7 +569,7 @@ namespace RevitTimasBIMTools.CutOpening
             modelList.Clear();
             transform?.Dispose();
             collector?.Dispose();
-            _ = stringBuilder.Clear();
+            stringBuilder.Clear();
             linkInstance?.Dispose();
             linkDocument?.Dispose();
             intersectSolid?.Dispose();
