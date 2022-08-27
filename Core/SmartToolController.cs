@@ -39,7 +39,6 @@ namespace RevitTimasBIMTools.Core
             services = services.AddTransient<CutOpeningCollisionManager>();
             services = services.AddTransient<CutOpeningOptionsViewModel>();
             services = services.AddTransient<CutOpeningDataViewModel>();
-            services = services.AddTransient<CutOpeningWindows>();
             services = services.AddTransient<SettingsWindow>();
 
             return services.BuildServiceProvider();

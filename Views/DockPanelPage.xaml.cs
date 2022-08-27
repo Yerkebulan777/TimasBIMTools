@@ -80,17 +80,11 @@ namespace RevitTimasBIMTools.Views
 
         private async void SettingsCmd_ClickAsync(object sender, RoutedEventArgs e)
         {
-            if (ShowSettingsWindow())
+            settingsControl = SmartToolController.Services.GetRequiredService<SettingsWindow>();
+            if (settingsControl.ShowDialog() is true)
             {
                 await optViewModel.RaiseExternalEventAsync();
             }
-        }
-
-
-        private bool ShowSettingsWindow()
-        {
-            settingsControl = SmartToolController.Services.GetRequiredService<SettingsWindow>();
-            return settingsControl.ShowDialog() is true;
         }
 
 
