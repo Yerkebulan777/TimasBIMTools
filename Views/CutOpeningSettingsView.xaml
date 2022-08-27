@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels" 
     d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningSettingsViewModel}"
-    mc:Ignorable="d" Height="650" Width="455"
+    mc:Ignorable="d" Height="650" Width="460"
     x:Class="RevitTimasBIMTools.Views.CutOpeningSettingsView"
     WindowStartupLocation="CenterScreen"
     Title="Cut opening setting" 
@@ -20,7 +20,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    
+
     <Grid Height="Auto" MinHeight="350" MaxHeight="750" Width="450" >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -44,7 +44,7 @@
                             <Slider x:Name="sliderMinSizeH" Grid.Column="1"  Minimum="5" Maximum="100" TickFrequency="5" Margin="10"
                                     Value="{Binding MinElementSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding MinElementSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                     Text="{Binding MinElementSize, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -64,7 +64,7 @@
                             <Slider x:Name="sliderMaxSizeH" Grid.Column="1"  Minimum="100" Maximum="1500" TickFrequency="100" Margin="10"
                                     Value="{Binding MaxElementSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding MaxElementSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                     Text="{Binding MaxElementSize, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -88,7 +88,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Cut offset" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider x:Name="sliderCutOffset" Grid.Column="1"  Minimum="0" Maximum="150" TickFrequency="5" 
+                            <Slider x:Name="sliderCutOffset" Grid.Column="1"  Minimum="0" Maximum="100" TickFrequency="5" 
                                     Value="{Binding CutOffset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
                                      Text="{Binding CutOffset, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
@@ -169,11 +169,10 @@
                 </GroupBox>
             </DockPanel>
         </StackPanel>
-        <StackPanel x:Name="SettingCommands" Grid.Row="4" Height="80" Orientation="Horizontal"  HorizontalAlignment="Right" >
-            <Button Content="Default" Height="25" Width="90" Margin="10" />
-            <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" />
-            <Button x:Name="ApplySettingCmd" Content="Apply" Height="25" Width="90" Margin="10,10,20,10" Click="ApplySettingCmd_Click"
-                     />
-        </StackPanel>
+        <ToolBarPanel x:Name="SettingCommands" Grid.Row="4" Orientation="Horizontal"
+                      VerticalAlignment="Center" HorizontalAlignment="Right" Margin="20" >
+            <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" Click="DefaultSettingCmd_Click"/>
+            <Button x:Name="ApplySettingCmd" Content="Apply" Height="25" Width="90" Margin="10" Click="ApplySettingCmd_Click" />
+        </ToolBarPanel>
     </Grid>
 </Window>

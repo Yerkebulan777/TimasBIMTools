@@ -96,26 +96,6 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region ObservableCollection
-
-        private ObservableCollection<Category> catList = null;
-        public ObservableCollection<Category> RevitCategories
-        {
-            get => catList;
-            set => SetProperty(ref catList, value);
-        }
-
-
-        private ObservableCollection<FamilySymbol> simbols = null;
-        public ObservableCollection<FamilySymbol> RevitFamilySimbols
-        {
-            get => simbols;
-            set => SetProperty(ref simbols, value);
-        }
-
-        #endregion
-
-
         #region Size Property
 
         private int minSize = Properties.Settings.Default.MinSideSize;
@@ -150,7 +130,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Create Opening Property
+        #region Opening Property
 
         private int cutOffset = Properties.Settings.Default.CutOffsetInMm;
         public int CutOffset
@@ -168,7 +148,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         private int ratio = Properties.Settings.Default.Ratio;
-        public int RatioLimit
+        public int Ratio
         {
             get => ratio;
             set
@@ -261,6 +241,26 @@ namespace RevitTimasBIMTools.ViewModels
                 value = maxVal;
             }
             return value;
+        }
+
+        #endregion
+
+
+        #region ObservableCollection
+
+        private ObservableCollection<Category> catList = null;
+        public ObservableCollection<Category> RevitCategories
+        {
+            get => catList;
+            set => SetProperty(ref catList, value);
+        }
+
+
+        private ObservableCollection<FamilySymbol> simbols = null;
+        public ObservableCollection<FamilySymbol> RevitFamilySimbols
+        {
+            get => simbols;
+            set => SetProperty(ref simbols, value);
         }
 
         #endregion

@@ -49,10 +49,20 @@ namespace RevitTimasBIMTools.Views
             }
         }
 
+        private void DefaultSettingCmd_Click(object sender, RoutedEventArgs e)
+        {
+            optViewModel.MinElementSize = 30;
+            optViewModel.MaxElementSize = 500;
+            optViewModel.CutOffset = 50;
+            optViewModel.Ratio = 5;
+        }
+
         private void ApplySettingCmd_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.Save();
             Hide();
         }
+
+
     }
 }
