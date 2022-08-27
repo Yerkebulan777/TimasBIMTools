@@ -10,11 +10,7 @@ namespace RevitTimasBIMTools.ViewConverters
         private readonly ElementId invalidId = ElementId.InvalidElementId;
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null && value is ElementId id)
-            {
-                return  id != invalidId ? id.IntegerValue : invalidId.IntegerValue;
-            }
-            return null;
+            return value != null && value is ElementId id ? id.IntegerValue : invalidId.IntegerValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
