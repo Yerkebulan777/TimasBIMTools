@@ -54,7 +54,7 @@ namespace RevitTimasBIMTools.Views
             optViewModel.MinElementSize = 30;
             optViewModel.MaxElementSize = 500;
             optViewModel.CutOffset = 50;
-            optViewModel.Ratio = 5;
+            optViewModel.Ratio = 3;
         }
 
         private void ApplySettingCmd_Click(object sender, RoutedEventArgs e)
