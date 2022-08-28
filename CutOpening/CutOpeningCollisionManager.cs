@@ -451,6 +451,13 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
+
+
+
+
+
+
+
         #region Other methods
         private void CreateDirectShape(Document doc, Element elem, Solid solid)
         {
