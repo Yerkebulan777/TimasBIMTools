@@ -9,7 +9,7 @@ using GlobalParameter = Autodesk.Revit.DB.GlobalParameter;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
-    public static class ParameterUtils
+    public static class RevitParameterUtils
     {
         public const string Caption = "Parameter Checker";
         public static List<Element> GetSelection(this UIDocument uidoc)

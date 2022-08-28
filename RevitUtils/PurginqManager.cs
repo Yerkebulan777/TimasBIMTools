@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
-    internal class PurginqManager
+    internal class RevitPurginqManager
     {
         public void purgeFamiliesAndTypes(Document doc)
         {

@@ -2,6 +2,7 @@
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Revit.Async;
 using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,6 +19,7 @@ namespace RevitTimasBIMTools.ViewModels
     {
         public Window SettingsView { get; set; } = null;
 
+        private FilteredElementCollector collector = null;
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
             BuiltInCategory.OST_Conduit,
@@ -267,6 +269,32 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         //StringFormat={}{0:n5}
+
+
+        private void getConstructMaterial(Document doc)
+        {
+            collector = new FilteredElementCollector(doc).OfClass(typeof(WallType));
+            foreach (Element elem in collector)
+            {
+                GetCoreMayerial(elem);
+                return;
+            }
+
+        }
+
+
+        private void GetCoreMayerial(Element elem)
+        {
+            if (elem is Wall wall)
+            {
+                WallType wType = wall.WallType;
+                if (WallKind.Basic == wType.Kind)
+                {
+                    RevitLogger.Info(wType.FamilyName);
+                }
+            }
+
+        }
 
 
         public void Dispose()
