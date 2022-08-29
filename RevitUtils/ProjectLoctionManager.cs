@@ -32,7 +32,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
             // Angles are in radians when coming from Revit API, so we 
             // convert to degrees for display
-            const double angleRatio = Math.PI / 180;        // angle conversion factor
+            const double angleRatio = Math.PI / 180;  // angle conversion factor
 
             SiteLocation site = projectLocation.GetSiteLocation();
             string degreeSymbol = ((char)176).ToString();

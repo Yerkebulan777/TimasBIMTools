@@ -18,7 +18,6 @@ namespace RevitTimasBIMTools.ViewModels
     public class CutOpeningSettingsViewModel : ObservableObject, IDisposable
     {
         public Window SettingsView { get; set; } = null;
-
         private FilteredElementCollector collector = null;
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {

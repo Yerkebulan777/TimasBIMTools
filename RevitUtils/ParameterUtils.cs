@@ -11,7 +11,7 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     public static class RevitParameterUtils
     {
-        public const string Caption = "Parameter Checker";
+        public const string Caption = "BIM Tools";
         public static List<Element> GetSelection(this UIDocument uidoc)
         {
             Document doc = uidoc.Document;
