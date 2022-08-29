@@ -12,11 +12,11 @@ namespace RevitTimasBIMTools.RevitUtils
             return RevitFilterManager.GetInstancesOfCategory(doc, typeof(RevitLinkInstance), BuiltInCategory.OST_RvtLinks);
         }
 
-        public static IList<RevitDocumenModel> GetDocumentCollection(Document doc)
+        public static IList<DocumentModel> GetDocumentCollection(Document doc)
         {
-            List<RevitDocumenModel> documents = new List<RevitDocumenModel>
+            List<DocumentModel> documents = new List<DocumentModel>
             {
-                new RevitDocumenModel(true, doc, Transform.Identity)
+                new DocumentModel(true, doc, Transform.Identity)
             };
             foreach (RevitLinkInstance link in GetRevitLinkInstanceCollector(doc))
             {
@@ -27,7 +27,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     try
                     {
                         Transform totalTransform = link.GetTotalTransform();
-                        documents.Add(new RevitDocumenModel(false, linkDocument, totalTransform, id));
+                        documents.Add(new DocumentModel(false, linkDocument, totalTransform, id));
                     }
                     catch (System.Exception exc)
                     {

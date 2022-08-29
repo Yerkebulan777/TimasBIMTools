@@ -221,7 +221,7 @@
     <Compile Include="RevitCommads\CmdParameterUnitConverter.cs" />
     <Compile Include="RevitModel\IRevitStructuralModel.cs" />
     <Compile Include="RevitUtils\IntersectionExtension.cs" />
-    <Compile Include="RevitModel\RevitDocumenModel.cs" />
+    <Compile Include="RevitModel\DocumentModel.cs" />
     <Compile Include="RevitModel\RevitElementModel.cs" />
     <Compile Include="RevitUtils\RevitDocumentManager.cs" />
     <Compile Include="RevitUtils\ParameterUtils.cs" />

@@ -22,10 +22,11 @@ namespace RevitTimasBIMTools.Views
         public Document CurrentDocument { get; set; } = null;
 
         private bool disposedValue = false;
-        private RevitDocumenModel revitDocumentModel;
-        private IList<RevitDocumenModel> revitDocumentModeList = null;
+        private DocumentModel revitDocumentModel;
+        private IList<DocumentModel> revitDocumentModeList = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningSettingsViewModel optViewModel = ViewModelLocator.SettingsViewModel;
+        private readonly CutOpeningSettingsView settingsView = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
         private readonly CutOpeningMainHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
 
         public CutOpeningDockPanelView()
@@ -53,8 +54,12 @@ namespace RevitTimasBIMTools.Views
         {
             revitDocumentModeList = e.Documents;
             revitDocumentModel = revitDocumentModeList.FirstOrDefault();
-            if (CurrentDocument == null && revitDocumentModeList.Count > 0)
+            if (CurrentDocument == null && revitDocumentModel.IsActive)
             {
+                settingsView.ComboTargetCats.ItemsSource = e.Categories;
+                settingsView.ComboRoundSymbol.ItemsSource = e.FamilySymbols;
+                settingsView.ComboRectangSymbol.ItemsSource = e.FamilySymbols;
+                settingsView.ComboStructMats.ItemsSource = e.StructureMaterials;
                 ActiveDocTitle.Content = revitDocumentModel.Document.Title.ToUpper();
                 dataViewModel.CurrentDocument = revitDocumentModel.Document;
                 ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
@@ -65,10 +70,19 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        private void ShowSettingsCmd_Click(object sender, RoutedEventArgs e)
+        {
+            if (true == settingsView.ShowDialog())
+            {
+                settingsView.Activate();
+            }
+        }
+
+
         private void ComboDocs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             object item = ComboDocs.SelectedItem;
-            if (item is RevitDocumenModel model)
+            if (item is DocumentModel model)
             {
                 Properties.Settings.Default.TargetDocumentName = model.Title;
                 Properties.Settings.Default.Save();
@@ -168,5 +182,7 @@ namespace RevitTimasBIMTools.Views
             GC.WaitForPendingFinalizers();
             //GC.SuppressFinalize(this);
         }
+
+
     }
 }

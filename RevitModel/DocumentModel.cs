@@ -3,9 +3,9 @@ using System.IO;
 
 namespace RevitTimasBIMTools.RevitModel
 {
-    public struct RevitDocumenModel
+    public struct DocumentModel
     {
-        public RevitDocumenModel(bool active, Document document, Transform transform, int id = 0)
+        public DocumentModel(bool active, Document document, Transform transform, int id = 0)
         {
             Id = id;
             IsActive = active;
