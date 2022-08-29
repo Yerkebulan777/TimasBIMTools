@@ -22,7 +22,7 @@ namespace RevitTimasBIMTools.ViewModels
         private Categories allCategories { get; set; } = null;
         private FilteredElementCollector collector { get; set; } = null;
 
-        public readonly Dictionary<string, Material> StructuralMaterials = new Dictionary<string, Material>();
+        public readonly Dictionary<string, string> StructuralMaterials = new Dictionary<string, string>();
         private readonly MaterialFunctionAssignment structure = MaterialFunctionAssignment.Structure;
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
@@ -302,21 +302,21 @@ namespace RevitTimasBIMTools.ViewModels
                 foreach (Element elem in collector)
                 {
                     Tuple<string, Material> temp = GetStructureMaterial(elem);
-                    StructuralMaterials[temp.Item1] = temp.Item2;
+                    StructuralMaterials[temp.Item1] = temp.Item2.Name;
                 }
 
                 collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors);
                 foreach (Element elem in collector)
                 {
                     Tuple<string, Material> temp = GetStructureMaterial(elem);
-                    StructuralMaterials[temp.Item1] = temp.Item2;
+                    StructuralMaterials[temp.Item1] = temp.Item2.Name;
                 }
 
                 collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs);
                 foreach (Element elem in collector)
                 {
                     Tuple<string, Material> temp = GetStructureMaterial(elem);
-                    StructuralMaterials[temp.Item1] = temp.Item2;
+                    StructuralMaterials[temp.Item1] = temp.Item2.Name;
                 }
                 collector.Dispose();
             });
