@@ -7,11 +7,13 @@ namespace RevitTimasBIMTools.RevitUtils
     {
         public static Dictionary<string, string> GetAllConstructionStructureMaterials(Document doc)
         {
-            Material material;
-            CompoundStructure comStruct;
+            Material material = null;
             Dictionary<string, string> result = new Dictionary<string, string>();
             MaterialFunctionAssignment structure = MaterialFunctionAssignment.Structure;
+
+            Material categoryMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
             FilteredElementCollector collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls);
+            CompoundStructure comStruct;
             foreach (Element elem in collector)
             {
                 if (elem is WallType wallType)
@@ -23,22 +25,29 @@ namespace RevitTimasBIMTools.RevitUtils
                         {
                             if (structure == structLayer.Function)
                             {
-                                try
+                                if (structure == structLayer.Function)
                                 {
-                                    material = doc.GetElement(structLayer.MaterialId) as Material;
-                                    if (null != material)
+                                    try
                                     {
-                                        result[wallType.Name] = material.Name;
+                                        material = doc.GetElement(structLayer.MaterialId) as Material;
+                                        material = material ?? categoryMaterial;
                                     }
+                                    finally
+                                    {
+                                        if (null != material)
+                                        {
+                                            result[wallType.Name] = material.Name;
+                                        }
+                                    }
+                                    break;
                                 }
-                                catch (System.Exception) { continue; }
-                                break;
                             }
                         }
                     }
                 }
             }
 
+            categoryMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Floors).Material;
             collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors);
             foreach (Element elem in collector)
             {
@@ -51,22 +60,29 @@ namespace RevitTimasBIMTools.RevitUtils
                         {
                             if (structure == structLayer.Function)
                             {
-                                try
+                                if (structure == structLayer.Function)
                                 {
-                                    material = doc.GetElement(structLayer.MaterialId) as Material;
-                                    if (null != material)
+                                    try
                                     {
-                                        result[floorType.Name] = material.Name;
+                                        material = doc.GetElement(structLayer.MaterialId) as Material;
+                                        material = material ?? categoryMaterial;
                                     }
+                                    finally
+                                    {
+                                        if (null != material)
+                                        {
+                                            result[floorType.Name] = material.Name;
+                                        }
+                                    }
+                                    break;
                                 }
-                                catch (System.Exception) { continue; }
-                                break;
                             }
                         }
                     }
                 }
             }
 
+            categoryMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
             collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs);
             foreach (Element elem in collector)
             {
@@ -82,12 +98,15 @@ namespace RevitTimasBIMTools.RevitUtils
                                 try
                                 {
                                     material = doc.GetElement(structLayer.MaterialId) as Material;
+                                    material = material ?? categoryMaterial;
+                                }
+                                finally
+                                {
                                     if (null != material)
                                     {
                                         result[roofType.Name] = material.Name;
                                     }
                                 }
-                                catch (System.Exception) { continue; }
                                 break;
                             }
                         }
@@ -96,8 +115,8 @@ namespace RevitTimasBIMTools.RevitUtils
             }
 
             collector.Dispose();
-
             return result;
+
         }
     }
 }
