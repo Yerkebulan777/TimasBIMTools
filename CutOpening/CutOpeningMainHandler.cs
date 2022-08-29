@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
+using System;
+using System.Collections.Generic;
 
 
 namespace RevitTimasBIMTools.CutOpening
@@ -21,8 +21,9 @@ namespace RevitTimasBIMTools.CutOpening
                 return;
             }
 
+            Categories categories = uidoc.Document.Settings.Categories;
             IList<RevitDocumenModel> documents = RevitDocumentManager.GetDocumentCollection(doc);
-            OnCompleted(new BaseCompletedEventArgs(documents));
+            OnCompleted(new BaseCompletedEventArgs(documents, categories));
         }
 
 
@@ -41,10 +42,12 @@ namespace RevitTimasBIMTools.CutOpening
 
     public class BaseCompletedEventArgs : EventArgs
     {
+        public Categories Categories { get; }
         public IList<RevitDocumenModel> Documents { get; }
-        public BaseCompletedEventArgs(IList<RevitDocumenModel> documents)
+        public BaseCompletedEventArgs(IList<RevitDocumenModel> documents, Categories categories)
         {
             Documents = documents;
+            Categories = categories;
         }
     }
 }

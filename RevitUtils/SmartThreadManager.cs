@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
-    internal class CutOpeningManager
+    internal class SmartThreadManager
     {
         public void DoWork(object state)
         {
@@ -49,6 +49,5 @@ namespace RevitTimasBIMTools.RevitUtils
 
             return result;
         }
-
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Input;
 using Revit.Async;
 using RevitTimasBIMTools.RevitUtils;
 using System;
@@ -10,19 +11,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+
 using Document = Autodesk.Revit.DB.Document;
 
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public class CutOpeningSettingsViewModel : ObservableObject, IDisposable
+    public sealed class CutOpeningSettingsViewModel : ObservableObject, IDisposable
     {
         public Window SettingsView { get; set; } = null;
         //private Document currenDocument { get; set; } = null;
-        private Categories allCategories { get; set; } = null;
+
         private FilteredElementCollector collector { get; set; } = null;
 
-        public readonly Dictionary<string, string> StructuralMaterials = new Dictionary<string, string>();
+        public Dictionary<string, string> StructuralMaterials = new Dictionary<string, string>();
         private readonly MaterialFunctionAssignment structure = MaterialFunctionAssignment.Structure;
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
@@ -37,15 +39,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutOpeningSettingsViewModel()
         {
-            Task task = CetAllCategoriesAsync();
-            if (task.IsCompleted)
-            {
-                task = GetAllConstructionStructureMaterials();
-                if (task.IsCompleted)
-                {
-                    CommandManager.InvalidateRequerySuggested();
-                }
-            }
+            GetStructureMaterialsCommand = new AsyncRelayCommand(GetAllConstructionStructureMaterials);
         }
 
 
@@ -281,44 +275,40 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        //StringFormat={}{0:n5}
-
-        private async Task CetAllCategoriesAsync()
-        {
-            allCategories = await RevitTask.RunAsync(app =>
-            {
-                return app.ActiveUIDocument.Document.Settings.Categories;
-            });
-        }
-
-
+        #region GetStructureMaterialsCommand
+        public ICommand GetStructureMaterialsCommand { get; private set; }
+        private Categories allCategories { get; set; } = null;
 
         private async Task GetAllConstructionStructureMaterials()
         {
             await RevitTask.RunAsync(app =>
             {
                 Document doc = app.ActiveUIDocument.Document;
-                collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls);
-                foreach (Element elem in collector)
+                if (CurrentDocument.Title == doc.Title)
                 {
-                    Tuple<string, Material> temp = GetStructureMaterial(elem);
-                    StructuralMaterials[temp.Item1] = temp.Item2.Name;
-                }
+                    allCategories = app.ActiveUIDocument.Document.Settings.Categories;
+                    collector = RevitFilterManager.GetInstancesOfCategory(CurrentDocument, typeof(WallType), BuiltInCategory.OST_Walls);
+                    foreach (Element elem in collector)
+                    {
+                        Tuple<string, Material> temp = GetStructureMaterial(elem);
+                        StructuralMaterials[temp.Item1] = temp.Item2.Name;
+                    }
 
-                collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors);
-                foreach (Element elem in collector)
-                {
-                    Tuple<string, Material> temp = GetStructureMaterial(elem);
-                    StructuralMaterials[temp.Item1] = temp.Item2.Name;
-                }
+                    collector = RevitFilterManager.GetInstancesOfCategory(CurrentDocument, typeof(FloorType), BuiltInCategory.OST_Floors);
+                    foreach (Element elem in collector)
+                    {
+                        Tuple<string, Material> temp = GetStructureMaterial(elem);
+                        StructuralMaterials[temp.Item1] = temp.Item2.Name;
+                    }
 
-                collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs);
-                foreach (Element elem in collector)
-                {
-                    Tuple<string, Material> temp = GetStructureMaterial(elem);
-                    StructuralMaterials[temp.Item1] = temp.Item2.Name;
+                    collector = RevitFilterManager.GetInstancesOfCategory(CurrentDocument, typeof(RoofType), BuiltInCategory.OST_Roofs);
+                    foreach (Element elem in collector)
+                    {
+                        Tuple<string, Material> temp = GetStructureMaterial(elem);
+                        StructuralMaterials[temp.Item1] = temp.Item2.Name;
+                    }
+                    collector.Dispose();
                 }
-                collector.Dispose();
             });
         }
 
@@ -398,6 +388,8 @@ namespace RevitTimasBIMTools.ViewModels
             }
             return Tuple.Create(name, material);
         }
+
+        #endregion
 
 
         public void Dispose()

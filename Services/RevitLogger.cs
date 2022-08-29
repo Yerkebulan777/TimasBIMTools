@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using log4net;
 using log4net.Appender;
 using log4net.Config;
@@ -137,6 +138,22 @@ namespace RevitTimasBIMTools.Services
             {
                 Debug.WriteLine(exc.Message);
             }
+        }
+
+        public static string ElementDescription(Element elem)
+        {
+            if (elem.IsValidObject && elem is FamilyInstance)
+            {
+                FamilyInstance finst = elem as FamilyInstance;
+
+                string typeName = elem.GetType().Name;
+                string famName = null == finst ? string.Empty : $"{finst.Symbol.Family.Name}";
+                string catName = null == elem.Category ? string.Empty : $"{elem.Category.Name}";
+                string symbName = null == finst || elem.Name.Equals(finst.Symbol.Name) ? string.Empty : $"{finst.Symbol.Name}";
+
+                return $"{famName}-{symbName}<{elem.Id.IntegerValue} {elem.Name}>({typeName}-{catName})";
+            }
+            return "<null>";
         }
     }
 }

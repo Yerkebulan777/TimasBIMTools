@@ -170,7 +170,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (CancelToken.IsCancellationRequested)
                     {
-                        _ = Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
+                        Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
                     }
                 }
             }

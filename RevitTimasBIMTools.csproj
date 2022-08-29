@@ -186,7 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\SmartToolController.cs" />
-    <Compile Include="RevitUtils\CutOpeningManager.cs" />
+    <Compile Include="RevitUtils\SmartThreadManager.cs" />
     <Compile Include="RevitUtils\ElementDataDictionary.cs" />
     <Compile Include="Core\SmartToolGeneralHelper.cs" />
     <Compile Include="Core\SmartToolSetupUIPanel.cs" />
@@ -195,6 +195,7 @@
     <Compile Include="RevitModel\RevitHostConstruction.cs" />
     <Compile Include="CutOpening\CutOpeningCollisionManager.cs" />
     <Compile Include="RevitUtils\ProjectLoctionManager.cs" />
+    <Compile Include="RevitUtils\RevitMaterialManager.cs" />
     <Compile Include="RevitUtils\RevitViewManager.cs" />
     <Compile Include="Services\RevitLogger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
@@ -229,8 +230,7 @@
     <Compile Include="RevitUtils\RevitSelectManager.cs" />
     <Compile Include="RevitUtils\RevitTransactionManager.cs" />
     <Compile Include="RevitUtils\RevitWPFViewer.cs" />
-    <Compile Include="RevitUtils\SendMessageManager.cs" />
-    <Compile Include="RevitUtils\RevitViewModelExtension.cs" />
+    <Compile Include="RevitUtils\ViewModelExtension.cs" />
     <Compile Include="Services\FiIeIOServise.cs" />
     <Compile Include="Services\MutexServise.cs" />
     <Compile Include="Services\TaskService.cs" />

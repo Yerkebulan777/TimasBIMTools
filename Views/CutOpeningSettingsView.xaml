@@ -79,7 +79,6 @@
             </GroupBox>
         </DockPanel>
         <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Background="White">
-            <!--Visibility="{Binding AdvancedSettingsVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToViz}, FallbackValue=Hidden}"-->
             <GroupBox Header=" Opening settings " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
@@ -135,7 +134,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text=" Structure material " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                         <ComboBox Name="cmbMats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Value"
-                                  ItemsSource="{Binding Path=StructuralMaterials, Mode=OneWay, UpdateSourceTrigger=Explicit}"/>
+                                  ItemsSource="{Binding Path=StructuralMaterials}"/>
                     </Grid>
                     <Grid Height="65" VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
@@ -144,7 +143,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text=" Сommunication сategory " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                         <ComboBox Name="cmbCats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Name"
-                                  ItemsSource="{Binding Path=RevitCategories, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                                  ItemsSource="{Binding Path=RevitCategories}"
                                   SelectionChanged="ComboCats_SelectionChanged"/>
                     </Grid>
                 </StackPanel>
@@ -181,6 +180,7 @@
             </DockPanel>
         </StackPanel>
         <StackPanel x:Name="SettingCommands" Grid.Row="4" Height="100"  Orientation="Horizontal" VerticalAlignment="Center"  HorizontalAlignment="Right" Margin="15,0">
+            <RadioButton x:Name="TestCmd" Content="Test" Command="{Binding Path=GetStructureMaterialsCommand}" VerticalAlignment="Center" Margin="10"/>
             <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" Click="DefaultSettingCmd_Click" />
             <Button x:Name="ApplySettingCmd" Content="Apply" Height="25" Width="90" Margin="10" Click="ApplySettingCmd_Click" />
         </StackPanel>
