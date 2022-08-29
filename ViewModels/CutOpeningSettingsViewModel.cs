@@ -1,18 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
-using Revit.Async;
-using RevitTimasBIMTools.RevitUtils;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
-
-using Document = Autodesk.Revit.DB.Document;
 
 
 namespace RevitTimasBIMTools.ViewModels
@@ -95,7 +85,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Methods
-        
+
         private static int NormilizeIntValue(int value, int minVal = 0, int maxVal = 100)
         {
             if (value < minVal)

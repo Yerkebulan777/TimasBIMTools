@@ -77,18 +77,6 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-
-
-        private async void SettingsCmd_ClickAsync(object sender, RoutedEventArgs e)
-        {
-            settingsControl = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
-            if (settingsControl.ShowDialog() is true)
-            {
-                await optViewModel.RaiseExternalEventAsync();
-            }
-        }
-
-
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             if (CheckSelectAll.IsFocused == false)

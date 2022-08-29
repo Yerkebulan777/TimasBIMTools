@@ -40,7 +40,8 @@
                         </Grid.ColumnDefinitions>
                         <ComboBox Name="ComboDocs" Grid.Column="0" Margin="25,5" DisplayMemberPath="Title" d:IsLocked="True" />
                         <Button Name="SettingsCmd" Grid.Column="1" Content="Settings" Height="30" Width="75" Margin="25,0" 
-                                Click="SettingsCmd_ClickAsync"  VerticalAlignment="Center" HorizontalAlignment="Right" d:IsLocked="True"/>
+                                Command="{Binding Path=ShowSettingsCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                                VerticalAlignment="Center" HorizontalAlignment="Right" d:IsLocked="True"/>
                     </Grid>
                     <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13" d:IsLocked="True"/>
                     <Grid Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="Auto" MinWidth="500" MaxWidth="1000" d:IsLocked="True" >

@@ -1,7 +1,5 @@
 ﻿using Autodesk.Revit.DB;
-using Newtonsoft.Json.Linq;
 using RevitTimasBIMTools.ViewModels;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,6 +14,9 @@ namespace RevitTimasBIMTools.Views
             DataContext = optViewModel;
         }
 
+
+
+        #region SelectionChanged
 
         private void ComboCats_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -50,6 +51,9 @@ namespace RevitTimasBIMTools.Views
             }
         }
 
+        #endregion
+
+
         private void DefaultSettingCmd_Click(object sender, RoutedEventArgs e)
         {
             optViewModel.MinElementSize = 30;
@@ -63,5 +67,23 @@ namespace RevitTimasBIMTools.Views
             Properties.Settings.Default.Save();
             Hide();
         }
+
+        #region Methods
+
+        private static int NormilizeIntValue(int value, int minVal = 0, int maxVal = 100)
+        {
+            if (value < minVal)
+            {
+                value = minVal;
+            }
+            if (value > maxVal)
+            {
+                value = maxVal;
+            }
+            return value;
+        }
+
+        #endregion
+
     }
 }
