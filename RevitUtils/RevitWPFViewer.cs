@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using RevitTimasBIMTools.Services;
 using System;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -51,7 +52,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 catch (Exception exc)
                 {
-                    SendMessageManager.ErrorMsg(exc.Message);
+                    RevitLogger.Error(exc.Message);
                 }
                 finally
                 {
