@@ -2,7 +2,6 @@
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Revit.Async;
 using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Document = Autodesk.Revit.DB.Document;
 
 
 namespace RevitTimasBIMTools.ViewModels
@@ -18,7 +18,10 @@ namespace RevitTimasBIMTools.ViewModels
     public class CutOpeningSettingsViewModel : ObservableObject, IDisposable
     {
         public Window SettingsView { get; set; } = null;
-        private FilteredElementCollector collector = null;
+        private Categories allCategories { get; set; } = null;
+        private  FilteredElementCollector collector { get; set; } = null;
+
+        private readonly MaterialFunctionAssignment structure = MaterialFunctionAssignment.Structure;
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
             BuiltInCategory.OST_Conduit,
@@ -32,6 +35,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutOpeningSettingsViewModel()
         {
+            allCategories = doc.Settings.Categories;
         }
 
 
@@ -270,29 +274,80 @@ namespace RevitTimasBIMTools.ViewModels
         //StringFormat={}{0:n5}
 
 
-        private void getConstructMaterial(Document doc)
+        private void GetConstructMaterials(Document doc)
         {
-            collector = new FilteredElementCollector(doc).OfClass(typeof(WallType));
+            collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls);
             foreach (Element elem in collector)
             {
-                GetCoreMayerial(elem);
-                return;
+                _ = GetStructureMaterial(elem);
             }
 
+            collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors);
+            foreach (Element elem in collector)
+            {
+                _ = GetStructureMaterial(elem);
+            }
+
+            collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs);
+            foreach (Element elem in collector)
+            {
+                _ = GetStructureMaterial(elem);
+            }
         }
 
 
-        private void GetCoreMayerial(Element elem)
+        private Material GetStructureMaterial(Element elem)
         {
-            if (elem is Wall wall)
+            Material material = null;
+            if (elem is WallType wallType)
             {
-                WallType wType = wall.WallType;
-                if (WallKind.Basic == wType.Kind)
+                CompoundStructure comStruct = wallType.GetCompoundStructure();
+                foreach (CompoundStructureLayer structLayer in comStruct.GetLayers())
                 {
-                    RevitLogger.Info(wType.FamilyName);
+                    if (structure == structLayer.Function)
+                    {
+                        material = doc.GetElement(structLayer.MaterialId) as Material;
+                        if (null == material)
+                        {
+                            material = allCategories.get_Item(BuiltInCategory.OST_WallsStructure).Material;
+                        }
+                        break;
+                    }
                 }
             }
-
+            if (elem is FloorType floorType)
+            {
+                CompoundStructure comStruct = floorType.GetCompoundStructure();
+                foreach (CompoundStructureLayer structLayer in comStruct.GetLayers())
+                {
+                    if (structure == structLayer.Function)
+                    {
+                        material = doc.GetElement(structLayer.MaterialId) as Material;
+                        if (null == material)
+                        {
+                            material = allCategories.get_Item(BuiltInCategory.OST_FloorsStructure).Material;
+                        }
+                        break;
+                    }
+                }
+            }
+            if (elem is RoofType roofType)
+            {
+                CompoundStructure comStruct = roofType.GetCompoundStructure();
+                foreach (CompoundStructureLayer structLayer in comStruct.GetLayers())
+                {
+                    if (structure == structLayer.Function)
+                    {
+                        material = doc.GetElement(structLayer.MaterialId) as Material;
+                        if (null == material)
+                        {
+                            material = allCategories.get_Item(BuiltInCategory.OST_RoofsStructure).Material;
+                        }
+                        break;
+                    }
+                }
+            }
+            return material;
         }
 
 
