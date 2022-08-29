@@ -133,8 +133,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text=" Structure material " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                        <ComboBox Name="cmbMats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Value"
-                                  ItemsSource="{Binding Path=StructuralMaterials}"/>
+                        <ComboBox Name="ComboStructMats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Value" />
                     </Grid>
                     <Grid Height="65" VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
@@ -142,9 +141,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text=" Сommunication сategory " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                        <ComboBox Name="cmbCats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Name"
-                                  ItemsSource="{Binding Path=RevitCategories}"
-                                  SelectionChanged="ComboCats_SelectionChanged"/>
+                        <ComboBox Name="ComboCats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Name" SelectionChanged="ComboCats_SelectionChanged"/>
                     </Grid>
                 </StackPanel>
             </Border>

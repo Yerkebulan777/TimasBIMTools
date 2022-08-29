@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Newtonsoft.Json.Linq;
 using RevitTimasBIMTools.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,7 +23,7 @@ namespace RevitTimasBIMTools.Views
             {
                 if (cbx.SelectionBoxItem is Category cat)
                 {
-                    optViewModel.СommunCatIdInt = cat.Id.IntegerValue;
+                    Properties.Settings.Default.СommunCatIdInt = cat.Id.IntegerValue;
                 }
             }
         }
@@ -33,7 +34,7 @@ namespace RevitTimasBIMTools.Views
             {
                 if (cbx.SelectionBoxItem is Element elem)
                 {
-                    optViewModel.RectangSymbolUniqueId = elem.UniqueId;
+                    Properties.Settings.Default.RectangSymbolUniqueId = elem.UniqueId;
                 }
             }
         }
@@ -44,7 +45,7 @@ namespace RevitTimasBIMTools.Views
             {
                 if (cbx.SelectionBoxItem is Element elem)
                 {
-                    optViewModel.RoundSymbolUniqueId = elem.UniqueId;
+                    Properties.Settings.Default.RoundSymbolUniqueId = elem.UniqueId;
                 }
             }
         }

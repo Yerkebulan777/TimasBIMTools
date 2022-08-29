@@ -38,70 +38,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutOpeningSettingsViewModel()
         {
-            GetStructureMaterialsCommand = new AsyncRelayCommand(GetAllConstructionStructureMaterials);
         }
 
-
-        #region General Property
-
-        private Document doc = null;
-        public Document CurrentDocument
-        {
-            get => doc;
-            set
-            {
-                if (value != null)
-                {
-                    doc = value;
-                    OnPropertyChanged(nameof(CurrentDocument));
-                    CommandManager.InvalidateRequerySuggested();
-                };
-            }
-        }
-
-
-        private int commCatIdInt = Properties.Settings.Default.СommunCatIdInt;
-        public int СommunCatIdInt
-        {
-            get => commCatIdInt;
-            set
-            {
-                if (SetProperty(ref commCatIdInt, value))
-                {
-                    Properties.Settings.Default.СommunCatIdInt = value;
-                }
-            }
-        }
-
-
-        private string rectangSymbolId = Properties.Settings.Default.RectangSymbolUniqueId;
-        public string RectangSymbolUniqueId
-        {
-            get => rectangSymbolId;
-            set
-            {
-                if (SetProperty(ref rectangSymbolId, value))
-                {
-                    Properties.Settings.Default.RectangSymbolUniqueId = value;
-                }
-            }
-        }
-
-
-        private string roundSymbolId = Properties.Settings.Default.RoundSymbolUniqueId;
-        public string RoundSymbolUniqueId
-        {
-            get => roundSymbolId;
-            set
-            {
-                if (SetProperty(ref roundSymbolId, value))
-                {
-                    Properties.Settings.Default.RoundSymbolUniqueId = value;
-                }
-            }
-        }
-
-        #endregion
 
 
         #region Size Property
@@ -272,9 +210,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         #endregion
-
-
-
 
 
         public void Dispose()

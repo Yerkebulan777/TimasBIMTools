@@ -58,7 +58,6 @@ namespace RevitTimasBIMTools.Views
             {
                 ActiveDocTitle.Content = revitDocumentModel.Document.Title.ToUpper();
                 dataViewModel.CurrentDocument = revitDocumentModel.Document;
-                optViewModel.CurrentDocument = revitDocumentModel.Document;
                 ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
                 ComboDocs.ItemsSource = revitDocumentModeList;
