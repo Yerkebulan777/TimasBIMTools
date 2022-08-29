@@ -42,9 +42,10 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             string name = null;
             Material material = null;
-            if (elem is WallType wallType)
+            CompoundStructure comStruct = null; 
+            if (elem is WallType wallType && wallType != null)
             {
-                CompoundStructure comStruct = wallType.GetCompoundStructure();
+                comStruct = wallType.GetCompoundStructure();
                 foreach (CompoundStructureLayer structLayer in comStruct.GetLayers())
                 {
                     if (structure == structLayer.Function)
@@ -65,9 +66,9 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-            else if (elem is FloorType floorType)
+            if (elem is FloorType floorType && floorType != null)
             {
-                CompoundStructure comStruct = floorType.GetCompoundStructure();
+                comStruct = floorType.GetCompoundStructure();
                 foreach (CompoundStructureLayer structLayer in comStruct.GetLayers())
                 {
                     if (structure == structLayer.Function)
@@ -88,9 +89,9 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-            else if (elem is RoofType roofType)
+            if (elem is RoofType roofType && roofType != null)
             {
-                CompoundStructure comStruct = roofType.GetCompoundStructure();
+                comStruct = roofType.GetCompoundStructure();
                 foreach (CompoundStructureLayer structLayer in comStruct.GetLayers())
                 {
                     if (structure == structLayer.Function)

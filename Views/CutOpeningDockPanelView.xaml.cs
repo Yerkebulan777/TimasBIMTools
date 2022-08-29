@@ -23,7 +23,6 @@ namespace RevitTimasBIMTools.Views
 
         private bool disposedValue = false;
         private RevitDocumenModel revitDocumentModel;
-        private CutOpeningSettingsView settingsControl = null;
         private IList<RevitDocumenModel> revitDocumentModeList = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningSettingsViewModel optViewModel = ViewModelLocator.SettingsViewModel;

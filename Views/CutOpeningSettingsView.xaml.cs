@@ -2,6 +2,7 @@
 using RevitTimasBIMTools.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
+using Window = System.Windows.Window;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -12,8 +13,8 @@ namespace RevitTimasBIMTools.Views
         {
             InitializeComponent();
             DataContext = optViewModel;
+            
         }
-
 
 
         #region SelectionChanged

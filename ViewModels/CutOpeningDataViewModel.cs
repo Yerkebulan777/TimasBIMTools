@@ -46,15 +46,14 @@ namespace RevitTimasBIMTools.ViewModels
         private IList<RevitElementModel> resultCollection = new List<RevitElementModel>(150);
         private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
         private readonly string rectangOpeningId = Properties.Settings.Default.RectangSymbolUniqueId;
-        private readonly CutOpeningSettingsView settingsControl = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
 
         public CutOpeningDataViewModel()
         {
             CloseCommand = new RelayCommand(CancelCallbackLogic);
+            ShowSettingsCommand = new RelayCommand(ShowSettingsAsync);
             SetFilterCommand = new RelayCommand(SetFilterTextCommand);
             CleanFilterCommand = new RelayCommand(СleanFilterTextCommand);
-            ShowSettingsCommand = new AsyncRelayCommand(ShowSettingsAsync);
             ApplyCommand = new AsyncRelayCommand(ExecuteApplyCommandAsync);
             SnoopCommand = new AsyncRelayCommand(ExecuteSnoopCommandAsync);
             SelectAllCommand = new RelayCommand<bool?>(HandleSelectAllCommand);
@@ -192,16 +191,17 @@ namespace RevitTimasBIMTools.ViewModels
         #region ShowSettingsCommand
         public ICommand ShowSettingsCommand { get; private set; }
 
-        private async Task ShowSettingsAsync()
+        private void ShowSettingsAsync()
         {
-            await RevitTask.RunAsync(app =>
+            CutOpeningSettingsView settings = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
+            settings.Loaded += async (s, e) => await RevitTask.RunAsync(app =>
             {
                 FilteredElementCollector collector;
                 Document doc = app.ActiveUIDocument.Document;
-                if (CurrentDocument.Title == doc.Title && settingsControl.ShowDialog() is true)
+                if (CurrentDocument.Title == doc.Title)
                 {
-                    settingsControl.ComboTargetCats.ItemsSource = RevitFilterManager.GetCategories(doc, builtInCats);
-                    settingsControl.ComboStructMats.ItemsSource = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
+                    settings.ComboTargetCats.ItemsSource = RevitFilterManager.GetCategories(doc, builtInCats);
+                    settings.ComboStructMats.ItemsSource = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
                     collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), BuiltInCategory.OST_GenericModel);
                     FamilyPlacementType placementType = FamilyPlacementType.OneLevelBasedHosted;
                     IList<FamilySymbol> symbols = new List<FamilySymbol>(25);
@@ -218,8 +218,8 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                 }
             });
+            _ = settings.ShowDialog();
         }
-
 
         #endregion
 
