@@ -31,20 +31,30 @@ namespace RevitTimasBIMTools.ViewModels
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
+        private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
+        {
+            BuiltInCategory.OST_Conduit,
+            BuiltInCategory.OST_CableTray,
+            BuiltInCategory.OST_PipeCurves,
+            BuiltInCategory.OST_DuctCurves,
+            BuiltInCategory.OST_GenericModel,
+            BuiltInCategory.OST_MechanicalEquipment
+        };
+
         private readonly object syncLocker = new object();
-        private Dictionary<string, string> structuralMaterials = null;
         private readonly ElementId elementId = ElementId.InvalidElementId;
         private IList<RevitElementModel> resultCollection = new List<RevitElementModel>(150);
         private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
         private readonly string rectangOpeningId = Properties.Settings.Default.RectangSymbolUniqueId;
+        private readonly CutOpeningSettingsView settingsControl = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
-
 
         public CutOpeningDataViewModel()
         {
             CloseCommand = new RelayCommand(CancelCallbackLogic);
             SetFilterCommand = new RelayCommand(SetFilterTextCommand);
             CleanFilterCommand = new RelayCommand(СleanFilterTextCommand);
+            ShowSettingsCommand = new AsyncRelayCommand(ShowSettingsAsync);
             ApplyCommand = new AsyncRelayCommand(ExecuteApplyCommandAsync);
             SnoopCommand = new AsyncRelayCommand(ExecuteSnoopCommandAsync);
             SelectAllCommand = new RelayCommand<bool?>(HandleSelectAllCommand);
@@ -179,19 +189,38 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region GetStructureMaterialsCommand
-        public ICommand GetStructureMaterialsCommand { get; private set; }
-        private async Task GetAllConstructionStructureMaterials()
+        #region ShowSettingsCommand
+        public ICommand ShowSettingsCommand { get; private set; }
+
+        private async Task ShowSettingsAsync()
         {
             await RevitTask.RunAsync(app =>
             {
+                FilteredElementCollector collector;
                 Document doc = app.ActiveUIDocument.Document;
-                if (CurrentDocument.Title == doc.Title)
+                if (CurrentDocument.Title == doc.Title && settingsControl.ShowDialog() is true)
                 {
-                    structuralMaterials = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
+                    settingsControl.ComboTargetCats.ItemsSource = RevitFilterManager.GetCategories(doc, builtInCats);
+                    settingsControl.ComboStructMats.ItemsSource = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
+                    collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), BuiltInCategory.OST_GenericModel);
+                    FamilyPlacementType placementType = FamilyPlacementType.OneLevelBasedHosted;
+                    IList<FamilySymbol> symbols = new List<FamilySymbol>(25);
+                    foreach (FamilySymbol smb in collector)
+                    {
+                        Family family = smb.Family;
+                        if (family.IsValidObject && family.IsEditable)
+                        {
+                            if (family.FamilyPlacementType.Equals(placementType))
+                            {
+                                symbols.Add(smb);
+                            }
+                        }
+                    }
                 }
             });
         }
+
+
         #endregion
 
 

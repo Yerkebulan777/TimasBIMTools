@@ -1,12 +1,11 @@
 ﻿using Autodesk.Revit.DB;
-using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
-    sealed class RevitFilterManager
+    internal sealed class RevitFilterManager
     {
 
         #region Standert Filtered Element Collector
@@ -118,15 +117,21 @@ namespace RevitTimasBIMTools.RevitUtils
             FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(Family));
 
             foreach (Family f in collector)
+            {
                 if (f.Name.Equals(familyName))
                 {
                     ISet<ElementId> ids = f.GetFamilySymbolIds();
                     foreach (ElementId id in ids)
                     {
                         FamilySymbol symbol = doc.GetElement(id) as FamilySymbol;
-                        if (symbol.Name == symbolName) return symbol;
+                        if (symbol.Name == symbolName)
+                        {
+                            return symbol;
+                        }
                     }
                 }
+            }
+
             return null;
         }
 
@@ -134,7 +139,11 @@ namespace RevitTimasBIMTools.RevitUtils
         public static Element GetFirstElementOfTypeNamed(Document doc, Type type, string name)
         {
             FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(type);
-            Func<Element, bool> nameEquals = e => e.Name.Equals(name);
+            bool nameEquals(Element e)
+            {
+                return e.Name.Equals(name);
+            }
+
             return collector.Any(nameEquals) ? collector.First(nameEquals) : null;
         }
 
@@ -192,29 +201,32 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Category filter
 
-        public IList<BuiltInCategory> GetFitrableCategories(Document document)
+        public static IEnumerable<Category> GetCategories(Document doc, IList<BuiltInCategory> bics)
         {
-            List<BuiltInCategory> output = new List<BuiltInCategory>();
-            foreach (ElementId catId in ParameterFilterUtilities.GetAllFilterableCategories())
+            foreach (BuiltInCategory catId in bics)
             {
-                try
+                Category cat = Category.GetCategory(doc, catId);
+                if (cat != null)
                 {
-                    Category category = Category.GetCategory(document, catId);
-                    if (category != null && category.AllowsBoundParameters)
-                    {
-                        if (category.CategoryType == CategoryType.Model)
-                        {
-                            output.Add((BuiltInCategory)catId.IntegerValue);
-                        }
-                    }
-                }
-                catch (Exception exc)
-                {
-                    RevitLogger.Error(exc.Message);
+                    yield return cat;
                 }
             }
+        }
 
-            return output;
+
+        public static IEnumerable<Category> GetCategories(Document doc, bool model = true)
+        {
+            foreach (ElementId catId in ParameterFilterUtilities.GetAllFilterableCategories())
+            {
+                Category cat = Category.GetCategory(doc, catId);
+                if (cat is Category && cat.AllowsBoundParameters)
+                {
+                    if (cat.CategoryType == CategoryType.Model && model)
+                    {
+                        yield return cat;
+                    }
+                }
+            }
         }
 
         #endregion

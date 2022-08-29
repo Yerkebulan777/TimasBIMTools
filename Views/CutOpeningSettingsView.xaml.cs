@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Newtonsoft.Json.Linq;
 using RevitTimasBIMTools.ViewModels;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -13,7 +14,6 @@ namespace RevitTimasBIMTools.Views
         {
             InitializeComponent();
             DataContext = optViewModel;
-            optViewModel.SettingsView = this;
         }
 
 
@@ -63,7 +63,5 @@ namespace RevitTimasBIMTools.Views
             Properties.Settings.Default.Save();
             Hide();
         }
-
-
     }
 }

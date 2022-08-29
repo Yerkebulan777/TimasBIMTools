@@ -77,6 +77,8 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+
+
         private async void SettingsCmd_ClickAsync(object sender, RoutedEventArgs e)
         {
             settingsControl = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();

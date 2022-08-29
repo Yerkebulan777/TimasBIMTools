@@ -141,7 +141,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text=" Сommunication сategory " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                        <ComboBox Name="ComboCats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Name" SelectionChanged="ComboCats_SelectionChanged"/>
+                        <ComboBox Name="ComboTargetCats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Name" SelectionChanged="ComboCats_SelectionChanged"/>
                     </Grid>
                 </StackPanel>
             </Border>

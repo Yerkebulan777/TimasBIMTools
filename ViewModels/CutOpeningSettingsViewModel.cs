@@ -20,22 +20,6 @@ namespace RevitTimasBIMTools.ViewModels
     public sealed class CutOpeningSettingsViewModel : ObservableObject, IDisposable
     {
         public Window SettingsView { get; set; } = null;
-        //private Document currenDocument { get; set; } = null;
-
-        private FilteredElementCollector collector { get; set; } = null;
-        public Dictionary<string, string> StructuralMaterials = new Dictionary<string, string>();
-
-        private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
-        {
-            BuiltInCategory.OST_Conduit,
-            BuiltInCategory.OST_CableTray,
-            BuiltInCategory.OST_PipeCurves,
-            BuiltInCategory.OST_DuctCurves,
-            BuiltInCategory.OST_GenericModel,
-            BuiltInCategory.OST_MechanicalEquipment
-        };
-
-
         public CutOpeningSettingsViewModel()
         {
         }
@@ -111,71 +95,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Methods
-        public async Task RaiseExternalEventAsync()
-        {
-            await GetTargetCategories();
-            await GetOpeningFamilySymbols();
-        }
-
-        private async Task GetTargetCategories()
-        {
-            RevitCategories?.Clear();
-            RevitCategories = await RevitTask.RunAsync(app =>
-            {
-                Document doc = app.ActiveUIDocument.Document;
-                IList<Category> output = GetCategories(doc, builtInCats);
-                return new ObservableCollection<Category>(output.OrderBy(i => i.Name).ToList());
-            });
-        }
-
-        private async Task GetOpeningFamilySymbols()
-        {
-            RevitFamilySimbols?.Clear();
-            RevitFamilySimbols = await RevitTask.RunAsync(app =>
-            {
-                FilteredElementCollector collector;
-                Document doc = app.ActiveUIDocument.Document;
-                IList<FamilySymbol> output = new List<FamilySymbol>();
-                BuiltInCategory bic = BuiltInCategory.OST_GenericModel;
-                collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), bic);
-                foreach (FamilySymbol symbol in collector)
-                {
-                    Family family = symbol.Family;
-                    if (family.IsValidObject && family.IsEditable)
-                    {
-                        if (family.FamilyPlacementType.Equals(FamilyPlacementType.OneLevelBasedHosted))
-                        {
-                            output.Add(symbol);
-                        }
-                    }
-                }
-                return new ObservableCollection<FamilySymbol>(output.OrderBy(i => i.Name).ToList());
-            });
-        }
-
-
-        private IList<Category> GetCategories(Document doc, IList<BuiltInCategory> bics)
-        {
-            IList<Category> output = new List<Category>();
-            foreach (BuiltInCategory catId in bics)
-            {
-                Category cat = null;
-                try
-                {
-                    cat = Category.GetCategory(doc, catId);
-                }
-                finally
-                {
-                    if (cat != null)
-                    {
-                        output.Add(cat);
-                    }
-                }
-            }
-            return output;
-        }
-
-
+        
         private static int NormilizeIntValue(int value, int minVal = 0, int maxVal = 100)
         {
             if (value < minVal)
