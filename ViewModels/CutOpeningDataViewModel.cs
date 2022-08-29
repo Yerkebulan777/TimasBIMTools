@@ -32,6 +32,7 @@ namespace RevitTimasBIMTools.ViewModels
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
         private readonly object syncLocker = new object();
+        private Dictionary<string, string> structuralMaterials = null;
         private readonly ElementId elementId = ElementId.InvalidElementId;
         private IList<RevitElementModel> resultCollection = new List<RevitElementModel>(150);
         private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
@@ -170,10 +171,26 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (CancelToken.IsCancellationRequested)
                     {
-                        Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
+                        _ = Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
                     }
                 }
             }
+        }
+        #endregion
+
+
+        #region GetStructureMaterialsCommand
+        public ICommand GetStructureMaterialsCommand { get; private set; }
+        private async Task GetAllConstructionStructureMaterials()
+        {
+            await RevitTask.RunAsync(app =>
+            {
+                Document doc = app.ActiveUIDocument.Document;
+                if (CurrentDocument.Title == doc.Title)
+                {
+                    structuralMaterials = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
+                }
+            });
         }
         #endregion
 

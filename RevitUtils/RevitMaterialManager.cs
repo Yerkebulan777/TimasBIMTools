@@ -6,10 +6,10 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal class RevitMaterialManager
     {
-        private Categories allCategories = null;
-        private readonly MaterialFunctionAssignment structure = MaterialFunctionAssignment.Structure;
+        private static Categories allCategories = null;
+        private static readonly MaterialFunctionAssignment structure = MaterialFunctionAssignment.Structure;
 
-        private Dictionary<string, string> GetAllConstructionStructureMaterials(Document doc)
+        public static Dictionary<string, string> GetAllConstructionStructureMaterials(Document doc)
         {
             allCategories = doc.Settings.Categories;
             Dictionary<string, string> result = new Dictionary<string, string>();
@@ -38,7 +38,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        private Tuple<string, Material> GetStructureMaterial(Document doc, Element elem)
+        private static Tuple<string, Material> GetStructureMaterial(Document doc, Element elem)
         {
             string name = null;
             Material material = null;

@@ -24,7 +24,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private FilteredElementCollector collector { get; set; } = null;
         public Dictionary<string, string> StructuralMaterials = new Dictionary<string, string>();
-        
+
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
         {
             BuiltInCategory.OST_Conduit,
@@ -274,25 +274,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region GetStructureMaterialsCommand
-        public ICommand GetStructureMaterialsCommand { get; private set; }
-        private Categories allCategories { get; set; } = null;
 
-        private async Task GetAllConstructionStructureMaterials()
-        {
-            await RevitTask.RunAsync(app =>
-            {
-                Document doc = app.ActiveUIDocument.Document;
-                if (CurrentDocument.Title == doc.Title)
-                {
-
-                }
-            });
-        }
-
-
-
-        #endregion
 
 
         public void Dispose()
