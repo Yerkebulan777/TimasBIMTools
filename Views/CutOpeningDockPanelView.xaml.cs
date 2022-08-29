@@ -22,8 +22,8 @@ namespace RevitTimasBIMTools.Views
         public Document CurrentDocument { get; set; } = null;
 
         private bool disposedValue = false;
-        private DocumentModel revitDocumentModel;
-        private IList<DocumentModel> revitDocumentModeList = null;
+        private DocumentModel documentModel;
+        private IList<DocumentModel> documentModeList = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningSettingsViewModel optViewModel = ViewModelLocator.SettingsViewModel;
         private readonly CutOpeningSettingsView settingsView = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
@@ -52,20 +52,20 @@ namespace RevitTimasBIMTools.Views
 
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs e)
         {
-            revitDocumentModeList = e.Documents;
-            revitDocumentModel = revitDocumentModeList.FirstOrDefault();
-            if (CurrentDocument == null && revitDocumentModel.IsActive)
+            documentModeList = e.Documents;
+            documentModel = documentModeList.FirstOrDefault();
+            if (CurrentDocument == null && documentModel.IsActive)
             {
                 settingsView.ComboTargetCats.ItemsSource = e.Categories;
                 settingsView.ComboRoundSymbol.ItemsSource = e.FamilySymbols;
                 settingsView.ComboRectangSymbol.ItemsSource = e.FamilySymbols;
                 settingsView.ComboStructMats.ItemsSource = e.StructureMaterials;
-                ActiveDocTitle.Content = revitDocumentModel.Document.Title.ToUpper();
-                dataViewModel.CurrentDocument = revitDocumentModel.Document;
+                ActiveDocTitle.Content = documentModel.Document.Title.ToUpper();
+                dataViewModel.CurrentDocument = documentModel.Document;
                 ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
-                ComboDocs.ItemsSource = revitDocumentModeList;
-                CurrentDocument = revitDocumentModel.Document;
+                ComboDocs.ItemsSource = documentModeList;
+                CurrentDocument = documentModel.Document;
             }
         }
 
