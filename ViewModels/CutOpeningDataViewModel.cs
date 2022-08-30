@@ -113,7 +113,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private IList<RevitElementModel> GetUniqueList(Collection<RevitElementModel> collection)
         {
-            return collection.Cast<RevitElementModel>().GroupBy(item => item.SymbolName).Select(grp => grp.First()).ToList();
+            return collection.Cast<RevitElementModel>().GroupBy(i => i.SymbolName).Select(grp => grp.First()).ToList();
         }
 
         #endregion
