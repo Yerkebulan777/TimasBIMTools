@@ -93,21 +93,29 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-
-        private ObservableCollection<RevitElementModel> elemList = new ObservableCollection<RevitElementModel>();
+        public IList<RevitElementModel> UniqueList { get; set; } = null;
+        private ObservableCollection<RevitElementModel> modelCollection = new ObservableCollection<RevitElementModel>();
         public ObservableCollection<RevitElementModel> RevitElementModels
         {
-            get => elemList;
+            get => modelCollection;
             set
             {
-                if (SetProperty(ref elemList, value))
+                if (SetProperty(ref modelCollection, value))
                 {
-                    DockPanelView.CheckSelectAll.IsEnabled = elemList.Count != 0;
+                    DockPanelView.CheckSelectAll.IsEnabled = modelCollection.Count != 0;
                     ItemCollectionView = CollectionViewSource.GetDefaultView(value);
                     IsEnabled = !ItemCollectionView.IsEmpty;
+                    UniqueList = GetUniqueList(value);
                 }
             }
         }
+
+
+        private IList<RevitElementModel> GetUniqueList(Collection<RevitElementModel> collection)
+        {
+            return collection.Cast<RevitElementModel>().GroupBy(item => item.SymbolName).Select(grp => grp.First()).ToList();
+        }
+
         #endregion
 
 
@@ -150,30 +158,16 @@ namespace RevitTimasBIMTools.ViewModels
             || model.CategoryName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
         }
 
-        ICollectionView view =  CollectionViewSource.GetDefaultView(new ObservableCollection<RevitElementModel>());
+        private readonly ICollectionView view = CollectionViewSource.GetDefaultView(new ObservableCollection<RevitElementModel>());
 
-        void FindDuplicate(CollectionView collection)
+        private void FindDuplicate(CollectionView collection)
         {
             if (!collection.IsEmpty)
             {
                 collection.Refresh();
-                collection.Filter = DuplicateFilterCollection;
+                //object value = collection.Select(product => product.ProductName).Distinct();
             };
         }
-
-        private bool DuplicateFilterCollection(object obj)
-        {
-            var index1 = collection.FindIndex(delegate (MyClass s)
-            {
-                return Object.ReferenceEquals(s, i);
-            });
-            var index2 = c.MyData.FindLastIndex(delegate (MyClass s)
-            {
-                return ((MyClass)i).MyProperty == s.MyProperty as string; //value comparison
-            });
-            return index1 == index2;
-        }
-
 
 
 

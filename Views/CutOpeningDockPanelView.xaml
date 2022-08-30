@@ -63,14 +63,18 @@
             </ScrollViewer>
             <ScrollViewer Grid.Row="2">
                 <DataGrid Name="dataGridView" Width="Auto" MinWidth="500" MaxWidth="1000"
-                          SelectedItem="{Binding Path=SelectedModel, UpdateSourceTrigger=PropertyChanged}" 
                           ItemsSource="{Binding ItemCollectionView, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                    <!--SelectedItem="{Binding Path=SelectedModel, UpdateSourceTrigger=PropertyChanged}"-->
                     <DataGrid.RowStyle>
                         <Style TargetType="{x:Type DataGridRow}">
                             <EventSetter Event="MouseDoubleClick" Handler="DataGrid_MouseDoubleClick"/>
                         </Style>
                     </DataGrid.RowStyle>
+                    <DataGrid.Resources>
+                        <converter:RowFromViewItem x:Key="rowByItem"/>
+                    </DataGrid.Resources>
                     <DataGrid.Columns>
+                        <DataGridTextColumn Width="50" Binding="{Binding ItemCollectionView, Converter={StaticResource rowByItem}, StringFormat=#;;#}" Header="Num"/>
                         <DataGridTemplateColumn Width="50" Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
