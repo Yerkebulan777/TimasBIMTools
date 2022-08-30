@@ -93,7 +93,7 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-        public IList<ElementModel> UniqueElementModels { get; set; } = null;
+
         private ObservableCollection<ElementModel> modelCollection = new ObservableCollection<ElementModel>();
         public ObservableCollection<ElementModel> RevitElementModels
         {
@@ -110,10 +110,17 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
+        private IList<ElementModel> unique = null;
+        public IList<ElementModel> UniqueElementModels
+        {
+            get => unique;
+            set => SetProperty(ref unique, value);
+        }
+
 
         private IList<ElementModel> GetUniqueList(Collection<ElementModel> collection)
         {
-            return collection.Cast<ElementModel>().GroupBy(i => i.SymbolName).Select(g => g.First()).OrderBy(i => i.FamilyName).Distinct().ToList();
+            return collection.GroupBy(i => i.SymbolName).Select(g => g.First()).OrderBy(i => i.FamilyName).Append(null).Distinct().ToList();
         }
 
         #endregion
@@ -122,6 +129,8 @@ namespace RevitTimasBIMTools.ViewModels
         #region TextFilter
 
         private string filterText = string.Empty;
+        private readonly IList<ElementModel> uniqueElementModels = null;
+
         public string FilterText
         {
             get => filterText;
