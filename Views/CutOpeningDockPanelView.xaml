@@ -56,6 +56,9 @@
                             Command="{Binding SetFilterCommand, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}"
                             CommandParameter="{Binding IsEnabled, ElementName=SetFilter, UpdateSourceTrigger=Explicit}" />
                     </Grid>
+                    <Grid Margin="10">
+                        <ComboBox Name="ComboFilter" />
+                    </Grid>
                 </StackPanel>
             </ScrollViewer>
             <ScrollViewer Grid.Row="2">

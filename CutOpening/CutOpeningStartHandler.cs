@@ -40,13 +40,13 @@ namespace RevitTimasBIMTools.CutOpening
             IList<FamilySymbol> symbols = new List<FamilySymbol>(50);
             string targetTitle = Properties.Settings.Default.TargetDocumentName;
             FamilyPlacementType placement = FamilyPlacementType.OneLevelBasedHosted;
+            SortedList<string, Material> materials = new SortedList<string, Material>(100);
             IList<DocumentModel> documents = RevitDocumentManager.GetDocumentCollection(doc);
-            DocumentModel target = documents.Cast<DocumentModel>().Where(i => i.Document.Title.Equals(targetTitle)).DefaultIfEmpty().First();
-
-            if (!string.IsNullOrEmpty(target.Title))
+            //DocumentModel target = documents.Cast<DocumentModel>().Where(i => i.Document.Title.Equals(targetTitle)).DefaultIfEmpty().First();
+            if (!string.IsNullOrEmpty(targetTitle))
             {
-                categories = RevitFilterManager.GetCategories(doc, builtInCats).ToList();
-                dictionary = RevitMaterialManager.GetAllConstructionStructureMaterials(target.Document);
+                categories = RevitFilterManager.GetCategories(doc, builtInCats).ToList(); /// Get Link Instances cats
+                dictionary = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
                 collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), BuiltInCategory.OST_GenericModel);
                 foreach (FamilySymbol smb in collector)
                 {
