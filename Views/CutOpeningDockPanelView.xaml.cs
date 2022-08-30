@@ -95,7 +95,7 @@ namespace RevitTimasBIMTools.Views
             if (CheckSelectAll.IsFocused == false)
             {
                 ItemCollection items = dataGridView.Items;
-                if (items.OfType<RevitElementModel>().All(x => x.IsSelected == true))
+                if (items.OfType<ElementModel>().All(x => x.IsSelected == true))
                 {
                     CheckSelectAll.IsChecked = true;
                 }
@@ -112,7 +112,7 @@ namespace RevitTimasBIMTools.Views
             if (CheckSelectAll.IsFocused == false)
             {
                 ItemCollection items = dataGridView.Items;
-                if (items.OfType<RevitElementModel>().All(x => x.IsSelected == false))
+                if (items.OfType<ElementModel>().All(x => x.IsSelected == false))
                 {
                     CheckSelectAll.IsChecked = false;
                 }
@@ -127,7 +127,7 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (sender is DataGridRow row && row.DataContext is RevitElementModel model)
+            if (sender is DataGridRow row && row.DataContext is ElementModel model)
             {
                 System.Threading.Tasks.Task task = RevitTask.RunAsync(app =>
                 {

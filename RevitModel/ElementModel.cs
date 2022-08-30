@@ -5,7 +5,7 @@ using System;
 
 namespace RevitTimasBIMTools.RevitModel
 {
-    public sealed class RevitElementModel : ObservableObject, IRevitElementModel
+    public sealed class ElementModel : ObservableObject, IRevitElementModel
     {
         public readonly int IdInt = 0;
         public readonly int LevelId = 0;
@@ -13,7 +13,7 @@ namespace RevitTimasBIMTools.RevitModel
         private readonly ElementTypeData elemTypeData;
         public readonly string CategoryName = string.Empty;
         //private readonly string date = DateTime.Today.Date.ToShortDateString();
-        public RevitElementModel(Element elem, ElementTypeData data, string description = null)
+        public ElementModel(Element elem, ElementTypeData data, string description = null)
         {
             instance = elem;
             if (instance.IsValidObject)

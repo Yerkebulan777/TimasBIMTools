@@ -33,7 +33,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private readonly object syncLocker = new object();
         private readonly ElementId elementId = ElementId.InvalidElementId;
-        private IList<RevitElementModel> resultCollection = new List<RevitElementModel>(150);
+        private IList<ElementModel> resultCollection = new List<ElementModel>(150);
         private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
         private readonly string rectangOpeningId = Properties.Settings.Default.RectangSymbolUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
@@ -85,17 +85,17 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     ItemCollectionView.SortDescriptions.Clear();
                     ItemCollectionView.GroupDescriptions.Clear();
-                    ItemCollectionView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(RevitElementModel.CategoryName)));
-                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(RevitElementModel.SymbolName), ListSortDirection.Ascending));
-                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(RevitElementModel.FamilyName), ListSortDirection.Ascending));
-                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(RevitElementModel.Description), ListSortDirection.Ascending));
+                    ItemCollectionView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
+                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.FamilyName), ListSortDirection.Ascending));
+                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
                 }
             }
         }
 
-        public IList<RevitElementModel> UniqueList { get; set; } = null;
-        private ObservableCollection<RevitElementModel> modelCollection = new ObservableCollection<RevitElementModel>();
-        public ObservableCollection<RevitElementModel> RevitElementModels
+        public IList<ElementModel> UniqueElementModels { get; set; } = null;
+        private ObservableCollection<ElementModel> modelCollection = new ObservableCollection<ElementModel>();
+        public ObservableCollection<ElementModel> RevitElementModels
         {
             get => modelCollection;
             set
@@ -104,16 +104,16 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     DockPanelView.CheckSelectAll.IsEnabled = modelCollection.Count != 0;
                     ItemCollectionView = CollectionViewSource.GetDefaultView(value);
+                    UniqueElementModels = GetUniqueList(value);
                     IsEnabled = !ItemCollectionView.IsEmpty;
-                    UniqueList = GetUniqueList(value);
                 }
             }
         }
 
 
-        private IList<RevitElementModel> GetUniqueList(Collection<RevitElementModel> collection)
+        private IList<ElementModel> GetUniqueList(Collection<ElementModel> collection)
         {
-            return collection.Cast<RevitElementModel>().GroupBy(i => i.SymbolName).Select(grp => grp.First()).ToList();
+            return collection.Cast<ElementModel>().GroupBy(i => i.SymbolName).Select(g => g.First()).OrderBy(i => i.FamilyName).Distinct().ToList();
         }
 
         #endregion
@@ -152,13 +152,13 @@ namespace RevitTimasBIMTools.ViewModels
         private bool FilterModelCollection(object obj)
         {
             return string.IsNullOrEmpty(FilterText)
-            || !(obj is RevitElementModel model) || model.SymbolName.Contains(FilterText)
+            || !(obj is ElementModel model) || model.SymbolName.Contains(FilterText)
             || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
             || model.FamilyName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
             || model.CategoryName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
         }
 
-        private readonly ICollectionView view = CollectionViewSource.GetDefaultView(new ObservableCollection<RevitElementModel>());
+        private readonly ICollectionView view = CollectionViewSource.GetDefaultView(new ObservableCollection<ElementModel>());
 
         private void FindDuplicate(CollectionView collection)
         {
@@ -216,7 +216,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         lock (syncLocker)
                         {
-                            if (item is RevitElementModel model)
+                            if (item is ElementModel model)
                             {
                                 if (checkedHasValue)
                                 {
@@ -300,7 +300,7 @@ namespace RevitTimasBIMTools.ViewModels
             try
             {
                 Task.Delay(3000).Wait();
-                RevitElementModel model = RevitElementModels.First();
+                ElementModel model = RevitElementModels.First();
                 Element elem = document.GetElement(new ElementId(model.IdInt));
                 if (RevitElementModels.Remove(model) && elem.IsValidObject)
                 {

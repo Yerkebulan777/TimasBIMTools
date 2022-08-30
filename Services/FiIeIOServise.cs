@@ -22,17 +22,17 @@ namespace RevitTimasBIMTools.Services
             }
         }
 
-        public BindingList<RevitElementModel> LoadData()
+        public BindingList<ElementModel> LoadData()
         {
             if (!File.Exists(path))
             {
                 File.CreateText(path).Dispose();
-                return new BindingList<RevitElementModel>();
+                return new BindingList<ElementModel>();
             }
             using (var reader = File.OpenText(path))
             {
                 var fileText = reader.ReadToEnd();
-                return JsonConvert.DeserializeObject<BindingList<RevitElementModel>>(fileText);
+                return JsonConvert.DeserializeObject<BindingList<ElementModel>>(fileText);
             }
         }
     }

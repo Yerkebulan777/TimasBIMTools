@@ -76,7 +76,7 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly int minSideSize = Properties.Settings.Default.MinSideSize;
         private readonly int maxSideSize = Properties.Settings.Default.MaxSideSize;
         private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
-        private readonly IList<RevitElementModel> modelList = new List<RevitElementModel>(300);
+        private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
         private readonly string linkDocumentTitle = Properties.Settings.Default.TargetDocumentName;
         private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
 
@@ -117,7 +117,7 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         [STAThread]
-        public IList<RevitElementModel> GetCollisionCommunicateElements()
+        public IList<ElementModel> GetCollisionCommunicateElements()
         {
             modelList.Clear();
             collector = ValidWallCollector();
@@ -131,7 +131,7 @@ namespace RevitTimasBIMTools.CutOpening
                     hostSolid = host.GetElementCenterSolid(options, identityTransform, centroidPoint);
                     if (hostSolid != null)
                     {
-                        foreach (RevitElementModel model in GetIntersectionElementModels(currentDocument))
+                        foreach (ElementModel model in GetIntersectionElementModels(currentDocument))
                         {
                             elemId = host.Id;
                             if (!hostIdList.Contains(elemId))
@@ -194,7 +194,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private IEnumerable<RevitElementModel> GetIntersectionElementModels(Document doc)
+        private IEnumerable<ElementModel> GetIntersectionElementModels(Document doc)
         {
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new LogicalAndFilter(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
@@ -211,7 +211,7 @@ namespace RevitTimasBIMTools.CutOpening
                         {
                             centroidPoint = intersectSolid.ComputeCentroid();
                             ElementTypeData sizeData = DefineElementSize(elem);
-                            yield return new RevitElementModel(elem, sizeData, stringBuilder.ToString());
+                            yield return new ElementModel(elem, sizeData, stringBuilder.ToString());
                         }
                     }
                 }

@@ -222,7 +222,7 @@
     <Compile Include="RevitModel\IRevitStructuralModel.cs" />
     <Compile Include="RevitUtils\IntersectionExtension.cs" />
     <Compile Include="RevitModel\DocumentModel.cs" />
-    <Compile Include="RevitModel\RevitElementModel.cs" />
+    <Compile Include="RevitModel\ElementModel.cs" />
     <Compile Include="RevitUtils\RevitDocumentManager.cs" />
     <Compile Include="RevitUtils\ParameterUtils.cs" />
     <Compile Include="RevitUtils\PurginqManager.cs" />
@@ -241,7 +241,6 @@
     <Compile Include="ViewConverters\BitmapToImageSourceConverter.cs" />
     <Compile Include="ViewConverters\ElementIdConverter.cs" />
     <Compile Include="ViewConverters\ComponentOptionConverter.cs" />
-    <Compile Include="ViewConverters\RowFromViewItem.cs" />
     <Compile Include="ViewConverters\SelectAllConverter.cs" />
     <Compile Include="ViewConverters\StatusConverter.cs" />
     <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
