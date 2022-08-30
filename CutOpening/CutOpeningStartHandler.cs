@@ -6,9 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+
 namespace RevitTimasBIMTools.CutOpening
 {
-    public sealed class CutOpeningMainHandler : IExternalEventHandler
+    public sealed class CutOpeningStartHandler : IExternalEventHandler
     {
         public event EventHandler<BaseCompletedEventArgs> Completed;
         private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
@@ -32,25 +33,35 @@ namespace RevitTimasBIMTools.CutOpening
                 return;
             }
 
-            IList<DocumentModel> doumens = RevitDocumentManager.GetDocumentCollection(doc);
-            IList<Category> categories = RevitFilterManager.GetCategories(doc, builtInCats).ToList();
-            Dictionary<string, string> matDict = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
-            FilteredElementCollector collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), BuiltInCategory.OST_GenericModel);
+
+            IList<Category> categories = null;
+            FilteredElementCollector collector = null;
+            Dictionary<string, string> dictionary = null;
+            IList<FamilySymbol> symbols = new List<FamilySymbol>(50);
+            string targetTitle = Properties.Settings.Default.TargetDocumentName;
             FamilyPlacementType placement = FamilyPlacementType.OneLevelBasedHosted;
-            IList<FamilySymbol> symbols = new List<FamilySymbol>(25);
-            foreach (FamilySymbol smb in collector)
+            IList<DocumentModel> documents = RevitDocumentManager.GetDocumentCollection(doc);
+            DocumentModel target = documents.Cast<DocumentModel>().Where(i => i.Document.Title.Equals(targetTitle)).DefaultIfEmpty().First();
+
+            if (!string.IsNullOrEmpty(target.Title))
             {
-                Family family = smb.Family;
-                if (family.IsValidObject && family.IsEditable)
+                categories = RevitFilterManager.GetCategories(doc, builtInCats).ToList();
+                dictionary = RevitMaterialManager.GetAllConstructionStructureMaterials(target.Document);
+                collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), BuiltInCategory.OST_GenericModel);
+                foreach (FamilySymbol smb in collector)
                 {
-                    if (family.FamilyPlacementType.Equals(placement))
+                    Family fam = smb.Family;
+                    if (fam.IsValidObject && fam.IsEditable)
                     {
-                        symbols.Add(smb);
+                        if (fam.FamilyPlacementType.Equals(placement))
+                        {
+                            symbols.Add(smb);
+                        }
                     }
                 }
             }
 
-            OnCompleted(new BaseCompletedEventArgs(doumens, categories, symbols, matDict));
+            OnCompleted(new BaseCompletedEventArgs(documents, categories, symbols, dictionary));
         }
 
 
@@ -62,7 +73,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public string GetName()
         {
-            return nameof(CutOpeningMainHandler);
+            return nameof(CutOpeningStartHandler);
         }
     }
 

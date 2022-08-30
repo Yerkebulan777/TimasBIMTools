@@ -23,7 +23,6 @@ namespace RevitTimasBIMTools.Core
         public static readonly string DocumentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         public static readonly string LogPath = Path.Combine(DocumentPath, "RevitAsync.log");
 
-
         #region IconConvertToImageSource
         [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
         [return: MarshalAs(UnmanagedType.Bool)]

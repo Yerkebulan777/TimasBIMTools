@@ -27,7 +27,7 @@ namespace RevitTimasBIMTools.Views
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningSettingsViewModel optViewModel = ViewModelLocator.SettingsViewModel;
         private readonly CutOpeningSettingsView settingsView = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
-        private readonly CutOpeningMainHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
+        private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
 
         public CutOpeningDockPanelView()
         {

@@ -201,7 +201,7 @@
     <Compile Include="RevitUtils\UnitManager.cs" />
     <Compile Include="Services\ManifestFileManager.cs" />
     <Compile Include="CutOpening\CutOpeningRegisterDockablePane.cs" />
-    <Compile Include="CutOpening\CutOpeningMainHandler.cs" />
+    <Compile Include="CutOpening\CutOpeningStartHandler.cs" />
     <Compile Include="CutOpening\CutOpeningShowPanelCmd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -285,7 +285,9 @@
   <ItemGroup>
     <None Include="Properties\baseIcon.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Examples\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

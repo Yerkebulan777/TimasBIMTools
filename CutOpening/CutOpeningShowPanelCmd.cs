@@ -16,7 +16,7 @@ namespace RevitTimasBIMTools.CutOpening
     {
         private DockablePane dockpane = null;
         private readonly DockablePaneId dockpid = SmartToolController.DockPaneId;
-        private readonly CutOpeningMainHandler dockpaneHandler = SmartToolController.Services.GetRequiredService<CutOpeningMainHandler>();
+        private readonly CutOpeningStartHandler dockpaneHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
         private readonly IDockablePaneProvider provider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)

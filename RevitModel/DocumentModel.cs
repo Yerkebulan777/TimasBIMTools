@@ -15,9 +15,10 @@ namespace RevitTimasBIMTools.RevitModel
             Title = Path.GetFileNameWithoutExtension(FilePath).Trim();
         }
 
+        
         public int Id { get; private set; }
-        public bool IsActive { get; private set; }
         public string Title { get; private set; }
+        public bool IsActive { get; private set; }
         public string FilePath { get; private set; }
         public Document Document { get; private set; }
         public Transform Transform { get; private set; }
