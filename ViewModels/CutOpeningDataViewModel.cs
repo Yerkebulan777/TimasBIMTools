@@ -120,7 +120,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private IList<ElementModel> GetUniqueList(Collection<ElementModel> collection)
         {
-            return collection.GroupBy(i => i.SymbolName).Select(g => g.First()).OrderBy(i => i.FamilyName).Append(null).Distinct().ToList();
+            return collection.GroupBy(i => i.SymbolName).Select(g => g.First()).OrderBy(i => i.FamilyName).Distinct().ToList();
         }
 
         #endregion
