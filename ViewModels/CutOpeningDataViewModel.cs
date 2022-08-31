@@ -233,7 +233,6 @@ namespace RevitTimasBIMTools.ViewModels
                                 Element elem = doc.GetElement(new ElementId(model.IdInt));
                                 view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
                                 RevitViewManager.SetColorElement(uidoc, elem);
-                                Task.Delay(3000).Wait();
                                 break;
                             }
                         }
@@ -243,6 +242,7 @@ namespace RevitTimasBIMTools.ViewModels
                         if (RevitElementModels.Remove(model))
                         {
                             // reset combofilter ...
+                            Task.Delay(1000).Wait();
                         }
                     }
                 }

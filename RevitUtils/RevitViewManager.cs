@@ -91,7 +91,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxXYZ GetBoundingBox(Element elem, View view = null, double factor = 0.5)
+        public static BoundingBoxXYZ GetBoundingBox(Element elem, View view = null, double factor = 3)
         {
             BoundingBoxXYZ bbox = elem.get_BoundingBox(view);
             if (bbox != null && bbox.Enabled)
