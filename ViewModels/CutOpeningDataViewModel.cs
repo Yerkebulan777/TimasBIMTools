@@ -110,18 +110,6 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-        private IList<ElementModel> unique = null;
-        public IList<ElementModel> UniqueElementModels
-        {
-            get => unique;
-            set => SetProperty(ref unique, value);
-        }
-
-
-        private IList<ElementModel> GetUniqueList(Collection<ElementModel> collection)
-        {
-            return collection.GroupBy(i => i.SymbolName).Select(g => g.First()).OrderBy(i => i.FamilyName).Distinct().ToList();
-        }
 
         #endregion
 
@@ -129,8 +117,6 @@ namespace RevitTimasBIMTools.ViewModels
         #region TextFilter
 
         private string filterText = string.Empty;
-        private readonly IList<ElementModel> uniqueElementModels = null;
-
         public string FilterText
         {
             get => filterText;
@@ -167,22 +153,19 @@ namespace RevitTimasBIMTools.ViewModels
             || model.CategoryName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
         }
 
-        private readonly ICollectionView view = CollectionViewSource.GetDefaultView(new ObservableCollection<ElementModel>());
 
-        private void FindDuplicate(CollectionView collection)
+        private IList<ElementModel> unique = null;
+        public IList<ElementModel> UniqueElementModels
         {
-            if (!collection.IsEmpty)
-            {
-                collection.Refresh();
-                //object value = collection.Select(product => product.ProductName).Distinct();
-            };
+            get => unique;
+            set => SetProperty(ref unique, value);
         }
 
 
-
-
-
-
+        private IList<ElementModel> GetUniqueList(Collection<ElementModel> collection)
+        {
+            return collection.GroupBy(i => i.SymbolName).Select(g => g.First()).OrderBy(i => i.FamilyName).Distinct().ToList();
+        }
 
         #endregion
 
