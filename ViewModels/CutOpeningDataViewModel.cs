@@ -243,9 +243,10 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (RevitElementModels.Remove(model))
                         {
-                            // set to buttom IsCollectionEnabled
+                            IsAllSelected = null;
                             UniqueElementNames = GetUniqueStringList(RevitElementModels);
                             IsCollectionEnabled = !ViewCollection.IsEmpty;
+                            // set to buttom IsCollectionEnabled
                             Task.Delay(1000).Wait();
                         }
                     }
