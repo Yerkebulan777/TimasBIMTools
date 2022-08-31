@@ -234,18 +234,19 @@ namespace RevitTimasBIMTools.ViewModels
                             }
                             finally
                             {
-                                IsAllSelected = null;
                                 RevitViewManager.SetColorElement(uidoc, elem);
                                 view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
-                                UniqueElementNames = GetUniqueStringList(RevitElementModels);
-                                IsCollectionEnabled = !ViewCollection.IsEmpty;
-                                // set to buttom IsCollectionEnabled
-                                Task.Delay(1000).Wait();
                             }
                             break;
                         }
                     }
                 }
+                Task.Delay(1000).Wait();
+                ViewCollection.Refresh();
+                // seletAll update by ViewItems
+                // set to buttom IsCollectionEnabled
+                IsCollectionEnabled = !ViewCollection.IsEmpty;
+                UniqueElementNames = GetUniqueStringList(RevitElementModels);
             });
         }
 
