@@ -220,31 +220,30 @@ namespace RevitTimasBIMTools.ViewModels
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
                 View3D view3d = RevitViewManager.Get3dView(uidoc);
-                while (0 < RevitElementModels.Count)
+                foreach (ElementModel model in RevitElementModels)
                 {
-                    ElementModel model = RevitElementModels.First();
-                    try
+                    if (model != null && model.IsSelected && RevitElementModels.Remove(model))
                     {
-                        if (model != null && model.IsSelected && RevitElementModels.Remove(model))
+                        Element elem = doc.GetElement(new ElementId(model.IdInt));
+                        // SetPostCommand Select element
+                        lock (syncLocker)
                         {
-                            Element elem = doc.GetElement(new ElementId(model.IdInt));
-                            // SetPostCommand Select element
-                            lock (syncLocker)
+                            try
                             {
                                 // Set Openning Logic with doc regenerate and transaction RollBack
-                                view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
-                                RevitViewManager.SetColorElement(uidoc, elem);
-                                break;
                             }
+                            finally
+                            {
+                                IsAllSelected = null;
+                                RevitViewManager.SetColorElement(uidoc, elem);
+                                view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
+                                UniqueElementNames = GetUniqueStringList(RevitElementModels);
+                                IsCollectionEnabled = !ViewCollection.IsEmpty;
+                                // set to buttom IsCollectionEnabled
+                                Task.Delay(1000).Wait();
+                            }
+                            break;
                         }
-                    }
-                    finally
-                    {
-                        IsAllSelected = null;
-                        UniqueElementNames = GetUniqueStringList(RevitElementModels);
-                        IsCollectionEnabled = !ViewCollection.IsEmpty;
-                        // set to buttom IsCollectionEnabled
-                        Task.Delay(1000).Wait();
                     }
                 }
             });
