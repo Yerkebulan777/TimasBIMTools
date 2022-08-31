@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using RevitTimasBIMTools.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -53,6 +54,30 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
             return CreateNew3DView(uidoc, viewName);
+        }
+
+
+        public static void ZoomElementInView(UIDocument uidoc, Element elem, View view)
+        {
+            RevitCommandId cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
+            try
+            {
+                UIView uiView = uidoc.GetOpenUIViews().FirstOrDefault(uv => uv.ViewId.Equals(view.Id));
+
+                List<XYZ> zc = uiView.GetZoomCorners().ToList();
+
+                uidoc.ShowElements(elem);
+
+                uiView.ZoomAndCenterRectangle(zc.ElementAt(0), zc.ElementAt(1));
+            }
+            catch (Exception ex)
+            {
+                RevitLogger.Error(ex.Message);
+            }
+            finally
+            {
+                uidoc.Application.PostCommand(cmdId);
+            }
         }
 
 
@@ -143,13 +168,17 @@ namespace RevitTimasBIMTools.RevitUtils
                         view.IsolateElementTemporary(elem.Id);
                         status = t.Commit();
                     }
-                    catch (System.Exception ex)
+                    catch (Exception ex)
                     {
                         if (status != t.RollBack())
                         {
                             status = t.GetStatus();
                             RevitLogger.Error(ex.Message);
                         }
+                    }
+                    finally
+                    {
+                        ZoomElementInView(uidoc, elem, view);
                     }
                 }
             }

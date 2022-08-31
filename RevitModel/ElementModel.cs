@@ -11,8 +11,6 @@ namespace RevitTimasBIMTools.RevitModel
         public readonly int LevelId = 0;
         private readonly Element instance = null;
         private readonly ElementTypeData elemTypeData;
-        public readonly string CategoryName = string.Empty;
-        //private readonly string date = DateTime.Today.Date.ToShortDateString();
         public ElementModel(Element elem, ElementTypeData data, string description = null)
         {
             instance = elem;
@@ -35,7 +33,8 @@ namespace RevitTimasBIMTools.RevitModel
 
         public string SymbolName { get; private set; }
         public string FamilyName { get; private set; }
-        public string Description { get; set; }
+        public string CategoryName { get; private set; }
+        public string Description { get; set; } = string.Empty;
 
         private bool selected = false;
         public bool IsSelected
