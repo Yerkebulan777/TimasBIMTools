@@ -43,7 +43,7 @@ namespace RevitTimasBIMTools.ViewModels
             CloseCommand = new RelayCommand(CancelCallbackLogic);
             ApplyCommand = new AsyncRelayCommand(ExecuteApplyCommandAsync);
             SnoopCommand = new AsyncRelayCommand(ExecuteSnoopCommandAsync);
-            SelectAllCommand = new RelayCommand<bool?>(HandleSelectAllCommand);
+            ShowSelectedCommand = new RelayCommand(HandleShowSelectedCommand);
         }
 
 
@@ -54,6 +54,13 @@ namespace RevitTimasBIMTools.ViewModels
         {
             get => enable;
             set => SetProperty(ref enable, value);
+        }
+
+        private bool? isSelected = false;
+        public bool? IsAllSelected
+        {
+            get => isSelected;
+            set => SetProperty(ref isSelected, value);
         }
 
         private Document doc = null;
@@ -79,7 +86,6 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref modelCollection, value))
                 {
-                    DockPanelView.CheckSelectAll.IsEnabled = modelCollection.Count != 0;
                     ViewCollection = CollectionViewSource.GetDefaultView(value);
                     UniqueElementNames = GetUniqueStringList(value);
                     IsEnabled = !ViewCollection.IsEmpty;
@@ -175,36 +181,24 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region SelectAllCommand
-        public ICommand SelectAllCommand { get; private set; }
-        public void HandleSelectAllCommand(bool? isChecked)
+        public ICommand ShowSelectedCommand { get; private set; }
+        public void HandleShowSelectedCommand()
         {
-            bool checkedHasValue = isChecked.HasValue;
-            bool boolean = checkedHasValue && isChecked.Value;
-            if (ViewCollection != null)
+            if (ViewCollection == null)
             {
-                try
+                return;
+            }
+            foreach (object item in ViewCollection)
+            {
+                lock (syncLocker)
                 {
-                    foreach (object item in ViewCollection)
+                    if (item is ElementModel model)
                     {
-                        lock (syncLocker)
+                        if (model.IsSelected == true)
                         {
-                            if (item is ElementModel model)
-                            {
-                                if (checkedHasValue)
-                                {
-                                    model.IsSelected = boolean;
-                                }
-                                if (model.IsSelected == true)
-                                {
-                                    resultCollection.Add(model);
-                                }
-                            }
+                            RevitLogger.Info($"Selectet Item {model.FamilyName}");
                         }
                     }
-                }
-                catch (Exception exc)
-                {
-                    RevitLogger.Error(exc.Message);
                 }
             }
         }
@@ -219,7 +213,6 @@ namespace RevitTimasBIMTools.ViewModels
             RevitElementModels.Clear();
             RevitElementModels = await RevitTask.RunAsync(app =>
             {
-                DockPanelView.CheckSelectAll.IsChecked = false;
                 CurrentDocument = app.ActiveUIDocument.Document;
                 manager.InitializeActiveDocument(CurrentDocument);
                 resultCollection = manager.GetCollisionCommunicateElements();

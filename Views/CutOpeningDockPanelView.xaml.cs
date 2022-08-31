@@ -25,7 +25,6 @@ namespace RevitTimasBIMTools.Views
         private DocumentModel documentModel;
         private IList<DocumentModel> documentModeList = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
-        private readonly CutOpeningSettingsViewModel optViewModel = ViewModelLocator.SettingsViewModel;
         private readonly CutOpeningSettingsView settingsView = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
 
@@ -90,37 +89,31 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        private void CheckSelectAll_CheckChanged(object sender, RoutedEventArgs e)
+        {
+            CheckBox chkSelectAll = (CheckBox)sender;
+            ItemCollection items = dataGridView.Items;
+            if (chkSelectAll.IsChecked == true)
+            {
+                items.OfType<ElementModel>().ToList().ForEach(x => x.IsSelected = true);
+            }
+            else if (chkSelectAll.IsChecked == false)
+            {
+                items.OfType<ElementModel>().ToList().ForEach(x => x.IsSelected = false);
+            }
+        }
+
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            if (CheckSelectAll.IsFocused == false)
-            {
-                ItemCollection items = dataGridView.Items;
-                if (items.OfType<ElementModel>().All(x => x.IsSelected == true))
-                {
-                    CheckSelectAll.IsChecked = true;
-                }
-                else
-                {
-                    dataViewModel.HandleSelectAllCommand(null);
-                }
-            }
+            ItemCollection items = dataGridView.Items;
+            dataViewModel.IsAllSelected = items.OfType<ElementModel>().All(x => x.IsSelected == true) ? true : (bool?)null;
         }
 
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (CheckSelectAll.IsFocused == false)
-            {
-                ItemCollection items = dataGridView.Items;
-                if (items.OfType<ElementModel>().All(x => x.IsSelected == false))
-                {
-                    CheckSelectAll.IsChecked = false;
-                }
-                else
-                {
-                    dataViewModel.HandleSelectAllCommand(null);
-                }
-            }
+            ItemCollection items = dataGridView.Items;
+            dataViewModel.IsAllSelected = items.OfType<ElementModel>().All(x => x.IsSelected == false) ? false : (bool?)null;
         }
 
 
@@ -181,7 +174,6 @@ namespace RevitTimasBIMTools.Views
             GC.WaitForPendingFinalizers();
             //GC.SuppressFinalize(this);
         }
-
 
     }
 }

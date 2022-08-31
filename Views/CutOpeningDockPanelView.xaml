@@ -40,12 +40,7 @@
                     </StackPanel>
                     <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
                     <StackPanel Height="50" Width="350" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
-                        <CheckBox Name="CheckSelectAll" IsThreeState="True" Content="Select" 
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"
-                                  IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                                  Command="{Binding SelectAllCommand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  CommandParameter="{Binding ElementName=CheckSelectAll,  Path=IsChecked, UpdateSourceTrigger=Explicit}"/>
-                        <ComboBox Name="ComboDataFilter" Height="25" Width="240" Margin="10"
+                        <ComboBox Name="ComboDataFilter" Height="25" Width="300" Margin="10"
                                   IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                   SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -62,6 +57,12 @@
                     </DataGrid.RowStyle>
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}">
+                            <DataGridTemplateColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <CheckBox Name="CheckSelectAll" Content="Select" Checked="CheckSelectAll_CheckChanged" Unchecked="CheckSelectAll_CheckChanged"
+                                              IsChecked="{Binding DataContext.IsAllSelected, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.HeaderTemplate>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <CheckBox IsChecked="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -102,6 +103,8 @@
                 </DataGrid>
             </ScrollViewer>
             <StackPanel  Grid.Row="3" Margin="5" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                <Button Name="Test" Content="Test" Margin="5" Height="25" Width="90" 
+                        Command="{Binding }" />
                 <Button Name="UpdateCmd" Content="Snoop" Margin="5" Height="25" Width="90" 
                         Command="{Binding SnoopCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
                 <Button Name="ApplyCmd" Content="Apply" Margin="5" Height="25" Width="90" 
