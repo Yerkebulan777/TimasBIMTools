@@ -3,6 +3,7 @@ using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using Newtonsoft.Json.Linq;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
@@ -242,8 +243,9 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (RevitElementModels.Remove(model))
                         {
-                            // reset combofilter ...
                             // set to buttom IsCollectionEnabled
+                            UniqueElementNames = GetUniqueStringList(RevitElementModels);
+                            IsCollectionEnabled = !ViewCollection.IsEmpty;
                             Task.Delay(1000).Wait();
                         }
                     }
