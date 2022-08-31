@@ -3,7 +3,6 @@ using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
-using Newtonsoft.Json.Linq;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
@@ -226,7 +225,7 @@ namespace RevitTimasBIMTools.ViewModels
                     ElementModel model = RevitElementModels.First();
                     try
                     {
-                        if (model != null && model.IsSelected)
+                        if (model != null && model.IsSelected && RevitElementModels.Remove(model))
                         {
                             Element elem = doc.GetElement(new ElementId(model.IdInt));
                             // SetPostCommand Select element
@@ -241,14 +240,11 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                     finally
                     {
-                        if (RevitElementModels.Remove(model))
-                        {
-                            IsAllSelected = null;
-                            UniqueElementNames = GetUniqueStringList(RevitElementModels);
-                            IsCollectionEnabled = !ViewCollection.IsEmpty;
-                            // set to buttom IsCollectionEnabled
-                            Task.Delay(1000).Wait();
-                        }
+                        IsAllSelected = null;
+                        UniqueElementNames = GetUniqueStringList(RevitElementModels);
+                        IsCollectionEnabled = !ViewCollection.IsEmpty;
+                        // set to buttom IsCollectionEnabled
+                        Task.Delay(1000).Wait();
                     }
                 }
             });
