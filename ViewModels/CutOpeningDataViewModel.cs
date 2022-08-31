@@ -41,8 +41,6 @@ namespace RevitTimasBIMTools.ViewModels
         public CutOpeningDataViewModel()
         {
             CloseCommand = new RelayCommand(CancelCallbackLogic);
-            SetFilterCommand = new RelayCommand(SetFilterTextCommand);
-            CleanFilterCommand = new RelayCommand(СleanFilterTextCommand);
             ApplyCommand = new AsyncRelayCommand(ExecuteApplyCommandAsync);
             SnoopCommand = new AsyncRelayCommand(ExecuteSnoopCommandAsync);
             SelectAllCommand = new RelayCommand<bool?>(HandleSelectAllCommand);
@@ -57,7 +55,6 @@ namespace RevitTimasBIMTools.ViewModels
             get => enable;
             set => SetProperty(ref enable, value);
         }
-
 
         private Document doc = null;
         public Document CurrentDocument
@@ -74,26 +71,6 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-
-        private ICollectionView collectionView;
-        public ICollectionView ItemCollectionView
-        {
-            get => collectionView;
-            set
-            {
-                if (SetProperty(ref collectionView, value))
-                {
-                    ItemCollectionView.SortDescriptions.Clear();
-                    ItemCollectionView.GroupDescriptions.Clear();
-                    ItemCollectionView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
-                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
-                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.FamilyName), ListSortDirection.Ascending));
-                    ItemCollectionView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
-                }
-            }
-        }
-
-
         private ObservableCollection<ElementModel> modelCollection = new ObservableCollection<ElementModel>();
         public ObservableCollection<ElementModel> RevitElementModels
         {
@@ -103,13 +80,30 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref modelCollection, value))
                 {
                     DockPanelView.CheckSelectAll.IsEnabled = modelCollection.Count != 0;
-                    ItemCollectionView = CollectionViewSource.GetDefaultView(value);
-                    UniqueElementModels = GetUniqueList(value);
-                    IsEnabled = !ItemCollectionView.IsEmpty;
+                    ViewCollection = CollectionViewSource.GetDefaultView(value);
+                    UniqueElementNames = GetUniqueStringList(value);
+                    IsEnabled = !ViewCollection.IsEmpty;
                 }
             }
         }
 
+        private ICollectionView viewCollect;
+        public ICollectionView ViewCollection
+        {
+            get => viewCollect;
+            set
+            {
+                if (SetProperty(ref viewCollect, value))
+                {
+                    ViewCollection.SortDescriptions.Clear();
+                    ViewCollection.GroupDescriptions.Clear();
+                    ViewCollection.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
+                    ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                    ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.FamilyName), ListSortDirection.Ascending));
+                    ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
+                }
+            }
+        }
 
         #endregion
 
@@ -120,47 +114,37 @@ namespace RevitTimasBIMTools.ViewModels
         public string FilterText
         {
             get => filterText;
-            set => SetProperty(ref filterText, value);
-        }
-
-        private IList<ElementModel> unique = null;
-        public IList<ElementModel> UniqueElementModels
-        {
-            get => unique;
-            set => SetProperty(ref unique, value);
-        }
-
-        private IList<ElementModel> GetUniqueList(Collection<ElementModel> collection)
-        {
-            return collection.GroupBy(i => i.SymbolName).Select(g => g.First()).OrderBy(i => i.FamilyName).Distinct().ToList();
-        }
-
-        public ICommand SetFilterCommand { get; private set; }
-        private void SetFilterTextCommand()
-        {
-            if (!ItemCollectionView.IsEmpty)
+            set
             {
-                ItemCollectionView.Refresh();
-                ItemCollectionView.Filter = FilterModelCollection;
-            };
+                if (SetProperty(ref filterText, value))
+                {
+                    if (!ViewCollection.IsEmpty)
+                    {
+                        ViewCollection.Refresh();
+                        ViewCollection.Filter = FilterModelCollection;
+                    };
+                }
+            }
         }
 
-        public ICommand CleanFilterCommand { get; private set; }
-        private void СleanFilterTextCommand()
+        private IList<string> uniqueNames = null;
+        public IList<string> UniqueElementNames
         {
-            if (!ItemCollectionView.IsEmpty)
-            {
-                FilterText = string.Empty;
-                ItemCollectionView.Refresh();
-                ItemCollectionView.Filter = FilterModelCollection;
-            };
+            get => uniqueNames;
+            set => SetProperty(ref uniqueNames, value);
+        }
+
+        private IList<string> GetUniqueStringList(Collection<ElementModel> collection)
+        {
+            return new SortedSet<string>(collection.Select(c => c.SymbolName)).ToList();
         }
 
         private bool FilterModelCollection(object obj)
         {
             return string.IsNullOrEmpty(FilterText)
-            || !(obj is ElementModel model) || model.FamilyName.Contains(FilterText)
-            || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase);
+            || !(obj is ElementModel model) || model.SymbolName.Contains(FilterText)
+            || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
+            || model.SymbolName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
@@ -196,11 +180,11 @@ namespace RevitTimasBIMTools.ViewModels
         {
             bool checkedHasValue = isChecked.HasValue;
             bool boolean = checkedHasValue && isChecked.Value;
-            if (ItemCollectionView != null)
+            if (ViewCollection != null)
             {
                 try
                 {
-                    foreach (object item in ItemCollectionView)
+                    foreach (object item in ViewCollection)
                     {
                         lock (syncLocker)
                         {

@@ -140,6 +140,7 @@ namespace RevitTimasBIMTools.RevitUtils
                         {
                             view.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
                         }
+                        view.IsolateElementTemporary(elem.Id);
                         status = t.Commit();
                     }
                     catch (System.Exception ex)
@@ -149,11 +150,6 @@ namespace RevitTimasBIMTools.RevitUtils
                             status = t.GetStatus();
                             RevitLogger.Error(ex.Message);
                         }
-                    }
-                    finally
-                    {
-                        view.IsolateElementTemporary(elem.Id);
-                        uidoc.ShowElements(elem.Id);
                     }
                 }
             }

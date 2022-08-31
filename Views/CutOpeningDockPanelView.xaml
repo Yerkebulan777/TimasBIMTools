@@ -47,15 +47,14 @@
                                   CommandParameter="{Binding ElementName=CheckSelectAll,  Path=IsChecked, UpdateSourceTrigger=Explicit}"/>
                         <ComboBox Name="ComboDataFilter" Height="25" Width="240" Margin="10"
                                   IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                                  SelectedItem="{Binding Path=FilterText, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}"
-                                  ItemsSource="{Binding Path=UniqueElementModels, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                  SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>
             <ScrollViewer Grid.Row="2">
-                <DataGrid Name="dataGridView" Width="Auto" MinWidth="500" MaxWidth="1000"
-                          ItemsSource="{Binding ItemCollectionView, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
-                    <!--SelectedItem="{Binding Path=SelectedModel, UpdateSourceTrigger=PropertyChanged}"-->
+                <DataGrid Name="dataGridView" Width="Auto" MinWidth="500" MaxWidth="1000" IsSynchronizedWithCurrentItem="True"
+                          ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <DataGrid.RowStyle>
                         <Style TargetType="{x:Type DataGridRow}">
                             <EventSetter Event="MouseDoubleClick" Handler="DataGrid_MouseDoubleClick"/>
