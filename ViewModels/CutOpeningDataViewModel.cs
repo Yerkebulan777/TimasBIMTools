@@ -217,11 +217,10 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                int counts = RevitElementModels.Count;
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
                 View3D view3d = RevitViewManager.Get3dView(uidoc);
-                while (0 < counts)
+                while (0 < RevitElementModels.Count)
                 {
                     ElementModel model = RevitElementModels.First();
                     try
