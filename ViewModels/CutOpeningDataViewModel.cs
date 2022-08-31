@@ -47,7 +47,7 @@ namespace RevitTimasBIMTools.ViewModels
         #region INotifyPropertyChanged members
 
         private bool enable = false;
-        public bool IsEnabled
+        public bool IsCollectionEnabled
         {
             get => enable;
             set => SetProperty(ref enable, value);
@@ -85,7 +85,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     ViewCollection = CollectionViewSource.GetDefaultView(value);
                     UniqueElementNames = GetUniqueStringList(value);
-                    IsEnabled = !ViewCollection.IsEmpty;
+                    IsCollectionEnabled = !ViewCollection.IsEmpty;
                 }
             }
         }
@@ -217,10 +217,11 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
+                int counts = RevitElementModels.Count;
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
                 View3D view3d = RevitViewManager.Get3dView(uidoc);
-                while (0 < RevitElementModels.Count)
+                while (0 < counts)
                 {
                     ElementModel model = RevitElementModels.First();
                     try
@@ -233,6 +234,7 @@ namespace RevitTimasBIMTools.ViewModels
                                 Element elem = doc.GetElement(new ElementId(model.IdInt));
                                 view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
                                 RevitViewManager.SetColorElement(uidoc, elem);
+                                ///SetPostCommand
                                 break;
                             }
                         }
@@ -241,6 +243,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (RevitElementModels.Remove(model))
                         {
+                            // set to buttom IsCollectionEnabled
                             // reset combofilter ...
                             Task.Delay(1000).Wait();
                         }
