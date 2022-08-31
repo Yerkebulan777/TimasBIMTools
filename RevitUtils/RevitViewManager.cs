@@ -123,6 +123,7 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 View view = view3d;
                 uidoc.RequestViewChange(view);
+                TransactionStatus status = TransactionStatus.Error;
                 if (TransactionStatus.Started == t.Start())
                 {
                     try
@@ -139,25 +140,23 @@ namespace RevitTimasBIMTools.RevitUtils
                         {
                             view.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
                         }
-                        if (TransactionStatus.Committed == t.Commit())
-                        {
-                            view.IsolateElementTemporary(elem.Id);
-                            uidoc.ShowElements(elem.Id);
-                        }
+                        status = t.Commit();
                     }
                     catch (System.Exception ex)
                     {
-                        if (TransactionStatus.RolledBack == t.RollBack())
+                        if (status != t.RollBack())
                         {
+                            status = t.GetStatus();
                             RevitLogger.Error(ex.Message);
                         }
                     }
-
+                    finally
+                    {
+                        view.IsolateElementTemporary(elem.Id);
+                        uidoc.ShowElements(elem.Id);
+                    }
                 }
-
             }
         }
-
-
     }
 }

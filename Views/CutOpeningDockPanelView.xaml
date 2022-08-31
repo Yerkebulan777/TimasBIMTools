@@ -23,42 +23,33 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
-            <DockPanel Grid.Row="0" Height="50" Background="White">
-                <Label Name="ActiveDocTitle" TextElement.FontSize="15" Margin="10">
+            <Grid Grid.Row="0" Height="50" VerticalAlignment="Center" Margin="15" >
+                <Label Name="ActiveDocTitle" TextElement.FontSize="13" VerticalAlignment="Center" >
                     <Label.BitmapEffect>
                         <DropShadowBitmapEffect/>
                     </Label.BitmapEffect>
                 </Label>
-            </DockPanel>
+            </Grid>
             <ScrollViewer Grid.Row="1">
-                <StackPanel Background="WhiteSmoke">
+                <StackPanel Background="WhiteSmoke" CanVerticallyScroll="True" CanHorizontallyScroll="True" >
                     <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13"/>
-                    <Grid  Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="Auto" MinWidth="500" MaxWidth="1000" >
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <ComboBox Name="ComboDocs" Grid.Column="0" Margin="25,5" DisplayMemberPath="Title" />
-                        <Button Name="ShowSettingsCmd" Grid.Column="1" Content="Settings" Height="30" Width="75" Margin="25,0" 
+                    <StackPanel Height="50" Width="350" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
+                        <ComboBox Name="ComboDocs" Height="25" Width="200"  DisplayMemberPath="Title" Margin="10"/>
+                        <Button Name="ShowSettingsCmd" Content="Settings" Height="25" Width="90" Margin="10" 
                                 VerticalAlignment="Center" HorizontalAlignment="Right" Click="ShowSettingsCmd_Click"/>
-                    </Grid>
+                    </StackPanel>
                     <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
-                    <Grid Height="50" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="Auto" MinWidth="500" MaxWidth="1000" >
-                        <CheckBox IsThreeState="True" Name="CheckSelectAll" Content="Select" 
-                                  HorizontalAlignment="Left" VerticalAlignment="Center" Margin="25,0"
+                    <StackPanel Height="50" Width="350" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
+                        <CheckBox Name="CheckSelectAll" IsThreeState="True" Content="Select" 
+                                  HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"
                                   IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                   Command="{Binding SelectAllCommand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   CommandParameter="{Binding ElementName=CheckSelectAll,  Path=IsChecked, UpdateSourceTrigger=Explicit}"/>
-                        <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" Height="20" Margin="125,0" 
-                                 IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}" />
-                        <Button Name="SetFilter" Content="Search" Height="20" Width="75" Margin="25,0" HorizontalAlignment="Right"
-                            IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                            Command="{Binding SetFilterCommand, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}"
-                            CommandParameter="{Binding IsEnabled, ElementName=SetFilter, UpdateSourceTrigger=Explicit}" />
-                    </Grid>
-                    <Grid Margin="10">
-                        <ComboBox Name="ComboFilter" ItemsSource="{Binding Path=UniqueElementModels, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </Grid>
+                        <ComboBox Name="ComboDataFilter" Height="25" Width="240" Margin="10"
+                                  IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                                  SelectedItem="{Binding Path=FilterText, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}"
+                                  ItemsSource="{Binding Path=UniqueElementModels, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
             <ScrollViewer Grid.Row="2">
@@ -71,7 +62,7 @@
                         </Style>
                     </DataGrid.RowStyle>
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Width="50" Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}">
+                        <DataGridTemplateColumn Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <CheckBox IsChecked="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -94,14 +85,14 @@
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="150" Header="Description" Binding="{Binding Description}">
+                        <DataGridTextColumn Width="100" Header="Category" Binding="{Binding CategoryName}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="100" Header="Category" Binding="{Binding CategoryName}">
+                        <DataGridTextColumn Width="100" Header="Description" Binding="{Binding Description}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
