@@ -228,13 +228,13 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (model != null && model.IsSelected)
                         {
+                            Element elem = doc.GetElement(new ElementId(model.IdInt));
+                            // SetPostCommand Select element
                             lock (syncLocker)
                             {
-                                /* Set Openning Logic with doc regenerate and transaction RollBack */
-                                Element elem = doc.GetElement(new ElementId(model.IdInt));
+                                // Set Openning Logic with doc regenerate and transaction RollBack
                                 view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
                                 RevitViewManager.SetColorElement(uidoc, elem);
-                                ///SetPostCommand
                                 break;
                             }
                         }
@@ -243,8 +243,8 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (RevitElementModels.Remove(model))
                         {
-                            // set to buttom IsCollectionEnabled
                             // reset combofilter ...
+                            // set to buttom IsCollectionEnabled
                             Task.Delay(1000).Wait();
                         }
                     }
