@@ -237,12 +237,12 @@ namespace RevitTimasBIMTools.ViewModels
                 ElementModel model = RevitElementModels.First();
                 try
                 {
-                    Element elem = document.GetElement(new ElementId(model.IdInt));
-                    if (model != null && elem.IsValidObject && model.IsSelected)
+                    if (model != null && model.IsSelected)
                     {
                         lock (syncLocker)
                         {
                             /* Set Openning Logic*/
+                            Element elem = document.GetElement(new ElementId(model.IdInt));
                             view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
                             RevitViewManager.SetColorElement(uidoc, elem);
                             Task.Delay(1000).Wait();
