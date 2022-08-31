@@ -17,7 +17,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
@@ -40,10 +39,9 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutOpeningDataViewModel()
         {
-            CloseCommand = new RelayCommand(CancelCallbackLogic);
-            ApplyCommand = new AsyncRelayCommand(ExecuteApplyCommandAsync);
             SnoopCommand = new AsyncRelayCommand(ExecuteSnoopCommandAsync);
-            ShowSelectedCommand = new RelayCommand(HandleShowSelectedCommand);
+            ApplyCommand = new AsyncRelayCommand(ExecuteApplyCommandAsync);
+            CloseCommand = new RelayCommand(CancelCallbackLogic);
         }
 
 
@@ -180,32 +178,6 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region SelectAllCommand
-        public ICommand ShowSelectedCommand { get; private set; }
-        public void HandleShowSelectedCommand()
-        {
-            if (ViewCollection == null)
-            {
-                return;
-            }
-            foreach (object item in ViewCollection)
-            {
-                lock (syncLocker)
-                {
-                    if (item is ElementModel model)
-                    {
-                        if (model.IsSelected == true)
-                        {
-                            RevitLogger.Info($"Selectet Item {model.FamilyName}");
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-
         #region SnoopCommand
         public ICommand SnoopCommand { get; private set; }
         private async Task ExecuteSnoopCommandAsync()
@@ -240,8 +212,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region ApplyCommand
         public ICommand ApplyCommand { get; private set; }
-
-        [STAThread]
         private async Task ExecuteApplyCommandAsync()
         {
             UserControl presenter = new UserControl
@@ -252,34 +222,44 @@ namespace RevitTimasBIMTools.ViewModels
             await RevitTask.RunAsync(app =>
             {
                 CurrentDocument = app.ActiveUIDocument.Document;
-                presenter.Content = GetContent(app.ActiveUIDocument);
+                ShowOpeningLogic(app.ActiveUIDocument);
             });
         }
 
 
-        private ContentControl GetContent(UIDocument uidoc)
+        [STAThread]
+        private void ShowOpeningLogic(UIDocument uidoc)
         {
-            ContentControl content = null;
             Document document = uidoc.Document;
             View3D view3d = RevitViewManager.Get3dView(uidoc);
-            try
+            while (0 < RevitElementModels.Count)
             {
-                Task.Delay(3000).Wait();
                 ElementModel model = RevitElementModels.First();
-                Element elem = document.GetElement(new ElementId(model.IdInt));
-                if (RevitElementModels.Remove(model) && elem.IsValidObject)
+                try
                 {
-                    view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
-                    content = new PreviewControl(document, view3d.Id);
-                    RevitViewManager.SetColorElement(uidoc, elem);
+                    Element elem = document.GetElement(new ElementId(model.IdInt));
+                    if (model != null && elem.IsValidObject && model.IsSelected)
+                    {
+                        lock (syncLocker)
+                        {
+                            /* Set Openning Logic*/
+                            view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
+                            RevitViewManager.SetColorElement(uidoc, elem);
+                            Task.Delay(1000).Wait();
+                            break;
+                        }
+                    }
+                }
+                finally
+                {
+                    if (RevitElementModels.Remove(model))
+                    {
+                        // reset combofilter ...
+                    }
                 }
             }
-            catch (Exception ex)
-            {
-                RevitLogger.Log(ex.Message);
-            }
-            return content;
         }
+
         #endregion
 
 

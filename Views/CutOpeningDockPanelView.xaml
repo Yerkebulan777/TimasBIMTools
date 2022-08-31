@@ -33,15 +33,15 @@
             <ScrollViewer Grid.Row="1">
                 <StackPanel Background="WhiteSmoke" CanVerticallyScroll="True" CanHorizontallyScroll="True" >
                     <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13"/>
-                    <StackPanel Height="50" Width="350" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
-                        <ComboBox Name="ComboDocs" Height="25" Width="200"  DisplayMemberPath="Title" Margin="10"/>
+                    <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
+                        <ComboBox Name="ComboDocs" Height="25" Width="170"  DisplayMemberPath="Title" Margin="10"/>
                         <Button Name="ShowSettingsCmd" Content="Settings" Height="25" Width="90" Margin="10" 
                                 VerticalAlignment="Center" HorizontalAlignment="Right" Click="ShowSettingsCmd_Click"/>
                     </StackPanel>
                     <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
-                    <StackPanel Height="50" Width="350" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
-                        <ComboBox Name="ComboDataFilter" Height="25" Width="300" Margin="10"
-                                  IsEnabled ="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                    <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
+                        <ComboBox Name="ComboDataFilter" Height="25" Width="280" Margin="10"
+                                  IsEnabled ="{Binding Path=IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                   SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
@@ -102,16 +102,16 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </ScrollViewer>
-            <StackPanel  Grid.Row="3" Margin="5" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <StackPanel  Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
                 <Button Name="Test" Content="Test" Margin="5" Height="25" Width="90" 
                         Command="{Binding }" />
-                <Button Name="UpdateCmd" Content="Snoop" Margin="5" Height="25" Width="90" 
+                <Button Name="UpdateCmd" Content="Snoop" Height="25" Width="90" Margin="10" 
                         Command="{Binding SnoopCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
-                <Button Name="ApplyCmd" Content="Apply" Margin="5" Height="25" Width="90" 
+                <Button Name="ApplyCmd" Content="Apply"  Height="25" Width="90" Margin="10"
                         IsEnabled="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                         Command="{Binding ApplyCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                         CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}"/>
-                <Button Name="CancelCmd" Content="Close" Margin="5" Height="25" Width="90"
+                <Button Name="CancelCmd" Content="Close"  Height="25" Width="90" Margin="10"
                         Command="{Binding CancelCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
             </StackPanel>
         </Grid>

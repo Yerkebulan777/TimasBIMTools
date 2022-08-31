@@ -10,6 +10,7 @@ namespace RevitTimasBIMTools.RevitUtils
     internal sealed class RevitViewManager
     {
         private static RevitCommandId cmdId { get; set; } = null;
+        //ContentControl content = new PreviewControl(document, view3d.Id);
         public static View3D CreateNew3DView(UIDocument uidoc, string viewName)
         {
             bool flag = false;
@@ -66,39 +67,27 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void ZoomElementInView(UIDocument uidoc, Element elem, View view)
+        public static void CloseAllInactiveViews(UIDocument uidoc, Element elem, View view)
         {
+            uidoc.ActiveView = view;
+            uidoc.RefreshActiveView();
             cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
             UIView uiView = uidoc.GetOpenUIViews().FirstOrDefault(uv => uv.ViewId.Equals(view.Id));
-            uidoc.ActiveView = view;
             if (uiView != null)
             {
-                try
-                {
-                    List<XYZ> zc = uiView.GetZoomCorners().ToList();
-
-                    uidoc.ShowElements(elem);
-
-                    uiView.ZoomAndCenterRectangle(zc.ElementAt(0), zc.ElementAt(1));
-                }
-                catch (Exception ex)
-                {
-                    RevitLogger.Error(ex.Message);
-                }
-                finally
-                {
-                    uidoc.Application.PostCommand(cmdId);
-                }
+                uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
+                uidoc.Application.PostCommand(cmdId);
             }
         }
 
 
-        public static void ZoomView(UIDocument uidoc, View3D view3d)
+        public static void ZoomElementInView(UIDocument uidoc, View3D view3d, BoundingBoxXYZ box)
         {
             uidoc.ActiveView = view3d;
             UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(q => q.ViewId == view3d.Id);
+            uiview.ZoomAndCenterRectangle(box.Min, box.Max);
             uidoc.RefreshActiveView();
-            uiview.ZoomToFit();
+            //uiview.ZoomToFit();
         }
 
 
@@ -121,21 +110,18 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static View3D GetSectionBoxView(UIDocument uidoc, Element elem, View3D view3d)
         {
-            ElementId elemId = elem.Id;
-            uidoc.ShowElements(elemId);
             uidoc.RequestViewChange(view3d);
             BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
             using (Transaction t = new Transaction(uidoc.Document, "GetSectionBoxView"))
             {
-                uidoc.ActiveView = view3d;
                 if (TransactionStatus.Started == t.Start())
                 {
                     view3d.SetSectionBox(bbox);
                 }
                 if (TransactionStatus.Committed == t.Commit())
                 {
-                    uidoc.Selection.SetElementIds(new List<ElementId> { elemId });
-                    ZoomView(uidoc, view3d);
+                    CloseAllInactiveViews(uidoc, elem, view3d);
+                    ZoomElementInView(uidoc, view3d, bbox); 
                 }
             }
             return view3d;
@@ -144,13 +130,16 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static void SetColorElement(UIDocument uidoc, Element elem, byte blue = 0, byte red = 0, byte green = 0)
         {
-            OverrideGraphicSettings ogs = new OverrideGraphicSettings();
             Color color = uidoc.Application.Application.Create.NewColor();
-            color.Blue = blue;
-            color.Red = red;
-            color.Green = green;
-            ogs = ogs.SetProjectionLineColor(color);
-            uidoc.ActiveView.SetElementOverrides(elem.Id, ogs);
+            OverrideGraphicSettings ogs = new OverrideGraphicSettings();
+            if (!color.IsReadOnly)
+            {
+                color.Blue = blue;
+                color.Red = red;
+                color.Green = green;
+                ogs = ogs.SetProjectionLineColor(color);
+                uidoc.ActiveView.SetElementOverrides(elem.Id, ogs);
+            }
         }
 
 
@@ -190,7 +179,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                     finally
                     {
-                        ZoomElementInView(uidoc, elem, view);
+                        CloseAllInactiveViews(uidoc, elem, view);
                     }
                 }
             }
