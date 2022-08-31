@@ -90,7 +90,7 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-        private ICollectionView viewCollect = new CollectionView(new List<ElementModel>(50));
+        private ICollectionView viewCollect = new CollectionView(new List<ElementModel>());
         public ICollectionView ViewCollection
         {
             get => viewCollect;
