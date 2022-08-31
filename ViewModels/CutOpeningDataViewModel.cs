@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
-using UserControl = System.Windows.Controls.UserControl;
 
 
 namespace RevitTimasBIMTools.ViewModels
@@ -212,52 +211,42 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region ApplyCommand
         public ICommand ApplyCommand { get; private set; }
-        private async Task ExecuteApplyCommandAsync()
-        {
-            UserControl presenter = new UserControl
-            {
-                Height = 300,
-                Width = 500
-            };
-            await RevitTask.RunAsync(app =>
-            {
-                CurrentDocument = app.ActiveUIDocument.Document;
-                ShowOpeningLogic(app.ActiveUIDocument);
-            });
-        }
-
 
         [STAThread]
-        private void ShowOpeningLogic(UIDocument uidoc)
+        private async Task ExecuteApplyCommandAsync()
         {
-            Document document = uidoc.Document;
-            View3D view3d = RevitViewManager.Get3dView(uidoc);
-            while (0 < RevitElementModels.Count)
+            await RevitTask.RunAsync(app =>
             {
-                ElementModel model = RevitElementModels.First();
-                try
+                UIDocument uidoc = app.ActiveUIDocument;
+                Document document = app.ActiveUIDocument.Document;
+                View3D view3d = RevitViewManager.Get3dView(uidoc);
+                while (0 < RevitElementModels.Count)
                 {
-                    if (model != null && model.IsSelected)
+                    ElementModel model = RevitElementModels.First();
+                    try
                     {
-                        lock (syncLocker)
+                        if (model != null && model.IsSelected)
                         {
-                            /* Set Openning Logic*/
-                            Element elem = document.GetElement(new ElementId(model.IdInt));
-                            view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
-                            RevitViewManager.SetColorElement(uidoc, elem);
-                            Task.Delay(1000).Wait();
-                            break;
+                            lock (syncLocker)
+                            {
+                                /* Set Openning Logic with doc regenerate and transaction RollBack */
+                                Element elem = document.GetElement(new ElementId(model.IdInt));
+                                view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
+                                RevitViewManager.SetColorElement(uidoc, elem);
+                                Task.Delay(1000).Wait();
+                                break;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        if (RevitElementModels.Remove(model))
+                        {
+                            // reset combofilter ...
                         }
                     }
                 }
-                finally
-                {
-                    if (RevitElementModels.Remove(model))
-                    {
-                        // reset combofilter ...
-                    }
-                }
-            }
+            });
         }
 
         #endregion
