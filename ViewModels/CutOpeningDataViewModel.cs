@@ -218,7 +218,7 @@ namespace RevitTimasBIMTools.ViewModels
             await RevitTask.RunAsync(app =>
             {
                 UIDocument uidoc = app.ActiveUIDocument;
-                Document document = app.ActiveUIDocument.Document;
+                Document doc = app.ActiveUIDocument.Document;
                 View3D view3d = RevitViewManager.Get3dView(uidoc);
                 while (0 < RevitElementModels.Count)
                 {
@@ -230,10 +230,10 @@ namespace RevitTimasBIMTools.ViewModels
                             lock (syncLocker)
                             {
                                 /* Set Openning Logic with doc regenerate and transaction RollBack */
-                                Element elem = document.GetElement(new ElementId(model.IdInt));
+                                Element elem = doc.GetElement(new ElementId(model.IdInt));
                                 view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
                                 RevitViewManager.SetColorElement(uidoc, elem);
-                                Task.Delay(1000).Wait();
+                                Task.Delay(3000).Wait();
                                 break;
                             }
                         }
