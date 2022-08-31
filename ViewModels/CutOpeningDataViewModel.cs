@@ -123,6 +123,18 @@ namespace RevitTimasBIMTools.ViewModels
             set => SetProperty(ref filterText, value);
         }
 
+        private IList<ElementModel> unique = null;
+        public IList<ElementModel> UniqueElementModels
+        {
+            get => unique;
+            set => SetProperty(ref unique, value);
+        }
+
+        private IList<ElementModel> GetUniqueList(Collection<ElementModel> collection)
+        {
+            return collection.GroupBy(i => i.SymbolName).Select(g => g.First()).OrderBy(i => i.FamilyName).Distinct().ToList();
+        }
+
         public ICommand SetFilterCommand { get; private set; }
         private void SetFilterTextCommand()
         {
@@ -147,24 +159,8 @@ namespace RevitTimasBIMTools.ViewModels
         private bool FilterModelCollection(object obj)
         {
             return string.IsNullOrEmpty(FilterText)
-            || !(obj is ElementModel model) || model.SymbolName.Contains(FilterText)
-            || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
-            || model.FamilyName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
-            || model.CategoryName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
-        }
-
-
-        private IList<ElementModel> unique = null;
-        public IList<ElementModel> UniqueElementModels
-        {
-            get => unique;
-            set => SetProperty(ref unique, value);
-        }
-
-
-        private IList<ElementModel> GetUniqueList(Collection<ElementModel> collection)
-        {
-            return collection.GroupBy(i => i.SymbolName).Select(g => g.First()).OrderBy(i => i.FamilyName).Distinct().ToList();
+            || !(obj is ElementModel model) || model.FamilyName.Contains(FilterText)
+            || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
