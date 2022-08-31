@@ -74,7 +74,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (true == settingsView.ShowDialog())
             {
-                settingsView.Activate();
+                _ = settingsView.Activate();
             }
         }
 
@@ -136,9 +136,8 @@ namespace RevitTimasBIMTools.Views
                     Element elem = CurrentDocument.GetElement(new ElementId(model.IdInt));
                     if (elem != null && CurrentDocument is Document doc)
                     {
-                        View3D view = RevitViewManager.Get3dView(uidoc);
+                        RevitViewManager.ShowAndZoomElement(uidoc, elem);
                         System.Windows.Clipboard.SetText(model.IdInt.ToString());
-                        RevitViewManager.IsolateElementIn3DView(uidoc, elem, view);
                     }
                 });
             }

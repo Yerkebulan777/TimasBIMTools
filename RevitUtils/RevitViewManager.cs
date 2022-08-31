@@ -9,6 +9,7 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitViewManager
     {
+        private static RevitCommandId cmdId { get; set; } = null;
         public static View3D CreateNew3DView(UIDocument uidoc, string viewName)
         {
             bool flag = false;
@@ -56,27 +57,38 @@ namespace RevitTimasBIMTools.RevitUtils
             return CreateNew3DView(uidoc, viewName);
         }
 
+        public static void ShowAndZoomElement(UIDocument uidoc, Element elem)
+        {
+            uidoc.ShowElements(elem);
+            cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
+            uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
+            uidoc.Application.PostCommand(cmdId);
+        }
+
 
         public static void ZoomElementInView(UIDocument uidoc, Element elem, View view)
         {
-            RevitCommandId cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
-            try
+            cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
+            UIView uiView = uidoc.GetOpenUIViews().FirstOrDefault(uv => uv.ViewId.Equals(view.Id));
+            uidoc.ActiveView = view;
+            if (uiView != null)
             {
-                UIView uiView = uidoc.GetOpenUIViews().FirstOrDefault(uv => uv.ViewId.Equals(view.Id));
+                try
+                {
+                    List<XYZ> zc = uiView.GetZoomCorners().ToList();
 
-                List<XYZ> zc = uiView.GetZoomCorners().ToList();
+                    uidoc.ShowElements(elem);
 
-                uidoc.ShowElements(elem);
-
-                uiView.ZoomAndCenterRectangle(zc.ElementAt(0), zc.ElementAt(1));
-            }
-            catch (Exception ex)
-            {
-                RevitLogger.Error(ex.Message);
-            }
-            finally
-            {
-                uidoc.Application.PostCommand(cmdId);
+                    uiView.ZoomAndCenterRectangle(zc.ElementAt(0), zc.ElementAt(1));
+                }
+                catch (Exception ex)
+                {
+                    RevitLogger.Error(ex.Message);
+                }
+                finally
+                {
+                    uidoc.Application.PostCommand(cmdId);
+                }
             }
         }
 
