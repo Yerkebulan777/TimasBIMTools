@@ -20,7 +20,6 @@ namespace RevitTimasBIMTools.Views
     public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
         public UIDocument CurrentUIDocument { get; set; } = null;
-        public Document CurrentDocument { get; set; } = null;
         public View3D View3d { get; set; } = null;
 
         private bool disposedValue = false;
@@ -58,12 +57,12 @@ namespace RevitTimasBIMTools.Views
                 ComboDocs.ItemsSource = args.Documents;
                 CurrentUIDocument = sender as UIDocument;
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
+                ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
                 settingsView.ComboTargetCats.ItemsSource = args.Categories;
                 settingsView.ComboRoundSymbol.ItemsSource = args.FamilySymbols;
                 settingsView.ComboRectangSymbol.ItemsSource = args.FamilySymbols;
                 settingsView.ComboStructMats.ItemsSource = args.StructureMaterials;
                 ActiveDocTitle.Content = documentModel.Document.Title.ToUpper();
-                ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
                 dataViewModel.CurrentDocument = documentModel.Document;
             }
         }
