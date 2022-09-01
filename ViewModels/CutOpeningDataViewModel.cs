@@ -26,6 +26,7 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
+        public Document CurrentDocument { get; internal set; } = null;
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
@@ -60,20 +61,6 @@ namespace RevitTimasBIMTools.ViewModels
             set => SetProperty(ref isSelected, value);
         }
 
-        private Document doc = null;
-        public Document CurrentDocument
-        {
-            get => doc;
-            set
-            {
-                if (value != null)
-                {
-                    doc = value;
-                    OnPropertyChanged(nameof(CurrentDocument));
-                    CommandManager.InvalidateRequerySuggested();
-                };
-            }
-        }
 
         private ObservableCollection<ElementModel> modelCollection = new ObservableCollection<ElementModel>();
         public ObservableCollection<ElementModel> RevitElementModels
@@ -182,23 +169,22 @@ namespace RevitTimasBIMTools.ViewModels
             RevitElementModels.Clear();
             RevitElementModels = await RevitTask.RunAsync(app =>
             {
-                ActivateFamilySimbol(roundOpeningId);
-                ActivateFamilySimbol(rectangOpeningId);
                 UIDocument uidoc = app.ActiveUIDocument;
+                Document doc = app.ActiveUIDocument.Document;
+                ActivateFamilySimbol(doc, roundOpeningId);
+                ActivateFamilySimbol(doc, rectangOpeningId);
                 view3d = RevitViewManager.Get3dView(uidoc);
-                CurrentDocument = app.ActiveUIDocument.Document;
-                manager.InitializeActiveDocument(CurrentDocument);
+                manager.InitializeActiveDocument(app.ActiveUIDocument.Document);
                 IList<ElementModel> resultCollection = manager.GetCollisionCommunicateElements();
-                RevitViewManager.CloseAllInactiveViews(uidoc, view3d);
                 return resultCollection.ToObservableCollection();
             });
         }
 
-        private void ActivateFamilySimbol(string simbolId)
+        private void ActivateFamilySimbol(Document doc, string simbolId)
         {
             if (!string.IsNullOrEmpty(simbolId))
             {
-                Element element = CurrentDocument.GetElement(simbolId);
+                Element element = doc.GetElement(simbolId);
                 if (element is FamilySymbol symbol && !symbol.IsActive)
                 {
                     symbol.Activate();
@@ -211,6 +197,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region ExecuteCommand
         public ICommand ShowExecuteCommand { get; private set; }
+
 
         [STAThread]
         private async Task ExecuteHandelCommandAsync()
