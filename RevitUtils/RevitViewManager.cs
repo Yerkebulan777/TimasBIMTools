@@ -11,7 +11,7 @@ namespace RevitTimasBIMTools.RevitUtils
     {
         private static RevitCommandId cmdId { get; set; } = null;
         private static AddInCommandBinding bindedCmdId { get; set; } = null;
-        
+
         //ContentControl content = new PreviewControl(document, view3d.Id);
 
         #region Get3dView
@@ -68,62 +68,17 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
-        #region CloseAllInactiveViews
-
-        public static void CloseAllInactiveViews(UIDocument uidoc, Element elem, View view)
-        {
-            uidoc.ActiveView = view;
-            uidoc.RequestViewChange(view);
-            cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
-            UIView uiView = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view.Id));
-            if (uiView != null)
-            {
-                uidoc.Application.PostCommand(cmdId);
-                uidoc.RefreshActiveView();
-            }
-        }
-
-        #endregion
-
-
-
+        #region ShowElement
         public static void ShowElement(UIDocument uidoc, Element elem)
         {
             uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
             uidoc.ShowElements(elem);
         }
 
-
-        public static void ZoomElementInView(UIDocument uidoc, View3D view3d, BoundingBoxXYZ box)
-        {
-            uidoc.ActiveView = view3d;
-            uidoc.RequestViewChange(view3d);
-            UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view3d.Id));
-            if (uiview != null)
-            {
-                uiview.ZoomAndCenterRectangle(box.Min, box.Max);
-                uidoc.RefreshActiveView();
-            }
-        }
+        #endregion
 
 
-        public static BoundingBoxXYZ GetBoundingBox(Element elem, View view = null, double factor = 3)
-        {
-            BoundingBoxXYZ bbox = elem.get_BoundingBox(view);
-            if (bbox != null && bbox.Enabled)
-            {
-                double sizeX = bbox.Max.X - bbox.Min.X;
-                double sizeY = bbox.Max.Y - bbox.Min.Y;
-                double sizeZ = bbox.Max.Z - bbox.Min.Z;
-                double size = new double[] { sizeX, sizeY, sizeZ }.Min();
-                XYZ vector = new XYZ(size, size, size) * factor;
-                bbox.Min -= vector;
-                bbox.Max += vector;
-            }
-            return bbox;
-        }
-
-
+        #region SetCustomSectionBox
         public static View3D SetCustomSectionBox(UIDocument uidoc, Element elem, View3D view3d)
         {
             uidoc.ActiveView = view3d;
@@ -164,6 +119,35 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
+        public static BoundingBoxXYZ GetBoundingBox(Element elem, View view = null, double factor = 3)
+        {
+            BoundingBoxXYZ bbox = elem.get_BoundingBox(view);
+            if (bbox != null && bbox.Enabled)
+            {
+                double sizeX = bbox.Max.X - bbox.Min.X;
+                double sizeY = bbox.Max.Y - bbox.Min.Y;
+                double sizeZ = bbox.Max.Z - bbox.Min.Z;
+                double size = new double[] { sizeX, sizeY, sizeZ }.Min();
+                XYZ vector = new XYZ(size, size, size) * factor;
+                bbox.Min -= vector;
+                bbox.Max += vector;
+            }
+            return bbox;
+        }
+
+
+        public static void ZoomElementInView(UIDocument uidoc, View3D view3d, BoundingBoxXYZ box)
+        {
+            uidoc.ActiveView = view3d;
+            uidoc.RequestViewChange(view3d);
+            UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view3d.Id));
+            if (uiview != null)
+            {
+                uiview.ZoomAndCenterRectangle(box.Min, box.Max);
+            }
+        }
+
+
         public static void SetColorElement(UIDocument uidoc, Element elem, byte blue = 0, byte red = 0, byte green = 0)
         {
             Color color = uidoc.Application.Application.Create.NewColor();
@@ -178,6 +162,10 @@ namespace RevitTimasBIMTools.RevitUtils
             }
         }
 
+        #endregion
+
+
+        #region IsolateElementIn3DView
 
         public static void IsolateElementIn3DView(UIDocument uidoc, Element elem, View3D view3d)
         {
@@ -216,13 +204,31 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                     finally
                     {
-                        CloseAllInactiveViews(uidoc, elem, view);
+                        CloseAllInactiveViews(uidoc, view);
                     }
                 }
             }
         }
 
+        #endregion
 
+
+        #region CloseAllInactiveViews
+
+        public static void CloseAllInactiveViews(UIDocument uidoc, View view)
+        {
+            uidoc.ActiveView = view;
+            uidoc.RequestViewChange(view);
+            cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
+            UIView uiView = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view.Id));
+            if (uiView != null)
+            {
+                uidoc.Application.PostCommand(cmdId);
+                uidoc.RefreshActiveView();
+            }
+        }
+
+        #endregion
 
     }
 }

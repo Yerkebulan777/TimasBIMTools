@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.Input;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
@@ -29,6 +30,7 @@ namespace RevitTimasBIMTools.ViewModels
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
+        View3D view3d = null;
         private readonly object syncLocker = new object();
         private readonly ElementId elementId = ElementId.InvalidElementId;
         private IList<ElementModel> resultCollection = new List<ElementModel>(150);
@@ -182,10 +184,13 @@ namespace RevitTimasBIMTools.ViewModels
             RevitElementModels.Clear();
             RevitElementModels = await RevitTask.RunAsync(app =>
             {
+                var uidoc = app.ActiveUIDocument;
+                view3d = RevitViewManager.Get3dView(uidoc);
                 CurrentDocument = app.ActiveUIDocument.Document;
                 manager.InitializeActiveDocument(CurrentDocument);
                 resultCollection = manager.GetCollisionCommunicateElements();
                 RevitLogger.Info($"Found collision {resultCollection.Count()}");
+                RevitViewManager.CloseAllInactiveViews(uidoc, view3d);
                 ActivateFamilySimbol(rectangOpeningId);
                 ActivateFamilySimbol(roundOpeningId);
                 return resultCollection.ToObservableCollection();
@@ -217,7 +222,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
-                View3D view3d = RevitViewManager.Get3dView(uidoc);
+
                 foreach (ElementModel model in RevitElementModels)
                 {
                     if (model.IsSelected && RevitElementModels.Remove(model))
@@ -228,13 +233,12 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             try
                             {
-                                view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
                                 // Set Openning Logic with doc regenerate and transaction RollBack
+                                view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
                             }
                             finally
                             {
                                 RevitViewManager.SetColorElement(uidoc, elem);
-                                //view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
                             }
                             break;
                         }
