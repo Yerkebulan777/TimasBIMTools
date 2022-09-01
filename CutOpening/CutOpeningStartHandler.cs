@@ -39,10 +39,11 @@ namespace RevitTimasBIMTools.CutOpening
             Properties.Settings.Default.TargetDocumentName = string.Empty;
             FamilyPlacementType placement = FamilyPlacementType.OneLevelBasedHosted;
             SortedList<string, Material> materials = new SortedList<string, Material>(100);
-            IList<DocumentModel> documents = RevitDocumentManager.GetDocumentCollection(doc);
-            IList<Category> categories = RevitFilterManager.GetCategories(doc, builtInCats).ToList();
-            Dictionary<string, string> dictionary = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
+            IList<DocumentModel> docs = RevitDocumentManager.GetDocumentCollection(doc);
+            IList<Category> cats = RevitFilterManager.GetCategories(doc, builtInCats).ToList();
+            Dictionary<string, string> dict = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
             FilteredElementCollector collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), BuiltInCategory.OST_GenericModel);
+            
             foreach (FamilySymbol smb in collector)
             {
                 Family fam = smb.Family;
@@ -54,8 +55,8 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                 }
             }
-            
-            OnCompleted(new BaseCompletedEventArgs(documents, categories, symbols, dictionary, view3d));
+
+            OnCompleted(new BaseCompletedEventArgs(uidoc, view3d, cats, symbols, docs, dict));
         }
 
 
@@ -76,16 +77,24 @@ namespace RevitTimasBIMTools.CutOpening
     {
         public View3D View3d { get; }
         public IList<Category> Categories { get; }
+        public UIDocument CurrentUIDocument { get; }
         public IList<DocumentModel> Documents { get; }
         public IList<FamilySymbol> FamilySymbols { get; }
+        
         public Dictionary<string, string> StructureMaterials { get; }
         
-        public BaseCompletedEventArgs(IList<DocumentModel> documents, IList<Category> categories, IList<FamilySymbol> symbols, Dictionary<string, string> matDict, View3D view3d)
+        public BaseCompletedEventArgs(UIDocument uidoc,
+                                      View3D view3d,
+                                      IList<Category> cats,
+                                      IList<FamilySymbol> smbs,
+                                      IList<DocumentModel> docs,
+                                      Dictionary<string, string> matDict)
         {
             View3d = view3d;
-            Documents = documents;
-            Categories = categories;
-            FamilySymbols = symbols;
+            Documents = docs;
+            Categories = cats;
+            FamilySymbols = smbs;
+            CurrentUIDocument = uidoc;
             StructureMaterials = matDict;
         }
     }

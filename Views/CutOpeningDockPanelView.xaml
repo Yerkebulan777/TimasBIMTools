@@ -59,7 +59,9 @@
                         <DataGridTemplateColumn Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}" d:IsLocked="True">
                             <DataGridTemplateColumn.HeaderTemplate>
                                 <DataTemplate>
-                                    <CheckBox Name="CheckSelectAll" Content="Select" Checked="CheckSelectAll_CheckChanged" Unchecked="CheckSelectAll_CheckChanged"
+                                    <CheckBox Name="CheckSelectAll" 
+                                              DataContextChanged="CheckSelectAll_DataContextChanged"
+                                              Checked="CheckSelectAll_CheckChanged" Unchecked="CheckSelectAll_CheckChanged"
                                               IsChecked="{Binding DataContext.IsAllSelected, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.HeaderTemplate>

@@ -102,6 +102,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 Document doc = uiapp.ActiveUIDocument.Document;
                 ICollection<ElementId> selectedIds = uidoc.Selection.GetElementIds();
                 Element elem = doc.GetElement(selectedIds.Cast<ElementId>().FirstOrDefault());
+                cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
                 using (Transaction t = new Transaction(uidoc.Document, "SetCustomSectionBox"))
                 {
                     BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
@@ -111,8 +112,16 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                     if (TransactionStatus.Committed == t.Commit())
                     {
-                        ZoomElementInView(uidoc, view3d, bbox);
-                        uidoc.RefreshActiveView();
+                        try
+                        {
+                            ZoomElementInView(uidoc, view3d, bbox);
+                            uidoc.Application.PostCommand(cmdId);
+                        }
+                        finally
+                        {
+                            uidoc.RefreshActiveView();
+                        }
+
                     }
                 }
             }
@@ -169,6 +178,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static void IsolateElementIn3DView(UIDocument uidoc, Element elem, View3D view3d)
         {
+            cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
             using (Transaction t = new Transaction(uidoc.Document, "IsolateElementIn3DView"))
             {
                 View view = view3d;
@@ -204,7 +214,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                     finally
                     {
-                        CloseAllInactiveViews(uidoc, view);
+                        uidoc.Application.PostCommand(cmdId);
                     }
                 }
             }
@@ -212,23 +222,6 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #endregion
 
-
-        #region CloseAllInactiveViews
-
-        public static void CloseAllInactiveViews(UIDocument uidoc, View view)
-        {
-            uidoc.ActiveView = view;
-            uidoc.RequestViewChange(view);
-            cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
-            UIView uiView = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view.Id));
-            if (uiView != null)
-            {
-                uidoc.Application.PostCommand(cmdId);
-                uidoc.RefreshActiveView();
-            }
-        }
-
-        #endregion
 
     }
 }

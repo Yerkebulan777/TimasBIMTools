@@ -6,6 +6,7 @@ using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Linq;
@@ -52,6 +53,7 @@ namespace RevitTimasBIMTools.Views
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             View3d = args.View3d;
+            CurrentUIDocument = args.CurrentUIDocument;
             documentModel = args.Documents.FirstOrDefault();
             ComboDocs.ItemsSource = args.Documents;
             if (documentModel.IsActive)
@@ -88,17 +90,33 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        #region CheckSelectAll
+        private void CheckSelectAll_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            ItemCollection items = dataGridView.Items;
+            if (sender is CheckBox chkSelectAll && items.IsEmpty)
+            {
+                chkSelectAll.IsChecked = false;
+            }
+        }
+
         private void CheckSelectAll_CheckChanged(object sender, RoutedEventArgs e)
         {
-            CheckBox chkSelectAll = (CheckBox)sender;
             ItemCollection items = dataGridView.Items;
-            if (chkSelectAll.IsChecked == true)
+            if (sender is CheckBox chkSelectAll)
             {
-                items.OfType<ElementModel>().ToList().ForEach(x => x.IsSelected = true);
-            }
-            else if (chkSelectAll.IsChecked == false)
-            {
-                items.OfType<ElementModel>().ToList().ForEach(x => x.IsSelected = false);
+                if (!items.IsEmpty)
+                {
+                    chkSelectAll = null;
+                }
+                else if (chkSelectAll.IsChecked == true)
+                {
+                    items.OfType<ElementModel>().ToList().ForEach(x => x.IsSelected = true);
+                }
+                else if (chkSelectAll.IsChecked == false)
+                {
+                    items.OfType<ElementModel>().ToList().ForEach(x => x.IsSelected = false);
+                }
             }
         }
 
@@ -108,12 +126,13 @@ namespace RevitTimasBIMTools.Views
             dataViewModel.IsAllSelected = items.OfType<ElementModel>().All(x => x.IsSelected == true) ? true : (bool?)null;
         }
 
-
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             ItemCollection items = dataGridView.Items;
             dataViewModel.IsAllSelected = items.OfType<ElementModel>().All(x => x.IsSelected == false) ? false : (bool?)null;
         }
+
+        #endregion
 
 
         [STAThread]
@@ -172,6 +191,7 @@ namespace RevitTimasBIMTools.Views
             GC.WaitForPendingFinalizers();
             //GC.SuppressFinalize(this);
         }
+
 
     }
 }
