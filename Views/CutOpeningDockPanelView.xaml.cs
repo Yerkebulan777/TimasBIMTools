@@ -93,6 +93,7 @@ namespace RevitTimasBIMTools.Views
         #region CheckSelectAll
         private void CheckSelectAll_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            RevitLogger.Info(sender.GetType().ToString());
             ItemCollection items = dataGridView.Items;
             if (sender is CheckBox chkSelectAll && items.IsEmpty)
             {
@@ -105,9 +106,9 @@ namespace RevitTimasBIMTools.Views
             ItemCollection items = dataGridView.Items;
             if (sender is CheckBox chkSelectAll)
             {
-                if (!items.IsEmpty)
+                if (items.IsEmpty)
                 {
-                    chkSelectAll = null;
+                    chkSelectAll.IsChecked = false;
                 }
                 else if (chkSelectAll.IsChecked == true)
                 {
