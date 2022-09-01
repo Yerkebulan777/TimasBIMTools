@@ -9,10 +9,9 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitViewManager
     {
-        //private static readonly View3D view3d = null;
-        //private static readonly UIDocument uidoc = null;
-        //private static readonly BoundingBoxXYZ bbox = null;
         private static RevitCommandId cmdId { get; set; } = null;
+        private static AddInCommandBinding bindedCmdId { get; set; } = null;
+        
         //ContentControl content = new PreviewControl(document, view3d.Id);
 
         #region Get3dView
@@ -131,16 +130,16 @@ namespace RevitTimasBIMTools.RevitUtils
             uidoc.RequestViewChange(view3d);
             uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
             cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.SelectionBox);
-            AddInCommandBinding bindedCmdId = uidoc.Application.CreateAddInCommandBinding(cmdId);
+            bindedCmdId = uidoc.Application.CreateAddInCommandBinding(cmdId);
             bindedCmdId.Executed += BindedSectionBoxCmdId_Executed;
             uidoc.Application.PostCommand(cmdId);
-
             return view3d;
         }
 
 
         private static void BindedSectionBoxCmdId_Executed(object sender, Autodesk.Revit.UI.Events.ExecutedEventArgs e)
         {
+            bindedCmdId.Executed -= BindedSectionBoxCmdId_Executed;
             UIApplication uiapp = sender as UIApplication;
             UIDocument uidoc = uiapp.ActiveUIDocument;
             if (uidoc.ActiveView is View3D view3d)
