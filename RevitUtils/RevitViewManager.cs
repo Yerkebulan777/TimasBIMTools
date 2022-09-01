@@ -129,40 +129,39 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             uidoc.ActiveView = view3d;
             uidoc.RequestViewChange(view3d);
-            BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
             uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
             cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.SelectionBox);
             AddInCommandBinding bindedCmdId = uidoc.Application.CreateAddInCommandBinding(cmdId);
             bindedCmdId.Executed += BindedSectionBoxCmdId_Executed;
             uidoc.Application.PostCommand(cmdId);
-            uidoc.RefreshActiveView();
+
             return view3d;
         }
 
 
         private static void BindedSectionBoxCmdId_Executed(object sender, Autodesk.Revit.UI.Events.ExecutedEventArgs e)
         {
-
-            if (sender is UIDocument uidoc)
+            UIApplication uiapp = sender as UIApplication;
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            if (uidoc.ActiveView is View3D view3d)
             {
-                RevitLogger.Info($"Hello! {uidoc.Document.Title}");
+                Document doc = uiapp.ActiveUIDocument.Document;
+                ICollection<ElementId> selectedIds = uidoc.Selection.GetElementIds();
+                Element elem = doc.GetElement(selectedIds.Cast<ElementId>().FirstOrDefault());
+                using (Transaction t = new Transaction(uidoc.Document, "SetCustomSectionBox"))
+                {
+                    BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
+                    if (TransactionStatus.Started == t.Start())
+                    {
+                        view3d.SetSectionBox(bbox);
+                    }
+                    if (TransactionStatus.Committed == t.Commit())
+                    {
+                        ZoomElementInView(uidoc, view3d, bbox);
+                        uidoc.RefreshActiveView();
+                    }
+                }
             }
-            else
-            {
-                RevitLogger.Info("Sender type! " + sender.GetType().Name);
-            }
-            //BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
-            //using (Transaction t = new Transaction(uidoc.Document, "SetCustomSectionBox"))
-            //{
-            //    if (TransactionStatus.Started == t.Start())
-            //    {
-            //        view3d.SetSectionBox(bbox);
-            //    }
-            //    if (TransactionStatus.Committed == t.Commit())
-            //    {
-            //        ZoomElementInView(uidoc, view3d, bbox);
-            //    }
-            //}
         }
 
 
