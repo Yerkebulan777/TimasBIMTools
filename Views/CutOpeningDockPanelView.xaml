@@ -103,13 +103,13 @@
                 </DataGrid>
             </ScrollViewer>
             <StackPanel  Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" d:IsLocked="True">
-                <Button Name="Test" Content="Test" Height="25" Width="90" Margin="5" 
-                        Command="{Binding }" d:IsLocked="True" />
-                <Button Name="UpdateCmd" Content="Snoop" Height="25" Width="90" Margin="5" 
-                        Command="{Binding SnoopCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
+                <!--<Button Name="Test" Content="Test" Height="25" Width="90" Margin="5" 
+                        Command="{Binding }" d:IsLocked="True" />-->
+                <Button Name="SnoopCmd" Content="Snoop" Height="25" Width="90" Margin="5" 
+                        Command="{Binding SnoopCommand, Mode=OneTime}" d:IsLocked="True"/>
                 <Button Name="ApplyCmd" Content="Apply"  Height="25" Width="90" Margin="5"
-                        IsEnabled="{Binding IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                        Command="{Binding ApplyCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                        IsEnabled="{Binding Path=IsCollectionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                        Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                         CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}" d:IsLocked="True"/>
                 <Button Name="CancelCmd" Content="Close"  Height="25" Width="90" Margin="5"
                         Command="{Binding CancelCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>

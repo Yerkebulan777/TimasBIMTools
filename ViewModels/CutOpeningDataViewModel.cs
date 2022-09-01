@@ -39,7 +39,7 @@ namespace RevitTimasBIMTools.ViewModels
         public CutOpeningDataViewModel()
         {
             SnoopCommand = new AsyncRelayCommand(SnoopHandelCommandAsync);
-            ExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
+            ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             CloseCommand = new RelayCommand(CancelCallbackLogic);
         }
 
@@ -208,7 +208,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region ExecuteCommand
-        public ICommand ExecuteCommand { get; private set; }
+        public ICommand ShowExecuteCommand { get; private set; }
 
         [STAThread]
         private async Task ExecuteHandelCommandAsync()
