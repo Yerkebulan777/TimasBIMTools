@@ -39,7 +39,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutOpeningDataViewModel()
         {
-            view3d = DockPanelView?.View3d;
             SnoopCommand = new AsyncRelayCommand(SnoopHandelCommandAsync);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             CloseCommand = new RelayCommand(CancelCallbackLogic);
@@ -73,7 +72,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     ViewCollection = CollectionViewSource.GetDefaultView(value);
                     UniqueElementNames = GetUniqueStringList(value);
-                    IsCollectionEnabled = !ViewCollection.IsEmpty;
                 }
             }
         }
@@ -86,8 +84,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref viewCollect, value))
                 {
+                    ViewCollection.Refresh();
                     ViewCollection.SortDescriptions.Clear();
                     ViewCollection.GroupDescriptions.Clear();
+                    IsCollectionEnabled = !ViewCollection.IsEmpty;
                     ViewCollection.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
                     ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
                 }
@@ -202,12 +202,12 @@ namespace RevitTimasBIMTools.ViewModels
         #region ExecuteCommand
         public ICommand ShowExecuteCommand { get; private set; }
 
-
         [STAThread]
         private async Task ExecuteHandelCommandAsync()
         {
             await RevitTask.RunAsync(app =>
             {
+                view3d = DockPanelView?.View3d;
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
                 if (CurrentDocument.Equals(doc) && view3d != null)
@@ -233,10 +233,8 @@ namespace RevitTimasBIMTools.ViewModels
                         }
                     }
                     Task.Delay(1000).Wait();
-                    ViewCollection.Refresh();
                     // seletAll update by ViewItems
                     // set to buttom IsCollectionEnabled
-                    IsCollectionEnabled = !ViewCollection.IsEmpty;
                     UniqueElementNames = GetUniqueStringList(RevitElementModels);
                 }
             });

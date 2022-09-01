@@ -25,9 +25,9 @@ namespace RevitTimasBIMTools.Views
         private bool disposedValue = false;
         private DocumentModel documentModel;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
-        private readonly CutOpeningSettingsView settingsView = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
-
+        private readonly CutOpeningSettingsView settingsView = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
+        
         public CutOpeningDockPanelView()
         {
             InitializeComponent();
@@ -51,11 +51,11 @@ namespace RevitTimasBIMTools.Views
 
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
+            View3d = args.View3d;
             documentModel = args.Documents.FirstOrDefault();
+            ComboDocs.ItemsSource = args.Documents;
             if (documentModel.IsActive)
             {
-                ComboDocs.ItemsSource = args.Documents;
-                CurrentUIDocument = sender as UIDocument;
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
                 ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
                 settingsView.ComboTargetCats.ItemsSource = args.Categories;
@@ -72,7 +72,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (true == settingsView.ShowDialog() && settingsView.Activate())
             {
-                View3d = RevitViewManager.Get3dView(CurrentUIDocument);
+                Task.Delay(1000).Wait();
             }
         }
 
@@ -123,12 +123,12 @@ namespace RevitTimasBIMTools.Views
             {
                 Task task = RevitTask.RunAsync(app =>
                 {
-                    UIDocument uidoc = app.ActiveUIDocument;
-                    Element elem = uidoc.Document.GetElement(new ElementId(model.IdInt));
-                    if (CurrentUIDocument.Equals(uidoc) && elem.IsValidObject)
+                    Document doc = app.ActiveUIDocument.Document;
+                    if (CurrentUIDocument is UIDocument uidoc && uidoc.Document.Title.Equals(doc.Title))
                     {
+                        Element elem = doc.GetElement(new ElementId(model.IdInt));
                         System.Windows.Clipboard.SetText(model.IdInt.ToString());
-                        RevitViewManager.ShowElement(uidoc, elem);
+                        RevitViewManager.ShowElement(CurrentUIDocument, elem);
                     }
                 });
             }

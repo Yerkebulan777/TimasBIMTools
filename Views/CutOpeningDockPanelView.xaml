@@ -107,7 +107,7 @@
                         Command="{Binding }" d:IsLocked="True" />-->
                 <Button Name="SnoopCmd" Content="Snoop" Height="25" Width="90" Margin="5" 
                         Command="{Binding SnoopCommand, Mode=OneTime}" d:IsLocked="True"/>
-                <Button Name="ApplyCmd" Content="Apply"  Height="25" Width="90" Margin="5"
+                <RepeatButton Name="ApplyCmd" Content="Apply"  Delay="5000" Interval="500" Height="25" Width="90" Margin="5"
                         IsEnabled="{Binding Path=IsCollectionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                         Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                         CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}" d:IsLocked="True"/>

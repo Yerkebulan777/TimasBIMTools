@@ -34,34 +34,28 @@ namespace RevitTimasBIMTools.CutOpening
             }
 
 
-            IList<Category> categories = null;
-            FilteredElementCollector collector = null;
-            Dictionary<string, string> dictionary = null;
+            View3D view3d = RevitViewManager.Get3dView(uidoc);
             IList<FamilySymbol> symbols = new List<FamilySymbol>(50);
-            string targetTitle = Properties.Settings.Default.TargetDocumentName;
+            Properties.Settings.Default.TargetDocumentName = string.Empty;
             FamilyPlacementType placement = FamilyPlacementType.OneLevelBasedHosted;
             SortedList<string, Material> materials = new SortedList<string, Material>(100);
             IList<DocumentModel> documents = RevitDocumentManager.GetDocumentCollection(doc);
-            //DocumentModel target = documents.Cast<DocumentModel>().Where(i => i.Document.Title.Equals(targetTitle)).DefaultIfEmpty().First();
-            if (!string.IsNullOrEmpty(targetTitle))
+            IList<Category> categories = RevitFilterManager.GetCategories(doc, builtInCats).ToList();
+            Dictionary<string, string> dictionary = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
+            FilteredElementCollector collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), BuiltInCategory.OST_GenericModel);
+            foreach (FamilySymbol smb in collector)
             {
-                categories = RevitFilterManager.GetCategories(doc, builtInCats).ToList(); /// Get Link Instances cats
-                dictionary = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
-                collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), BuiltInCategory.OST_GenericModel);
-                foreach (FamilySymbol smb in collector)
+                Family fam = smb.Family;
+                if (fam.IsValidObject && fam.IsEditable)
                 {
-                    Family fam = smb.Family;
-                    if (fam.IsValidObject && fam.IsEditable)
+                    if (fam.FamilyPlacementType.Equals(placement))
                     {
-                        if (fam.FamilyPlacementType.Equals(placement))
-                        {
-                            symbols.Add(smb);
-                        }
+                        symbols.Add(smb);
                     }
                 }
             }
-
-            OnCompleted(new BaseCompletedEventArgs(documents, categories, symbols, dictionary));
+            
+            OnCompleted(new BaseCompletedEventArgs(documents, categories, symbols, dictionary, view3d));
         }
 
 
@@ -80,12 +74,15 @@ namespace RevitTimasBIMTools.CutOpening
 
     public class BaseCompletedEventArgs : EventArgs
     {
-        public IList<DocumentModel> Documents { get; }
+        public View3D View3d { get; }
         public IList<Category> Categories { get; }
+        public IList<DocumentModel> Documents { get; }
         public IList<FamilySymbol> FamilySymbols { get; }
         public Dictionary<string, string> StructureMaterials { get; }
-        public BaseCompletedEventArgs(IList<DocumentModel> documents, IList<Category> categories, IList<FamilySymbol> symbols, Dictionary<string, string> matDict)
+        
+        public BaseCompletedEventArgs(IList<DocumentModel> documents, IList<Category> categories, IList<FamilySymbol> symbols, Dictionary<string, string> matDict, View3D view3d)
         {
+            View3d = view3d;
             Documents = documents;
             Categories = categories;
             FamilySymbols = symbols;
