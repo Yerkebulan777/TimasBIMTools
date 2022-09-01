@@ -107,11 +107,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref filterText, value))
                 {
-                    if (!ViewCollection.IsEmpty)
-                    {
-                        ViewCollection.Refresh();
-                        ViewCollection.Filter = FilterModelCollection;
-                    };
+                    ViewCollection.Refresh();
+                    ViewCollection.Filter = FilterModelCollection;
                 }
             }
         }
@@ -222,6 +219,8 @@ namespace RevitTimasBIMTools.ViewModels
                                 try
                                 {
                                     // Set Openning Logic with doc regenerate and transaction RollBack
+                                    ViewCollection.Refresh();
+                                    UniqueElementNames = GetUniqueStringList(RevitElementModels);
                                     view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
                                 }
                                 finally
@@ -235,7 +234,7 @@ namespace RevitTimasBIMTools.ViewModels
                     Task.Delay(1000).Wait();
                     // seletAll update by ViewItems
                     // set to buttom IsCollectionEnabled
-                    UniqueElementNames = GetUniqueStringList(RevitElementModels);
+
                 }
             });
         }
