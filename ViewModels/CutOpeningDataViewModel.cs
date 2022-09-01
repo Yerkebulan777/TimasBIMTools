@@ -218,13 +218,12 @@ namespace RevitTimasBIMTools.ViewModels
                             {
                                 try
                                 {
-                                    // Set Openning Logic with doc regenerate and transaction RollBack
-                                    ViewCollection.Refresh();
-                                    UniqueElementNames = GetUniqueStringList(RevitElementModels);
+                                    // Set Openning Logic with doc regenerate and transaction RollBack                                   
                                     view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
                                 }
                                 finally
                                 {
+                                    UniqueElementNames = GetUniqueStringList(RevitElementModels);
                                     RevitViewManager.SetColorElement(uidoc, elem);
                                 }
                             }
@@ -234,7 +233,6 @@ namespace RevitTimasBIMTools.ViewModels
                     Task.Delay(1000).Wait();
                     // seletAll update by ViewItems
                     // set to buttom IsCollectionEnabled
-
                 }
             });
         }
