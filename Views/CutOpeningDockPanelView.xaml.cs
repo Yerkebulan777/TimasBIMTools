@@ -129,7 +129,7 @@ namespace RevitTimasBIMTools.Views
                     Element elem = CurrentDocument.GetElement(new ElementId(model.IdInt));
                     if (elem != null && CurrentDocument is Document doc)
                     {
-                        RevitViewManager.ShowAndZoomElement(uidoc, elem);
+                        RevitViewManager.ShowElement(uidoc, elem);
                         System.Windows.Clipboard.SetText(model.IdInt.ToString());
                     }
                 });

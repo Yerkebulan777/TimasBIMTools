@@ -38,8 +38,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutOpeningDataViewModel()
         {
-            SnoopCommand = new AsyncRelayCommand(ExecuteSnoopCommandAsync);
-            ApplyCommand = new AsyncRelayCommand(ExecuteApplyCommandAsync);
+            SnoopCommand = new AsyncRelayCommand(SnoopHandelCommandAsync);
+            ExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             CloseCommand = new RelayCommand(CancelCallbackLogic);
         }
 
@@ -177,7 +177,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region SnoopCommand
         public ICommand SnoopCommand { get; private set; }
-        private async Task ExecuteSnoopCommandAsync()
+        private async Task SnoopHandelCommandAsync()
         {
             RevitElementModels.Clear();
             RevitElementModels = await RevitTask.RunAsync(app =>
@@ -207,11 +207,11 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region ApplyCommand
-        public ICommand ApplyCommand { get; private set; }
+        #region ExecuteCommand
+        public ICommand ExecuteCommand { get; private set; }
 
         [STAThread]
-        private async Task ExecuteApplyCommandAsync()
+        private async Task ExecuteHandelCommandAsync()
         {
             await RevitTask.RunAsync(app =>
             {
@@ -233,7 +233,7 @@ namespace RevitTimasBIMTools.ViewModels
                             finally
                             {
                                 RevitViewManager.SetColorElement(uidoc, elem);
-                                view3d = RevitViewManager.GetSectionBoxView(uidoc, elem, view3d);
+                                view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
                             }
                             break;
                         }
