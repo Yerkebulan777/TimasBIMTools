@@ -220,7 +220,7 @@ namespace RevitTimasBIMTools.ViewModels
                 View3D view3d = RevitViewManager.Get3dView(uidoc);
                 foreach (ElementModel model in RevitElementModels)
                 {
-                    if (model != null && model.IsSelected && RevitElementModels.Remove(model))
+                    if (model.IsSelected && RevitElementModels.Remove(model))
                     {
                         Element elem = doc.GetElement(new ElementId(model.IdInt));
                         // SetPostCommand Select element
@@ -228,12 +228,13 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             try
                             {
+                                view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
                                 // Set Openning Logic with doc regenerate and transaction RollBack
                             }
                             finally
                             {
                                 RevitViewManager.SetColorElement(uidoc, elem);
-                                view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
+                                //view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
                             }
                             break;
                         }

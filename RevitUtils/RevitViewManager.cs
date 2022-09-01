@@ -147,6 +147,10 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 RevitLogger.Info($"Hello! {uidoc.Document.Title}");
             }
+            else
+            {
+                RevitLogger.Info("Sender type! " + sender.GetType().Name);
+            }
             //BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
             //using (Transaction t = new Transaction(uidoc.Document, "SetCustomSectionBox"))
             //{
