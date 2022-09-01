@@ -166,19 +166,28 @@ namespace RevitTimasBIMTools.ViewModels
         public ICommand SnoopCommand { get; private set; }
         private async Task SnoopHandelCommandAsync()
         {
-            RevitElementModels.Clear();
+            RevitElementModels?.Clear();
             RevitElementModels = await RevitTask.RunAsync(app =>
             {
                 UIDocument uidoc = app.ActiveUIDocument;
+                
+                IList<ElementModel> resultCollection = null;
                 Document doc = app.ActiveUIDocument.Document;
-                ActivateFamilySimbol(doc, roundOpeningId);
-                ActivateFamilySimbol(doc, rectangOpeningId);
-                view3d = RevitViewManager.Get3dView(uidoc);
-                manager.InitializeActiveDocument(app.ActiveUIDocument.Document);
-                IList<ElementModel> resultCollection = manager.GetCollisionCommunicateElements();
+                if (CurrentDocument.Equals(doc))
+                {
+                    ActivateFamilySimbol(doc, roundOpeningId);
+                    ActivateFamilySimbol(doc, rectangOpeningId);
+                    manager.InitializeActiveDocument(app.ActiveUIDocument.Document);
+                    resultCollection = manager.GetCollisionCommunicateElements();
+                }
+                else
+                {
+                    uidoc.RequestViewChange(view3d);
+                }
                 return resultCollection.ToObservableCollection();
             });
         }
+
 
         private void ActivateFamilySimbol(Document doc, string simbolId)
         {

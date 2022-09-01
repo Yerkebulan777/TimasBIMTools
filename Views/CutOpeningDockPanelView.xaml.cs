@@ -8,8 +8,8 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -19,11 +19,12 @@ namespace RevitTimasBIMTools.Views
     /// <summary> Логика взаимодействия для CutOpeningDockPanelView.xaml </summary>
     public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
+        public UIDocument CurrentUIDocument { get; set; } = null;
         public Document CurrentDocument { get; set; } = null;
+        public View3D View3d { get; set; } = null;
 
         private bool disposedValue = false;
         private DocumentModel documentModel;
-        private IList<DocumentModel> documentModeList = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningSettingsView settingsView = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
@@ -49,31 +50,30 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs e)
+        private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
-            documentModeList = e.Documents;
-            documentModel = documentModeList.FirstOrDefault();
-            if (CurrentDocument == null && documentModel.IsActive)
+            documentModel = args.Documents.FirstOrDefault();
+            if (documentModel.IsActive)
             {
-                settingsView.ComboTargetCats.ItemsSource = e.Categories;
-                settingsView.ComboRoundSymbol.ItemsSource = e.FamilySymbols;
-                settingsView.ComboRectangSymbol.ItemsSource = e.FamilySymbols;
-                settingsView.ComboStructMats.ItemsSource = e.StructureMaterials;
-                ActiveDocTitle.Content = documentModel.Document.Title.ToUpper();
-                dataViewModel.CurrentDocument = documentModel.Document;
-                ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
+                ComboDocs.ItemsSource = args.Documents;
+                CurrentUIDocument = sender as UIDocument;
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
-                ComboDocs.ItemsSource = documentModeList;
-                CurrentDocument = documentModel.Document;
+                settingsView.ComboTargetCats.ItemsSource = args.Categories;
+                settingsView.ComboRoundSymbol.ItemsSource = args.FamilySymbols;
+                settingsView.ComboRectangSymbol.ItemsSource = args.FamilySymbols;
+                settingsView.ComboStructMats.ItemsSource = args.StructureMaterials;
+                ActiveDocTitle.Content = documentModel.Document.Title.ToUpper();
+                ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
+                dataViewModel.CurrentDocument = documentModel.Document;
             }
         }
 
 
         private void ShowSettingsCmd_Click(object sender, RoutedEventArgs e)
         {
-            if (true == settingsView.ShowDialog())
+            if (true == settingsView.ShowDialog() && settingsView.Activate())
             {
-                _ = settingsView.Activate();
+                View3d = RevitViewManager.Get3dView(CurrentUIDocument);
             }
         }
 
@@ -122,12 +122,11 @@ namespace RevitTimasBIMTools.Views
         {
             if (sender is DataGridRow row && row.DataContext is ElementModel model)
             {
-                System.Threading.Tasks.Task task = RevitTask.RunAsync(app =>
+                Task task = RevitTask.RunAsync(app =>
                 {
                     UIDocument uidoc = app.ActiveUIDocument;
-                    CurrentDocument = uidoc.Document;
-                    Element elem = CurrentDocument.GetElement(new ElementId(model.IdInt));
-                    if (elem != null && CurrentDocument is Document doc)
+                    Element elem = uidoc.Document.GetElement(new ElementId(model.IdInt));
+                    if (CurrentUIDocument.Equals(uidoc) && elem.IsValidObject)
                     {
                         RevitViewManager.ShowElement(uidoc, elem);
                         System.Windows.Clipboard.SetText(model.IdInt.ToString());
