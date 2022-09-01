@@ -32,13 +32,14 @@ namespace RevitTimasBIMTools.ViewModels
 
         private View3D view3d = null;
         private readonly object syncLocker = new object();
-        private readonly IList<ElementModel> resultCollection = new List<ElementModel>(150);
+        private IList<ElementModel> collection = new List<ElementModel>();
         private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
         private readonly string rectangOpeningId = Properties.Settings.Default.RectangSymbolUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
 
         public CutOpeningDataViewModel()
         {
+            view3d = DockPanelView?.View3d;
             SnoopCommand = new AsyncRelayCommand(SnoopHandelCommandAsync);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             CloseCommand = new RelayCommand(CancelCallbackLogic);
@@ -169,22 +170,16 @@ namespace RevitTimasBIMTools.ViewModels
             RevitElementModels?.Clear();
             RevitElementModels = await RevitTask.RunAsync(app =>
             {
-                UIDocument uidoc = app.ActiveUIDocument;
-                
-                IList<ElementModel> resultCollection = null;
                 Document doc = app.ActiveUIDocument.Document;
+                UIDocument uidoc = app.ActiveUIDocument;
                 if (CurrentDocument.Equals(doc))
                 {
+                    manager.InitializeActiveDocument(doc);
                     ActivateFamilySimbol(doc, roundOpeningId);
                     ActivateFamilySimbol(doc, rectangOpeningId);
-                    manager.InitializeActiveDocument(app.ActiveUIDocument.Document);
-                    resultCollection = manager.GetCollisionCommunicateElements();
+                    collection = manager.GetCollisionCommunicateElements();
                 }
-                else
-                {
-                    uidoc.RequestViewChange(view3d);
-                }
-                return resultCollection.ToObservableCollection();
+                return collection.ToObservableCollection();
             });
         }
 
@@ -215,32 +210,35 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
-                foreach (ElementModel model in RevitElementModels)
+                if (CurrentDocument.Equals(doc) && view3d != null)
                 {
-                    if (model.IsSelected && RevitElementModels.Remove(model))
+                    foreach (ElementModel model in RevitElementModels)
                     {
-                        Element elem = doc.GetElement(new ElementId(model.IdInt));
-                        lock (syncLocker)
+                        if (model.IsSelected && RevitElementModels.Remove(model))
                         {
-                            try
+                            Element elem = doc.GetElement(new ElementId(model.IdInt));
+                            lock (syncLocker)
                             {
-                                // Set Openning Logic with doc regenerate and transaction RollBack
-                                view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
+                                try
+                                {
+                                    // Set Openning Logic with doc regenerate and transaction RollBack
+                                    view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
+                                }
+                                finally
+                                {
+                                    RevitViewManager.SetColorElement(uidoc, elem);
+                                }
                             }
-                            finally
-                            {
-                                RevitViewManager.SetColorElement(uidoc, elem);
-                            }
+                            break;
                         }
-                        break;
                     }
+                    Task.Delay(1000).Wait();
+                    ViewCollection.Refresh();
+                    // seletAll update by ViewItems
+                    // set to buttom IsCollectionEnabled
+                    IsCollectionEnabled = !ViewCollection.IsEmpty;
+                    UniqueElementNames = GetUniqueStringList(RevitElementModels);
                 }
-                Task.Delay(1000).Wait();
-                ViewCollection.Refresh();
-                // seletAll update by ViewItems
-                // set to buttom IsCollectionEnabled
-                IsCollectionEnabled = !ViewCollection.IsEmpty;
-                UniqueElementNames = GetUniqueStringList(RevitElementModels);
             });
         }
 
@@ -250,7 +248,7 @@ namespace RevitTimasBIMTools.ViewModels
         public void Dispose()
         {
             manager?.Dispose();
-            resultCollection.Clear();
+            collection?.Clear();
             RevitElementModels.Clear();
             FilterText = string.Empty;
         }

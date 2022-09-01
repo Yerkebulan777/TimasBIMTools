@@ -127,8 +127,8 @@ namespace RevitTimasBIMTools.Views
                     Element elem = uidoc.Document.GetElement(new ElementId(model.IdInt));
                     if (CurrentUIDocument.Equals(uidoc) && elem.IsValidObject)
                     {
-                        RevitViewManager.ShowElement(uidoc, elem);
                         System.Windows.Clipboard.SetText(model.IdInt.ToString());
+                        RevitViewManager.ShowElement(uidoc, elem);
                     }
                 });
             }
