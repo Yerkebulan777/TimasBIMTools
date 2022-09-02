@@ -103,7 +103,7 @@
             <StackPanel  Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
                 <Button Name="SnoopCmd" Content="Snoop" Height="25" Width="90" Margin="5" 
                         Command="{Binding SnoopCommand, Mode=OneTime}"/>
-                <RepeatButton Name="ApplyCmd" Content="Apply" Delay="5000" Interval="1000" Height="25" Width="90" Margin="5"
+                <RepeatButton Name="ApplyCmd" Content="Apply" Delay="10000" Interval="5000" Height="25" Width="90" Margin="5"
                         Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                         CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}"/>
                 <Button Name="CancelCmd" Content="Close"  Height="25" Width="90" Margin="5"

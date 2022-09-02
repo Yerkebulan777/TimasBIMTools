@@ -4,6 +4,7 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Color = Autodesk.Revit.DB.Color;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -62,9 +63,6 @@ namespace RevitTimasBIMTools.RevitUtils
             return CreateNew3DView(uidoc, viewName);
         }
 
-
-
-
         #endregion
 
 
@@ -78,11 +76,20 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
+        #region Show3DView
+        public static void Show3DView(UIDocument uidoc, View3D view3d)
+        {
+            uidoc.RequestViewChange(view3d);
+            uidoc.RefreshActiveView();
+        }
+
+        #endregion
+
+
         #region SetCustomSectionBox
         public static View3D SetCustomSectionBox(UIDocument uidoc, Element elem, View3D view3d)
         {
             uidoc.ActiveView = view3d;
-            uidoc.RequestViewChange(view3d);
             uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
             cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.SelectionBox);
             bindedCmdId = uidoc.Application.CreateAddInCommandBinding(cmdId);
@@ -115,10 +122,10 @@ namespace RevitTimasBIMTools.RevitUtils
                         try
                         {
                             ZoomElementInView(uidoc, view3d, bbox);
-                            uidoc.Application.PostCommand(cmdId);
                         }
                         finally
                         {
+                            uidoc.Application.PostCommand(cmdId);
                             uidoc.RefreshActiveView();
                         }
 
@@ -126,7 +133,6 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
         }
-
 
         public static BoundingBoxXYZ GetBoundingBox(Element elem, View view = null, double factor = 3)
         {

@@ -30,7 +30,6 @@ namespace RevitTimasBIMTools.ViewModels
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
-        private View3D view3d = null;
         private readonly object syncLocker = new object();
         private IList<ElementModel> collection = new List<ElementModel>();
         private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
@@ -41,7 +40,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             SnoopCommand = new AsyncRelayCommand(SnoopHandelCommandAsync);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
-            SelectItemCommand = new RelayCommand(SelectItemHandelCommand);
+            SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             CloseCommand = new RelayCommand(CancelCallbackLogic);
 
         }
@@ -122,9 +121,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref filterText, value))
                 {
-                    ViewCollection.Refresh();
-                    IsAllSelectChecked = false;
                     ViewCollection.Filter = FilterModelCollection;
+                    SelectAllVaueHandelCommand();
+                    ViewCollection.Refresh();
                 }
             }
         }
@@ -157,6 +156,7 @@ namespace RevitTimasBIMTools.ViewModels
         private async Task SnoopHandelCommandAsync()
         {
             RevitElementModels?.Clear();
+            View3D view3d = DockPanelView.View3d;
             RevitElementModels = await RevitTask.RunAsync(app =>
             {
                 Document doc = app.ActiveUIDocument.Document;
@@ -168,6 +168,7 @@ namespace RevitTimasBIMTools.ViewModels
                     ActivateFamilySimbol(doc, rectangOpeningId);
                     collection = manager.GetCollisionCommunicateElements();
                 }
+                RevitViewManager.Show3DView(uidoc, view3d);
                 return collection.ToObservableCollection();
             });
         }
@@ -190,7 +191,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region SelectItemCommand
         public ICommand SelectItemCommand { get; private set; }
-        private void SelectItemHandelCommand()
+        private void SelectAllVaueHandelCommand()
         {
             IEnumerable<ElementModel> items = ViewCollection.OfType<ElementModel>();
             ElementModel firstItem = ViewCollection.OfType<ElementModel>().FirstOrDefault();
@@ -208,12 +209,12 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                view3d = DockPanelView?.View3d;
+                View3D view3d = DockPanelView.View3d;
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
-                if (CurrentDocument.Equals(doc) && view3d != null)
+                if (CurrentDocument.Equals(doc) && !ViewCollection.IsEmpty)
                 {
-                    foreach (ElementModel model in RevitElementModels)
+                    foreach (ElementModel model in ViewCollection)
                     {
                         if (model.IsSelected && RevitElementModels.Remove(model))
                         {
@@ -229,12 +230,12 @@ namespace RevitTimasBIMTools.ViewModels
                                 {
                                     UniqueElementNames = GetUniqueStringList(RevitElementModels);
                                     RevitViewManager.SetColorElement(uidoc, elem);
+                                    Task.Delay(1000).Wait();
                                 }
                             }
                             break;
                         }
                     }
-                    Task.Delay(1000).Wait();
                     // seletAll update by ViewItems
                     // boolSet to buttom IsCollectionEnabled
                 }
@@ -268,6 +269,7 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
         #endregion
+
 
         public void Dispose()
         {
