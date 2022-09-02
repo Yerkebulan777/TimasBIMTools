@@ -47,7 +47,7 @@
                 </StackPanel>
             </ScrollViewer>
             <ScrollViewer Grid.Row="2">
-                <DataGrid Name="dataGridView" Width="Auto" MinWidth="500" MaxWidth="1000" IsSynchronizedWithCurrentItem="True"
+                <DataGrid Name="dataGridView" Width="Auto" MinWidth="300" MaxWidth="1500" IsSynchronizedWithCurrentItem="True"
                           ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <DataGrid.RowStyle>
                         <Style TargetType="{x:Type DataGridRow}">
@@ -55,10 +55,14 @@
                         </Style>
                     </DataGrid.RowStyle>
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}" Visibility="Visible" >
+                        <DataGridTemplateColumn Header="Switch" Width="30" CellStyle="{StaticResource SingleClickEditStyle}" >
                             <DataGridTemplateColumn.HeaderTemplate>
                                 <DataTemplate>
-                                    <CheckBox Name="CheckSelectAll" IsChecked="{Binding DataContext.IsAllSelectChecked, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                    <CheckBox Name="CheckSelectAll" IsChecked="{Binding DataContext.IsAllSelectChecked, RelativeSource={RelativeSource AncestorType=DataGrid}}">
+                                        <CheckBox.LayoutTransform>
+                                            <ScaleTransform ScaleX="1.15" ScaleY="1.15"/>
+                                        </CheckBox.LayoutTransform>
+                                    </CheckBox>
                                 </DataTemplate>
                             </DataGridTemplateColumn.HeaderTemplate>
                             <DataGridTemplateColumn.CellTemplate>
