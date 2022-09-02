@@ -5,7 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningDataViewModel}"
-    DataContext="{Binding Source={DynamicResource Locator}, Path=CutOpeningDataViewModel}"
     x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelView" 
     mc:Ignorable="d" Background="Silver">
     <Page.Resources>
@@ -61,7 +60,7 @@
                                 <DataTemplate>
                                     <CheckBox Name="CheckSelectAll"
                                               Checked="CheckSelectAll_CheckChanged" Unchecked="CheckSelectAll_CheckChanged"
-                                              IsChecked="{Binding DataContext.IsAllSelect, RelativeSource={RelativeSource AncestorType=DataGrid, Mode=FindAncestor}}"/>
+                                              IsChecked="{Binding DataContext.IsAllSelectChecked, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.HeaderTemplate>
                             <DataGridTemplateColumn.CellTemplate>
