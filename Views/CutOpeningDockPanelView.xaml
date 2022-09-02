@@ -55,44 +55,42 @@
                         </Style>
                     </DataGrid.RowStyle>
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}">
+                        <DataGridTemplateColumn Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}" Visibility="Visible" >
                             <DataGridTemplateColumn.HeaderTemplate>
                                 <DataTemplate>
-                                    <CheckBox Name="CheckSelectAll"
-                                              Checked="CheckSelectAll_CheckChanged" Unchecked="CheckSelectAll_CheckChanged"
-                                              IsChecked="{Binding DataContext.IsAllSelectChecked, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                    <CheckBox Name="CheckSelectAll" IsChecked="{Binding DataContext.IsAllSelectChecked, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.HeaderTemplate>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox IsChecked="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                              Checked ="CheckBox_Checked"  Unchecked="CheckBox_Unchecked"
-                                              IsThreeState="False" HorizontalAlignment="Center" />
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                              Command="{Binding DataContext.TestCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                              CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Width="150" Header="Symbol Name" Binding="{Binding SymbolName}">
+                        <DataGridTextColumn Width="150" Header="Symbol Name" Binding="{Binding SymbolName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="150" Header="Family Name" Binding="{Binding FamilyName}">
+                        <DataGridTextColumn Width="150" Header="Family Name" Binding="{Binding FamilyName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="100" Header="Category" Binding="{Binding CategoryName}">
+                        <DataGridTextColumn Width="100" Header="Category" Binding="{Binding CategoryName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="100" Header="Description" Binding="{Binding Description}">
+                        <DataGridTextColumn Width="100" Header="Description" Binding="{Binding Description, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
@@ -103,12 +101,9 @@
                 </DataGrid>
             </ScrollViewer>
             <StackPanel  Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
-                <!--<Button Name="Test" Content="Test" Height="25" Width="90" Margin="5" 
-                        Command="{Binding }" d:IsLocked="True" />-->
                 <Button Name="SnoopCmd" Content="Snoop" Height="25" Width="90" Margin="5" 
                         Command="{Binding SnoopCommand, Mode=OneTime}"/>
-                <RepeatButton Name="ApplyCmd" Content="Apply"  Delay="5000" Interval="500" Height="25" Width="90" Margin="5"
-                        IsEnabled="{Binding Path=IsCollectionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                <RepeatButton Name="ApplyCmd" Content="Apply" Delay="5000" Interval="1000" Height="25" Width="90" Margin="5"
                         Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                         CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}"/>
                 <Button Name="CancelCmd" Content="Close"  Height="25" Width="90" Margin="5"

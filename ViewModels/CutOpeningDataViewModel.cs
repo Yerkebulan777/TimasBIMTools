@@ -41,7 +41,22 @@ namespace RevitTimasBIMTools.ViewModels
         {
             SnoopCommand = new AsyncRelayCommand(SnoopHandelCommandAsync);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
+            SelectItemCommand = new RelayCommand(SelectItemHandelCommand);
             CloseCommand = new RelayCommand(CancelCallbackLogic);
+
+        }
+
+
+        public ICommand SelectItemCommand { get; private set; }
+        private void SelectItemHandelCommand()
+        {
+            IEnumerable<ElementModel> items = ViewCollection.OfType<ElementModel>();
+            ElementModel firstItem = items.FirstOrDefault();
+            bool? value = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem?.IsSelected : null;
+            if (IsAllSelectChecked != value)
+            {
+                IsAllSelectChecked = value;
+            }
         }
 
 
@@ -58,7 +73,17 @@ namespace RevitTimasBIMTools.ViewModels
         public bool? IsAllSelectChecked
         {
             get => isSelected;
-            set => SetProperty(ref isSelected, value);
+            set
+            {
+                if (SetProperty(ref isSelected, value))
+                {
+                    bool flag = (bool)(value != null ? value : false);
+                    foreach (ElementModel model in ViewCollection)
+                    {
+                        model.IsSelected = flag;
+                    }
+                }
+            }
         }
 
 
@@ -76,6 +101,7 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
+
         private ICollectionView viewCollect = new CollectionView(new List<ElementModel>());
         public ICollectionView ViewCollection
         {
@@ -84,12 +110,11 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref viewCollect, value))
                 {
-                    ViewCollection.Refresh();
                     ViewCollection.SortDescriptions.Clear();
                     ViewCollection.GroupDescriptions.Clear();
-                    IsAllSelectChecked = IsAllSelectChecked == true && ViewCollection.IsEmpty ? false : IsAllSelectChecked;
                     ViewCollection.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
                     ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
+                    IsAllSelectChecked = IsAllSelectChecked == true && ViewCollection.IsEmpty ? false : IsAllSelectChecked;
                 }
             }
         }
@@ -107,8 +132,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref filterText, value))
                 {
-                    ViewCollection.Refresh();
                     ViewCollection.Filter = FilterModelCollection;
+                    ViewCollection.Refresh();
                 }
             }
         }
@@ -138,6 +163,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region CloseCommand
         public ICommand CloseCommand { get; private set; }
+
+
         private void CancelCallbackLogic()
         {
             CancellationTokenSource cts = new CancellationTokenSource();
@@ -232,7 +259,7 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                     Task.Delay(1000).Wait();
                     // seletAll update by ViewItems
-                    // set to buttom IsCollectionEnabled
+                    // boolSet to buttom IsCollectionEnabled
                 }
             });
         }

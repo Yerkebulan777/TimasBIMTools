@@ -6,7 +6,6 @@ using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Linq;
@@ -28,7 +27,7 @@ namespace RevitTimasBIMTools.Views
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
         private readonly CutOpeningSettingsView settingsView = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
-        
+
         public CutOpeningDockPanelView()
         {
             InitializeComponent();
@@ -91,37 +90,18 @@ namespace RevitTimasBIMTools.Views
 
 
         #region CheckSelectAll
-        private void CheckSelectAll_CheckChanged(object sender, RoutedEventArgs e)
-        {
-            ItemCollection items = dataGridView.Items;
-            if (sender is CheckBox chkSelectAll)
-            {
-                if (items.IsEmpty)
-                {
-                    chkSelectAll.IsChecked = false;
-                }
-                else if (chkSelectAll.IsChecked == true)
-                {
-                    items.OfType<ElementModel>().ToList().ForEach(x => x.IsSelected = true);
-                }
-                else if (chkSelectAll.IsChecked == false)
-                {
-                    items.OfType<ElementModel>().ToList().ForEach(x => x.IsSelected = false);
-                }
-            }
-        }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            ItemCollection items = dataGridView.Items;
-            dataViewModel.IsAllSelectChecked = items.OfType<ElementModel>().All(x => x.IsSelected == true) ? true : (bool?)null;
-        }
+        //private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    ItemCollection items = dataGridView.Items;
+        //    dataViewModel.IsAllSelectChecked = items.OfType<ElementModel>().All(x => x.IsSelected == true) ? true : (bool?)null;
+        //}
 
-        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            ItemCollection items = dataGridView.Items;
-            dataViewModel.IsAllSelectChecked = items.OfType<ElementModel>().All(x => x.IsSelected == false) ? false : (bool?)null;
-        }
+        //private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        //{
+        //    ItemCollection items = dataGridView.Items;
+        //    dataViewModel.IsAllSelectChecked = items.OfType<ElementModel>().All(x => x.IsSelected == false) ? false : (bool?)null;
+        //}
 
         #endregion
 
