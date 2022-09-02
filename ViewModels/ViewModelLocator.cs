@@ -4,7 +4,7 @@ using System;
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public static class ViewModelLocator
+    public class ViewModelLocator
     {
         private static readonly IServiceProvider services = SmartToolController.Services;
 

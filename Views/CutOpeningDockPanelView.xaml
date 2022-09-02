@@ -3,9 +3,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="Page" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels" 
-    xmlns:converter="clr-namespace:RevitTimasBIMTools.ViewConverters"
+    xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningDataViewModel}"
+    DataContext="{Binding Source={DynamicResource Locator}, Path=CutOpeningDataViewModel}"
     x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelView" 
     mc:Ignorable="d" Background="Silver">
     <Page.Resources>
