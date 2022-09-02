@@ -105,7 +105,6 @@ namespace RevitTimasBIMTools.ViewModels
                     ViewCollection.GroupDescriptions.Clear();
                     ViewCollection.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
                     ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
-                    IsAllSelectChecked = IsAllSelectChecked == true && ViewCollection.IsEmpty ? false : IsAllSelectChecked;
                 }
             }
         }
@@ -123,8 +122,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref filterText, value))
                 {
-                    ViewCollection.Filter = FilterModelCollection;
                     ViewCollection.Refresh();
+                    IsAllSelectChecked = false;
+                    ViewCollection.Filter = FilterModelCollection;
                 }
             }
         }
