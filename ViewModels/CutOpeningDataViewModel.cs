@@ -42,7 +42,6 @@ namespace RevitTimasBIMTools.ViewModels
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             CloseCommand = new RelayCommand(CancelCallbackLogic);
-
         }
 
 
