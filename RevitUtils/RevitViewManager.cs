@@ -109,7 +109,6 @@ namespace RevitTimasBIMTools.RevitUtils
                 Document doc = uiapp.ActiveUIDocument.Document;
                 ICollection<ElementId> selectedIds = uidoc.Selection.GetElementIds();
                 Element elem = doc.GetElement(selectedIds.Cast<ElementId>().FirstOrDefault());
-                cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
                 using (Transaction t = new Transaction(uidoc.Document, "SetCustomSectionBox"))
                 {
                     BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
@@ -125,7 +124,6 @@ namespace RevitTimasBIMTools.RevitUtils
                         }
                         finally
                         {
-                            uidoc.Application.PostCommand(cmdId);
                             uidoc.RefreshActiveView();
                         }
 

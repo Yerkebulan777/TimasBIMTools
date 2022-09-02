@@ -33,13 +33,13 @@
                 <StackPanel Background="WhiteSmoke" CanVerticallyScroll="True" CanHorizontallyScroll="True" >
                     <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13"/>
                     <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
-                        <ComboBox Name="ComboDocs" Height="25" Width="170"  DisplayMemberPath="Title" Margin="10"/>
+                        <ComboBox Name="ComboDocs" Height="25" Width="170" DisplayMemberPath="Title" SelectedIndex="0" Margin="10"/>
                         <Button Name="ShowSettingsCmd" Content="Settings" Height="25" Width="90" Margin="10" 
                                 VerticalAlignment="Center" HorizontalAlignment="Right" Click="ShowSettingsCmd_Click"/>
                     </StackPanel>
                     <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
                     <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
-                        <ComboBox Name="ComboDataFilter" Height="25" Width="280" Margin="10"
+                        <ComboBox Name="ComboDataFilter" Height="25" Width="280" SelectedIndex="0" Margin="10" 
                                   IsEnabled ="{Binding Path=IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                   SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />

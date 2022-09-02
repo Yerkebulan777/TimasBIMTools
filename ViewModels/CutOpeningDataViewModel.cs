@@ -136,7 +136,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private IList<string> GetUniqueStringList(Collection<ElementModel> collection)
         {
-            return new SortedSet<string>(collection.Select(c => c.SymbolName)).ToList();
+            return new SortedSet<string>(collection.Select(c => c.SymbolName).Append(string.Empty)).ToList();
         }
 
         private bool FilterModelCollection(object obj)
@@ -200,7 +200,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region ExecuteCommand
+        #region ShowExecuteCommand
         public ICommand ShowExecuteCommand { get; private set; }
 
         [STAThread]
