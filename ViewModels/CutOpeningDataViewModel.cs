@@ -225,11 +225,10 @@ namespace RevitTimasBIMTools.ViewModels
                                 {
                                     // Set Openning Logic with doc regenerate and transaction RollBack                                   
                                     view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
+                                    RevitViewManager.SetColorElement(uidoc, elem);
                                 }
                                 finally
                                 {
-                                    UniqueElementNames = GetUniqueStringList(RevitElementModels);
-                                    RevitViewManager.SetColorElement(uidoc, elem);
                                     Task.Delay(1000).Wait();
                                 }
                             }
@@ -238,8 +237,10 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                     // seletAll update by ViewItems
                     // boolSet to buttom IsCollectionEnabled
+                    UniqueElementNames = GetUniqueStringList(RevitElementModels);
                 }
             });
+            
         }
 
         #endregion
