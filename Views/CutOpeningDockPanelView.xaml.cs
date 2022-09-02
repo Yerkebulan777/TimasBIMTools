@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
+using RevitTimasBIMTools.RevitCommads;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
@@ -73,6 +74,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (true == settingsView.ShowDialog() && settingsView.Activate())
             {
+                RevitTask.RegisterGlobal(new GetFamilyParamsEventHandler());
                 Task.Delay(1000).Wait();
             }
         }

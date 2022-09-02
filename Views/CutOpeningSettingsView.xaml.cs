@@ -1,6 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Newtonsoft.Json.Linq;
-using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +10,7 @@ namespace RevitTimasBIMTools.Views
     {
         public CutOpeningSettingsView()
         {
-            InitializeComponent();           
+            InitializeComponent();
         }
 
 
@@ -20,10 +18,10 @@ namespace RevitTimasBIMTools.Views
 
         private void DefaultSettingCmd_Click(object sender, RoutedEventArgs e)
         {
-            this.sliderMinSize.Value = 30;
-            this.sliderMaxSize.Value = 500;
-            this.sliderCutOffset.Value = 50;
-            this.sliderRatio.Value = 3;
+            sliderMinSize.Value = 30;
+            sliderMaxSize.Value = 500;
+            sliderCutOffset.Value = 50;
+            sliderRatio.Value = 3;
         }
 
         private void MinSideSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

@@ -251,6 +251,7 @@
     <Compile Include="Views\CutOpeningSettingsView.xaml.cs">
       <DependentUpon>CutOpeningSettingsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RevitCommads\GetFamilyParamsEventHandler.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
