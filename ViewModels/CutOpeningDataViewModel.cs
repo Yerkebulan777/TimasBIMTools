@@ -55,7 +55,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         private bool? isSelected = false;
-        public bool? IsAllSelected
+        public bool? IsAllSelectChecked
         {
             get => isSelected;
             set => SetProperty(ref isSelected, value);
@@ -87,7 +87,7 @@ namespace RevitTimasBIMTools.ViewModels
                     ViewCollection.Refresh();
                     ViewCollection.SortDescriptions.Clear();
                     ViewCollection.GroupDescriptions.Clear();
-                    IsCollectionEnabled = !ViewCollection.IsEmpty;
+                    IsAllSelectChecked = IsAllSelectChecked == true && ViewCollection.IsEmpty ? false : IsAllSelectChecked;
                     ViewCollection.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
                     ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
                 }

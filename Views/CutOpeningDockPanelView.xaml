@@ -15,53 +15,53 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
-    <Border BorderThickness="2.5" BorderBrush="Gray" d:IsLocked="True">
-        <Grid x:Name="PageMainGrid" d:IsLocked="True">
+    <Border BorderThickness="2.5" BorderBrush="Gray">
+        <Grid x:Name="PageMainGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Height="50" VerticalAlignment="Center" Margin="15" d:IsLocked="True" >
-                <Label Name="ActiveDocTitle" TextElement.FontSize="13" VerticalAlignment="Center" d:IsLocked="True" >
+            <Grid Grid.Row="0" Height="50" VerticalAlignment="Center" Margin="15" >
+                <Label Name="ActiveDocTitle" TextElement.FontSize="13" VerticalAlignment="Center" >
                     <Label.BitmapEffect>
                         <DropShadowBitmapEffect/>
                     </Label.BitmapEffect>
                 </Label>
             </Grid>
-            <ScrollViewer Grid.Row="1" d:IsLocked="True">
-                <StackPanel Background="WhiteSmoke" CanVerticallyScroll="True" CanHorizontallyScroll="True" d:IsLocked="True" >
-                    <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13" d:IsLocked="True"/>
-                    <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" d:IsLocked="True" >
-                        <ComboBox Name="ComboDocs" Height="25" Width="170"  DisplayMemberPath="Title" Margin="10" d:IsLocked="True"/>
+            <ScrollViewer Grid.Row="1">
+                <StackPanel Background="WhiteSmoke" CanVerticallyScroll="True" CanHorizontallyScroll="True" >
+                    <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13"/>
+                    <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
+                        <ComboBox Name="ComboDocs" Height="25" Width="170"  DisplayMemberPath="Title" Margin="10"/>
                         <Button Name="ShowSettingsCmd" Content="Settings" Height="25" Width="90" Margin="10" 
-                                VerticalAlignment="Center" HorizontalAlignment="Right" Click="ShowSettingsCmd_Click" d:IsLocked="True"/>
+                                VerticalAlignment="Center" HorizontalAlignment="Right" Click="ShowSettingsCmd_Click"/>
                     </StackPanel>
-                    <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13" d:IsLocked="True"/>
-                    <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" d:IsLocked="True" >
+                    <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
+                    <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
                         <ComboBox Name="ComboDataFilter" Height="25" Width="280" Margin="10"
                                   IsEnabled ="{Binding Path=IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                   SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True" />
+                                  ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>
-            <ScrollViewer Grid.Row="2" d:IsLocked="True">
+            <ScrollViewer Grid.Row="2">
                 <DataGrid Name="dataGridView" Width="Auto" MinWidth="500" MaxWidth="1000" IsSynchronizedWithCurrentItem="True"
-                          ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:IsLocked="True" >
+                          ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <DataGrid.RowStyle>
                         <Style TargetType="{x:Type DataGridRow}">
                             <EventSetter Event="MouseDoubleClick" Handler="DataGrid_MouseDoubleClick"/>
                         </Style>
                     </DataGrid.RowStyle>
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}" d:IsLocked="True">
+                        <DataGridTemplateColumn Header="Switch" CellStyle="{StaticResource SingleClickEditStyle}">
                             <DataGridTemplateColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <CheckBox Name="CheckSelectAll"
                                               Checked="CheckSelectAll_CheckChanged" Unchecked="CheckSelectAll_CheckChanged"
-                                              IsChecked="{Binding DataContext.IsAllSelected, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                              IsChecked="{Binding DataContext.IsAllSelect, RelativeSource={RelativeSource AncestorType=DataGrid, Mode=FindAncestor}}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.HeaderTemplate>
                             <DataGridTemplateColumn.CellTemplate>
@@ -72,28 +72,28 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Width="150" Header="Symbol Name" Binding="{Binding SymbolName}" d:IsLocked="True">
+                        <DataGridTextColumn Width="150" Header="Symbol Name" Binding="{Binding SymbolName}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="150" Header="Family Name" Binding="{Binding FamilyName}" d:IsLocked="True">
+                        <DataGridTextColumn Width="150" Header="Family Name" Binding="{Binding FamilyName}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="100" Header="Category" Binding="{Binding CategoryName}" d:IsLocked="True">
+                        <DataGridTextColumn Width="100" Header="Category" Binding="{Binding CategoryName}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="100" Header="Description" Binding="{Binding Description}" d:IsLocked="True">
+                        <DataGridTextColumn Width="100" Header="Description" Binding="{Binding Description}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
@@ -103,17 +103,17 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </ScrollViewer>
-            <StackPanel  Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" d:IsLocked="True">
+            <StackPanel  Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
                 <!--<Button Name="Test" Content="Test" Height="25" Width="90" Margin="5" 
                         Command="{Binding }" d:IsLocked="True" />-->
                 <Button Name="SnoopCmd" Content="Snoop" Height="25" Width="90" Margin="5" 
-                        Command="{Binding SnoopCommand, Mode=OneTime}" d:IsLocked="True"/>
+                        Command="{Binding SnoopCommand, Mode=OneTime}"/>
                 <RepeatButton Name="ApplyCmd" Content="Apply"  Delay="5000" Interval="500" Height="25" Width="90" Margin="5"
                         IsEnabled="{Binding Path=IsCollectionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                         Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
-                        CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}" d:IsLocked="True"/>
+                        CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}"/>
                 <Button Name="CancelCmd" Content="Close"  Height="25" Width="90" Margin="5"
-                        Command="{Binding CancelCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" d:IsLocked="True"/>
+                        Command="{Binding CancelCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
             </StackPanel>
         </Grid>
     </Border>

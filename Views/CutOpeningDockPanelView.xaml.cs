@@ -114,13 +114,13 @@ namespace RevitTimasBIMTools.Views
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             ItemCollection items = dataGridView.Items;
-            dataViewModel.IsAllSelected = items.OfType<ElementModel>().All(x => x.IsSelected == true) ? true : (bool?)null;
+            dataViewModel.IsAllSelectChecked = items.OfType<ElementModel>().All(x => x.IsSelected == true) ? true : (bool?)null;
         }
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             ItemCollection items = dataGridView.Items;
-            dataViewModel.IsAllSelected = items.OfType<ElementModel>().All(x => x.IsSelected == false) ? false : (bool?)null;
+            dataViewModel.IsAllSelectChecked = items.OfType<ElementModel>().All(x => x.IsSelected == false) ? false : (bool?)null;
         }
 
         #endregion
