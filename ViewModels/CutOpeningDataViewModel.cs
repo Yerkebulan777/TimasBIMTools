@@ -47,19 +47,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        public ICommand SelectItemCommand { get; private set; }
-        private void SelectItemHandelCommand()
-        {
-            IEnumerable<ElementModel> items = ViewCollection.OfType<ElementModel>();
-            ElementModel firstItem = items.FirstOrDefault();
-            bool? value = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem?.IsSelected : null;
-            if (IsAllSelectChecked != value)
-            {
-                IsAllSelectChecked = value;
-            }
-        }
-
-
         #region INotifyPropertyChanged members
 
         private bool enable = false;
@@ -77,11 +64,15 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref isSelected, value))
                 {
-                    bool flag = (bool)(value != null ? value : false);
-                    foreach (ElementModel model in ViewCollection)
+                    if (value.HasValue)
                     {
-                        model.IsSelected = flag;
+                        bool val = (bool)value;
+                        foreach (ElementModel model in ViewCollection)
+                        {
+                            model.IsSelected = val;
+                        }
                     }
+
                 }
             }
         }
@@ -161,32 +152,6 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region CloseCommand
-        public ICommand CloseCommand { get; private set; }
-
-
-        private void CancelCallbackLogic()
-        {
-            CancellationTokenSource cts = new CancellationTokenSource();
-            lock (syncLocker)
-            {
-                try
-                {
-                    cts.Cancel(true);
-                    CancelToken = cts.Token;
-                }
-                catch (AggregateException)
-                {
-                    if (CancelToken.IsCancellationRequested)
-                    {
-                        _ = Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
-                    }
-                }
-            }
-        }
-        #endregion
-
-
         #region SnoopCommand
         public ICommand SnoopCommand { get; private set; }
         private async Task SnoopHandelCommandAsync()
@@ -218,6 +183,18 @@ namespace RevitTimasBIMTools.ViewModels
                     symbol.Activate();
                 }
             }
+        }
+
+        #endregion
+
+
+        #region SelectItemCommand
+        public ICommand SelectItemCommand { get; private set; }
+        private void SelectItemHandelCommand()
+        {
+            IEnumerable<ElementModel> items = ViewCollection.OfType<ElementModel>();
+            ElementModel firstItem = ViewCollection.OfType<ElementModel>().FirstOrDefault();
+            IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem?.IsSelected : null;
         }
 
         #endregion
@@ -266,6 +243,31 @@ namespace RevitTimasBIMTools.ViewModels
 
         #endregion
 
+
+        #region CloseCommand
+        public ICommand CloseCommand { get; private set; }
+
+
+        private void CancelCallbackLogic()
+        {
+            CancellationTokenSource cts = new CancellationTokenSource();
+            lock (syncLocker)
+            {
+                try
+                {
+                    cts.Cancel(true);
+                    CancelToken = cts.Token;
+                }
+                catch (AggregateException)
+                {
+                    if (CancelToken.IsCancellationRequested)
+                    {
+                        _ = Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
+                    }
+                }
+            }
+        }
+        #endregion
 
         public void Dispose()
         {

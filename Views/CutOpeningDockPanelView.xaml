@@ -64,7 +64,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                              Command="{Binding DataContext.TestCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                              Command="{Binding DataContext.SelectItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
                                               CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

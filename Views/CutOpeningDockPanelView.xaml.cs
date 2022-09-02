@@ -89,23 +89,6 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        #region CheckSelectAll
-
-        //private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    ItemCollection items = dataGridView.Items;
-        //    dataViewModel.IsAllSelectChecked = items.OfType<ElementModel>().All(x => x.IsSelected == true) ? true : (bool?)null;
-        //}
-
-        //private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
-        //{
-        //    ItemCollection items = dataGridView.Items;
-        //    dataViewModel.IsAllSelectChecked = items.OfType<ElementModel>().All(x => x.IsSelected == false) ? false : (bool?)null;
-        //}
-
-        #endregion
-
-
         [STAThread]
         private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
