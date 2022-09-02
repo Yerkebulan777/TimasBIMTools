@@ -102,7 +102,8 @@ namespace RevitTimasBIMTools.ViewModels
                     ViewCollection.SortDescriptions.Clear();
                     ViewCollection.GroupDescriptions.Clear();
                     ViewCollection.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
-                    ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
+                    ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                    ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.FamilyName), ListSortDirection.Ascending));
                 }
             }
         }
