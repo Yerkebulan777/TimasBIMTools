@@ -236,7 +236,6 @@
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Services\ThreadService.cs" />
     <Compile Include="Services\Timer.cs" />
-    <Compile Include="Temp\Converter.cs" />
     <Compile Include="ViewConverters\BitmapSourceConverter.cs" />
     <Compile Include="ViewConverters\BitmapToImageSourceConverter.cs" />
     <Compile Include="ViewConverters\ElementIdConverter.cs" />
@@ -248,10 +247,12 @@
     <Compile Include="Views\CutOpeningDockPanelView.xaml.cs">
       <DependentUpon>CutOpeningDockPanelView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\CutOpeningSettingsControl.xaml.cs">
+      <DependentUpon>CutOpeningSettingsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CutOpeningSettingsView.xaml.cs">
       <DependentUpon>CutOpeningSettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RevitCommads\GetFamilyParamsEventHandler.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -277,6 +278,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\CutOpeningSettingsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CutOpeningSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -287,6 +292,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Examples\" />
+    <Folder Include="Temp\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

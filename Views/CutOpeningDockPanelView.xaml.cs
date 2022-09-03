@@ -74,7 +74,6 @@ namespace RevitTimasBIMTools.Views
         {
             if (true == settingsView.ShowDialog() && settingsView.Activate())
             {
-                RevitTask.RegisterGlobal(new GetFamilyParamsEventHandler());
                 Task.Delay(1000).Wait();
             }
         }
