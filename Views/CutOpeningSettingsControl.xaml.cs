@@ -22,9 +22,9 @@ namespace RevitTimasBIMTools.Views
     public partial class CutOpeningSettingsControl : UserControl
     {
 
-        DispatcherTimer timer;
-        double panelWidth;
-        bool hidden;
+        //DispatcherTimer timer;
+        //double panelWidth;
+        //bool hidden;
         public CutOpeningSettingsControl()
         {
             InitializeComponent();

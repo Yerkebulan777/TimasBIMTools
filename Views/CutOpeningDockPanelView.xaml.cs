@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
-using RevitTimasBIMTools.RevitCommads;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
@@ -20,9 +19,9 @@ namespace RevitTimasBIMTools.Views
     /// <summary> Логика взаимодействия для CutOpeningDockPanelView.xaml </summary>
     public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
-        public UIDocument CurrentUIDocument { get; set; } = null;
         public View3D View3d { get; set; } = null;
-
+        public string CurrentDocumentGuid { get; set; } = null;
+        
         private bool disposedValue = false;
         private DocumentModel documentModel;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
@@ -53,8 +52,8 @@ namespace RevitTimasBIMTools.Views
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             View3d = args.View3d;
-            CurrentUIDocument = args.CurrentUIDocument;
             documentModel = args.Documents.FirstOrDefault();
+            CurrentDocumentGuid = args.CurrentDocumentGuid;
             ComboDocs.ItemsSource = args.Documents;
             if (documentModel.IsActive)
             {
@@ -98,11 +97,11 @@ namespace RevitTimasBIMTools.Views
                 Task task = RevitTask.RunAsync(app =>
                 {
                     Document doc = app.ActiveUIDocument.Document;
-                    if (CurrentUIDocument is UIDocument uidoc && uidoc.Document.Title.Equals(doc.Title))
+                    if (CurrentDocumentGuid.Equals(doc.ProjectInformation.UniqueId))
                     {
                         Element elem = doc.GetElement(new ElementId(model.IdInt));
                         System.Windows.Clipboard.SetText(model.IdInt.ToString());
-                        RevitViewManager.ShowElement(CurrentUIDocument, elem);
+                        RevitViewManager.ShowElement(app.ActiveUIDocument, elem);
                     }
                 });
             }

@@ -33,7 +33,7 @@ namespace RevitTimasBIMTools.CutOpening
                 return;
             }
 
-
+            string guid = doc.ProjectInformation.UniqueId;
             View3D view3d = RevitViewManager.Get3dView(uidoc);
             IList<FamilySymbol> symbols = new List<FamilySymbol>(50);
             Properties.Settings.Default.TargetDocumentName = string.Empty;
@@ -43,7 +43,7 @@ namespace RevitTimasBIMTools.CutOpening
             IList<Category> cats = RevitFilterManager.GetCategories(doc, builtInCats).ToList();
             Dictionary<string, string> dict = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
             FilteredElementCollector collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FamilySymbol), BuiltInCategory.OST_GenericModel);
-            
+
             foreach (FamilySymbol smb in collector)
             {
                 Family fam = smb.Family;
@@ -56,7 +56,7 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
 
-            OnCompleted(new BaseCompletedEventArgs(uidoc, view3d, cats, symbols, docs, dict));
+            OnCompleted(new BaseCompletedEventArgs(guid, view3d, cats, symbols, docs, dict));
         }
 
 
@@ -77,13 +77,13 @@ namespace RevitTimasBIMTools.CutOpening
     {
         public View3D View3d { get; }
         public IList<Category> Categories { get; }
-        public UIDocument CurrentUIDocument { get; }
+        public string CurrentDocumentGuid { get; }
         public IList<DocumentModel> Documents { get; }
         public IList<FamilySymbol> FamilySymbols { get; }
-        
+
         public Dictionary<string, string> StructureMaterials { get; }
-        
-        public BaseCompletedEventArgs(UIDocument uidoc,
+
+        public BaseCompletedEventArgs(string guid,
                                       View3D view3d,
                                       IList<Category> cats,
                                       IList<FamilySymbol> smbs,
@@ -94,7 +94,7 @@ namespace RevitTimasBIMTools.CutOpening
             Documents = docs;
             Categories = cats;
             FamilySymbols = smbs;
-            CurrentUIDocument = uidoc;
+            CurrentDocumentGuid = guid;
             StructureMaterials = matDict;
         }
     }
