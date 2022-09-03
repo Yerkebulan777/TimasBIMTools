@@ -17,7 +17,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Height="750" Width="450" d:IsLocked="True"  >
+    <Grid Height="750" Width="450"  >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -25,25 +25,25 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Height="50" VerticalAlignment="Center" d:IsLocked="True" >
-            <Label Content="Settings" Margin="15,10" FontSize="15" d:IsLocked="True"/>
+        <StackPanel Grid.Row="0" Height="50" VerticalAlignment="Center" >
+            <Label Content="Settings" Margin="15,10" FontSize="15"/>
         </StackPanel>
-        <DockPanel Grid.Row="1" Height="150" VerticalAlignment="Center" Background="White" d:IsLocked="True" >
-            <GroupBox Header=" Element size " Margin="5" Padding="5" d:IsLocked="True">
-                <StackPanel Orientation="Vertical" VerticalAlignment="Center" d:IsLocked="True">
-                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5" d:IsLocked="True">
-                        <Grid d:IsLocked="True">
+        <DockPanel Grid.Row="1" Height="150" VerticalAlignment="Center" Background="White" >
+            <GroupBox Header=" Element size " Margin="5" Padding="5">
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Minimum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
+                            <TextBlock Text="Minimum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderMinSize" Grid.Column="1" Margin="10" 
                                     Minimum="5" Maximum="100" TickFrequency="5" 
-                                    ValueChanged="MinSideSize_ValueChanged" d:IsLocked="True"/>
+                                    ValueChanged="MinSideSize_ValueChanged"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding ElementName=sliderMinSize, Path=Value, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
+                                     Text="{Binding ElementName=sliderMinSize, Path=Value, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -52,19 +52,19 @@
                             </TextBox>
                         </Grid>
                     </Border>
-                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5" d:IsLocked="True">
-                        <Grid d:IsLocked="True">
+                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Maximum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
+                            <TextBlock Text="Maximum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderMaxSize" Grid.Column="1" Margin="10"  
                                     Minimum="100" Maximum="1500" TickFrequency="100"
-                                    ValueChanged="MaxSideSize_ValueChanged" d:IsLocked="True" />
+                                    ValueChanged="MaxSideSize_ValueChanged" />
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding ElementName=sliderMaxSize, Path=Value, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
+                                     Text="{Binding ElementName=sliderMaxSize, Path=Value, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -76,22 +76,22 @@
                 </StackPanel>
             </GroupBox>
         </DockPanel>
-        <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Background="White" d:IsLocked="True">
-            <GroupBox Header=" Opening settings " Margin="5" Padding="5" d:IsLocked="True">
-                <StackPanel Orientation="Vertical" VerticalAlignment="Center" d:IsLocked="True">
-                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5" d:IsLocked="True">
-                        <Grid d:IsLocked="True">
+        <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Background="White">
+            <GroupBox Header=" Opening settings " Margin="5" Padding="5">
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Cut offset" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
+                            <TextBlock Text="Cut offset" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderCutOffset" Grid.Column="1" 
                                     Minimum="0" Maximum="100" TickFrequency="5"
-                                    ValueChanged="CutOffset_ValueChanged" d:IsLocked="True"/>
+                                    ValueChanged="CutOffset_ValueChanged"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding  ElementName=sliderCutOffset, Path=Value, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
+                                     Text="{Binding  ElementName=sliderCutOffset, Path=Value, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -100,19 +100,19 @@
                             </TextBox>
                         </Grid>
                     </Border>
-                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5" d:IsLocked="True">
-                        <Grid d:IsLocked="True">
+                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150"/>
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Size ratio limit" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
+                            <TextBlock Text="Size ratio limit" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                             <Slider x:Name="sliderRatio" Grid.Column="1"
                                     Minimum="1" Maximum="5" TickFrequency="1" 
-                                    ValueChanged="Ratio_ValueChanged" d:IsLocked="True"/>
+                                    ValueChanged="Ratio_ValueChanged"/>
                             <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding ElementName=sliderRatio, Path=Value, UpdateSourceTrigger=LostFocus}" d:IsLocked="True">
+                                     Text="{Binding ElementName=sliderRatio, Path=Value, UpdateSourceTrigger=LostFocus}">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="3"/>
@@ -124,61 +124,61 @@
                 </StackPanel>
             </GroupBox>
         </DockPanel>
-        <StackPanel Grid.Row="3" Orientation="Vertical" Height="300" Background="White" d:IsLocked="True" >
-            <Border BorderBrush="LightGray" BorderThickness="0.5" CornerRadius="3" Margin="15" d:IsLocked="True">
-                <StackPanel Height="130" VerticalAlignment="Center" d:IsLocked="True">
-                    <Grid Height="65" VerticalAlignment="Center" d:IsLocked="True">
+        <StackPanel Grid.Row="3" Orientation="Vertical" Height="300" Background="White" >
+            <Border BorderBrush="LightGray" BorderThickness="0.5" CornerRadius="3" Margin="15">
+                <StackPanel Height="130" VerticalAlignment="Center">
+                    <Grid Height="65" VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="180"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text=" Structure material " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
-                        <ComboBox Name="ComboStructMats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Value" d:IsLocked="True" />
+                        <TextBlock Text=" Structure material " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                        <ComboBox Name="ComboStructMats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Value" />
                     </Grid>
-                    <Grid Height="65" VerticalAlignment="Center" d:IsLocked="True">
+                    <Grid Height="65" VerticalAlignment="Center">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="180"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text=" Сommunication сategory " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
-                        <ComboBox Name="ComboTargetCats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Name" SelectionChanged="ComboCats_SelectionChanged" d:IsLocked="True"/>
+                        <TextBlock Text=" Сommunication сategory " Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                        <ComboBox Name="ComboTargetCats" Grid.Column="1" VerticalAlignment="Center" Margin="25,0" DisplayMemberPath="Name" SelectionChanged="ComboCats_SelectionChanged"/>
                     </Grid>
                 </StackPanel>
             </Border>
-            <DockPanel Height="150" VerticalAlignment="Center" Background="White" d:IsLocked="True">
-                <GroupBox Header=" Select opening family " HorizontalAlignment="Center"  Margin="5" Padding="5" d:IsLocked="True">
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" d:IsLocked="True">
-                        <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5" d:IsLocked="True">
-                            <Grid Margin="5" d:IsLocked="True">
+            <DockPanel Height="150" VerticalAlignment="Center" Background="White">
+                <GroupBox Header=" Select opening family " HorizontalAlignment="Center"  Margin="5" Padding="5">
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                        <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5">
+                            <Grid Margin="5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="200"/>
                                     <ColumnDefinition Width="180"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Rectangular opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
+                                <TextBlock Text="Rectangular opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                                 <ComboBox x:Name="ComboRectangSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0" DisplayMemberPath="Name"
                                           ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                                          SelectionChanged="ComboRectangSymbol_SelectionChanged" d:IsLocked="True"/>
+                                          SelectionChanged="ComboRectangSymbol_SelectionChanged"/>
                             </Grid>
                         </Border>
-                        <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5" d:IsLocked="True" >
-                            <Grid Margin="5" d:IsLocked="True">
+                        <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="5" >
+                            <Grid Margin="5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="200"/>
                                     <ColumnDefinition Width="180"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Round opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}" d:IsLocked="True"/>
+                                <TextBlock Text="Round opening family" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                                 <ComboBox x:Name="ComboRoundSymbol" Grid.Column="1" VerticalAlignment="Center" Margin="15,0" DisplayMemberPath="Name"
                                           ItemsSource="{Binding Path=RevitFamilySimbols, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                                          SelectionChanged="ComboRoundSymbol_SelectionChanged" d:IsLocked="True"/>
+                                          SelectionChanged="ComboRoundSymbol_SelectionChanged"/>
                             </Grid>
                         </Border>
                     </StackPanel>
                 </GroupBox>
             </DockPanel>
         </StackPanel>
-        <StackPanel x:Name="SettingCommands" Grid.Row="4" Height="100"  Orientation="Horizontal" VerticalAlignment="Center"  HorizontalAlignment="Right" Margin="15,0" d:IsLocked="True">
-            <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" Click="DefaultSettingCmd_Click" d:IsLocked="True" />
-            <Button x:Name="ApplySettingCmd" Content="Apply" Height="25" Width="90" Margin="10" Click="ApplySettingCmd_Click" d:IsLocked="True" />
+        <StackPanel x:Name="SettingCommands" Grid.Row="4" Height="100"  Orientation="Horizontal" VerticalAlignment="Center"  HorizontalAlignment="Right" Margin="15,0">
+            <Button x:Name="DefaultSettingCmd" Content="Default" Height="25" Width="90" Margin="10" Click="DefaultSettingCmd_Click" />
+            <Button x:Name="ApplySettingCmd" Content="Apply" Height="25" Width="90" Margin="10" Click="ApplySettingCmd_Click" />
         </StackPanel>
     </Grid>
 </Window>

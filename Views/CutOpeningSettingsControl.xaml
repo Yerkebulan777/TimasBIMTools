@@ -1,11 +1,123 @@
-﻿<UserControl x:Class="RevitTimasBIMTools.Views.CutOpeningSettingsControl"
+﻿<UserControl
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Height="750" Width="450" >
-    
-    <Grid Height="750" Width="450" Background="Gainsboro" >
+             x:Class="RevitTimasBIMTools.Views.CutOpeningSettingsControl" 
+             mc:Ignorable="d" Height="750" Width="350" >
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="Gainsboro" >
+
+        <!--<Button Content="Plus" Height="45" Width="45" Style="{DynamicResource CircularButtonStyle}"/>-->
+
+        <ListView ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+
+            <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
+                <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="50"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Minimum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <Slider x:Name="sliderMinSize" Grid.Column="1" Margin="10" 
+                                    Minimum="5" Maximum="100" TickFrequency="5" />
+                            <TextBox Grid.Column="2" Height="20" Width="50" HorizontalContentAlignment="Center" Margin="10">
+                                <TextBox.Resources>
+                                    <Style TargetType="{x:Type Border}">
+                                        <Setter Property="CornerRadius" Value="3"/>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
+                        </Grid>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Maximum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <Slider x:Name="sliderMaxSize" Grid.Column="1" Margin="10"  
+                                    Minimum="100" Maximum="1500" TickFrequency="100"/>
+                            <TextBox Grid.Column="2" Height="20" Width="50" HorizontalContentAlignment="Center" Margin="10">
+                                <TextBox.Resources>
+                                    <Style TargetType="{x:Type Border}">
+                                        <Setter Property="CornerRadius" Value="3"/>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </ListViewItem>
+
+            <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
+                <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="50"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Minimum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <Slider x:Name="slider01" Grid.Column="1" Margin="10" 
+                                    Minimum="5" Maximum="100" TickFrequency="5" />
+                            <TextBox Grid.Column="2" Height="20" Width="50" HorizontalContentAlignment="Center" Margin="10">
+                                <TextBox.Resources>
+                                    <Style TargetType="{x:Type Border}">
+                                        <Setter Property="CornerRadius" Value="3"/>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
+                        </Grid>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Maximum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
+                            <Slider x:Name="slider02" Grid.Column="1" Margin="10"  
+                                    Minimum="100" Maximum="1500" TickFrequency="100" />
+                            <TextBox Grid.Column="2" Height="20" Width="50" HorizontalContentAlignment="Center" Margin="10">
+                                <TextBox.Resources>
+                                    <Style TargetType="{x:Type Border}">
+                                        <Setter Property="CornerRadius" Value="3"/>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </ListViewItem>
+
+            
+            
+        </ListView>
+
+
 
 
 
