@@ -22,30 +22,35 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Height="50" VerticalAlignment="Center" Margin="15" >
-                <Label Name="ActiveDocTitle" TextElement.FontSize="13" VerticalAlignment="Center" >
+            <Grid Grid.Row="0" Height="50" VerticalAlignment="Center" >
+                <Label Name="ActiveDocTitle" TextElement.FontSize="13" VerticalAlignment="Center" Margin="15">
                     <Label.BitmapEffect>
                         <DropShadowBitmapEffect/>
                     </Label.BitmapEffect>
                 </Label>
+                <Button HorizontalAlignment="Right" VerticalAlignment="Center"  Background="Transparent" BorderBrush="Transparent" >
+                    <Label FontFamily="Segoe MDL2 Assets" Content="&#xE700;" Height="25" VerticalContentAlignment="Center" Margin="10"/>
+                </Button>
             </Grid>
-            <ScrollViewer Grid.Row="1">
-                <StackPanel Background="WhiteSmoke" CanVerticallyScroll="True" CanHorizontallyScroll="True" >
-                    <TextBlock Text=" TARGET PROJECT" Style="{StaticResource Header}" FontSize="13"/>
-                    <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
-                        <ComboBox Name="ComboDocs" Height="25" Width="170" DisplayMemberPath="Title" SelectedIndex="0" Margin="10"/>
-                        <Button Name="ShowSettingsCmd" Content="Settings" Height="25" Width="90" Margin="10" 
-                                VerticalAlignment="Center" HorizontalAlignment="Right" Click="ShowSettingsCmd_Click"/>
-                    </StackPanel>
-                    <TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>
-                    <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
-                        <ComboBox Name="ComboDataFilter" Height="25" Width="280" SelectedIndex="0" Margin="10" 
+            <StackPanel Grid.Row="1" Background="WhiteSmoke" CanVerticallyScroll="True" CanHorizontallyScroll="True" >
+                <Border Height="25" Background="{DynamicResource FloralGradientBrush}">
+                    <!--<StackPanel Orientation="Horizontal" Height="50" VerticalAlignment="Center" >
+                        --><!--<Label Content="TARGET PROJECT" Style="{StaticResource Header}" VerticalContentAlignment="Center" HorizontalAlignment="Left"/>-->
+                        <!--<ComboBox x:Name="ComboDocs" Height="25" Width="170" DisplayMemberPath="Title" SelectedIndex="0" HorizontalContentAlignment="Right"/>--><!--
+                    </StackPanel>-->
+                </Border>
+                <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
+                    <!--<Button Name="ShowSettingsCmd" Content="Settings" Height="25" Width="90" Margin="10" 
+                                VerticalAlignment="Center" HorizontalAlignment="Right" Click="ShowSettingsCmd_Click"/>-->
+                </StackPanel>
+                <!--<TextBlock Text=" ELEMENT DATA" Style="{StaticResource Header}" FontSize="13"/>-->
+                <StackPanel Height="50" Width="300" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" >
+                    <ComboBox Name="ComboDataFilter" Height="25" Width="280" SelectedIndex="0" Margin="10" 
                                   IsEnabled ="{Binding Path=IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                   SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                   ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
                 </StackPanel>
-            </ScrollViewer>
+            </StackPanel>
             <ScrollViewer Grid.Row="2">
                 <DataGrid Name="dataGridView" Width="Auto" MinWidth="300" MaxWidth="1500" IsSynchronizedWithCurrentItem="True"
                           ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >

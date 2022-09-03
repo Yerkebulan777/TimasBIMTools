@@ -9,15 +9,14 @@
     <!--DropShadowEffect-->
     <DropShadowEffect x:Key="ShadowBlur" />
     <!--HeaderTextBox-->
-    <Style x:Key="Header" TargetType="TextBlock" >
-        <Setter Property="FontSize" Value="13"/>
+    <Style x:Key="Header" TargetType="Label" >
+        <Setter Property="Margin" Value="10,0"/>
+        <Setter Property="FontSize" Value="11"/>
         <Setter Property="MinWidth" Value="150"/>
         <Setter Property="MaxWidth" Value="1500"/>
         <Setter Property="FontWeight" Value="Medium"/>
-        <Setter Property="TextDecorations" Value="None"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Foreground" Value="DarkOliveGreen"/>
-        <Setter Property="Background" Value="{DynamicResource FloralGradientBrush}"/>
     </Style>
     <!--TextBox-->
     <Style TargetType="TextBox">

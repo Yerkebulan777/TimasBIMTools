@@ -21,7 +21,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Grid x:Name="panelHeader" Grid.Row="0" Height="30" VerticalAlignment="Top" Background="#FF0F4E7A" >
+        <Grid x:Name="panelHeader" Grid.Row="0" Height="30" VerticalAlignment="Top" >
             <Border Background="{DynamicResource FloralGradientBrush}">
                 <TextBlock Text="Settings" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Century Gothic" FontSize="15" FontWeight="Bold" Foreground="AliceBlue"/>
             </Border>
