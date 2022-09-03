@@ -19,7 +19,6 @@ namespace RevitTimasBIMTools.Core
     public class SmartToolController : IExternalApplication
     {
         private UIControlledApplication controller = null;
-        public static Document CurrentDocument { get; set; } = null;
         public static IServiceProvider Services = CreateServiceProvider();
         public static readonly DockablePaneId DockPaneId = new DockablePaneId(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
         private readonly CutOpeningRegisterDockablePane dockManager = Services.GetRequiredService<CutOpeningRegisterDockablePane>();
@@ -35,13 +34,13 @@ namespace RevitTimasBIMTools.Core
             services = services.AddSingleton<IRevitTask, RevitTask>();
             services = services.AddSingleton<CutOpeningStartHandler>();
             services = services.AddSingleton<SmartToolGeneralHelper>();
-            
+
             services = services.AddTransient<IDockablePaneProvider, CutOpeningDockPanelView>();
 
             services = services.AddTransient<CutOpeningSettingsView>();
             services = services.AddTransient<CutOpeningCollisionManager>();
             services = services.AddTransient<CutOpeningDataViewModel>();
-            
+
             return services.BuildServiceProvider();
         }
 
@@ -57,17 +56,18 @@ namespace RevitTimasBIMTools.Core
 
             Dispatcher.CurrentDispatcher.Thread.Name = "UIRevitGeneralThread";
             cntrapp.ControlledApplication.ApplicationInitialized += DockablePaneRegisters;
-            cntrapp.ControlledApplication.DocumentOpened += DocumentOpened;
+            cntrapp.ControlledApplication.DocumentClosed += OnDocumentClosed; ;
 
             return Result.Succeeded;
         }
+
 
 
         [STAThread]
         public Result OnShutdown(UIControlledApplication cntrapp)
         {
             cntrapp.ControlledApplication.ApplicationInitialized -= DockablePaneRegisters;
-            cntrapp.ControlledApplication.DocumentOpened -= DocumentOpened;
+            cntrapp.ControlledApplication.DocumentClosed -= OnDocumentClosed;
             Properties.Settings.Default.Reset();
             return Result.Succeeded;
         }
@@ -85,18 +85,15 @@ namespace RevitTimasBIMTools.Core
 
 
         [STAThread]
-        private void DocumentOpened(object sender, DocumentOpenedEventArgs args)
+        private void OnDocumentClosed(object sender, DocumentClosedEventArgs e)
         {
             try
             {
                 DockablePane dockpane = controller.GetDockablePane(DockPaneId);
-                if (dockpane is DockablePane)
+                if (dockpane.IsShown())
                 {
-                    if (dockpane.IsShown())
-                    {
-                        dockpane.Hide();
-                        dockpane.Dispose();
-                    }
+                    dockpane.Hide();
+                    dockpane.Dispose();
                 }
             }
             catch (Exception)
@@ -104,5 +101,6 @@ namespace RevitTimasBIMTools.Core
                 throw;
             }
         }
+
     }
 }

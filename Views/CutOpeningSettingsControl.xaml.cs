@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -20,6 +21,10 @@ namespace RevitTimasBIMTools.Views
     /// </summary>
     public partial class CutOpeningSettingsControl : UserControl
     {
+
+        DispatcherTimer timer;
+        double panelWidth;
+        bool hidden;
         public CutOpeningSettingsControl()
         {
             InitializeComponent();

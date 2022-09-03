@@ -27,7 +27,6 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
-            SmartToolController.CurrentDocument = uiapp.ActiveUIDocument.Document;
             ExternalEvent dockpaneExtEvent = ExternalEvent.Create(dockpaneHandler);
             if (dockpid != null && DockablePane.PaneIsRegistered(dockpid))
             {

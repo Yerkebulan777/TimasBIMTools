@@ -17,7 +17,7 @@
         <Setter Property="TextDecorations" Value="None"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Foreground" Value="DarkOliveGreen"/>
-        <Setter Property="Background" Value="{StaticResource FloralGradientBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource FloralGradientBrush}"/>
     </Style>
     <!--TextBox-->
     <Style TargetType="TextBox">
