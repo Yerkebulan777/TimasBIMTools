@@ -19,22 +19,26 @@ namespace RevitTimasBIMTools.Views
     /// <summary> Логика взаимодействия для CutOpeningDockPanelView.xaml </summary>
     public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
-        public View3D View3d { get; set; } = null;
         public string CurrentDocumentGuid { get; set; } = null;
+        public View3D View3d { get; set; } = null;
         
         private bool disposedValue = false;
-        private DocumentModel documentModel;
+        private double previewWidthSize = 0;
+        private DocumentModel documentModel = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
         private readonly CutOpeningSettingsView settingsView = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
+
 
         public CutOpeningDockPanelView()
         {
             InitializeComponent();
             DataContext = dataViewModel;
             dataViewModel.DockPanelView = this;
+            this.SizeChanged += OnViewSizeChanged;
             viewHandler.Completed += OnContextViewHandlerCompleted;
             Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
+
         }
 
 
@@ -46,6 +50,15 @@ namespace RevitTimasBIMTools.Views
                 DockPosition = DockPosition.Tabbed,
                 TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette
             };
+        }
+
+
+        private void OnViewSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (e.WidthChanged)
+            {
+                previewWidthSize = e.NewSize.Width;
+            }
         }
 
 
