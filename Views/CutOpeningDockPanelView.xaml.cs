@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-
+using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -22,6 +22,8 @@ namespace RevitTimasBIMTools.Views
         public string CurrentDocumentGuid { get; set; } = null;
         public View3D View3d { get; set; } = null;
 
+        private bool settingsHidden;
+        private DispatcherTimer timer;
         private bool disposedValue = false;
         private double previewWidthSize = 0;
         private DocumentModel documentModel = null;
@@ -38,6 +40,9 @@ namespace RevitTimasBIMTools.Views
             dataViewModel.DockPanelView = this;
             viewHandler.Completed += OnContextViewHandlerCompleted;
             Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
+            timer = new DispatcherTimer();
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 10);
+            timer.Tick += Timer_Tick;
         }
 
 
@@ -59,6 +64,31 @@ namespace RevitTimasBIMTools.Views
                 previewWidthSize = e.NewSize.Width;
             }
         }
+
+
+        #region TickTimer
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if (settingsHidden)
+            {
+                sidePanel.Width += 1;
+                if (sidePanel.Width >= previewWidthSize)
+                {
+                    timer.Stop();
+                    settingsHidden = false;
+                }
+            }
+            else
+            {
+                sidePanel.Width -= 1;
+                if (sidePanel.Width == 0)
+                {
+                    timer.Stop();
+                    settingsHidden = true;
+                }
+            }
+        }
+        #endregion
 
 
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
@@ -83,10 +113,7 @@ namespace RevitTimasBIMTools.Views
 
         private void ShowSettingsCmd_Click(object sender, RoutedEventArgs e)
         {
-            //if (true == settingsView.ShowDialog() && settingsView.Activate())
-            //{
-            //    Task.Delay(1000).Wait();
-            //}
+            timer.Start();
         }
 
 

@@ -52,7 +52,7 @@
             </Border>
 
             <Border Grid.Row="1" Background="WhiteSmoke"  BorderThickness="0" >
-                <Grid Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+                <Grid Name="sidePanel" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right">
                     <local:CutOpeningSettingsControl/>
                 </Grid>
             </Border>

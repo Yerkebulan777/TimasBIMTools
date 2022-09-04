@@ -21,7 +21,7 @@
     <!--TextBox-->
     <Style TargetType="TextBox">
         <Setter Property="IsUndoEnabled" Value="False"/>
-        <Setter Property="TextWrapping" Value="WrapWithOverflow"/>
+        <Setter Property="TextWrapping" Value="NoWrap"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Style.Triggers>
             <MultiTrigger>
