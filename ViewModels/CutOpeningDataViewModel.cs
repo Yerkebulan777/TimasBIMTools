@@ -76,6 +76,14 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        private ObservableCollection<DocumentModel> docModels;
+        public ObservableCollection<DocumentModel> DocumentModels
+        {
+            get { return docModels; }
+            set { docModels = value; }
+        }
+
+
         private ObservableCollection<ElementModel> modelCollection = new ObservableCollection<ElementModel>();
         public ObservableCollection<ElementModel> RevitElementModels
         {

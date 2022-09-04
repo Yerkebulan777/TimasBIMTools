@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using RevitTimasBIMTools.RevitModel;
-using RevitTimasBIMTools.Services;
 using System.Collections.Generic;
 
 namespace RevitTimasBIMTools.RevitUtils
@@ -14,28 +13,17 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static IList<DocumentModel> GetDocumentCollection(Document doc)
         {
-            List<DocumentModel> documents = new List<DocumentModel>
-            {
-                new DocumentModel(true, doc, Transform.Identity)
-            };
+            List<DocumentModel> docs = new List<DocumentModel> { new DocumentModel(doc) };
+
             foreach (RevitLinkInstance link in GetRevitLinkInstanceCollector(doc))
             {
-                int id = link.Id.IntegerValue;
-                Document linkDocument = link.GetLinkDocument();
-                if (linkDocument != null && linkDocument.IsValidObject)
+                Document linkDoc = link.GetLinkDocument();
+                if (linkDoc != null && linkDoc.IsValidObject)
                 {
-                    try
-                    {
-                        Transform totalTransform = link.GetTotalTransform();
-                        documents.Add(new DocumentModel(false, linkDocument, totalTransform, id));
-                    }
-                    catch (System.Exception exc)
-                    {
-                        RevitLogger.Error("linkInstance: " + exc.Message);
-                    }
+                    docs.Add(new DocumentModel(linkDoc, link));
                 }
             }
-            return documents;
+            return docs;
         }
     }
 }

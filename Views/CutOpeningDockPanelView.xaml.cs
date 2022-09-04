@@ -54,11 +54,11 @@ namespace RevitTimasBIMTools.Views
             View3d = args.View3d;
             documentModel = args.Documents.FirstOrDefault();
             CurrentDocumentGuid = args.CurrentDocumentGuid;
-            ComboDocs.ItemsSource = args.Documents;
+            //ComboDocs.ItemsSource = args.Documents;
             if (documentModel.IsActive)
             {
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
-                ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
+                //ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
                 settingsView.ComboTargetCats.ItemsSource = args.Categories;
                 settingsView.ComboRoundSymbol.ItemsSource = args.FamilySymbols;
                 settingsView.ComboRectangSymbol.ItemsSource = args.FamilySymbols;
@@ -80,12 +80,12 @@ namespace RevitTimasBIMTools.Views
 
         private void ComboDocs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            object item = ComboDocs.SelectedItem;
-            if (item is DocumentModel model)
-            {
-                Properties.Settings.Default.TargetDocumentName = model.Title;
-                Properties.Settings.Default.Save();
-            }
+            //object item = ComboDocs.SelectedItem;
+            //if (item is DocumentModel model)
+            //{
+            //    Properties.Settings.Default.TargetDocumentName = model.Title;
+            //    Properties.Settings.Default.Save();
+            //}
         }
 
 
@@ -124,7 +124,7 @@ namespace RevitTimasBIMTools.Views
                     Content = null;
                     DataContext = null;
                     dataViewModel.Dispose();
-                    ComboDocs.SelectionChanged -= ComboDocs_SelectionChanged;
+                    //ComboDocs.SelectionChanged -= ComboDocs_SelectionChanged;
                     for (int i = 0; i < PageMainGrid.Children.Count; i++)
                     {
                         PageMainGrid.Children.Remove(PageMainGrid.Children[i]);
