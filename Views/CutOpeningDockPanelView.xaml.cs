@@ -40,7 +40,7 @@ namespace RevitTimasBIMTools.Views
             viewHandler.Completed += OnContextViewHandlerCompleted;
             Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
             timer = new DispatcherTimer();
-            timer.Interval = new TimeSpan(0, 0, 0, 0, 10);
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 1);
             timer.Tick += Timer_Tick;
             sidePanel.Width = 0;
         }
@@ -62,7 +62,6 @@ namespace RevitTimasBIMTools.Views
             if (e.WidthChanged)
             {
                 sidePanel.Width = 0;
-                viewPage.Width = 500;
             }
         }
 
@@ -71,18 +70,18 @@ namespace RevitTimasBIMTools.Views
         private void Timer_Tick(object sender, EventArgs e)
         {
             gridWidthSize = viewPage.Width;
-            if (viewPage.Width < gridWidthSize)
+            if (sidePanel.Width < gridWidthSize)
             {
-                viewPage.Width += 1;
-                if (viewPage.Width > gridWidthSize)
+                sidePanel.Width += 0.5;
+                if (sidePanel.Width > gridWidthSize)
                 {
                     timer.Stop();
                 }
             }
             else
             {
-                viewPage.Width -= 1;
-                if (viewPage.Width > 1)
+                sidePanel.Width -= 0.5;
+                if (sidePanel.Width > 1)
                 {
                     timer.Stop();
                 }
