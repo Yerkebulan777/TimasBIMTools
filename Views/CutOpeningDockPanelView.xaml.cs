@@ -22,10 +22,9 @@ namespace RevitTimasBIMTools.Views
         public string CurrentDocumentGuid { get; set; } = null;
         public View3D View3d { get; set; } = null;
 
-        private bool settingsHidden;
         private DispatcherTimer timer;
+        private double gridWidthSize = 0;
         private bool disposedValue = false;
-        private double previewWidthSize = 0;
         private DocumentModel documentModel = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
@@ -43,6 +42,7 @@ namespace RevitTimasBIMTools.Views
             timer = new DispatcherTimer();
             timer.Interval = new TimeSpan(0, 0, 0, 0, 10);
             timer.Tick += Timer_Tick;
+            sidePanel.Width = 0;
         }
 
 
@@ -61,7 +61,8 @@ namespace RevitTimasBIMTools.Views
         {
             if (e.WidthChanged)
             {
-                previewWidthSize = e.NewSize.Width;
+                sidePanel.Width = 0;
+                viewPage.Width = 500;
             }
         }
 
@@ -69,22 +70,21 @@ namespace RevitTimasBIMTools.Views
         #region TickTimer
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (settingsHidden)
+            gridWidthSize = viewPage.Width;
+            if (viewPage.Width < gridWidthSize)
             {
-                sidePanel.Width += 1;
-                if (sidePanel.Width >= previewWidthSize)
+                viewPage.Width += 1;
+                if (viewPage.Width > gridWidthSize)
                 {
                     timer.Stop();
-                    settingsHidden = false;
                 }
             }
             else
             {
-                sidePanel.Width -= 1;
-                if (sidePanel.Width == 0)
+                viewPage.Width -= 1;
+                if (viewPage.Width > 1)
                 {
                     timer.Stop();
-                    settingsHidden = true;
                 }
             }
         }
