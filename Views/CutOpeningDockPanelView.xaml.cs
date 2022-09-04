@@ -21,7 +21,7 @@ namespace RevitTimasBIMTools.Views
     {
         public string CurrentDocumentGuid { get; set; } = null;
         public View3D View3d { get; set; } = null;
-        
+
         private bool disposedValue = false;
         private double previewWidthSize = 0;
         private DocumentModel documentModel = null;
@@ -34,11 +34,10 @@ namespace RevitTimasBIMTools.Views
         {
             InitializeComponent();
             DataContext = dataViewModel;
+            SizeChanged += OnViewSizeChanged;
             dataViewModel.DockPanelView = this;
-            this.SizeChanged += OnViewSizeChanged;
             viewHandler.Completed += OnContextViewHandlerCompleted;
             Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
-
         }
 
 
