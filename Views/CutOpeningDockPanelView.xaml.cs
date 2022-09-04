@@ -113,7 +113,7 @@ namespace RevitTimasBIMTools.Views
 
         private void ShowSettingsCmd_Click(object sender, RoutedEventArgs e)
         {
-            timer.Start();
+            Task task = RevitTask.RunAsync(app => timer.Start());
         }
 
 
