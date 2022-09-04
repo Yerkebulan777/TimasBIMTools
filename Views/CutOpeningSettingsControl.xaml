@@ -4,7 +4,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     x:Class="RevitTimasBIMTools.Views.CutOpeningSettingsControl" 
-    mc:Ignorable="d" Height="750" Width="450" >
+    mc:Ignorable="d" d:Height="750" d:Width="300" >
     
     <UserControl.Resources>
         <ResourceDictionary>
@@ -27,8 +27,6 @@
             </Border>
         </Grid>
 
-        <!--<Button Content="Plus" Height="45" Width="45" Style="{DynamicResource CircularButtonStyle}"/>-->
-
             <ListView Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
                 <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
@@ -39,7 +37,7 @@
                                 <RowDefinition Height="50"/>
                             </Grid.RowDefinitions>
 
-                            <Grid Grid.Row="0">
+                            <Grid Grid.Row="0" Width="Auto" >
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="2*"/>
                                     <ColumnDefinition Width="3*"/>
@@ -48,7 +46,7 @@
                                 <TextBlock Text="Minimum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                                 <Slider x:Name="sliderMinSize" Grid.Column="1" Margin="5" 
                                     Minimum="5" Maximum="100" TickFrequency="5" />
-                                <TextBox Grid.Column="2" Height="20" Width="50" HorizontalContentAlignment="Center" Margin="10">
+                                <TextBox Grid.Column="2" Height="20" Width="Auto" HorizontalContentAlignment="Center" Margin="10">
                                     <TextBox.Resources>
                                         <Style TargetType="{x:Type Border}">
                                             <Setter Property="CornerRadius" Value="3"/>
@@ -66,7 +64,7 @@
                                 <TextBlock Text="Maximum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                                 <Slider x:Name="sliderMaxSize" Grid.Column="1" Margin="5"  
                                     Minimum="100" Maximum="1500" TickFrequency="100"/>
-                                <TextBox Grid.Column="2" Height="20" Width="50" HorizontalContentAlignment="Center" Margin="10">
+                                <TextBox Grid.Column="2" Height="20" Width="Auto" HorizontalContentAlignment="Center" Margin="10">
                                     <TextBox.Resources>
                                         <Style TargetType="{x:Type Border}">
                                             <Setter Property="CornerRadius" Value="3"/>
@@ -95,7 +93,7 @@
                                 <TextBlock Text="Minimum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                                 <Slider x:Name="slider01" Grid.Column="1" Margin="5" 
                                     Minimum="5" Maximum="100" TickFrequency="5" />
-                                <TextBox Grid.Column="2" Height="20" Width="50" HorizontalContentAlignment="Center" Margin="10">
+                                <TextBox Grid.Column="2" Height="20" Width="Auto" HorizontalContentAlignment="Center" Margin="10">
                                     <TextBox.Resources>
                                         <Style TargetType="{x:Type Border}">
                                             <Setter Property="CornerRadius" Value="3"/>
@@ -113,7 +111,7 @@
                                 <TextBlock Text="Maximum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
                                 <Slider x:Name="slider02" Grid.Column="1" Margin="5"  
                                     Minimum="100" Maximum="1500" TickFrequency="100" />
-                                <TextBox Grid.Column="2" Height="20" Width="50" HorizontalContentAlignment="Center" Margin="10">
+                                <TextBox Grid.Column="2" Height="20" Width="Auto" HorizontalContentAlignment="Center" Margin="10">
                                     <TextBox.Resources>
                                         <Style TargetType="{x:Type Border}">
                                             <Setter Property="CornerRadius" Value="3"/>

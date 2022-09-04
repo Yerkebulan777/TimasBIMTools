@@ -17,9 +17,8 @@
         <GradientStop Color="DarkGray" Offset="1" />
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="FloralGradientBrush" Opacity="0.5">
-        <GradientStop Color="LimeGreen" Offset="0"/>
-        <GradientStop Color="LightSeaGreen" Offset="0.5"/>
-        <GradientStop Color="SeaGreen" Offset="1"/>
+        <GradientStop Color="LimeGreen"  Offset="0"/>
+        <GradientStop Color="DeepSkyBlue"  Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="ModernGradientBrush" Opacity="0.5">
         <GradientStop Color="DeepSkyBlue" Offset="0.0"/>

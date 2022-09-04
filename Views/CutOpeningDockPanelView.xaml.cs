@@ -71,10 +71,10 @@ namespace RevitTimasBIMTools.Views
 
         private void ShowSettingsCmd_Click(object sender, RoutedEventArgs e)
         {
-            if (true == settingsView.ShowDialog() && settingsView.Activate())
-            {
-                Task.Delay(1000).Wait();
-            }
+            //if (true == settingsView.ShowDialog() && settingsView.Activate())
+            //{
+            //    Task.Delay(1000).Wait();
+            //}
         }
 
 
