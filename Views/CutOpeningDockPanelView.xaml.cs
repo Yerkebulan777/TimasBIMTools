@@ -54,7 +54,6 @@ namespace RevitTimasBIMTools.Views
             View3d = args.View3d;
             documentModel = args.Documents.FirstOrDefault();
             CurrentDocumentGuid = args.CurrentDocumentGuid;
-            //ComboDocs.ItemsSource = args.Documents;
             if (documentModel.IsActive)
             {
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
@@ -63,6 +62,7 @@ namespace RevitTimasBIMTools.Views
                 settingsView.ComboRoundSymbol.ItemsSource = args.FamilySymbols;
                 settingsView.ComboRectangSymbol.ItemsSource = args.FamilySymbols;
                 settingsView.ComboStructMats.ItemsSource = args.StructureMaterials;
+                dataViewModel.DocumentModels = args.Documents.ToObservableCollection();
                 ActiveDocTitle.Content = documentModel.Document.Title.ToUpper();
                 dataViewModel.CurrentDocument = documentModel.Document;
             }

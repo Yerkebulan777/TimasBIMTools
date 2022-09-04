@@ -76,11 +76,11 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private ObservableCollection<DocumentModel> docModels;
+        private ObservableCollection<DocumentModel> docModels = new ObservableCollection<DocumentModel>();
         public ObservableCollection<DocumentModel> DocumentModels
         {
-            get { return docModels; }
-            set { docModels = value; }
+            get => docModels;
+            set => SetProperty(ref docModels, value);
         }
 
 
@@ -248,7 +248,7 @@ namespace RevitTimasBIMTools.ViewModels
                     UniqueElementNames = GetUniqueStringList(RevitElementModels);
                 }
             });
-            
+
         }
 
         #endregion
