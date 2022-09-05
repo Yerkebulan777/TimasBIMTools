@@ -33,8 +33,10 @@
                             <DropShadowBitmapEffect/>
                         </Label.BitmapEffect>
                     </Label>
-                    <ToggleButton Name="ShowSettingsCmd" Height="40" Width="60" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                  Background="Transparent" BorderBrush="Transparent" 
+                    <ToggleButton Name="ShowSettingsCmd" Height="40" Width="60"
+                                  HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  Background="Transparent" BorderBrush="Transparent"
+                                  IsChecked="{Binding Path=IsOptEnabled}"
                                   Click="ShowSettingsCmd_Cick" >
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
@@ -64,11 +66,12 @@
             <Border Grid.Row="1" Background="WhiteSmoke"  BorderThickness="0" >
                 <WrapPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="5">
                     <ComboBox Name="ComboFloorFilter" Height="25"  SelectedIndex="0" Margin="5" 
-                          SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                          ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <ComboBox Name="ComboDataFilter" Height="25" SelectedIndex="0" Margin="5"  
-                          SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                          ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                              SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" 
+                              ItemsSource="{Binding Path=LevelDict, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                              DisplayMemberPath="Value.Name"/>
+                    <ComboBox Name="ComboDataFilter" Height="25" SelectedIndex="0" Margin="5" 
+                              SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                              ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                 </WrapPanel>
             </Border>
 

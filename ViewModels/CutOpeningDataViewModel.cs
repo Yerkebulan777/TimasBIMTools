@@ -58,7 +58,15 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref isOpt, value))
                 {
-                    _ = GetLevelsAsync();
+                    RevitTask.RunAsync(app =>
+                    {
+                        UIDocument uidoc = app.ActiveUIDocument;
+                        Document doc = app.ActiveUIDocument.Document;
+                        foreach (Level level in RevitFilterManager.GetValidLevels(doc))
+                        {
+                            LevelDict[level.ProjectElevation] = level;
+                        }
+                    });
                 }
             }
         }
@@ -73,7 +81,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region FloorDict
+        #region LevelDict
 
         public Level ActualLevel { get; set; } = null;
 
@@ -315,20 +323,6 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
         #endregion
-
-
-        private async Task GetLevelsAsync()
-        {
-            await RevitTask.RunAsync(app =>
-            {
-                UIDocument uidoc = app.ActiveUIDocument;
-                Document doc = app.ActiveUIDocument.Document;
-                foreach (Level level in RevitFilterManager.GetValidLevels(doc))
-                {
-                    LevelDict[level.ProjectElevation] = level;
-                }
-            });
-        }
 
 
         public void Dispose()
