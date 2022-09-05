@@ -205,6 +205,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region SnoopCommand
+
         public ICommand SnoopCommand { get; private set; }
         private async Task SnoopHandelCommandAsync()
         {
