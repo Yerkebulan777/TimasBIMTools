@@ -243,12 +243,12 @@ namespace RevitTimasBIMTools.RevitUtils
             FilteredElementCollector collector = new FilteredElementCollector(doc);
             foreach (Level level in collector.OfClass(typeof(Level)))
             {
-                ElementLevelFilter level1Filter = new ElementLevelFilter(level.Id);
+                ElementLevelFilter levelFilter = new ElementLevelFilter(level.Id);
                 collector = new FilteredElementCollector(doc, wallIds);
-                if (collector.WherePasses(level1Filter).Any())
+                if (collector.WherePasses(levelFilter).Any())
                 {
                     collector = new FilteredElementCollector(doc, floorIds);
-                    if (collector.WherePasses(level1Filter).Any())
+                    if (collector.WherePasses(levelFilter).Any())
                     {
                         yield return level;
                     }
