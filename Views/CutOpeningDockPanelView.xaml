@@ -7,7 +7,7 @@
     d:DataContext="{d:DesignInstance Type=vm:CutOpeningDataViewModel}"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelView" 
-    d:Height="Auto" d:Width="450" mc:Ignorable="d">
+    d:Height="Auto" d:Width="Auto" mc:Ignorable="d">
 
     <Page.Resources>
         <ResourceDictionary>
@@ -63,20 +63,20 @@
                 </Grid>
             </Border>
             <!-- Filter Control -->
-            <Border Grid.Row="1" Background="WhiteSmoke"  BorderThickness="0" >
-                <WrapPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="5">
-                    <ComboBox Name="ComboFloorFilter" Height="25"  SelectedIndex="0" Margin="5" 
+            <Border Grid.Row="1" BorderThickness="0" >
+                <WrapPanel HorizontalAlignment="Right" Margin="5">
+                    <ComboBox Name="ComboFloorFilter" Height="25" Width="200" SelectedIndex="0" Margin="5" 
                               SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" 
                               ItemsSource="{Binding Path=LevelDict, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                               DisplayMemberPath="Value.Name"/>
-                    <ComboBox Name="ComboDataFilter" Height="25" SelectedIndex="0" Margin="5" 
+                    <ComboBox Name="ComboDataFilter" Height="25" Width="200" SelectedIndex="0" Margin="5" 
                               SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                               ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                 </WrapPanel>
             </Border>
 
-            <ScrollViewer Grid.Row="2" Visibility="Collapsed">
-                <DataGrid Name="dataGridView" Width="Auto" MinWidth="300" MaxWidth="1500" IsSynchronizedWithCurrentItem="True"
+            <ScrollViewer Grid.Row="2" >
+                <DataGrid Name="dataGridView" Width="Auto" IsSynchronizedWithCurrentItem="True"
                           ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <DataGrid.RowStyle>
                         <Style TargetType="{x:Type DataGridRow}">
