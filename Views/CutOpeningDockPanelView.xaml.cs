@@ -9,7 +9,6 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -38,15 +37,15 @@ namespace RevitTimasBIMTools.Views
             dataViewModel.DockPanelView = this;
             viewHandler.Completed += OnContextViewHandlerCompleted;
             Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
-            this.SizeChanged += delegate
+            SizeChanged += delegate
             {
-                Dispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
+                if (sidePanel.ActualWidth != 0)
                 {
-                    if (sidePanel.ActualWidth != 0)
-                    {
-                        sidePanel.Width = this.ActualWidth;
-                    }
-                });
+                    _ = Dispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
+                   {
+                       sidePanel.Width = ActualWidth;
+                   });
+                }
             };
         }
 
@@ -85,12 +84,13 @@ namespace RevitTimasBIMTools.Views
 
         private void ShowSettingsCmd_Cick(object sender, RoutedEventArgs e)
         {
+            sidePanel.Visibility = System.Windows.Visibility.Visible;
             DoubleAnimation anim = new DoubleAnimation();
             double widht = sidePanel.ActualWidth;
             if (widht == 0)
             {
                 anim.From = 0;
-                anim.To = this.ActualWidth;
+                anim.To = ActualWidth;
             }
             else
             {
@@ -99,6 +99,7 @@ namespace RevitTimasBIMTools.Views
             }
             anim.EasingFunction = new QuadraticEase();
             sidePanel.BeginAnimation(WidthProperty, anim);
+            sidePanel.DataContext = dataViewModel;
         }
 
 

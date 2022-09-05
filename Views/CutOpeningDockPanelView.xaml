@@ -3,11 +3,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="viewPage" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:viewmodels="clr-namespace:RevitTimasBIMTools.ViewModels"
-    d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningDataViewModel}"
+    xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:CutOpeningDataViewModel}"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelView" 
     d:Height="Auto" d:Width="450" mc:Ignorable="d">
+
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -15,6 +16,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
+    
     <Border BorderThickness="2.5" BorderBrush="Gray">
         <Grid Name="PageMainGrid" Background="SeaShell">
             <Grid.RowDefinitions>
@@ -23,7 +25,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
+            <!--Header -->
             <Border  Grid.Row="0" Background="{DynamicResource FloralGradientBrush}" BorderThickness="0">
                 <Grid Grid.Row="0" VerticalAlignment="Center" >
                     <Label Name="ActiveDocTitle" TextElement.FontSize="13" VerticalAlignment="Center" >
@@ -51,14 +53,14 @@
                     </ToggleButton>
                 </Grid>
             </Border>
-
-            <Border Grid.Row="1" BorderThickness="0" >
+            <!--Settings-->
+            <Border Grid.Row="1" BorderThickness="0"  Visibility="Collapsed">
                 <Grid Name="sidePanel" Grid.Row="1" Width="0"
                       VerticalAlignment="Stretch"  HorizontalAlignment="Right">
-                    <local:CutOpeningSettingsControl/>
+                    <local:CutOpeningSettingsControl DataContext="{Binding Data}"/>
                 </Grid>
             </Border>
-
+            <!--    -->
             <Border Grid.Row="1" Background="WhiteSmoke"  BorderThickness="0" Visibility="Collapsed">
                 <WrapPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="5">
                     <ComboBox Name="ComboFloorFilter" Height="25" Width="250"  SelectedIndex="0" Margin="5" 
