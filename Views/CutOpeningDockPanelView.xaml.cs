@@ -41,10 +41,10 @@ namespace RevitTimasBIMTools.Views
             {
                 if (sidePanel.ActualWidth != 0)
                 {
-                    _ = Dispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
-                   {
-                       sidePanel.Width = ActualWidth;
-                   });
+                    Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
+                    {
+                        sidePanel.Width = ActualWidth;
+                    });
                 }
             };
         }
@@ -84,22 +84,24 @@ namespace RevitTimasBIMTools.Views
 
         private void ShowSettingsCmd_Cick(object sender, RoutedEventArgs e)
         {
-            sidePanel.Visibility = System.Windows.Visibility.Visible;
-            DoubleAnimation anim = new DoubleAnimation();
-            double widht = sidePanel.ActualWidth;
-            if (widht == 0)
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
             {
-                anim.From = 0;
-                anim.To = ActualWidth;
-            }
-            else
-            {
-                anim.From = widht;
-                anim.To = 0;
-            }
-            anim.EasingFunction = new QuadraticEase();
-            sidePanel.BeginAnimation(WidthProperty, anim);
-            sidePanel.DataContext = dataViewModel;
+                sidePanel.Visibility = System.Windows.Visibility.Visible;
+                DoubleAnimation anim = new DoubleAnimation();
+                double widht = sidePanel.ActualWidth;
+                if (widht == 0)
+                {
+                    anim.From = 0;
+                    anim.To = ActualWidth;
+                }
+                else
+                {
+                    anim.From = widht;
+                    anim.To = 0;
+                }
+                anim.EasingFunction = new QuadraticEase();
+                sidePanel.BeginAnimation(WidthProperty, anim);
+            });
         }
 
 

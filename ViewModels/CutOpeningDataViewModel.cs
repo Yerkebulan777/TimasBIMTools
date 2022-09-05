@@ -46,8 +46,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        #region INotifyPropertyChanged members
-
         #region Visibility
 
         private bool isOpt = false;
@@ -198,8 +196,6 @@ namespace RevitTimasBIMTools.ViewModels
             || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
             || model.SymbolName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
         }
-
-        #endregion
 
         #endregion
 
