@@ -68,7 +68,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region FloorDict
 
-        private SortedList<double, string> floors;
+        private SortedList<double, string> floors = new SortedList<double, string>();
         public SortedList<double, string> FloorDict
         {
             get => floors;

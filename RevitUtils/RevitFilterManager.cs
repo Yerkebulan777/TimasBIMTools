@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Document = Autodesk.Revit.DB.Document;
+using Level = Autodesk.Revit.DB.Level;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -225,6 +227,29 @@ namespace RevitTimasBIMTools.RevitUtils
                     {
                         yield return cat;
                     }
+                }
+            }
+        }
+
+        #endregion
+
+
+        #region LevelFilter
+
+        public static IEnumerable<Level> GetValidLevels(Document doc)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            foreach (Level level in collector.OfClass(typeof(Level)))
+            {
+                int count = 0;
+                collector = new FilteredElementCollector(doc);
+                ElementLevelFilter level1Filter = new ElementLevelFilter(level.Id);
+                count += collector.OfClass(typeof(Wall)).WherePasses(level1Filter).Count();
+                count += collector.OfClass(typeof(Floor)).WherePasses(level1Filter).Count();
+                count += collector.OfCategory(BuiltInCategory.OST_Roofs).WherePasses(level1Filter).Count();
+                if (0 < count)
+                {
+                    yield return level;
                 }
             }
         }
