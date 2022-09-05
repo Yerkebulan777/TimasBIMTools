@@ -47,9 +47,9 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region INotifyPropertyChanged members
 
-        #region ViewVisibility
+        #region Visibility
 
-        private bool isOpt;
+        private bool isOpt = false;
         public bool IsOptEnabled
         {
             get => isOpt;
@@ -65,6 +65,20 @@ namespace RevitTimasBIMTools.ViewModels
 
         #endregion
 
+
+        #region FloorDict
+
+        private SortedList<double, string> floors;
+        public SortedList<double, string> FloorDict
+        {
+            get => floors;
+            set => SetProperty(ref floors, value);
+        }
+
+        #endregion
+
+
+        #region DataGrid
 
         private bool? isSelected = false;
         public bool? IsAllSelectChecked
@@ -167,6 +181,8 @@ namespace RevitTimasBIMTools.ViewModels
             || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
             || model.SymbolName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
         }
+
+        #endregion
 
         #endregion
 
