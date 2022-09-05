@@ -47,12 +47,24 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region INotifyPropertyChanged members
 
-        private bool enable = false;
-        public bool IsCollectionEnabled
+        #region ViewVisibility
+
+        private bool isOpt;
+        public bool IsOptEnabled
         {
-            get => enable;
-            set => SetProperty(ref enable, value);
+            get => isOpt;
+            set => SetProperty(ref isOpt, value);
         }
+
+        private bool isData = false;
+        public bool IsDataEnabled
+        {
+            get => isData;
+            set => SetProperty(ref isData, value);
+        }
+
+        #endregion
+
 
         private bool? isSelected = false;
         public bool? IsAllSelectChecked
@@ -244,7 +256,7 @@ namespace RevitTimasBIMTools.ViewModels
                         }
                     }
                     // seletAll update by ViewItems
-                    // boolSet to buttom IsCollectionEnabled
+                    // boolSet to buttom IsDataEnabled
                     UniqueElementNames = GetUniqueStringList(RevitElementModels);
                 }
             });

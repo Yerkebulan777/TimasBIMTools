@@ -60,14 +60,14 @@
                     <local:CutOpeningSettingsControl DataContext="{Binding Data}"/>
                 </Grid>
             </Border>
-            <!--    -->
-            <Border Grid.Row="1" Background="WhiteSmoke"  BorderThickness="0" Visibility="Collapsed">
+            <!-- Filter Control -->
+            <Border Grid.Row="1" Background="WhiteSmoke"  BorderThickness="0" >
                 <WrapPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="5">
-                    <ComboBox Name="ComboFloorFilter" Height="25" Width="250"  SelectedIndex="0" Margin="5" 
+                    <ComboBox Name="ComboFloorFilter" Height="25"  SelectedIndex="0" Margin="5" 
                           IsEnabled ="{Binding Path=IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
                           SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                           ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <ComboBox Name="ComboDataFilter" Height="25" Width="250" SelectedIndex="0" Margin="5" 
+                    <ComboBox Name="ComboDataFilter" Height="25" SelectedIndex="0" Margin="5" 
                           IsEnabled ="{Binding Path=IsEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
                           SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                           ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
