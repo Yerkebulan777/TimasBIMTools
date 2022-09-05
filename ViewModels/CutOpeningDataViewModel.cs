@@ -36,6 +36,7 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly string rectangOpeningId = Properties.Settings.Default.RectangSymbolUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
 
+
         public CutOpeningDataViewModel()
         {
             SnoopCommand = new AsyncRelayCommand(SnoopHandelCommandAsync);
