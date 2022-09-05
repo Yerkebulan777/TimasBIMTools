@@ -3,7 +3,7 @@ using System.IO;
 
 namespace RevitTimasBIMTools.RevitModel
 {
-    public class DocumentModel
+    public sealed class DocumentModel
     {
         public readonly string Title = null;
         public readonly bool IsActive = false;

@@ -238,15 +238,17 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static IEnumerable<Level> GetValidLevels(Document doc)
         {
+            FilteredElementCollector wallCollector = GetInstancesOfCategory(doc, typeof(Wall), BuiltInCategory.OST_Walls);
+            FilteredElementCollector floorCollector = GetInstancesOfCategory(doc, typeof(Floor), BuiltInCategory.OST_Floors);
+            FilteredElementCollector roofCollector = GetInstancesOfCategory(doc, typeof(RoofBase), BuiltInCategory.OST_Roofs);
             FilteredElementCollector collector = new FilteredElementCollector(doc);
             foreach (Level level in collector.OfClass(typeof(Level)))
             {
                 int count = 0;
-                collector = new FilteredElementCollector(doc);
                 ElementLevelFilter level1Filter = new ElementLevelFilter(level.Id);
-                count += collector.OfClass(typeof(Wall)).WherePasses(level1Filter).Count();
-                count += collector.OfClass(typeof(Floor)).WherePasses(level1Filter).Count();
-                count += collector.OfCategory(BuiltInCategory.OST_Roofs).WherePasses(level1Filter).Count();
+                count += wallCollector.WherePasses(level1Filter).Count();
+                count += floorCollector.WherePasses(level1Filter).Count();
+                count += roofCollector.WherePasses(level1Filter).Count();
                 if (0 < count)
                 {
                     yield return level;

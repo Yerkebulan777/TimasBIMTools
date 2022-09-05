@@ -54,7 +54,13 @@ namespace RevitTimasBIMTools.ViewModels
         public bool IsOptEnabled
         {
             get => isOpt;
-            set => SetProperty(ref isOpt, value);
+            set
+            {
+                if (SetProperty(ref isOpt, value))
+                {
+                    _ = GetLevelsAsync();
+                }
+            }
         }
 
         private bool isData = false;
@@ -68,6 +74,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region FloorDict
+
 
         private SortedList<double, string> floors = new SortedList<double, string>();
         public SortedList<double, string> FloorDict
@@ -308,6 +315,19 @@ namespace RevitTimasBIMTools.ViewModels
         }
         #endregion
 
+
+        private async Task GetLevelsAsync()
+        {
+            await RevitTask.RunAsync(app =>
+            {
+                UIDocument uidoc = app.ActiveUIDocument;
+                Document doc = app.ActiveUIDocument.Document;
+                foreach (Level level in RevitFilterManager.GetValidLevels(doc))
+                {
+                    FloorDict[level.ProjectElevation] = level.Name;
+                }
+            });
+        }
 
         public void Dispose()
         {
