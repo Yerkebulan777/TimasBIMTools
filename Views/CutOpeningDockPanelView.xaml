@@ -7,7 +7,7 @@
     d:DataContext="{d:DesignInstance Type=viewmodels:CutOpeningDataViewModel}"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelView" 
-    d:Height="Auto" d:Width="500" mc:Ignorable="d">
+    d:Height="Auto" d:Width="450" mc:Ignorable="d">
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,7 +16,7 @@
         </ResourceDictionary>
     </Page.Resources>
     <Border BorderThickness="2.5" BorderBrush="Gray">
-        <Grid Name="PageMainGrid">
+        <Grid Name="PageMainGrid" Background="SeaShell">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -31,8 +31,9 @@
                             <DropShadowBitmapEffect/>
                         </Label.BitmapEffect>
                     </Label>
-                    <ToggleButton Name="ShowSettingsCmd" Height="40" Width="60" Click="ShowSettingsCmd_Click" 
-                            HorizontalAlignment="Right" VerticalAlignment="Center"  Background="Transparent" BorderBrush="Transparent" >
+                    <ToggleButton Name="ShowSettingsCmd" Height="40" Width="60" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                  Background="Transparent" BorderBrush="Transparent" 
+                                  Click="ShowSettingsCmd_Cick" >
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
                                 <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
@@ -51,8 +52,9 @@
                 </Grid>
             </Border>
 
-            <Border Grid.Row="1" Background="WhiteSmoke"  BorderThickness="0" >
-                <Grid Name="sidePanel" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <Border Grid.Row="1" BorderThickness="0" >
+                <Grid Name="sidePanel" Grid.Row="1" Width="0"
+                      VerticalAlignment="Stretch"  HorizontalAlignment="Right">
                     <local:CutOpeningSettingsControl/>
                 </Grid>
             </Border>
@@ -70,7 +72,7 @@
                 </WrapPanel>
             </Border>
 
-            <ScrollViewer Grid.Row="2">
+            <ScrollViewer Grid.Row="2" Visibility="Collapsed">
                 <DataGrid Name="dataGridView" Width="Auto" MinWidth="300" MaxWidth="1500" IsSynchronizedWithCurrentItem="True"
                           ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <DataGrid.RowStyle>

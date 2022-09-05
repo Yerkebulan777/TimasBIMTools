@@ -4,7 +4,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     x:Class="RevitTimasBIMTools.Views.CutOpeningSettingsControl" 
-    mc:Ignorable="d" d:Height="750" d:Width="300" >
+    mc:Ignorable="d" d:Height="Auto" d:Width="300" >
     
     <UserControl.Resources>
         <ResourceDictionary>
@@ -22,7 +22,7 @@
 
         <Grid x:Name="panelHeader" Grid.Row="0" Height="30" VerticalAlignment="Top" >
             <Border Background="{DynamicResource FloralGradientBrush}">
-                <TextBlock Text="Settings" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Century Gothic" FontSize="15" FontWeight="Bold" Foreground="AliceBlue"/>
+                <TextBlock Text="Settings" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Century Gothic" FontSize="15" FontWeight="Bold" />
             </Border>
         </Grid>
 

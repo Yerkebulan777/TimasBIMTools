@@ -9,9 +9,11 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Views
@@ -22,8 +24,6 @@ namespace RevitTimasBIMTools.Views
         public string CurrentDocumentGuid { get; set; } = null;
         public View3D View3d { get; set; } = null;
 
-        private DispatcherTimer timer;
-        private double gridWidthSize = 0;
         private bool disposedValue = false;
         private DocumentModel documentModel = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
@@ -35,14 +35,19 @@ namespace RevitTimasBIMTools.Views
         {
             InitializeComponent();
             DataContext = dataViewModel;
-            SizeChanged += OnViewSizeChanged;
             dataViewModel.DockPanelView = this;
             viewHandler.Completed += OnContextViewHandlerCompleted;
             Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
-            timer = new DispatcherTimer();
-            timer.Interval = new TimeSpan(0, 0, 0, 0, 1);
-            timer.Tick += Timer_Tick;
-            sidePanel.Width = 0;
+            this.SizeChanged += delegate
+            {
+                Dispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
+                {
+                    if (sidePanel.ActualWidth != 0)
+                    {
+                        sidePanel.Width = this.ActualWidth;
+                    }
+                });
+            };
         }
 
 
@@ -52,42 +57,10 @@ namespace RevitTimasBIMTools.Views
             data.InitialState = new DockablePaneState
             {
                 DockPosition = DockPosition.Tabbed,
-                TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette
+                TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser
             };
         }
 
-
-        private void OnViewSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (e.WidthChanged)
-            {
-                sidePanel.Width = 0;
-            }
-        }
-
-
-        #region TickTimer
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            gridWidthSize = viewPage.Width;
-            if (sidePanel.Width < gridWidthSize)
-            {
-                sidePanel.Width += 0.5;
-                if (sidePanel.Width > gridWidthSize)
-                {
-                    timer.Stop();
-                }
-            }
-            else
-            {
-                sidePanel.Width -= 0.5;
-                if (sidePanel.Width > 1)
-                {
-                    timer.Stop();
-                }
-            }
-        }
-        #endregion
 
 
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
@@ -110,9 +83,22 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void ShowSettingsCmd_Click(object sender, RoutedEventArgs e)
+        private void ShowSettingsCmd_Cick(object sender, RoutedEventArgs e)
         {
-            Task task = RevitTask.RunAsync(app => timer.Start());
+            DoubleAnimation anim = new DoubleAnimation();
+            double widht = sidePanel.ActualWidth;
+            if (widht == 0)
+            {
+                anim.From = 0;
+                anim.To = this.ActualWidth;
+            }
+            else
+            {
+                anim.From = widht;
+                anim.To = 0;
+            }
+            anim.EasingFunction = new QuadraticEase();
+            sidePanel.BeginAnimation(WidthProperty, anim);
         }
 
 
