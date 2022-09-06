@@ -57,7 +57,7 @@
                 </Grid>
             </Border>
             <!-- Filter Control -->
-            <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Margin="5"
+            <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Margin="5" Style="{StaticResource VisibleAnimation}"
                        Visibility="{Binding  Path=IsDataEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}}" >
                 <ComboBox Name="ComboFloorFilter" Height="25" Width="200" SelectedIndex="0" Margin="5" 
                         SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" 
@@ -68,9 +68,10 @@
                         ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
             </WrapPanel>
             <!-- DataGridView -->
-            <ScrollViewer Grid.Row="2" Visibility="{Binding  Path=IsDataEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}}">
+            <ScrollViewer Grid.Row="2" Style="{StaticResource VisibleAnimation}"
+                          Visibility="{Binding  Path=IsDataEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}}" >
                 <DataGrid Name="dataGridView" Width="Auto" IsSynchronizedWithCurrentItem="True"
-                          ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                          ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <DataGrid.RowStyle>
                         <Style TargetType="{x:Type DataGridRow}">
                             <EventSetter Event="MouseDoubleClick" Handler="DataGrid_MouseDoubleClick"/>
@@ -126,16 +127,16 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </ScrollViewer>
-            
-            <!--Settings-->
+
+            <!-- Options -->
             <Grid Name="sidePanel" Grid.Row="1" Grid.RowSpan="2" Width="0" VerticalAlignment="Stretch"  HorizontalAlignment="Right" 
-                  Visibility="{Binding  Path=IsOptEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}}" >
+                  Visibility="{Binding  Path=IsOptionsEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}, FallbackValue=False}" >
                 <local:CutOpeningSettingsControl DataContext="{Binding Data}"/>
             </Grid>
             
             <!-- ButtonPanel -->
             <Border Grid.Row="3" Background="Silver"  BorderThickness="0">
-                <DockPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
+                <DockPanel Grid.Row="3" LastChildFill="True" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
                     <Button Name="SnoopCmd" Height="30" Width="75" Margin="5" 
                         Command="{Binding SnoopCommand, Mode=OneTime}">
                         <Label FontFamily="Segoe MDL2 Assets" Content="&#xE786;" FontSize="17" />

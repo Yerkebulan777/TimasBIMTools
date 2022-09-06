@@ -42,11 +42,12 @@ namespace RevitTimasBIMTools.Views
             Dispatcher.CurrentDispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
             SizeChanged += delegate
             {
-                if (sidePanel.ActualWidth != 0)
+                if (sidePanel.ActualWidth != 0 && mutex.WaitOne(5000))
                 {
                     _ = Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
                     {
                         sidePanel.Width = ActualWidth;
+                        mutex.ReleaseMutex();
                     });
                 }
             };
@@ -88,7 +89,7 @@ namespace RevitTimasBIMTools.Views
         {
             _ = Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
             {
-                if (mutex.WaitOne())
+                if (mutex.WaitOne(5000))
                 {
                     sidePanel.Visibility = System.Windows.Visibility.Visible;
                     DoubleAnimation anim = new DoubleAnimation();
