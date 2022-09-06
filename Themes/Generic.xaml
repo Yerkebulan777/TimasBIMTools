@@ -7,7 +7,7 @@
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Colors.xaml"/>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Button.xaml"/>
     </ResourceDictionary.MergedDictionaries>
-    
+
     <BooleanToVisibilityConverter x:Key="BoolToViz"/>
 
     <!--DropShadowEffect-->

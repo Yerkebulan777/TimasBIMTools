@@ -36,7 +36,6 @@
                     <ToggleButton Name="settingsBtn" Height="40" Width="60"
                                   HorizontalAlignment="Right" VerticalAlignment="Center"
                                   Background="Transparent" BorderBrush="Transparent"
-                                  IsChecked="{Binding Path=IsOptEnabled}"
                                   Click="ShowSettingsCmd_Cick" >
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
@@ -57,7 +56,7 @@
             </Border>
             <!--Settings-->
             <Grid Name="sidePanel" Grid.Row="1" Width="0" VerticalAlignment="Stretch"  HorizontalAlignment="Right" 
-                  Visibility="{Binding  Path=IsOptEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}}" > 
+                  Visibility="{Binding  Path=IsOptEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToViz}}" > 
                 <local:CutOpeningSettingsControl DataContext="{Binding Data}"/>
             </Grid>
             <!-- Filter Control -->

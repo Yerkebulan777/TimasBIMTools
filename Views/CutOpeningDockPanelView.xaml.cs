@@ -24,8 +24,9 @@ namespace RevitTimasBIMTools.Views
         public string CurrentDocumentGuid { get; set; } = null;
         public View3D View3d { get; set; } = null;
 
-        private Mutex mutex = new Mutex();
+        private bool flag;
         private bool disposedValue = false;
+        private readonly Mutex mutex = new Mutex();
         private DocumentModel documentModel = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
@@ -43,7 +44,7 @@ namespace RevitTimasBIMTools.Views
             {
                 if (sidePanel.ActualWidth != 0)
                 {
-                    Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
+                    _ = Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
                     {
                         sidePanel.Width = ActualWidth;
                     });
@@ -85,23 +86,33 @@ namespace RevitTimasBIMTools.Views
 
         private void ShowSettingsCmd_Cick(object sender, RoutedEventArgs e)
         {
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
+            _ = Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
             {
-                sidePanel.Visibility = System.Windows.Visibility.Visible;
-                DoubleAnimation anim = new DoubleAnimation();
-                double widht = sidePanel.ActualWidth;
-                if (widht == 0)
+                if (mutex.WaitOne())
                 {
-                    anim.From = 0;
-                    anim.To = ActualWidth;
+                    sidePanel.Visibility = System.Windows.Visibility.Visible;
+                    DoubleAnimation anim = new DoubleAnimation();
+                    double widht = sidePanel.ActualWidth;
+
+                    if (widht == 0)
+                    {
+                        flag = true;
+                        anim.From = 0;
+                        anim.To = ActualWidth;
+                        dataViewModel.IsOptEnabled = true;
+                    }
+                    else
+                    {
+                        flag = false;
+                        anim.From = widht;
+                        anim.To = 0;
+                    }
+
+                    dataViewModel.IsOptEnabled = flag;
+                    anim.EasingFunction = new QuadraticEase();
+                    sidePanel.BeginAnimation(WidthProperty, anim);
+                    mutex.ReleaseMutex();
                 }
-                else
-                {
-                    anim.From = widht;
-                    anim.To = 0;
-                }
-                anim.EasingFunction = new QuadraticEase();
-                sidePanel.BeginAnimation(WidthProperty, anim);
             });
         }
 
@@ -133,7 +144,7 @@ namespace RevitTimasBIMTools.Views
                             Element elem = doc.GetElement(new ElementId(model.IdInt));
                             RevitViewManager.ShowElement(app.ActiveUIDocument, elem);
                             mutex.ReleaseMutex();
-                        } 
+                        }
                     }
                 });
             }
