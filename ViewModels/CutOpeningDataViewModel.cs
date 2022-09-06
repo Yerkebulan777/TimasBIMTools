@@ -50,20 +50,21 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Visibility
 
-        private bool isOpt = false;
-        public bool IsOptEnabled
+        private bool isOptEnabled = false;
+        public bool IsOptionsEnabled
         {
-            get => isOpt;
+            get => isOptEnabled;
             set => RevitTask.RunAsync(app =>
                    {
-                       if (SetProperty(ref isOpt, value))
+                       if (SetProperty(ref isOptEnabled, value))
                        {
-                           if (!isOpt)
+                           if (!isOptEnabled)
                            {
                                IsDataEnabled = true;
                            }
-                           else if (LevelSortDict.Keys.Any())
+                           else
                            {
+                               IsDataEnabled = false;
                                UIDocument uidoc = app.ActiveUIDocument;
                                Document doc = app.ActiveUIDocument.Document;
                                foreach (Level level in RevitFilterManager.GetValidLevels(doc))

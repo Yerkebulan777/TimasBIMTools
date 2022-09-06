@@ -99,7 +99,7 @@ namespace RevitTimasBIMTools.Views
                         flag = true;
                         anim.From = 0;
                         anim.To = ActualWidth;
-                        dataViewModel.IsOptEnabled = true;
+                        dataViewModel.IsOptionsEnabled = true;
                     }
                     else
                     {
@@ -108,7 +108,7 @@ namespace RevitTimasBIMTools.Views
                         anim.To = 0;
                     }
 
-                    dataViewModel.IsOptEnabled = flag;
+                    dataViewModel.IsOptionsEnabled = flag;
                     anim.EasingFunction = new QuadraticEase();
                     sidePanel.BeginAnimation(WidthProperty, anim);
                     mutex.ReleaseMutex();
