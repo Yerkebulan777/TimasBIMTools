@@ -67,6 +67,7 @@ namespace RevitTimasBIMTools.ViewModels
                                IsDataEnabled = false;
                                UIDocument uidoc = app.ActiveUIDocument;
                                Document doc = app.ActiveUIDocument.Document;
+                               LevelSortDict = new SortedList<double, Level>();
                                foreach (Level level in RevitFilterManager.GetValidLevels(doc))
                                {
                                    LevelSortDict[level.ProjectElevation] = level;
