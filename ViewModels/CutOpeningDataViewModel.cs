@@ -71,7 +71,6 @@ namespace RevitTimasBIMTools.ViewModels
                                foreach (Level level in RevitFilterManager.GetValidLevels(doc))
                                {
                                    LevelSortDict[level.ProjectElevation] = level;
-                                   Logger.Info(level.Name);
                                }
                            }
                        }
