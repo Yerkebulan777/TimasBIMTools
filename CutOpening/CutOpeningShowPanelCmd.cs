@@ -44,7 +44,7 @@ namespace RevitTimasBIMTools.CutOpening
                         }
                         catch (Exception exc)
                         {
-                            RevitLogger.Error("Show panel error:\t" + exc.Message);
+                            Logger.Error("Show panel error:\t" + exc.Message);
                         }
                     }
                     else
@@ -56,7 +56,7 @@ namespace RevitTimasBIMTools.CutOpening
                         }
                         catch (Exception exc)
                         {
-                            RevitLogger.Error("Show panel error:\t" + exc.Message);
+                            Logger.Error("Show panel error:\t" + exc.Message);
                         }
                     }
                 }

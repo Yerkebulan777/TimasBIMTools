@@ -39,7 +39,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 catch (System.Exception ex)
                 {
                     status = t.RollBack();
-                    RevitLogger.Error($"Error 3Dview {ex.Message}");
+                    Logger.Error($"Error 3Dview {ex.Message}");
                 }
                 finally
                 {
@@ -213,7 +213,7 @@ namespace RevitTimasBIMTools.RevitUtils
                         if (status != t.RollBack())
                         {
                             status = t.GetStatus();
-                            RevitLogger.Error(ex.Message);
+                            Logger.Error(ex.Message);
                         }
                     }
                     finally

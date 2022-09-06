@@ -95,7 +95,13 @@ namespace RevitTimasBIMTools.ViewModels
         public SortedList<double, Level> LevelSortDict
         {
             get => floors;
-            set => SetProperty(ref floors, value);
+            set
+            {
+                if (SetProperty(ref floors, value))
+                {
+                    Logger.Info("Tadam!!!");
+                }
+            }
         }
 
         #endregion
@@ -324,7 +330,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (CancelToken.IsCancellationRequested)
                     {
-                        _ = Task.Delay(1000).ContinueWith((action) => RevitLogger.Warning("Task cansceled"));
+                        _ = Task.Delay(1000).ContinueWith((action) => Logger.Warning("Task cansceled"));
                     }
                 }
             }

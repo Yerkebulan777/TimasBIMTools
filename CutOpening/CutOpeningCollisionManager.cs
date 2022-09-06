@@ -475,7 +475,7 @@ namespace RevitTimasBIMTools.CutOpening
                 catch (Exception exc)
                 {
                     _ = trans.RollBack();
-                    RevitLogger.Error(exc.Message);
+                    Logger.Error(exc.Message);
                 }
             }
         }
