@@ -90,7 +90,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         public Level ActualLevel { get; set; } = null;
 
-        private SortedList<double, Level> floors = new SortedList<double, Level>();
+        private SortedList<double, Level> floors = null;
         public SortedList<double, Level> LevelSortDict
         {
             get => floors;

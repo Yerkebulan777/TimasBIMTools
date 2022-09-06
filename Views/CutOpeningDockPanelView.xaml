@@ -61,7 +61,7 @@
                        Visibility="{Binding  Path=IsDataEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}}" >
                 <ComboBox Name="ComboFloorFilter" Height="25" Width="200" SelectedIndex="0" Margin="5" 
                         SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" 
-                        ItemsSource="{Binding Path=LevelDict, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                        ItemsSource="{Binding Path=LevelSortDict, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                         DisplayMemberPath="Value.Name"/>
                 <ComboBox Name="ComboDataFilter" Height="25" Width="200" SelectedIndex="0" Margin="5" 
                         SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
