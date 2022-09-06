@@ -56,17 +56,20 @@ namespace RevitTimasBIMTools.ViewModels
             get => isOpt;
             set => RevitTask.RunAsync(app =>
                    {
-                       if (SetProperty(ref isOpt, value) && true == value)
+                       if (SetProperty(ref isOpt, value))
                        {
-                           UIDocument uidoc = app.ActiveUIDocument;
-                           Document doc = app.ActiveUIDocument.Document;
-                           foreach (Level level in RevitFilterManager.GetValidLevels(doc))
-                           {
-                               LevelSortDict[level.ProjectElevation] = level;
-                           }
-                           if (LevelSortDict.Keys.Any())
+                           if (!isOpt)
                            {
                                IsDataEnabled = true;
+                           }
+                           else if (LevelSortDict.Keys.Any())
+                           {
+                               UIDocument uidoc = app.ActiveUIDocument;
+                               Document doc = app.ActiveUIDocument.Document;
+                               foreach (Level level in RevitFilterManager.GetValidLevels(doc))
+                               {
+                                   LevelSortDict[level.ProjectElevation] = level;
+                               }
                            }
                        }
                    });
