@@ -21,7 +21,7 @@ namespace RevitTimasBIMTools.Views
     /// <summary> Логика взаимодействия для CutOpeningDockPanelView.xaml </summary>
     public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
-        public string CurrentDocumentGuid { get; set; } = null;
+        public string DocumentGuid { get; set; } = null;
         public View3D View3d { get; set; } = null;
 
         private bool flag;
@@ -67,8 +67,9 @@ namespace RevitTimasBIMTools.Views
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             View3d = args.View3d;
+            DocumentGuid = args.CurrentDocumentGuid;
             documentModel = args.Documents.FirstOrDefault();
-            CurrentDocumentGuid = args.CurrentDocumentGuid;
+            dataViewModel.DocumentGuid = args.CurrentDocumentGuid;
             if (documentModel.IsActive)
             {
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
@@ -79,7 +80,6 @@ namespace RevitTimasBIMTools.Views
                 settingsView.ComboStructMats.ItemsSource = args.StructureMaterials;
                 dataViewModel.DocumentModels = args.Documents.ToObservableCollection();
                 ActiveDocTitle.Content = documentModel.Document.Title.ToUpper();
-                dataViewModel.CurrentDocument = documentModel.Document;
             }
         }
 
@@ -136,7 +136,7 @@ namespace RevitTimasBIMTools.Views
                 Task task = RevitTask.RunAsync(app =>
                 {
                     Document doc = app.ActiveUIDocument.Document;
-                    if (CurrentDocumentGuid.Equals(doc.ProjectInformation.UniqueId))
+                    if (DocumentGuid.Equals(doc.ProjectInformation.UniqueId))
                     {
                         if (mutex.WaitOne())
                         {

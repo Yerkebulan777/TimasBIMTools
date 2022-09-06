@@ -26,10 +26,11 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
-        public Document CurrentDocument { get; internal set; } = null;
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
+        public string DocumentGuid { get; internal set; } = string.Empty;
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
+        private string guid = null;
         private readonly object syncLocker = new object();
         private IList<ElementModel> collection = new List<ElementModel>();
         private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
@@ -209,7 +210,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 Document doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
-                if (CurrentDocument.Equals(doc))
+                guid = doc.ProjectInformation.UniqueId;
+                if (DocumentGuid.Equals(guid))
                 {
                     manager.InitializeActiveDocument(doc);
                     ActivateFamilySimbol(doc, roundOpeningId);
@@ -260,7 +262,8 @@ namespace RevitTimasBIMTools.ViewModels
                 View3D view3d = DockPanelView.View3d;
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
-                if (CurrentDocument.Equals(doc) && !ViewCollection.IsEmpty)
+                guid = doc.ProjectInformation.UniqueId;
+                if (DocumentGuid.Equals(guid) && !ViewCollection.IsEmpty)
                 {
                     foreach (ElementModel model in ViewCollection)
                     {

@@ -60,17 +60,15 @@
                 <local:CutOpeningSettingsControl DataContext="{Binding Data}"/>
             </Grid>
             <!-- Filter Control -->
-            <Border Grid.Row="1" BorderThickness="0" Visibility="Collapsed" >
-                <WrapPanel HorizontalAlignment="Right" Margin="5">
-                    <ComboBox Name="ComboFloorFilter" Height="25" Width="200" SelectedIndex="0" Margin="5" 
-                              SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" 
-                              ItemsSource="{Binding Path=LevelDict, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                              DisplayMemberPath="Value.Name"/>
-                    <ComboBox Name="ComboDataFilter" Height="25" Width="200" SelectedIndex="0" Margin="5" 
-                              SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                              ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                </WrapPanel>
-            </Border>
+            <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Margin="5">
+                <ComboBox Name="ComboFloorFilter" Height="25" Width="200" SelectedIndex="0" Margin="5" 
+                        SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" 
+                        ItemsSource="{Binding Path=LevelDict, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                        DisplayMemberPath="Value.Name"/>
+                <ComboBox Name="ComboDataFilter" Height="25" Width="200" SelectedIndex="0" Margin="5" 
+                        SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                        ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+            </WrapPanel>
             <!-- DataGridView -->
             <ScrollViewer Grid.Row="2" Visibility="Visible">
                 <DataGrid Name="dataGridView" Width="Auto" IsSynchronizedWithCurrentItem="True"
