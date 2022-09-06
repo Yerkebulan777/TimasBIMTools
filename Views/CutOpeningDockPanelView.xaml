@@ -33,7 +33,7 @@
                             <DropShadowBitmapEffect/>
                         </Label.BitmapEffect>
                     </Label>
-                    <ToggleButton Name="ShowSettingsCmd" Height="40" Width="60"
+                    <ToggleButton Name="settingsBtn" Height="40" Width="60"
                                   HorizontalAlignment="Right" VerticalAlignment="Center"
                                   Background="Transparent" BorderBrush="Transparent"
                                   IsChecked="{Binding Path=IsOptEnabled}"
@@ -56,12 +56,10 @@
                 </Grid>
             </Border>
             <!--Settings-->
-            <Border Grid.Row="1" BorderThickness="0"  Visibility="Visible">
-                <Grid Name="sidePanel" Grid.Row="1" Width="0"
-                      VerticalAlignment="Stretch"  HorizontalAlignment="Right">
-                    <local:CutOpeningSettingsControl DataContext="{Binding Data}"/>
-                </Grid>
-            </Border>
+            <Grid Name="sidePanel" Grid.Row="1" Width="0" VerticalAlignment="Stretch"  HorizontalAlignment="Right" 
+                  Visibility="{Binding  Path=IsOptEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}}" > 
+                <local:CutOpeningSettingsControl DataContext="{Binding Data}"/>
+            </Grid>
             <!-- Filter Control -->
             <Border Grid.Row="1" BorderThickness="0" Visibility="Collapsed" >
                 <WrapPanel HorizontalAlignment="Right" Margin="5">
@@ -74,7 +72,7 @@
                               ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                 </WrapPanel>
             </Border>
-
+            <!-- DataGridView -->
             <ScrollViewer Grid.Row="2" Visibility="Visible">
                 <DataGrid Name="dataGridView" Width="Auto" IsSynchronizedWithCurrentItem="True"
                           ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >

@@ -9,6 +9,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,6 +24,7 @@ namespace RevitTimasBIMTools.Views
         public string CurrentDocumentGuid { get; set; } = null;
         public View3D View3d { get; set; } = null;
 
+        private Mutex mutex = new Mutex();
         private bool disposedValue = false;
         private DocumentModel documentModel = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
@@ -36,7 +38,7 @@ namespace RevitTimasBIMTools.Views
             DataContext = dataViewModel;
             dataViewModel.DockPanelView = this;
             viewHandler.Completed += OnContextViewHandlerCompleted;
-            Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
+            Dispatcher.CurrentDispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
             SizeChanged += delegate
             {
                 if (sidePanel.ActualWidth != 0)
@@ -59,7 +61,6 @@ namespace RevitTimasBIMTools.Views
                 TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser
             };
         }
-
 
 
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
@@ -126,9 +127,13 @@ namespace RevitTimasBIMTools.Views
                     Document doc = app.ActiveUIDocument.Document;
                     if (CurrentDocumentGuid.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        Element elem = doc.GetElement(new ElementId(model.IdInt));
-                        System.Windows.Clipboard.SetText(model.IdInt.ToString());
-                        RevitViewManager.ShowElement(app.ActiveUIDocument, elem);
+                        if (mutex.WaitOne())
+                        {
+                            System.Windows.Clipboard.SetText(model.IdInt.ToString());
+                            Element elem = doc.GetElement(new ElementId(model.IdInt));
+                            RevitViewManager.ShowElement(app.ActiveUIDocument, elem);
+                            mutex.ReleaseMutex();
+                        } 
                     }
                 });
             }

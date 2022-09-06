@@ -266,6 +266,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Themes\Animation.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Button.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -45,6 +45,7 @@ namespace RevitTimasBIMTools.ViewModels
             CloseCommand = new RelayCommand(CancelCallbackLogic);
         }
 
+        //var dict = new ConcurrentDictionary<string, int>();
 
         #region Visibility
 
