@@ -61,7 +61,7 @@ namespace RevitTimasBIMTools.ViewModels
                            Document doc = app.ActiveUIDocument.Document;
                            foreach (Level level in RevitFilterManager.GetValidLevels(doc))
                            {
-                               LevelDict[level.ProjectElevation] = level;
+                               LevelSortDict[level.ProjectElevation] = level;
                            }
                        }
                    });
@@ -82,7 +82,7 @@ namespace RevitTimasBIMTools.ViewModels
         public Level ActualLevel { get; set; } = null;
 
         private SortedList<double, Level> floors = new SortedList<double, Level>();
-        public SortedList<double, Level> LevelDict
+        public SortedList<double, Level> LevelSortDict
         {
             get => floors;
             set => SetProperty(ref floors, value);
