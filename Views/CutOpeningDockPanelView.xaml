@@ -7,7 +7,7 @@
     d:DataContext="{d:DesignInstance Type=vm:CutOpeningDataViewModel}"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelView" 
-    d:Height="Auto" d:Width="Auto" mc:Ignorable="d">
+    d:Height="Auto" d:Width="300" mc:Ignorable="d">
 
     <Page.Resources>
         <ResourceDictionary>
@@ -22,6 +22,7 @@
             
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
@@ -56,23 +57,35 @@
                     </ToggleButton>
                 </Grid>
             </Border>
+
+            
+            <!-- Options -->
+            <Grid Name="sidePanel" Grid.Row="1" 
+                  VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}" 
+                  IsEnabled="{Binding  Path=IsOptionsEnabled, Mode=OneTime, UpdateSourceTrigger=Explicit}">
+                <local:CutOpeningSettingsControl DataContext="{Binding Path=IsDataEnabled}" Style="{StaticResource VisibleAnimation}"/>
+            </Grid>
+
             
             <!-- Filter Control -->
-            <DockPanel Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"  Margin="5" 
-                       Visibility="{Binding  Path=IsDataEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}}" >
-                <ComboBox Name="ComboFloorFilter" Height="25" SelectedIndex="0" Margin="5" 
+            <WrapPanel Grid.Row="2" Style="{StaticResource VisibleAnimation}" 
+                       VerticalAlignment="Bottom" HorizontalAlignment="Right"  Margin="5" 
+                       IsEnabled="{Binding  Path=IsDataEnabled, Mode=OneTime, UpdateSourceTrigger=Explicit}" >
+                <ComboBox Name="ComboFloorFilter" Height="25" Width="175" SelectedIndex="0" Margin="5" 
                         SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" 
                         ItemsSource="{Binding Path=LevelSortDict, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                         DisplayMemberPath="Value.Name"/>
-                <ComboBox Name="ComboDataFilter" Height="25"  SelectedIndex="0" Margin="5" 
+                <ComboBox Name="ComboDataFilter" Height="25" Width="175" SelectedIndex="0" Margin="5" 
                         SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                         ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-            </DockPanel>
+            </WrapPanel>
+            
             
             <!-- DataGridView -->
-            <ScrollViewer Grid.Row="2" >
+            <ScrollViewer Grid.Row="3" >
                 <DataGrid Name="dataGridView" IsSynchronizedWithCurrentItem="True" Style="{StaticResource VisibleAnimation}"
-                          ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                          ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                          IsEnabled="{Binding  Path=IsDataEnabled, Mode=OneTime, UpdateSourceTrigger=Explicit}" >
                     <DataGrid.RowStyle>
                         <Style TargetType="{x:Type DataGridRow}">
                             <EventSetter Event="MouseDoubleClick" Handler="DataGrid_MouseDoubleClick"/>
@@ -129,13 +142,9 @@
                 </DataGrid>
             </ScrollViewer>
 
-            <!-- Options -->
-            <Grid Name="sidePanel" Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Top" >
-                <local:CutOpeningSettingsControl DataContext="{Binding Path=IsDataEnabled}" Style="{StaticResource VisibleAnimation}"/>
-            </Grid>
-            
+
             <!-- ButtonPanel -->
-            <Border Grid.Row="3" Background="Silver"  BorderThickness="0">
+            <Border Grid.Row="4" Background="Silver"  BorderThickness="0">
                 <DockPanel Grid.Row="3" LastChildFill="True" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
                     <Button Name="SnoopCmd" Height="30" Width="75" Margin="5" 
                         Command="{Binding SnoopCommand, Mode=OneTime}">
@@ -153,6 +162,7 @@
                 </DockPanel>
             </Border>
 
+            
         </Grid>
     </Border>
 </Page>
