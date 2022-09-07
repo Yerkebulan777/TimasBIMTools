@@ -81,11 +81,11 @@ namespace RevitTimasBIMTools.Views
                     if (!dataViewModel.IsOptionsEnabled)
                     {
                         dataViewModel.IsOptionsEnabled = true;
-                        dataViewModel.IsOptionsEnabled = false;
+                        dataViewModel.IsDataEnabled = false;
                     }
                     else
                     {
-                        dataViewModel.IsOptionsEnabled = false;
+                        dataViewModel.IsDataEnabled = false;
                         dataViewModel.IsOptionsEnabled = true;
                     }
                 }
