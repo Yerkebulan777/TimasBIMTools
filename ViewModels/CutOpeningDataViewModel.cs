@@ -49,15 +49,15 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Visibility
 
-        private bool isOptEnabled = false;
+        private bool isOptions = false;
         public bool IsOptionsEnabled
         {
-            get => isOptEnabled;
+            get => isOptions;
             set => RevitTask.RunAsync(app =>
                    {
-                       if (SetProperty(ref isOptEnabled, value))
+                       if (SetProperty(ref isOptions, value))
                        {
-                           if (!isOptEnabled)
+                           if (!isOptions)
                            {
                                IsDataEnabled = true;
                            }
@@ -75,6 +75,7 @@ namespace RevitTimasBIMTools.ViewModels
                        }
                    });
         }
+
 
         private bool isData = false;
         public bool IsDataEnabled

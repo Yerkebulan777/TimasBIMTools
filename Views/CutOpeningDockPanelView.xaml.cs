@@ -78,15 +78,15 @@ namespace RevitTimasBIMTools.Views
             {
                 if (mutex.WaitOne(5000))
                 {
-                    if (sidePanel.Opacity == 0)
+                    if (!dataViewModel.IsOptionsEnabled)
                     {
-                        sidePanel.Opacity = 1;
                         dataViewModel.IsOptionsEnabled = true;
+                        dataViewModel.IsOptionsEnabled = false;
                     }
                     else
                     {
-                        sidePanel.Opacity = 0;
                         dataViewModel.IsOptionsEnabled = false;
+                        dataViewModel.IsOptionsEnabled = true;
                     }
                 }
                 mutex.ReleaseMutex();
