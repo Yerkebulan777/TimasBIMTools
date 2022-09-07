@@ -1,7 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
@@ -75,7 +74,7 @@ namespace RevitTimasBIMTools.Views
 
         private void ShowSettingsCmd_Cick(object sender, RoutedEventArgs e)
         {
-             Dispatcher.CurrentDispatcher.Invoke(() =>
+            Dispatcher.CurrentDispatcher.Invoke(() =>
             {
                 if (!dataViewModel.IsOptionsEnabled)
                 {
