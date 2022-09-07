@@ -23,7 +23,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -63,13 +63,13 @@
             <Grid Name="sidePanel" Grid.Row="1" 
                   VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}" 
                   Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}">
-                <local:CutOpeningSettingsControl DataContext="{Binding Path=IsDataEnabled}" Style="{StaticResource VisibleAnimation}"/>
+                <local:CutOpeningSettingsControl />
             </Grid>
 
             
             <!-- Filter Control -->
             <WrapPanel Grid.Row="2" Style="{StaticResource VisibleAnimation}" 
-                       VerticalAlignment="Bottom" HorizontalAlignment="Right"  Margin="5" 
+                       VerticalAlignment="Top"  HorizontalAlignment="Right"  Margin="5" 
                        Visibility="{Binding  Path=IsDataEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
                 <ComboBox Name="ComboFloorFilter" Height="25" Width="175" SelectedIndex="0" Margin="5" 
                         SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" 
@@ -83,9 +83,10 @@
             
             <!-- DataGridView -->
             <ScrollViewer Grid.Row="3" >
-                <DataGrid Name="dataGridView" IsSynchronizedWithCurrentItem="True" Style="{StaticResource VisibleAnimation}"
+                <DataGrid Name="dataGridView" VerticalAlignment="Top" HorizontalAlignment="Left"
+                          IsSynchronizedWithCurrentItem="True" Style="{StaticResource VisibleAnimation}"
                           Visibility="{Binding  Path=IsDataEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" 
-                          ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                          ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <DataGrid.RowStyle>
                         <Style TargetType="{x:Type DataGridRow}">
                             <EventSetter Event="MouseDoubleClick" Handler="DataGrid_MouseDoubleClick"/>
