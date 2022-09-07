@@ -11,7 +11,7 @@
                         <Storyboard>
                             <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:0.3"/>
                             <DoubleAnimation 
-                                Storyboard.TargetProperty="(ContentPresenter.LayoutTransform).(ScaleTransform.ScaleY)" From="0" To="1" Duration="0:0:0.5">
+                                Storyboard.TargetProperty="(ContentPresenter.LayoutTransform).(ScaleTransform.ScaleY)" From="0" To="1" Duration="0:0:1">
                                 <DoubleAnimation.EasingFunction>
                                     <SineEase EasingMode="EaseInOut" />
                                 </DoubleAnimation.EasingFunction>
@@ -19,18 +19,19 @@
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.EnterActions>
-                <!--<Trigger.ExitActions>
+                <Trigger.ExitActions>
                     <BeginStoryboard>
                         <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1.0" To="0" Duration="0:0:0.3"/>
                             <DoubleAnimation 
-                                Storyboard.TargetProperty="(ContentPresenter.LayoutTransform).(ScaleTransform.ScaleY)" From="1" To="0" Duration="0:0:0.5">
+                                Storyboard.TargetProperty="(ContentPresenter.LayoutTransform).(ScaleTransform.ScaleY)" From="1" To="0" Duration="0:0:1">
                                 <DoubleAnimation.EasingFunction>
                                     <SineEase EasingMode="EaseInOut" />
                                 </DoubleAnimation.EasingFunction>
                             </DoubleAnimation>
                         </Storyboard>
                     </BeginStoryboard>
-                </Trigger.ExitActions>-->
+                </Trigger.ExitActions>
             </Trigger>
         </Style.Triggers>
     </Style>

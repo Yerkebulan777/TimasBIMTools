@@ -70,7 +70,7 @@
             <!-- Filter Control -->
             <WrapPanel Grid.Row="2" Style="{StaticResource VisibleAnimation}" 
                        VerticalAlignment="Bottom" HorizontalAlignment="Right"  Margin="5" 
-                       Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
+                       Visibility="{Binding  Path=IsDataEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
                 <ComboBox Name="ComboFloorFilter" Height="25" Width="175" SelectedIndex="0" Margin="5" 
                         SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" 
                         ItemsSource="{Binding Path=LevelSortDict, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
@@ -84,7 +84,7 @@
             <!-- DataGridView -->
             <ScrollViewer Grid.Row="3" >
                 <DataGrid Name="dataGridView" IsSynchronizedWithCurrentItem="True" Style="{StaticResource VisibleAnimation}"
-                          Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" 
+                          Visibility="{Binding  Path=IsDataEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" 
                           ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <DataGrid.RowStyle>
                         <Style TargetType="{x:Type DataGridRow}">
