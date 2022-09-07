@@ -86,7 +86,6 @@ namespace RevitTimasBIMTools.Views
                     dataViewModel.IsDataEnabled = true;
                     dataViewModel.IsOptionsEnabled = false;
                 }
-
             });
         }
 
