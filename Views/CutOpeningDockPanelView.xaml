@@ -130,8 +130,8 @@
             </ScrollViewer>
 
             <!-- Options -->
-            <Grid Name="sidePanel" Grid.Row="1" Grid.RowSpan="2" Width="0" VerticalAlignment="Stretch"  HorizontalAlignment="Right" >
-                <local:CutOpeningSettingsControl DataContext="{Binding Data}"/>
+            <Grid Name="sidePanel" Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Top" >
+                <local:CutOpeningSettingsControl DataContext="{Binding Path=IsDataEnabled}" Style="{StaticResource VisibleAnimation}"/>
             </Grid>
             
             <!-- ButtonPanel -->
