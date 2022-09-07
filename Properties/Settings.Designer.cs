@@ -118,5 +118,17 @@ namespace RevitTimasBIMTools.Properties {
                 this["СommunCatIdInt"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CurrentDocumentUniqueId {
+            get {
+                return ((string)(this["CurrentDocumentUniqueId"]));
+            }
+            set {
+                this["CurrentDocumentUniqueId"] = value;
+            }
+        }
     }
 }
