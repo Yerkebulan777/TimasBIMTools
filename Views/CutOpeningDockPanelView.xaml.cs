@@ -76,20 +76,17 @@ namespace RevitTimasBIMTools.Views
         {
             _ = Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
             {
-                if (mutex.WaitOne(5000))
+                if (!dataViewModel.IsOptionsEnabled)
                 {
-                    if (!dataViewModel.IsOptionsEnabled)
-                    {
-                        dataViewModel.IsOptionsEnabled = true;
-                        dataViewModel.IsDataEnabled = false;
-                    }
-                    else
-                    {
-                        dataViewModel.IsDataEnabled = true;
-                        dataViewModel.IsOptionsEnabled = false;
-                    }
+                    dataViewModel.IsOptionsEnabled = true;
+                    dataViewModel.IsDataEnabled = false;
                 }
-                mutex.ReleaseMutex();
+                else
+                {
+                    dataViewModel.IsDataEnabled = true;
+                    dataViewModel.IsOptionsEnabled = false;
+                }
+
             });
         }
 
