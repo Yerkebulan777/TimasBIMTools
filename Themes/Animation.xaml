@@ -5,7 +5,7 @@
         <Setter Property="Visibility" Value="Visible"/>
         <Setter Property="Opacity" Value="1"/>
         <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="True">
+            <Trigger Property="IsEnabled" Value="False">
                 <Trigger.EnterActions>
                     <BeginStoryboard>
                         <Storyboard>

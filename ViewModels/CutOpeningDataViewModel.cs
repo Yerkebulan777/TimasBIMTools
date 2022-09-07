@@ -32,6 +32,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private string guid = null;
         private readonly object syncLocker = new object();
+        private readonly SynchronizationContext uiContext;
         private IList<ElementModel> collection = new List<ElementModel>();
         private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
         private readonly string rectangOpeningId = Properties.Settings.Default.RectangSymbolUniqueId;
@@ -44,6 +45,7 @@ namespace RevitTimasBIMTools.ViewModels
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             CanselCommand = new RelayCommand(CancelCallbackLogic);
+            uiContext = SynchronizationContext.Current;
         }
 
 
