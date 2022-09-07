@@ -23,7 +23,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -83,8 +83,7 @@
             
             <!-- DataGridView -->
             <ScrollViewer Grid.Row="3" >
-                <DataGrid Name="dataGridView" VerticalAlignment="Top" HorizontalAlignment="Left"
-                          IsSynchronizedWithCurrentItem="True" Style="{StaticResource VisibleAnimation}"
+                <DataGrid Name="dataGridView" IsSynchronizedWithCurrentItem="True" Style="{StaticResource VisibleAnimation}"
                           Visibility="{Binding  Path=IsDataEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" 
                           ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <DataGrid.RowStyle>
