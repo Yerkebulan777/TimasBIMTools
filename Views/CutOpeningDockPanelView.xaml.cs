@@ -23,7 +23,6 @@ namespace RevitTimasBIMTools.Views
         public string DocumentGuid { get; set; } = null;
         public View3D View3d { get; set; } = null;
 
-        private bool flag;
         private bool disposedValue = false;
         private readonly Mutex mutex = new Mutex();
         private DocumentModel documentModel = null;

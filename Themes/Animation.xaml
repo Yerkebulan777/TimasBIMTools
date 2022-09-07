@@ -3,19 +3,15 @@
 
     <Style TargetType="FrameworkElement" x:Key="VisibleAnimation">
         <Setter Property="Visibility" Value="Visible"/>
-        <Setter Property="Opacity" Value="0"/>
+        <Setter Property="Opacity" Value="1"/>
         <Style.Triggers>
-            <Trigger Property="Opacity" Value="1">
+            <Trigger Property="IsEnabled" Value="True">
                 <Trigger.EnterActions>
                     <BeginStoryboard>
                         <Storyboard>
-                            <!--<DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:0.3" From="0" To="1" >
-                                <DoubleAnimation.EasingFunction>
-                                    <ElasticEase EasingMode="EaseInOut" Oscillations="1"/>
-                                </DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>-->
-                            <DoubleAnimation Storyboard.TargetProperty="Width" Duration="0:0:0.3" From="0"
-                                             To="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=FrameworkElement}}" >
+                            <DoubleAnimation 
+                                Storyboard.TargetProperty="(ContentPresenter.LayoutTransform).(ScaleTransform.ScaleY)" 
+                                From="0" To="1" Duration="0:0:0.3">
                                 <DoubleAnimation.EasingFunction>
                                     <SineEase EasingMode="EaseInOut" />
                                 </DoubleAnimation.EasingFunction>
@@ -23,6 +19,19 @@
                         </Storyboard>
                     </BeginStoryboard>
                 </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation 
+                                Storyboard.TargetProperty="(ContentPresenter.LayoutTransform).(ScaleTransform.ScaleY)"
+                                From="1" To="0" Duration="0:0:0.3">
+                                <DoubleAnimation.EasingFunction>
+                                    <SineEase EasingMode="EaseInOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.ExitActions>
             </Trigger>
         </Style.Triggers>
     </Style>
