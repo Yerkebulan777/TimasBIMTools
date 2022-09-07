@@ -9,10 +9,15 @@
                 <Trigger.EnterActions>
                     <BeginStoryboard>
                         <Storyboard>
-                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="1.0" Duration="0:0:2.5">
+                            <!--<DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:0.3" From="0" To="1" >
+                                <DoubleAnimation.EasingFunction>
+                                    <ElasticEase EasingMode="EaseInOut" Oscillations="1"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>-->
+                            <DoubleAnimation Storyboard.TargetProperty="Width" Duration="0:0:0.3" From="0"
+                                             To="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=FrameworkElement}}" >
                                 <DoubleAnimation.EasingFunction>
                                     <SineEase EasingMode="EaseInOut" />
-                                    <!--<ElasticEase EasingMode="EaseOut" Oscillations="1"/>-->
                                 </DoubleAnimation.EasingFunction>
                             </DoubleAnimation>
                         </Storyboard>

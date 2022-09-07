@@ -56,20 +56,21 @@
                     </ToggleButton>
                 </Grid>
             </Border>
+            
             <!-- Filter Control -->
-            <WrapPanel Grid.Row="1" HorizontalAlignment="Right" Margin="5" Style="{StaticResource VisibleAnimation}"
+            <DockPanel Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"  Margin="5" 
                        Visibility="{Binding  Path=IsDataEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}}" >
-                <ComboBox Name="ComboFloorFilter" Height="25" Width="200" SelectedIndex="0" Margin="5" 
+                <ComboBox Name="ComboFloorFilter" Height="25" SelectedIndex="0" Margin="5" 
                         SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" 
                         ItemsSource="{Binding Path=LevelSortDict, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                         DisplayMemberPath="Value.Name"/>
-                <ComboBox Name="ComboDataFilter" Height="25" Width="200" SelectedIndex="0" Margin="5" 
+                <ComboBox Name="ComboDataFilter" Height="25"  SelectedIndex="0" Margin="5" 
                         SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                         ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-            </WrapPanel>
+            </DockPanel>
+            
             <!-- DataGridView -->
-            <ScrollViewer Grid.Row="2" Style="{StaticResource VisibleAnimation}"
-                          Visibility="{Binding  Path=IsDataEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}}" >
+            <ScrollViewer Grid.Row="2" Style="{StaticResource VisibleAnimation}" >
                 <DataGrid Name="dataGridView" Width="Auto" IsSynchronizedWithCurrentItem="True"
                           ItemsSource="{Binding Path=ViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <DataGrid.RowStyle>

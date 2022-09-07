@@ -13,7 +13,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Views
@@ -40,17 +39,6 @@ namespace RevitTimasBIMTools.Views
             dataViewModel.DockPanelView = this;
             viewHandler.Completed += OnContextViewHandlerCompleted;
             Dispatcher.CurrentDispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
-            SizeChanged += delegate
-            {
-                if (sidePanel.ActualWidth != 0 && mutex.WaitOne(5000))
-                {
-                    _ = Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (Action)delegate ()
-                    {
-                        sidePanel.Width = ActualWidth;
-                        mutex.ReleaseMutex();
-                    });
-                }
-            };
         }
 
 
@@ -91,29 +79,18 @@ namespace RevitTimasBIMTools.Views
             {
                 if (mutex.WaitOne(5000))
                 {
-                    sidePanel.Visibility = System.Windows.Visibility.Visible;
-                    DoubleAnimation anim = new DoubleAnimation();
-                    double widht = sidePanel.ActualWidth;
-
-                    if (widht == 0)
+                    if (sidePanel.Opacity == 0)
                     {
-                        flag = true;
-                        anim.From = 0;
-                        anim.To = ActualWidth;
+                        sidePanel.Opacity = 1;
                         dataViewModel.IsOptionsEnabled = true;
                     }
                     else
                     {
-                        flag = false;
-                        anim.From = widht;
-                        anim.To = 0;
+                        sidePanel.Opacity = 0;
+                        dataViewModel.IsOptionsEnabled = false;
                     }
-
-                    dataViewModel.IsOptionsEnabled = flag;
-                    anim.EasingFunction = new QuadraticEase();
-                    sidePanel.BeginAnimation(WidthProperty, anim);
-                    mutex.ReleaseMutex();
                 }
+                mutex.ReleaseMutex();
             });
         }
 
