@@ -43,7 +43,7 @@ namespace RevitTimasBIMTools.ViewModels
             SnoopCommand = new AsyncRelayCommand(SnoopHandelCommandAsync);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
-            CloseCommand = new RelayCommand(CancelCallbackLogic);
+            CanselCommand = new RelayCommand(CancelCallbackLogic);
         }
 
 
@@ -312,7 +312,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region CloseCommand
-        public ICommand CloseCommand { get; private set; }
+        public ICommand CanselCommand { get; private set; }
 
 
         private void CancelCallbackLogic()

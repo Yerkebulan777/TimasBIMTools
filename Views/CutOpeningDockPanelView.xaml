@@ -129,8 +129,7 @@
             </ScrollViewer>
 
             <!-- Options -->
-            <Grid Name="sidePanel" Grid.Row="1" Grid.RowSpan="2" Width="0" VerticalAlignment="Stretch"  HorizontalAlignment="Right" 
-                  Visibility="{Binding  Path=IsOptionsEnabled, Mode=TwoWay, Converter={StaticResource BoolToViz}, FallbackValue=False}" >
+            <Grid Name="sidePanel" Grid.Row="1" Grid.RowSpan="2" Width="0" VerticalAlignment="Stretch"  HorizontalAlignment="Right" >
                 <local:CutOpeningSettingsControl DataContext="{Binding Data}"/>
             </Grid>
             
@@ -147,7 +146,7 @@
                         <Label FontFamily="Segoe MDL2 Assets" Content="&#xE73E;" FontSize="17" />
                     </RepeatButton>
                     <Button Name="CancelCmd"  Height="30" Width="75" Margin="5" 
-                        Command="{Binding CancelCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}">
+                        Command="{Binding Path=CloseCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}">
                         <Label FontFamily="Segoe MDL2 Assets" Content="&#xE711;" FontSize="17" />
                     </Button>
                 </DockPanel>
