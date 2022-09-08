@@ -6,6 +6,7 @@ using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -102,26 +103,8 @@ namespace RevitTimasBIMTools.Views
                 {
                     dataViewModel.IsOptionsEnabled = false;
                     dataViewModel.IsDataEnabled = true;
-                    ComboFloorFilter.Items.Clear();
                 }
             });
-        }
-
-
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ComboBox combo = (ComboBox)sender;
-            object item = combo.SelectedItem;
-            if (item is DocumentModel model)
-            {
-                Properties.Settings.Default.TargetDocumentName = model.Title;
-                Properties.Settings.Default.Save();
-            }
-            else if (item is  Level level)
-            {
-                Properties.Settings.Default.CurrentLevelUniqueId = level.UniqueId;
-                Properties.Settings.Default.Save();
-            }
         }
 
 

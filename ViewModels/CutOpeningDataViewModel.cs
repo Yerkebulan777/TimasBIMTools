@@ -49,6 +49,22 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        private Level level = null;
+        public Level SelectedLevel
+        {
+            get => level;
+            set
+            {
+                if (SetProperty(ref level, value) && level != null)
+                {
+                    Properties.Settings.Default.CurrentLevelUniqueId = level.UniqueId;
+                    Properties.Settings.Default.Save();
+                    Logger.Info(level.Name);
+                }
+            }
+        }
+
+
         #region Visibility
 
         private bool isOptions = false;
