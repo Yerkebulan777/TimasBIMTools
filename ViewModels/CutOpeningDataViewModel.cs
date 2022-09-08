@@ -55,27 +55,13 @@ namespace RevitTimasBIMTools.ViewModels
         public bool IsOptionsEnabled
         {
             get => isOptions;
-            set => RevitTask.RunAsync(app =>
-                   {
-                       if (SetProperty(ref isOptions, value))
-                       {
-                           if (isOptions)
-                           {
-                               IsDataEnabled = false;
-                               UIDocument uidoc = app.ActiveUIDocument;
-                               Document doc = app.ActiveUIDocument.Document;
-                               LevelSortDict = new SortedList<double, Level>();
-                               foreach (Level level in RevitFilterManager.GetValidLevels(doc))
-                               {
-                                   LevelSortDict[level.ProjectElevation] = level;
-                               }
-                           }
-                           else
-                           {
-                               IsDataEnabled = true;
-                           }
-                       }
-                   });
+            set
+            {
+                if (SetProperty(ref isOptions, value))
+                {
+                    IsDataEnabled = !isOptions;
+                }
+            }
         }
 
 
@@ -101,7 +87,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref floors, value))
                 {
-                    Logger.Info("Tadam!!!");
+                    Logger.Info(floors.Keys.Count.ToString());
                 }
             }
         }

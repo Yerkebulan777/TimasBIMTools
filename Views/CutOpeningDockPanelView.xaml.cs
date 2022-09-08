@@ -8,6 +8,8 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,21 +74,42 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void ShowSettingsCmd_Cick(object sender, RoutedEventArgs e)
+        private void ShowSettingsCmd_Click(object sender, RoutedEventArgs e)
         {
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
                 if (!dataViewModel.IsOptionsEnabled)
                 {
-                    dataViewModel.IsOptionsEnabled = true;
-                    dataViewModel.IsDataEnabled = false;
+                    Document doc = null;
+                    Task t = RevitTask.RunAsync(async app =>
+                    {
+                        doc = app.ActiveUIDocument.Document;
+                        dataViewModel.IsDataEnabled = false;
+                        dataViewModel.IsOptionsEnabled = true;
+                        await Task.Delay(1000).ConfigureAwait(true);
+                    })
+                    .ContinueWith(app =>
+                    {
+                        SortedList<double, Level> levels = new SortedList<double, Level>();
+                        foreach (Level level in RevitFilterManager.GetValidLevels(doc))
+                        {
+                            levels[level.ProjectElevation] = level;
+                        }
+                        UpdateComboBoxUI(ComboFloorFilter, levels);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
                 else
                 {
-                    dataViewModel.IsDataEnabled = true;
                     dataViewModel.IsOptionsEnabled = false;
+                    dataViewModel.IsDataEnabled = true;
                 }
             });
+        }
+
+
+        private void UpdateComboBoxUI(System.Windows.Controls.ComboBox combo, object state)
+        {
+            combo.ItemsSource = (IEnumerable)state;
         }
 
 

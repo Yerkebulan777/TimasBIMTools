@@ -39,7 +39,7 @@
                     <ToggleButton Name="settingsBtn" Height="40" Width="60"
                                   HorizontalAlignment="Right" VerticalAlignment="Center"
                                   Background="Transparent" BorderBrush="Transparent"
-                                  Click="ShowSettingsCmd_Cick" >
+                                  Click="ShowSettingsCmd_Click" >
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
                                 <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
@@ -71,10 +71,8 @@
             <WrapPanel Grid.Row="2" Style="{StaticResource VisibleAnimation}" 
                        VerticalAlignment="Top"  HorizontalAlignment="Right"  Margin="5" 
                        Visibility="{Binding  Path=IsDataEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
-                <ComboBox Name="ComboFloorFilter" Height="25" Width="175" SelectedIndex="0" Margin="5" 
-                        SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" 
-                        ItemsSource="{Binding Path=LevelSortDict, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                        DisplayMemberPath="Value.Name"/>
+                <ComboBox Name="ComboFloorFilter" Height="25" Width="175" SelectedIndex="0" DisplayMemberPath="Value.Name" Margin="5" 
+                        SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" />
                 <ComboBox Name="ComboDataFilter" Height="25" Width="175" SelectedIndex="0" Margin="5" 
                         SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                         ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
