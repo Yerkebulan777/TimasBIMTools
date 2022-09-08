@@ -235,7 +235,6 @@
     <Compile Include="Services\MutexServise.cs" />
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Services\Timer.cs" />
-    <Compile Include="Services\ThreadingExtensions.cs" />
     <Compile Include="ViewConverters\BitmapSourceConverter.cs" />
     <Compile Include="ViewConverters\BitmapToImageSourceConverter.cs" />
     <Compile Include="ViewConverters\ElementIdConverter.cs" />

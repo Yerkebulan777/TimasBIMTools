@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Services
 {
-    internal class TaskService
+    internal sealed class TaskService
     {
-        public static void DelayCall(Action action, int msec = 100)
+        public static void RevitTaskCall(Action action, int msec = 1000)
         {
-            Task.Delay(msec).ContinueWith(t => Dispatcher.CurrentDispatcher.InvokeAsync(action));
+            //RevitTask.Run(msec).ContinueWith(t => Dispatcher.CurrentDispatcher.Invoke(action));
         }
     }
 }
