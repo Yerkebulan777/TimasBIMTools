@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:RevitTimasBIMTools.CustomControls">
+    
     <Style TargetType="local:SliderControl">
         <Setter Property="Template">
             <Setter.Value>
@@ -9,8 +10,8 @@
                     <Border x:Name="SliderBorder" BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
                         <Grid x:Name="SliderPanel" Height="25">
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="3*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock x:Name="SliderText" Grid.Column="0" HorizontalAlignment="Left"  Margin="5" />
