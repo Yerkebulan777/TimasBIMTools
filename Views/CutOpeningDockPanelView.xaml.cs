@@ -8,7 +8,6 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,6 +15,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using ComboBox = System.Windows.Controls.ComboBox;
+using Level = Autodesk.Revit.DB.Level;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -63,7 +64,6 @@ namespace RevitTimasBIMTools.Views
             if (documentModel.IsActive)
             {
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
-                //ComboDocs.SelectionChanged += ComboDocs_SelectionChanged;
                 settingsView.ComboTargetCats.ItemsSource = args.Categories;
                 settingsView.ComboRoundSymbol.ItemsSource = args.FamilySymbols;
                 settingsView.ComboRectangSymbol.ItemsSource = args.FamilySymbols;
@@ -86,14 +86,14 @@ namespace RevitTimasBIMTools.Views
                         doc = app.ActiveUIDocument.Document;
                         dataViewModel.IsDataEnabled = false;
                         dataViewModel.IsOptionsEnabled = true;
-                        await Task.Delay(5000).ConfigureAwait(true);
+                        await Task.Delay(1000).ConfigureAwait(true);
                     })
                     .ContinueWith(app =>
                     {
                         SortedList<double, Level> levels = new SortedList<double, Level>();
-                        foreach (Level level in RevitFilterManager.GetValidLevels(doc))
+                        foreach (Level lvl in RevitFilterManager.GetValidLevels(doc))
                         {
-                            levels[level.ProjectElevation] = level;
+                            levels[lvl.ProjectElevation] = lvl;
                         }
                         ComboFloorFilter.ItemsSource = levels;
                     }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -102,20 +102,28 @@ namespace RevitTimasBIMTools.Views
                 {
                     dataViewModel.IsOptionsEnabled = false;
                     dataViewModel.IsDataEnabled = true;
+                    ComboFloorFilter.Items.Clear();
                 }
             });
         }
 
 
-        private void ComboDocs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //object item = ComboDocs.SelectedItem;
-            //if (item is DocumentModel model)
-            //{
-            //    Properties.Settings.Default.TargetDocumentName = model.Title;
-            //    Properties.Settings.Default.Save();
-            //}
+            ComboBox combo = (ComboBox)sender;
+            object item = combo.SelectedItem;
+            if (item is DocumentModel model)
+            {
+                Properties.Settings.Default.TargetDocumentName = model.Title;
+                Properties.Settings.Default.Save();
+            }
+            else if (item is  Level level)
+            {
+                Properties.Settings.Default.CurrentLevelUniqueId = level.UniqueId;
+                Properties.Settings.Default.Save();
+            }
         }
+
 
 
         [STAThread]
@@ -157,6 +165,7 @@ namespace RevitTimasBIMTools.Views
                     Content = null;
                     DataContext = null;
                     dataViewModel.Dispose();
+                    Properties.Settings.Default.Reset();
                     //ComboDocs.SelectionChanged -= ComboDocs_SelectionChanged;
                     for (int i = 0; i < PageMainGrid.Children.Count; i++)
                     {

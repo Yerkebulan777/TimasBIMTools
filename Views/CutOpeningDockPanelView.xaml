@@ -71,8 +71,8 @@
             <WrapPanel Grid.Row="2" Style="{StaticResource VisibleAnimation}" 
                        VerticalAlignment="Top"  HorizontalAlignment="Right"  Margin="5" 
                        Visibility="{Binding  Path=IsDataEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
-                <ComboBox Name="ComboFloorFilter" Height="25" Width="175" SelectedIndex="0" DisplayMemberPath="Value.Name" Margin="5" 
-                        SelectedValue="{Binding Path=ActualLevel, Mode=OneWayToSource, UpdateSourceTrigger=Explicit}" />
+                <ComboBox Name="ComboFloorFilter" Height="25" Width="175" Margin="5"
+                          SelectedIndex="-1" DisplayMemberPath="Value.Name" SelectionChanged="ComboBox_SelectionChanged"/>
                 <ComboBox Name="ComboDataFilter" Height="25" Width="175" SelectedIndex="0" Margin="5" 
                         SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                         ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
