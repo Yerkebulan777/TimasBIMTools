@@ -86,7 +86,7 @@ namespace RevitTimasBIMTools.Views
                         doc = app.ActiveUIDocument.Document;
                         dataViewModel.IsDataEnabled = false;
                         dataViewModel.IsOptionsEnabled = true;
-                        await Task.Delay(3000).ConfigureAwait(true);
+                        await Task.Delay(5000).ConfigureAwait(true);
                     })
                     .ContinueWith(app =>
                     {
@@ -105,7 +105,6 @@ namespace RevitTimasBIMTools.Views
                 }
             });
         }
-
 
 
         private void ComboDocs_SelectionChanged(object sender, SelectionChangedEventArgs e)
