@@ -59,7 +59,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     Properties.Settings.Default.CurrentLevelUniqueId = level.UniqueId;
                     Properties.Settings.Default.Save();
-                    Logger.Info(level.Name);
                 }
             }
         }
