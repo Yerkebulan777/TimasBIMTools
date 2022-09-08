@@ -58,7 +58,7 @@
                 </Grid>
             </Border>
 
-            
+
             <!-- Options -->
             <Grid Name="sidePanel" Grid.Row="1" 
                   VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}" 
@@ -73,8 +73,8 @@
                        Visibility="{Binding  Path=IsDataEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
                 
                 <ComboBox Name="ComboDataFilter" Height="23" Width="150" SelectedIndex="0" Margin="5" 
-                        SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                        ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                          SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                          ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                 <ComboBox Name="ComboFloorFilter" Height="23" Width="150" Margin="5"
                           SelectedIndex="-1" DisplayMemberPath="Value.Name" SelectedValuePath="Value"
                           SelectedValue="{Binding Path=SelectedLevel, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
