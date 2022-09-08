@@ -4,6 +4,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     x:Class="RevitTimasBIMTools.Views.CutOpeningSettingsControl" 
+    xmlns:controls="clr-namespace:RevitTimasBIMTools.CustomControls"
     mc:Ignorable="d" d:Height="Auto" d:Width="300" >
     
     <UserControl.Resources>
@@ -69,43 +70,10 @@
             </ListViewItem>
 
             <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
-                <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
-                    <StackPanel>
-                        <Grid Grid.Row="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="3*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Minimum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider x:Name="slider01" Grid.Column="1" Margin="5" Minimum="5" Maximum="100" TickFrequency="5" />
-                            <TextBox Grid.Column="2" Height="20" MinWidth="30" HorizontalContentAlignment="Center" Margin="5">
-                                <TextBox.Resources>
-                                    <Style TargetType="{x:Type Border}">
-                                        <Setter Property="CornerRadius" Value="1.5"/>
-                                    </Style>
-                                </TextBox.Resources>
-                            </TextBox>
-                        </Grid>
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="3*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Maximum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider x:Name="slider02" Grid.Column="1" Margin="5"  Minimum="100" Maximum="1500" TickFrequency="100" />
-                            <TextBox Grid.Column="2" Height="20" MinWidth="30" HorizontalContentAlignment="Center" Margin="5">
-                                <TextBox.Resources>
-                                    <Style TargetType="{x:Type Border}">
-                                        <Setter Property="CornerRadius" Value="1.5"/>
-                                    </Style>
-                                </TextBox.Resources>
-                            </TextBox>
-                        </Grid>
-                    </StackPanel>
-                    </Border>
-                </ListViewItem>
+
+                <controls:SliderControl  />
+
+            </ListViewItem>
 
             </ListView>
         </Grid>
