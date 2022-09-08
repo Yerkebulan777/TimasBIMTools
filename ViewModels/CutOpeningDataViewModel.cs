@@ -75,26 +75,6 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region LevelDict
-
-        public Level ActualLevel { get; set; } = null;
-
-        private SortedList<double, Level> floors = null;
-        public SortedList<double, Level> LevelSortDict
-        {
-            get => floors;
-            set
-            {
-                if (SetProperty(ref floors, value))
-                {
-                    Logger.Info(floors.Keys.Count.ToString());
-                }
-            }
-        }
-
-        #endregion
-
-
         #region DataGrid
 
         private bool? isSelected = false;

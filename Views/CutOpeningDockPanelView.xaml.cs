@@ -86,7 +86,7 @@ namespace RevitTimasBIMTools.Views
                         doc = app.ActiveUIDocument.Document;
                         dataViewModel.IsDataEnabled = false;
                         dataViewModel.IsOptionsEnabled = true;
-                        await Task.Delay(1000).ConfigureAwait(true);
+                        await Task.Delay(3000).ConfigureAwait(true);
                     })
                     .ContinueWith(app =>
                     {
@@ -95,7 +95,7 @@ namespace RevitTimasBIMTools.Views
                         {
                             levels[level.ProjectElevation] = level;
                         }
-                        UpdateComboBoxUI(ComboFloorFilter, levels);
+                        ComboFloorFilter.ItemsSource = levels;
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
                 else
@@ -106,11 +106,6 @@ namespace RevitTimasBIMTools.Views
             });
         }
 
-
-        private void UpdateComboBoxUI(System.Windows.Controls.ComboBox combo, object state)
-        {
-            combo.ItemsSource = (IEnumerable)state;
-        }
 
 
         private void ComboDocs_SelectionChanged(object sender, SelectionChangedEventArgs e)
