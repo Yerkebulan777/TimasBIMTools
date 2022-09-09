@@ -21,34 +21,44 @@ namespace RevitTimasBIMTools.CustomControls
             DependencyProperty.Register("Content", typeof(string), typeof(SliderControl), new PropertyMetadata(""));
 
 
-        public int Minimum
+        public double Value
         {
-            get => (int)GetValue(MinimumProperty);
-            set => SetValue(MinimumProperty, value);
-        }
-
-        public static readonly DependencyProperty MinimumProperty =
-            DependencyProperty.Register("Minimum", typeof(int), typeof(SliderControl), new PropertyMetadata(0));
-
-
-        public int Maximum
-        {
-            get => (int)GetValue(MaximumProperty);
-            set => SetValue(MaximumProperty, value);
-        }
-
-        public static readonly DependencyProperty MaximumProperty =
-            DependencyProperty.Register("Maximum", typeof(int), typeof(SliderControl), new PropertyMetadata(100));
-
-
-        public int Value
-        {
-            get => (int)GetValue(ValueProperty);
+            get => (double)GetValue(ValueProperty);
             set => SetValue(ValueProperty, value);
         }
 
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(int), typeof(SliderControl), new PropertyMetadata(0));
+            DependencyProperty.Register("Value", typeof(double), typeof(SliderControl), new PropertyMetadata(0));
+
+
+        public double Minimum
+        {
+            get => (double)GetValue(MinimumProperty);
+            set => SetValue(MinimumProperty, value);
+        }
+
+        public static readonly DependencyProperty MinimumProperty =
+            DependencyProperty.Register("Minimum", typeof(double), typeof(SliderControl), new PropertyMetadata(0));
+
+
+        public double Maximum
+        {
+            get => (double)GetValue(MaximumProperty); 
+            set => SetValue(MaximumProperty, value);
+        }
+
+        public static readonly DependencyProperty MaximumProperty =
+            DependencyProperty.Register("Maximum", typeof(double), typeof(SliderControl), new PropertyMetadata(100));
+
+
+        public double TickFrequency
+        {
+            get => (double)GetValue(TickFrequencyProperty);
+            set => SetValue(TickFrequencyProperty, value);
+        }
+
+        public static readonly DependencyProperty TickFrequencyProperty =
+            DependencyProperty.Register("TickFrequency", typeof(double), typeof(SliderControl), new PropertyMetadata(5));
 
 
         public SliderControl()
