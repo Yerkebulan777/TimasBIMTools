@@ -21,6 +21,36 @@ namespace RevitTimasBIMTools.CustomControls
             DependencyProperty.Register("Content", typeof(string), typeof(SliderControl), new PropertyMetadata(""));
 
 
+        public int Minimum
+        {
+            get => (int)GetValue(MinimumProperty);
+            set => SetValue(MinimumProperty, value);
+        }
+
+        public static readonly DependencyProperty MinimumProperty =
+            DependencyProperty.Register("Minimum", typeof(int), typeof(SliderControl), new PropertyMetadata(0));
+
+
+        public int Maximum
+        {
+            get => (int)GetValue(MaximumProperty);
+            set => SetValue(MaximumProperty, value);
+        }
+
+        public static readonly DependencyProperty MaximumProperty =
+            DependencyProperty.Register("Maximum", typeof(int), typeof(SliderControl), new PropertyMetadata(100));
+
+
+        public int Value
+        {
+            get => (int)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
+        }
+
+        public static readonly DependencyProperty ValueProperty =
+            DependencyProperty.Register("Value", typeof(int), typeof(SliderControl), new PropertyMetadata(0));
+
+
         public SliderControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(SliderControl), new FrameworkPropertyMetadata(typeof(SliderControl)));

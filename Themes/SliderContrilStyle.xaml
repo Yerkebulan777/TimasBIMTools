@@ -2,11 +2,18 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:RevitTimasBIMTools.CustomControls">
 
+
     <Style TargetType="{x:Type local:SliderControl}">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="IsTabStop" Value="false" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:SliderControl}">
-                    <Border x:Name="SliderBorder" BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
+                    <Border x:Name="SliderBorder"
+                            BorderThickness="0.5"
+                            BorderBrush="LightGray"
+                            Background="Transparent" >
                         <Grid x:Name="SliderPanel" Background="{TemplateBinding Background}" 
                               Height="{TemplateBinding Height}" Width ="{TemplateBinding Width}" >
                             <Grid.ColumnDefinitions>
@@ -15,14 +22,15 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock x:Name="SliderText" Grid.Column="0"
-                                       Margin="{TemplateBinding Margin}" Text="{TemplateBinding Content}" 
-                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="Stretch"/>
+                                       Text="{TemplateBinding Content}" 
+                                       Margin="{TemplateBinding Margin}"  Padding="{TemplateBinding Padding}" 
+                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                             <Slider x:Name="SliderControl" Grid.Column="1" 
-                                    Margin="{TemplateBinding Margin}"
-                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="Stretch"/>
+                                    Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                             <TextBox x:Name="SliderLabel" Grid.Column="2" Width="Auto" MinWidth="25" MaxWidth="100" 
                                      Margin="{TemplateBinding Margin}"
-                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="Stretch"  >
+                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}" >
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="1.5"/>
@@ -30,6 +38,7 @@
                                 </TextBox.Resources>
                             </TextBox>
                         </Grid>
+                        
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
