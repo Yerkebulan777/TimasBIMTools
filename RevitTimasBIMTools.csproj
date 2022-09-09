@@ -200,7 +200,6 @@
     <Compile Include="RevitUtils\RevitViewManager.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
-    <Compile Include="Services\ManifestFileManager.cs" />
     <Compile Include="CutOpening\CutOpeningRegisterDockablePane.cs" />
     <Compile Include="CutOpening\CutOpeningStartHandler.cs" />
     <Compile Include="CutOpening\CutOpeningShowPanelCmd.cs" />
@@ -236,13 +235,6 @@
     <Compile Include="Services\MutexServise.cs" />
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Services\Timer.cs" />
-    <Compile Include="ViewConverters\BitmapSourceConverter.cs" />
-    <Compile Include="ViewConverters\BitmapToImageSourceConverter.cs" />
-    <Compile Include="ViewConverters\ElementIdConverter.cs" />
-    <Compile Include="ViewConverters\ComponentOptionConverter.cs" />
-    <Compile Include="ViewConverters\SelectAllConverter.cs" />
-    <Compile Include="Views\SettingBindingExtension.cs" />
-    <Compile Include="ViewConverters\StatusConverter.cs" />
     <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\CutOpeningDockPanelView.xaml.cs">
@@ -305,7 +297,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Examples\" />
-    <Folder Include="Temp\" />
+    <Folder Include="ViewConverters\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

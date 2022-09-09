@@ -1,19 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
 namespace RevitTimasBIMTools.CustomControls
 {
-    internal class SliderControl : Control
+    internal sealed class SliderControl : Control
     {
+        private Label label;
+        private Slider slider;
+        private TextBlock text;
+        private Border border;
+
+        public string Content
+        {
+            get { return (string)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
+        }
+
+
+        public static readonly DependencyProperty ValueProperty =
+            DependencyProperty.Register("Content", typeof(string), typeof(SliderControl), new PropertyMetadata(""));
+
+
+
         public SliderControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(SliderControl), new FrameworkPropertyMetadata(typeof(SliderControl)));
-        }
-    }
 
+        }
+
+
+        public override void OnApplyTemplate()
+        {
+            label = Template.FindName("SliderLabel", this) as Label;
+            text = Template.FindName("SliderText", this) as TextBlock;
+            border = Template.FindName("SliderBorder", this) as Border;
+            slider = Template.FindName("SliderControl", this) as Slider;
+
+            base.OnApplyTemplate();
+        }
+
+
+    }
 }

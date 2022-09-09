@@ -257,7 +257,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
         /// <summary>
-        /// Return Global Parameter Value
+        /// Return Global Parameter Content
         /// </summary>
         /// <param name="parameter"></param>
         /// <param name="doc"></param>
