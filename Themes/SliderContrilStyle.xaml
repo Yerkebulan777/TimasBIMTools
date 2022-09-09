@@ -7,23 +7,28 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:SliderControl}">
                     <Border x:Name="SliderBorder" BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
-                        <Grid x:Name="SliderPanel" Height="{TemplateBinding Height}" Background="{TemplateBinding Background}" >
+                        <Grid x:Name="SliderPanel" Background="{TemplateBinding Background}" 
+                              Height="{TemplateBinding Height}" Width ="{TemplateBinding Width}" >
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="1.5*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock x:Name="SliderText" Grid.Column="0" 
-                                       HorizontalAlignment="Left"  Margin="5" />
-                            <Slider x:Name="SliderControl" Grid.Column="1" HorizontalContentAlignment="Stretch" Margin="5" />
-                            <Label x:Name="SliderLabel" Grid.Column="2" Width="Auto" MinWidth="25" MaxWidth="100" 
-                                    VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Margin="5">
-                                <Label.Resources>
+                            <TextBlock x:Name="SliderText" Grid.Column="0"
+                                       Margin="{TemplateBinding Margin}" Text="{TemplateBinding Content}" 
+                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="Stretch"/>
+                            <Slider x:Name="SliderControl" Grid.Column="1" 
+                                    Margin="{TemplateBinding Margin}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="Stretch"/>
+                            <TextBox x:Name="SliderLabel" Grid.Column="2" Width="Auto" MinWidth="25" MaxWidth="100" 
+                                     Margin="{TemplateBinding Margin}"
+                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="Stretch"  >
+                                <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="1.5"/>
                                     </Style>
-                                </Label.Resources>
-                            </Label>
+                                </TextBox.Resources>
+                            </TextBox>
                         </Grid>
                     </Border>
                 </ControlTemplate>

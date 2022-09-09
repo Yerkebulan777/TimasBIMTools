@@ -10,22 +10,20 @@ namespace RevitTimasBIMTools.CustomControls
         private TextBlock text;
         private Border border;
 
+
         public string Content
         {
-            get { return (string)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
+            get => (string)GetValue(ContentProperty);
+            set => SetValue(ContentProperty, value);
         }
 
-
-        public static readonly DependencyProperty ValueProperty =
+        public static readonly DependencyProperty ContentProperty =
             DependencyProperty.Register("Content", typeof(string), typeof(SliderControl), new PropertyMetadata(""));
-
 
 
         public SliderControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(SliderControl), new FrameworkPropertyMetadata(typeof(SliderControl)));
-
         }
 
 

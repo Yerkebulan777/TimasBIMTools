@@ -71,7 +71,7 @@
 
             <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
 
-                <controls:SliderControl />
+                <controls:SliderControl Content="123" Margin="5" VerticalContentAlignment="Stretch"/>
 
             </ListViewItem>
 
