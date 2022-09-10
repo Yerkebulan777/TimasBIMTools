@@ -26,14 +26,14 @@
                                        Margin="{TemplateBinding Margin}"  Padding="{TemplateBinding Padding}" 
                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                             <Slider x:Name="SliderControl" Grid.Column="1"
-                                    Value="{TemplateBinding ActualValue}"
+                                    Value="{TemplateBinding Value}"
                                     Minimum="{TemplateBinding Minimum}"
                                     Maximum="{TemplateBinding Maximum}"
                                     TickFrequency="{TemplateBinding TickFrequency}"
                                     Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}"
                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                             <TextBox x:Name="SliderLabel" Grid.Column="2" Width="Auto" MinWidth="25" MaxWidth="100" 
-                                     Margin="{TemplateBinding Margin}"
+                                     Margin="{TemplateBinding Margin}" 
                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" >
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
