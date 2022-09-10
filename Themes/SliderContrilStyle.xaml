@@ -26,7 +26,7 @@
                                        Margin="{TemplateBinding Margin}"  Padding="{TemplateBinding Padding}" 
                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                             <Slider x:Name="SliderControl" Grid.Column="1"
-                                    Value="{TemplateBinding Value}"
+                                    Value="{TemplateBinding ActualValue}"
                                     Minimum="{TemplateBinding Minimum}"
                                     Maximum="{TemplateBinding Maximum}"
                                     TickFrequency="{TemplateBinding TickFrequency}"

@@ -3,7 +3,7 @@ using System.Windows.Controls;
 
 namespace RevitTimasBIMTools.CustomControls
 {
-    internal sealed class SliderControl : Control
+    internal sealed class SliderControl : Slider
     {
         private Label label;
         private Slider slider;
@@ -21,44 +21,44 @@ namespace RevitTimasBIMTools.CustomControls
             DependencyProperty.Register("Content", typeof(string), typeof(SliderControl), new PropertyMetadata(""));
 
 
-        public double Value
-        {
-            get => (double)GetValue(ValueProperty);
-            set => SetValue(ValueProperty, value);
-        }
+        //public double ActualValue
+        //{
+        //    get => (double)GetValue(ActualValueProperty);
+        //    set => SetValue(ActualValueProperty, value);
+        //}
 
-        public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(double), typeof(SliderControl), new PropertyMetadata(0));
-
-
-        public double Minimum
-        {
-            get => (double)GetValue(MinimumProperty);
-            set => SetValue(MinimumProperty, value);
-        }
-
-        public static readonly DependencyProperty MinimumProperty =
-            DependencyProperty.Register("Minimum", typeof(double), typeof(SliderControl), new PropertyMetadata(0));
+        //public static readonly DependencyProperty ActualValueProperty =
+        //    DependencyProperty.Register("ActualValue", typeof(double), typeof(SliderControl), new PropertyMetadata(50));
 
 
-        public double Maximum
-        {
-            get => (double)GetValue(MaximumProperty); 
-            set => SetValue(MaximumProperty, value);
-        }
+        //public double Minimum
+        //{
+        //    get => (double)GetValue(MinimumProperty);
+        //    set => SetValue(MinimumProperty, value);
+        //}
 
-        public static readonly DependencyProperty MaximumProperty =
-            DependencyProperty.Register("Maximum", typeof(double), typeof(SliderControl), new PropertyMetadata(100));
+        //public static readonly DependencyProperty MinimumProperty =
+        //    DependencyProperty.Register("Minimum", typeof(double), typeof(SliderControl), new PropertyMetadata(0));
 
 
-        public double TickFrequency
-        {
-            get => (double)GetValue(TickFrequencyProperty);
-            set => SetValue(TickFrequencyProperty, value);
-        }
+        //public double Maximum
+        //{
+        //    get => (double)GetValue(MaximumProperty); 
+        //    set => SetValue(MaximumProperty, value);
+        //}
 
-        public static readonly DependencyProperty TickFrequencyProperty =
-            DependencyProperty.Register("TickFrequency", typeof(double), typeof(SliderControl), new PropertyMetadata(5));
+        //public static readonly DependencyProperty MaximumProperty =
+        //    DependencyProperty.Register("Maximum", typeof(double), typeof(SliderControl), new PropertyMetadata(100));
+
+
+        //public double TickFrequency
+        //{
+        //    get => (double)GetValue(TickFrequencyProperty);
+        //    set => SetValue(TickFrequencyProperty, value);
+        //}
+
+        //public static readonly DependencyProperty TickFrequencyProperty =
+        //    DependencyProperty.Register("TickFrequency", typeof(double), typeof(SliderControl), new PropertyMetadata(5));
 
 
         public SliderControl()
