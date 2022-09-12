@@ -39,7 +39,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Minimum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider x:Name="sliderMinSize" Grid.Column="1" Margin="5" Minimum="5" Maximum="100" TickFrequency="5" />
+                            <Slider x:Name="sliderMinSize" Grid.Column="1" Margin="5"  />
                             <TextBox Grid.Column="2" Height="20" MinWidth="30" HorizontalContentAlignment="Center" Margin="5">
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
@@ -54,9 +54,7 @@
             </ListViewItem>
 
             <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
-
-                <controls:SliderControl Content="Minimum side size"  CornerRadius="3" VerticalContentAlignment="Center" Margin="5" />
-
+                <controls:SliderControl Content="Minimum side size" TickFrequency="5" Minimum="5" Maximum="100" />
             </ListViewItem>
 
             </ListView>

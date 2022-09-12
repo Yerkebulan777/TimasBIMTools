@@ -6,13 +6,17 @@
     <Style TargetType="{x:Type local:SliderControl}">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
-        <Setter Property="IsTabStop" Value="false" />
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+        <Setter Property="CornerRadius" Value="1.5"/>
+        <Setter Property="Margin" Value="2.5"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:SliderControl}">
                     <Border x:Name="PART_Border"
                             BorderThickness="0.5"
                             BorderBrush="LightGray"
+                            Margin="{TemplateBinding Margin}"
                             Background="{TemplateBinding Background}"
                             CornerRadius="{TemplateBinding CornerRadius}">
                         
@@ -41,6 +45,7 @@
                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Margin}" >
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
+                                        <Setter Property="Margin" Value="1.5"/>
                                         <Setter Property="CornerRadius" Value="1.5"/>
                                     </Style>
                                 </TextBox.Resources>
