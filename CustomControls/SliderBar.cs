@@ -4,7 +4,7 @@ using System.Windows.Controls;
 namespace RevitTimasBIMTools.CustomControls
 {
     [TemplatePart(Name = SliderBorder, Type = typeof(Border))]
-    internal sealed class SliderControl : Slider
+    internal sealed class SliderBar : Slider
     {
         public const string SliderBorder = "PART_Border";
 
@@ -15,12 +15,12 @@ namespace RevitTimasBIMTools.CustomControls
         }
 
         public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register("Content", typeof(string), typeof(SliderControl), new PropertyMetadata(""));
+            DependencyProperty.Register("Content", typeof(string), typeof(SliderBar), new PropertyMetadata(""));
 
 
-        public SliderControl()
+        public SliderBar()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(SliderControl), new FrameworkPropertyMetadata(typeof(SliderControl)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(SliderBar), new FrameworkPropertyMetadata(typeof(SliderBar)));
         }
 
 
@@ -37,7 +37,7 @@ namespace RevitTimasBIMTools.CustomControls
         }
 
         public static readonly DependencyProperty CornerRadiusProperty
-            = DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(SliderControl), new FrameworkPropertyMetadata(default(CornerRadius)));
+            = DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(SliderBar), new FrameworkPropertyMetadata(default(CornerRadius)));
 
 
         public Border sliderBorder { get; private set; }

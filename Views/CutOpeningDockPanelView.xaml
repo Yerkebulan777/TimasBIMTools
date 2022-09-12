@@ -6,6 +6,7 @@
     xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:CutOpeningDataViewModel}"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
+    xmlns:controls="clr-namespace:RevitTimasBIMTools.CustomControls"
     x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelView" 
     d:Height="Auto" d:Width="300" mc:Ignorable="d">
 
@@ -60,11 +61,14 @@
 
 
             <!-- Options -->
-            <Grid Name="sidePanel" Grid.Row="1" 
-                  VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}" 
-                  Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}">
-                <local:CutOpeningSettingsControl />
-            </Grid>
+            <!--Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}"-->
+            <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}"
+                      Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}">
+                <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
+                    <controls:SliderBar Content="Minimum side size" TickFrequency="5" Minimum="5" Maximum="100" />
+                </ListViewItem>
+
+            </ListView>
 
             
             <!-- Filter Control -->
