@@ -71,8 +71,7 @@
 
             <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
 
-                <controls:SliderControl Content="Minimum side size"  
-                                        VerticalContentAlignment="Center" Margin="5" />
+                <controls:SliderControl Content="Minimum side size"  CornerRadius="3" VerticalContentAlignment="Center" Margin="5" />
 
             </ListViewItem>
 

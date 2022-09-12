@@ -3,13 +3,10 @@ using System.Windows.Controls;
 
 namespace RevitTimasBIMTools.CustomControls
 {
+    [TemplatePart(Name = SliderBorder, Type = typeof(Border))]
     internal sealed class SliderControl : Slider
     {
-        private Label label;
-        private Slider slider;
-        private TextBlock text;
-        private Border border;
-
+        public const string SliderBorder = "PART_Border";
 
         public string Content
         {
@@ -27,16 +24,29 @@ namespace RevitTimasBIMTools.CustomControls
         }
 
 
-        public override void OnApplyTemplate()
+        public CornerRadius CornerRadius
         {
-            label = Template.FindName("SliderLabel", this) as Label;
-            text = Template.FindName("SliderText", this) as TextBlock;
-            border = Template.FindName("SliderBorder", this) as Border;
-            slider = Template.FindName("SliderControl", this) as Slider;
-
-            base.OnApplyTemplate();
+            get
+            {
+                return (CornerRadius)GetValue(CornerRadiusProperty);
+            }
+            set
+            {
+                SetValue(CornerRadiusProperty, value);
+            }
         }
 
+        public static readonly DependencyProperty CornerRadiusProperty
+            = DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(SliderControl), new FrameworkPropertyMetadata(default(CornerRadius)));
 
+
+        public Border sliderBorder { get; private set; }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            sliderBorder = GetTemplateChild(SliderBorder) as Border;
+        }
     }
+
 }

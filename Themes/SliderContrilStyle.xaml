@@ -10,21 +10,25 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:SliderControl}">
-                    <Border x:Name="SliderBorder"
+                    <Border x:Name="PART_Border"
                             BorderThickness="0.5"
                             BorderBrush="LightGray"
-                            Background="Transparent" >
-                        <Grid x:Name="SliderPanel" Background="{TemplateBinding Background}" 
-                              Height="{TemplateBinding Height}" Width ="{TemplateBinding Width}" >
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        
+                        <Grid Height="{TemplateBinding Height}" Width ="{TemplateBinding Width}" >
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="1.5*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
+                            
                             <TextBlock x:Name="SliderText" Grid.Column="0"
                                        Text="{TemplateBinding Content}" 
                                        Margin="{TemplateBinding Margin}"  Padding="{TemplateBinding Padding}" 
                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            
                             <Slider x:Name="SliderControl" Grid.Column="1"
                                     Value="{TemplateBinding Value}"
                                     Minimum="{TemplateBinding Minimum}"
@@ -32,15 +36,16 @@
                                     TickFrequency="{TemplateBinding TickFrequency}"
                                     Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}"
                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                            <TextBox x:Name="SliderLabel" Grid.Column="2" Width="Auto" MinWidth="25" MaxWidth="100" 
-                                     Margin="{TemplateBinding Margin}" 
-                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}" >
+                            
+                            <TextBox x:Name="PART_TextBox" Grid.Column="2" Width="Auto" MinWidth="25" MaxWidth="100"
+                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Margin}" >
                                 <TextBox.Resources>
                                     <Style TargetType="{x:Type Border}">
                                         <Setter Property="CornerRadius" Value="1.5"/>
                                     </Style>
                                 </TextBox.Resources>
                             </TextBox>
+                            
                         </Grid>
                         
                     </Border>
