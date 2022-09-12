@@ -20,7 +20,7 @@ namespace RevitTimasBIMTools.CustomControls
 
         public SliderBar()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(SliderBar), new FrameworkPropertyMetadata(typeof(SliderBar)));
+            //DefaultStyleKeyProperty.OverrideMetadata(typeof(SliderBar), new FrameworkPropertyMetadata(typeof(SliderBar)));
         }
 
 
