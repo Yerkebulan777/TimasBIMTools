@@ -238,20 +238,28 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static IEnumerable<Level> GetValidLevels(Document doc)
         {
-            var wallIds = GetInstancesOfCategory(doc, typeof(Wall), BuiltInCategory.OST_Walls).ToElementIds();
-            var floorIds = GetInstancesOfCategory(doc, typeof(Floor), BuiltInCategory.OST_Floors).ToElementIds();
+            ICollection<ElementId> wallIds = GetInstancesOfCategory(doc, typeof(Wall), BuiltInCategory.OST_Walls).ToElementIds();
+            ICollection<ElementId> floorIds = GetInstancesOfCategory(doc, typeof(Floor), BuiltInCategory.OST_Floors).ToElementIds();
             FilteredElementCollector collector = new FilteredElementCollector(doc);
+            bool isValid = wallIds.Any() && floorIds.Any();
             foreach (Level level in collector.OfClass(typeof(Level)))
             {
-                ElementLevelFilter levelFilter = new ElementLevelFilter(level.Id);
-                collector = new FilteredElementCollector(doc, wallIds);
-                if (collector.WherePasses(levelFilter).Any())
+                if (isValid)
                 {
-                    collector = new FilteredElementCollector(doc, floorIds);
+                    ElementLevelFilter levelFilter = new ElementLevelFilter(level.Id);
+                    collector = new FilteredElementCollector(doc, wallIds);
                     if (collector.WherePasses(levelFilter).Any())
                     {
-                        yield return level;
+                        collector = new FilteredElementCollector(doc, floorIds);
+                        if (collector.WherePasses(levelFilter).Any())
+                        {
+                            yield return level;
+                        }
                     }
+                }
+                else
+                {
+                    yield return level;
                 }
             }
         }
