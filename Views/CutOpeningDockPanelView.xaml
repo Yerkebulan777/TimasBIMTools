@@ -61,7 +61,6 @@
 
 
             <!-- Options -->
-            <!--Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}"-->
             <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}"
                       Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}">
                 <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
