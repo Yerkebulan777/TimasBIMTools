@@ -4,8 +4,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Height="750" Width="450" WindowState="Normal"
-    xmlns:controls="clr-namespace:RevitTimasBIMTools.CustomControls"
     x:Class="RevitTimasBIMTools.Views.CutOpeningSettingsView"
+    xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     WindowStartupLocation="CenterScreen" WindowStyle="None"
     ResizeMode="NoResize" Background="Gainsboro" 
     Topmost="True">
@@ -45,27 +45,9 @@
         <DockPanel Grid.Row="1" Height="150" VerticalAlignment="Center" Background="White" >
             <GroupBox Header=" Element size " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="150"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Minimum side size" Grid.Column="0" Style="{StaticResource CenterHeaderTextBlock}"/>
-                            <Slider x:Name="sliderMinSize" Grid.Column="1" Margin="10" 
-                                    Minimum="5" Maximum="100" TickFrequency="5" 
-                                    ValueChanged="MinSideSize_ValueChanged"/>
-                            <TextBox Grid.Column="2" Height="25" Width="50" HorizontalContentAlignment="Center"
-                                     Text="{Binding ElementName=sliderMinSize, Path=Value, UpdateSourceTrigger=LostFocus}">
-                                <TextBox.Resources>
-                                    <Style TargetType="{x:Type Border}">
-                                        <Setter Property="CornerRadius" Value="3"/>
-                                    </Style>
-                                </TextBox.Resources>
-                            </TextBox>
-                        </Grid>
-                    </Border>
+
+                    <Slider x:Name="Test" Style="{StaticResource SliderBarStyle}"/>
+
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
                         <Grid>
                             <Grid.ColumnDefinitions>

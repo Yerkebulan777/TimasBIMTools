@@ -186,7 +186,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\SmartToolController.cs" />
-    <Compile Include="CustomControls\SliderBar.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
     <Compile Include="RevitUtils\ElementDataDictionary.cs" />
     <Compile Include="Core\SmartToolGeneralHelper.cs" />
@@ -256,10 +255,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Themes\SliderBarStyle.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Themes\Animation.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
