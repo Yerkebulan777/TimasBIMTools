@@ -159,43 +159,6 @@
         </Style.Triggers>
     </Style>
     
-    <!-- SliderBarStyle -->
-    <Style TargetType="{x:Type Slider}" x:Key="SliderBarStyle">
-        <Setter Property="Background" Value="Gray"/>
-        <Setter Property="Width" Value="300"/>
-        <Setter Property="Height" Value="20"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type Slider}">
-                    <Border x:Name="PART_Border" BorderThickness="0.5" BorderBrush="LightGray" >
-                        <Grid>
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="1.5*"/>
-                                <ColumnDefinition Width="0.25*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock x:Name="PART_Text" Grid.Column="0" />
-
-                            <Slider x:Name="PART_Slider" Grid.Column="1" 
-                                    Height="{TemplateBinding Height}" />
-
-                            <TextBox x:Name="PART_TextBox" Grid.Column="2"  >
-                                <TextBox.Resources>
-                                    <Style TargetType="{x:Type Border}">
-                                        <Setter Property="Margin" Value="1.5"/>
-                                        <Setter Property="CornerRadius" Value="1.5"/>
-                                    </Style>
-                                </TextBox.Resources>
-                            </TextBox>
-
-                        </Grid>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    
+   
 
 </ResourceDictionary>

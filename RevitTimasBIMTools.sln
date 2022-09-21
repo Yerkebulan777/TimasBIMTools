@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitTimasBIMTools", "RevitTimasBIMTools.csproj", "{41093622-EED0-4117-B66C-BAF1B6B94DEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Btl.Controls", "..\..\..\Repos\SpinnerControlExample\Btl\Controls\Btl.Controls.csproj", "{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		2019|Any CPU = 2019|Any CPU
@@ -27,6 +29,18 @@ Global
 		{41093622-EED0-4117-B66C-BAF1B6B94DEE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{41093622-EED0-4117-B66C-BAF1B6B94DEE}.Release|x64.ActiveCfg = Release|x64
 		{41093622-EED0-4117-B66C-BAF1B6B94DEE}.Release|x64.Build.0 = Release|x64
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.2019|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.2019|Any CPU.Build.0 = Debug|Any CPU
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.2019|x64.ActiveCfg = Debug|Any CPU
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.2019|x64.Build.0 = Debug|Any CPU
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.Debug|x64.Build.0 = Debug|Any CPU
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.Release|x64.ActiveCfg = Release|Any CPU
+		{EEFA1336-44F6-4766-BE16-A81AD1FCC2E5}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -35,7 +35,7 @@
             
             <ListView Name="sidePanel" VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}" >
                 <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
-                    --><!--<controls:SliderBar Content="Minimum side size"  TickFrequency="5" Minimum="5" Maximum="100" />--><!--
+
                 </ListViewItem>
             </ListView>
             
@@ -46,7 +46,11 @@
             <GroupBox Header=" Element size " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
 
-                    <Slider x:Name="Test" Style="{StaticResource SliderBarStyle}"/>
+                    <ListView Name="sidePanel" VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}" >
+                        <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
+
+                        </ListViewItem>
+                    </ListView>
 
                     <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
                         <Grid>
