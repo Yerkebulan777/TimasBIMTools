@@ -1,9 +1,9 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local = 'clr-namespace:RevitTimasBIMTools.Views'>
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" >
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/SpinnerStyle.xaml"/>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Animation.xaml"/>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Colors.xaml"/>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Button.xaml"/>

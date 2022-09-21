@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Height="750" Width="450" WindowState="Normal"
     x:Class="RevitTimasBIMTools.Views.CutOpeningSettingsView"
-    xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
+    xmlns:btl="clr-namespace:Btl.Controls;assembly=Btl.Controls.MyControls"
     WindowStartupLocation="CenterScreen" WindowStyle="None"
     ResizeMode="NoResize" Background="Gainsboro" 
     Topmost="True">
@@ -46,13 +46,12 @@
             <GroupBox Header=" Element size " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
 
-                    <ListView Name="sidePanel" VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}" >
-                        <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
+                    <btl:SpinnerControl Name="spinnerControl2" 
+                                        Value="10" Minimum="0" Maximum="100" 
+                                        Height="25"  Width="100" />
 
-                        </ListViewItem>
-                    </ListView>
 
-                    <Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
+                    <!--<Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150"/>
@@ -72,7 +71,7 @@
                                 </TextBox.Resources>
                             </TextBox>
                         </Grid>
-                    </Border>
+                    </Border>-->
                 </StackPanel>
             </GroupBox>
         </DockPanel>
