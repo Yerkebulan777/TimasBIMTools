@@ -30,13 +30,17 @@
             <Label Content="Settings" Margin="15,10" FontSize="15"/>
         </StackPanel>
 
-        <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}"
->
-            <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
-                <controls:SliderBar Content="Minimum side size" TickFrequency="5" Minimum="5" Maximum="100" />
-            </ListViewItem>
+        <StackPanel Grid.Row="1" >
+            
+            <ListView Name="sidePanel" VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}" >
+                <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
+                    <controls:SliderBar Content="Minimum side size" Height="20" TickFrequency="5" Minimum="5" Maximum="100" />
+                </ListViewItem>
+            </ListView>
+            
+        </StackPanel>
 
-        </ListView>
+
 
         <!--<DockPanel Grid.Row="1" Height="150" VerticalAlignment="Center" Background="White" >
             <GroupBox Header=" Element size " Margin="5" Padding="5">

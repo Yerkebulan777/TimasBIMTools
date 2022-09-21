@@ -64,7 +64,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Visibility
 
-        private bool isEnabledOptions = true;
+        private bool isEnabledOptions = false;
         public bool IsOptionsEnabled
         {
             get => isEnabledOptions;
