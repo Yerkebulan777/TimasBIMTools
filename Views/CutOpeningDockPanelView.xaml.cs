@@ -6,7 +6,6 @@ using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -16,7 +15,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using ComboBox = System.Windows.Controls.ComboBox;
 using Level = Autodesk.Revit.DB.Level;
 
 namespace RevitTimasBIMTools.Views
