@@ -16,6 +16,7 @@
                 <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+        
     </Window.Resources>
 
     <Grid Height="750" Width="450"  >
@@ -34,7 +35,7 @@
             
             <ListView Name="sidePanel" VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}" >
                 <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
-                    <controls:SliderBar Content="Minimum side size" Height="20" TickFrequency="5" Minimum="5" Maximum="100" />
+                    <controls:SliderBar Content="Minimum side size"  TickFrequency="5" Minimum="5" Maximum="100" />
                 </ListViewItem>
             </ListView>
             
