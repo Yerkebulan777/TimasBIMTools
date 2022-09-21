@@ -63,10 +63,10 @@ namespace RevitTimasBIMTools.Views
             if (documentModel.IsActive)
             {
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
-                settingsView.ComboTargetCats.ItemsSource = args.Categories;
-                settingsView.ComboRoundSymbol.ItemsSource = args.FamilySymbols;
-                settingsView.ComboRectangSymbol.ItemsSource = args.FamilySymbols;
-                settingsView.ComboStructMats.ItemsSource = args.StructureMaterials;
+                //settingsView.ComboTargetCats.ItemsSource = args.Categories;
+                //settingsView.ComboRoundSymbol.ItemsSource = args.FamilySymbols;
+                //settingsView.ComboRectangSymbol.ItemsSource = args.FamilySymbols;
+                //settingsView.ComboStructMats.ItemsSource = args.StructureMaterials;
                 dataViewModel.DocumentModels = args.Documents.ToObservableCollection();
                 ActiveDocTitle.Content = documentModel.Document.Title.ToUpper();
             }

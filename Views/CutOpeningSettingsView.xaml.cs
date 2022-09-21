@@ -18,10 +18,10 @@ namespace RevitTimasBIMTools.Views
 
         private void DefaultSettingCmd_Click(object sender, RoutedEventArgs e)
         {
-            sliderMinSize.Value = 30;
-            sliderMaxSize.Value = 500;
-            sliderCutOffset.Value = 50;
-            sliderRatio.Value = 3;
+            //sliderMinSize.Value = 30;
+            //sliderMaxSize.Value = 500;
+            //sliderCutOffset.Value = 50;
+            //sliderRatio.Value = 3;
         }
 
         private void MinSideSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
