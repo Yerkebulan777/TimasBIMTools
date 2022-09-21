@@ -27,13 +27,13 @@
                                 <ColumnDefinition Width="1.5*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            
-                            <TextBlock x:Name="SliderText" Grid.Column="0"
+
+                            <TextBlock x:Name="PART_Text" Grid.Column="0"
                                        Text="{TemplateBinding Content}" 
                                        Margin="{TemplateBinding Margin}"  Padding="{TemplateBinding Padding}" 
                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                            
-                            <Slider x:Name="SliderControl" Grid.Column="1"
+
+                            <Slider x:Name="PART_Slider" Grid.Column="1"
                                     Value="{TemplateBinding Value}"
                                     Minimum="{TemplateBinding Minimum}"
                                     Maximum="{TemplateBinding Maximum}"

@@ -42,7 +42,6 @@
         </StackPanel>
 
 
-
         <!--<DockPanel Grid.Row="1" Height="150" VerticalAlignment="Center" Background="White" >
             <GroupBox Header=" Element size " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
