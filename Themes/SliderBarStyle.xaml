@@ -34,10 +34,7 @@
                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
 
                             <Slider x:Name="PART_Slider" Grid.Column="1"
-                                    Value="{TemplateBinding Value}"
-                                    Minimum="{TemplateBinding Minimum}"
-                                    Maximum="{TemplateBinding Maximum}"
-                                    TickFrequency="{TemplateBinding TickFrequency}"
+
                                     Margin="{TemplateBinding Margin}" Padding="{TemplateBinding Padding}"
                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                             

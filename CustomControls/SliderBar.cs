@@ -3,11 +3,11 @@ using System.Windows.Controls;
 
 namespace RevitTimasBIMTools.CustomControls
 {
-    [TemplatePart(Name = SliderControl, Type = typeof(Slider))]
+    [TemplatePart(Name = SliderPart, Type = typeof(Slider))]
     [TemplatePart(Name = SliderBorder, Type = typeof(Border))]
-    internal sealed class SliderBar : Slider
+    internal sealed class SliderBar : Control
     {
-        public const string SliderControl = "PART_Slider";
+        public const string SliderPart = "PART_Slider";
         public const string SliderBorder = "PART_Border";
         
         public string Content
@@ -17,13 +17,13 @@ namespace RevitTimasBIMTools.CustomControls
         }
 
         public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register("Content", typeof(string), typeof(SliderBar), new PropertyMetadata(""));
+            DependencyProperty.Register("Content", typeof(string), typeof(SliderBar), new PropertyMetadata("Text"));
 
 
-        //public SliderBar()
-        //{
-        //    //DefaultStyleKeyProperty.OverrideMetadata(typeof(SliderBar), new FrameworkPropertyMetadata(typeof(SliderBar)));
-        //}
+        public SliderBar()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(SliderBar), new FrameworkPropertyMetadata(typeof(SliderBar)));
+        }
 
 
         public CornerRadius CornerRadius
@@ -42,17 +42,15 @@ namespace RevitTimasBIMTools.CustomControls
             = DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(SliderBar), new FrameworkPropertyMetadata(default(CornerRadius)));
 
 
-        public Slider sliderControl{ get; private set; }
-        public Border sliderBorder { get; private set; }
+        public Slider sliderControl;
+        public Border sliderBorder;
 
         public override void OnApplyTemplate()
         {
-
-            base.OnApplyTemplate();
-
-            sliderControl = GetTemplateChild(SliderControl) as Slider;
+            sliderControl = FindName("PART_Slider") as Slider;
             sliderBorder = GetTemplateChild(SliderBorder) as Border;
             sliderBorder.CornerRadius = CornerRadius;
+            base.OnApplyTemplate();
         }
     }
 

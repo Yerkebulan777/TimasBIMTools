@@ -64,7 +64,7 @@
             <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}"
 >
                 <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
-                    <controls:SliderBar Content="Minimum side size" TickFrequency="5" Minimum="5" Maximum="100" />
+                    <!--<controls:SliderBar Content="Minimum side size" TickFrequency="5" Minimum="5" Maximum="100" />-->
                 </ListViewItem>
 
             </ListView>
