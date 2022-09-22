@@ -30,7 +30,7 @@
             </Grid.RowDefinitions>
 
             <!--Header -->
-            <Border  Grid.Row="0" Background="{DynamicResource FloralGradientBrush}" BorderThickness="0">
+            <Border  Grid.Row="0" Background="{DynamicResource FloralGradientBrush}">
                 <Grid Grid.Row="0" VerticalAlignment="Center" >
                     <Label Name="ActiveDocTitle" TextElement.FontSize="13" VerticalAlignment="Center" >
                         <Label.BitmapEffect>
@@ -61,39 +61,74 @@
 
 
             <!-- Options -->
-            <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch">
+            <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch"
+                      Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}"
+                      Style="{StaticResource VisibleAnimation}" >
 
                 <ListViewItem>
-                    <Border  BorderThickness="1" BorderBrush="Silver"  CornerRadius="2.5" Margin="2.5" Padding="2.5">
+                    <Border Style="{StaticResource GroupBoxBorderStyle}" >
+                        <StackPanel>
+                            <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Project: " Width="125"/>
+                                <xctk:WatermarkComboBox Name="ComboTargetDocs" Height="23" Width="125" Watermark="Select project..."/>
+                            </WrapPanel>
+                            <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Category: " Width="125"/>
+                                <xctk:WatermarkComboBox Name="ComboTargetCats" Height="23" Width="125" Watermark="Select category..."/>
+                            </WrapPanel>
+                            <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Structure: " Width="125"/>
+                                <xctk:WatermarkComboBox Name="ComboStructMats" Height="23" Width="125" Watermark="Select by material..."/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                </ListViewItem>
+
+                <ListViewItem>
+                    <Border Style="{StaticResource GroupBoxBorderStyle}" >
+                        <StackPanel>
+                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Rectangle opening:" Width="125"/>
+                                <xctk:WatermarkComboBox x:Name="ComboRectangSymbol" Height="23" Width="125" Watermark="Select family..."/>
+                            </WrapPanel>
+                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Round opening: " Width="125"/>
+                                <xctk:WatermarkComboBox x:Name="ComboRoundSymbol" Height="23" Width="125" Watermark="Select family..."/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                </ListViewItem>
+
+                <ListViewItem>
+                    <Border Style="{StaticResource GroupBoxBorderStyle}">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
-                            <StackPanel x:Name="minSize" Orientation="Horizontal" Margin="2.5" >
-                                <Label Content="Minimum size" Width="100"/>
+                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Minimum size: " Width="125"/>
                                 <xctk:IntegerUpDown Name="sldMinSize"
-                                                    Height="20" Width="65" TextAlignment="Center"
+                                                    Height="23" Width="65" TextAlignment="Center"
                                                     Value="25" Minimum="5" Maximum="150" />
-                            </StackPanel>
+                            </WrapPanel>
 
-                            <StackPanel x:Name="maxSize" Orientation="Horizontal" Margin="2.5" >
-                                <Label Content="Maximum size" Width="100"/>
+                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Maximum size: " Width="125"/>
                                 <xctk:IntegerUpDown Name="sldMaxSize"
-                                                    Height="20" Width="65" TextAlignment="Center"
+                                                    Height="23" Width="65" TextAlignment="Center"
                                                     Value="250" Minimum="150" Maximum="1000" />
-                            </StackPanel>
+                            </WrapPanel>
 
                         </StackPanel>
                     </Border>
                 </ListViewItem>
 
                 <ListViewItem>
-                    <Border  BorderThickness="1" BorderBrush="Silver"  CornerRadius="2.5" Margin="2.5" Padding="2.5">
-                        <StackPanel x:Name="cutSize" Orientation="Horizontal" 
-                                    VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                            <Label Content="Cut offset" Width="100"/>
+                    <Border Style="{StaticResource GroupBoxBorderStyle}" >
+                        <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                            <Label Content="Cut offset: " Width="125"/>
                             <xctk:IntegerUpDown Name="sldCutSize"
-                                                Height="20" Width="65" TextAlignment="Center" 
+                                                Height="23" Width="65" TextAlignment="Center" 
                                                 Value="50" Minimum="0" Maximum="500" />
-                        </StackPanel>
+                        </WrapPanel>
                     </Border>
                 </ListViewItem>
 
@@ -178,24 +213,35 @@
 
 
             <!-- ButtonPanel -->
-            <Border Grid.Row="4" Background="Silver"  BorderThickness="0">
+            <Border Grid.Row="4" Background="Silver" >
                 <DockPanel Grid.Row="3" LastChildFill="True" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
                     <Button Name="SnoopCmd" Height="30" Width="75" Margin="5" 
                         Command="{Binding SnoopCommand, Mode=OneTime}">
-                        <Label FontFamily="Segoe MDL2 Assets" Content="&#xE786;" FontSize="17" />
+                        <Label FontFamily="Segoe MDL2 Assets" Content="&#59647;" Foreground="BlueViolet"  FontSize="15" >
+                            <Label.BitmapEffect>
+                                <DropShadowBitmapEffect/>
+                            </Label.BitmapEffect>
+                        </Label>
                     </Button>
                     <RepeatButton Name="ApplyCmd" Delay="5000" Interval="2500" Height="30" Width="75" Margin="5"
                         Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                         CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}">
-                        <Label FontFamily="Segoe MDL2 Assets" Content="&#xE73E;" FontSize="17" />
+                        <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" Foreground="Green"  FontSize="15">
+                            <Label.BitmapEffect>
+                                <DropShadowBitmapEffect/>
+                            </Label.BitmapEffect>
+                        </Label>
                     </RepeatButton>
                     <Button Name="CancelCmd"  Height="30" Width="75" Margin="5" 
                         Command="{Binding Path=CloseCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}">
-                        <Label FontFamily="Segoe MDL2 Assets" Content="&#xE711;" FontSize="17" />
+                        <Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" Foreground="Red" FontSize="15" >
+                            <Label.BitmapEffect>
+                                <DropShadowBitmapEffect />
+                            </Label.BitmapEffect>
+                        </Label>
                     </Button>
                 </DockPanel>
             </Border>
-
 
         </Grid>
     </Border>

@@ -149,7 +149,8 @@
         </Setter>
     </Style>
     <!--SingleClickEditStyle-->
-    <Style x:Key="SingleClickEditStyle" TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
+    <Style x:Key="SingleClickEditStyle" TargetType="{x:Type DataGridCell}"
+           BasedOn="{StaticResource {x:Type DataGridCell}}">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="IsEditing" Value="True" />
@@ -157,7 +158,14 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    
+    <!--GroupBoxBorderStyle-->
+    <Style x:Key="GroupBoxBorderStyle"  TargetType="Border" >
+        <Setter Property="BorderBrush" Value="Silver"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="2.5"/>
+        <Setter Property="Padding" Value="2.5"/>
+        <Setter Property="Margin" Value="2.5"/>
+    </Style>
    
 
 </ResourceDictionary>
