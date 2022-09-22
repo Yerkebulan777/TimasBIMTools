@@ -31,15 +31,6 @@
             <Label Content="Settings" Margin="15,10" FontSize="15"/>
         </StackPanel>
 
-        <!--<StackPanel Grid.Row="1" >
-            
-            <ListView Name="sidePanel" VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}" >
-                <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
-
-                </ListViewItem>
-            </ListView>
-            
-        </StackPanel>-->
 
         <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch">
             <ListViewItem  >

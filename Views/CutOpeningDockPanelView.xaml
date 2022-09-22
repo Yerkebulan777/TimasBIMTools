@@ -64,11 +64,20 @@
             <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch">
                 <ListViewItem  >
                     <GroupBox Header=" Element size " Margin="2.5" Padding="2.5">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
-                            <StackPanel x:Name="minSize" Orientation="Horizontal" Height="30">
-                                <Label Content="Minimum side size" Width="125"/>
-                                <xctk:IntegerUpDown Name="sldSize" Minimum="5" Maximum="1000" />
+                            <StackPanel x:Name="minSize" Orientation="Horizontal" Margin="2.5" >
+                                <Label Content="Minimum size" Width="100"/>
+                                <xctk:IntegerUpDown Name="sldMinSize"
+                                                    Height="20" Width="65" TextAlignment="Center"
+                                                    Value="25" Minimum="5" Maximum="150" />
+                            </StackPanel>
+
+                            <StackPanel x:Name="maxSize" Orientation="Horizontal" Margin="2.5" >
+                                <Label Content="Maximum size" Width="100"/>
+                                <xctk:IntegerUpDown Name="sldMaxSize"
+                                                    Height="20" Width="65" TextAlignment="Center"
+                                                    Value="250" Minimum="150" Maximum="1000" />
                             </StackPanel>
 
                         </StackPanel>
