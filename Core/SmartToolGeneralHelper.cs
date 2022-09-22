@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RevitTimasBIMTools.Properties;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
@@ -7,7 +8,6 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using RevitTimasBIMTools.Properties;
 
 
 namespace RevitTimasBIMTools.Core
@@ -39,7 +39,7 @@ namespace RevitTimasBIMTools.Core
                     Int32Rect.Empty,
                     BitmapSizeOptions.FromEmptyOptions());
             }
-            finally { DeleteObject(handle); }
+            finally { _ = DeleteObject(handle); }
         }
         #endregion
     }

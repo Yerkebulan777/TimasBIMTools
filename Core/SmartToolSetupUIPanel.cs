@@ -1,6 +1,6 @@
-﻿using System;
-using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.UI;
 using RevitTimasBIMTools.CutOpening;
+using System;
 
 namespace RevitTimasBIMTools.Core
 {
