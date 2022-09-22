@@ -8,7 +8,8 @@
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelView" 
-    d:Height="Auto" d:Width="300" mc:Ignorable="d">
+    d:Height="Auto" d:Width="300" mc:Ignorable="d"
+    Background="LightSlateGray">
 
     <Page.Resources>
         <ResourceDictionary>
@@ -19,7 +20,14 @@
     </Page.Resources>
 
     <Border BorderThickness="2.5" BorderBrush="Gray">
-        <Grid Name="PageMainGrid" Background="SeaShell">
+        <Grid Name="PageMainGrid">
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="0,0" StartPoint="0,1">
+                    <GradientStop Offset="0" Color="WhiteSmoke"/>
+                    <GradientStop Offset="0.5" Color="SeaShell" />
+                    <GradientStop Offset="1" Color="WhiteSmoke"/>
+                </LinearGradientBrush>
+            </Grid.Background>
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
@@ -67,20 +75,28 @@
 
                 <ListViewItem>
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
-                        <StackPanel>
-                            <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Project: " Width="125"/>
-                                <xctk:WatermarkComboBox Name="ComboTargetDocs" Height="23" Width="125" Watermark="Select project..."/>
-                            </WrapPanel>
-                            <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Category: " Width="125"/>
-                                <xctk:WatermarkComboBox Name="ComboTargetCats" Height="23" Width="125" Watermark="Select category..."/>
-                            </WrapPanel>
-                            <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Structure: " Width="125"/>
-                                <xctk:WatermarkComboBox Name="ComboStructMats" Height="23" Width="125" Watermark="Select by material..."/>
-                            </WrapPanel>
-                        </StackPanel>
+                        <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                            <Label Content="Project: " Width="125"/>
+                            <xctk:WatermarkComboBox Name="ComboTargetDocs" Height="23" Width="125" Watermark="Select project..."/>
+                        </WrapPanel>
+                    </Border>
+                </ListViewItem>
+
+                <ListViewItem>
+                    <Border Style="{StaticResource GroupBoxBorderStyle}" >
+                        <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                            <Label Content="Structure: " Width="125"/>
+                            <xctk:WatermarkComboBox Name="ComboStructMats" Height="23" Width="125" Watermark="Select by material..."/>
+                        </WrapPanel>
+                    </Border>
+                </ListViewItem>
+
+                <ListViewItem>
+                    <Border Style="{StaticResource GroupBoxBorderStyle}" >
+                        <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                            <Label Content="Category: " Width="125"/>
+                            <xctk:WatermarkComboBox Name="ComboTargetCats" Height="23" Width="125" Watermark="Select category..."/>
+                        </WrapPanel>
                     </Border>
                 </ListViewItem>
 
@@ -107,14 +123,14 @@
                                 <Label Content="Minimum size: " Width="125"/>
                                 <xctk:IntegerUpDown Name="sldMinSize"
                                                     Height="23" Width="65" TextAlignment="Center"
-                                                    Value="25" Minimum="5" Maximum="150" />
+                                                    Value="50" Minimum="0" Maximum="100" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Maximum size: " Width="125"/>
                                 <xctk:IntegerUpDown Name="sldMaxSize"
                                                     Height="23" Width="65" TextAlignment="Center"
-                                                    Value="250" Minimum="150" Maximum="1000" />
+                                                    Value="250" Minimum="100" Maximum="1000" />
                             </WrapPanel>
 
                         </StackPanel>
@@ -146,7 +162,6 @@
                 <ComboBox Name="ComboFloorFilter" Height="23" Width="150" Margin="5"
                           SelectedIndex="-1" DisplayMemberPath="Value.Name" SelectedValuePath="Value"
                           SelectedValue="{Binding Path=SelectedLevel, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
-
             </WrapPanel>
 
 

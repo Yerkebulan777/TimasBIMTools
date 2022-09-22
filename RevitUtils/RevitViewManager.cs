@@ -79,8 +79,11 @@ namespace RevitTimasBIMTools.RevitUtils
         #region Show3DView
         public static void Show3DView(UIDocument uidoc, View3D view3d)
         {
-            uidoc.RequestViewChange(view3d);
-            uidoc.RefreshActiveView();
+            if (view3d != null)
+            {
+                uidoc.RequestViewChange(view3d);
+                uidoc.RefreshActiveView();
+            }
         }
 
         #endregion
