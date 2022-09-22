@@ -306,12 +306,6 @@
     <Folder Include="Examples\" />
     <Folder Include="ViewConverters\" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Repos\SpinnerControlExample\Btl\Controls\Btl.Controls.csproj">
-      <Project>{eefa1336-44f6-4766-be16-a81ad1fcc2e5}</Project>
-      <Name>Btl.Controls</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

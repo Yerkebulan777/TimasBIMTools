@@ -6,6 +6,7 @@
     xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:CutOpeningDataViewModel}"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelView" 
     d:Height="Auto" d:Width="300" mc:Ignorable="d">
 
@@ -60,10 +61,22 @@
 
 
             <!-- Options -->
+            <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch">
+                <ListViewItem  >
+                    <GroupBox Header=" Element size " Margin="2.5" Padding="2.5">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right">
+
+                            <StackPanel x:Name="minSize" Orientation="Horizontal" Height="30">
+                                <Label Content="Minimum side size" Width="125"/>
+                                <xctk:IntegerUpDown Name="sldSize" Minimum="5" Maximum="1000" />
+                            </StackPanel>
+
+                        </StackPanel>
+                    </GroupBox>
+                </ListViewItem>
+            </ListView>
 
 
-
-            
             <!-- Filter Control -->
             <WrapPanel Grid.Row="2" Style="{StaticResource VisibleAnimation}" 
                        Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="5" 

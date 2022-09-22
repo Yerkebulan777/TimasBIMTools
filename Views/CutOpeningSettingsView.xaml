@@ -6,7 +6,6 @@
     mc:Ignorable="d" Height="750" Width="450" WindowState="Normal"
     x:Class="RevitTimasBIMTools.Views.CutOpeningSettingsView"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    xmlns:btl="clr-namespace:Btl.Controls;assembly=Btl.Controls.MyControls"
     WindowStartupLocation="CenterScreen" WindowStyle="None"
     ResizeMode="NoResize" Background="Gainsboro" 
     Topmost="True">
