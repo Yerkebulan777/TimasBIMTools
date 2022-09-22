@@ -124,5 +124,9 @@ namespace RevitTimasBIMTools.Views
             Hide();
         }
 
+        private void spinnerControl2_ValueChanged(object sender, RoutedPropertyChangedEventArgs<decimal> e)
+        {
+
+        }
     }
 }

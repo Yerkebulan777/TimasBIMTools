@@ -41,17 +41,38 @@
             
         </StackPanel>-->
 
+        <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch">
+            <ListViewItem  >
+                <GroupBox Header=" Element size " Margin="2.5" Padding="2.5">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right">
 
-        <DockPanel Grid.Row="1" Height="150" VerticalAlignment="Center" Background="White" >
+                        <StackPanel x:Name="minSize" Orientation="Horizontal" Height="30">
+                            <Label Content="Minimum side size" Width="125"/>
+                            <btl:SpinnerControl Name="spinnerMin" 
+                                                Value="10" Minimum="0" Maximum="100" 
+                                                Height="25"  Width="100" />
+                        </StackPanel>
+                        
+                        <StackPanel x:Name="maxSize" Orientation="Horizontal" Height="30">
+                            <Label Content="Maximum side size" Width="125"/>
+                            <btl:SpinnerControl Name="spinnerMax" 
+                                                Value="10" Minimum="0" Maximum="100" 
+                                                Height="25"  Width="100" />
+                        </StackPanel>
+
+                    </StackPanel>
+                </GroupBox>
+            </ListViewItem>
+        </ListView>
+
+        <!--<DockPanel Grid.Row="1" Height="150" VerticalAlignment="Center" Background="White" >
             <GroupBox Header=" Element size " Margin="5" Padding="5">
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
 
-                    <btl:SpinnerControl Name="spinnerControl2" 
-                                        Value="10" Minimum="0" Maximum="100" 
-                                        Height="25"  Width="100" />
+                    
+                    <Label Content="Minimum"/>
 
-
-                    <!--<Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
+                    --><!--<Border BorderBrush="LightGray" BorderThickness="0.5" Margin="2.5">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="150"/>
@@ -71,10 +92,10 @@
                                 </TextBox.Resources>
                             </TextBox>
                         </Grid>
-                    </Border>-->
+                    </Border>--><!--
                 </StackPanel>
             </GroupBox>
-        </DockPanel>
+        </DockPanel>-->
         
         <DockPanel Grid.Row="2" Height="150" VerticalAlignment="Center" Background="White">
             <GroupBox Header=" Opening settings " Margin="5" Padding="5">

@@ -60,13 +60,8 @@
 
 
             <!-- Options -->
-            <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top" Style="{StaticResource VisibleAnimation}"
->
-                <ListViewItem VerticalContentAlignment="Center" HorizontalContentAlignment="Stretch">
-                   
-                </ListViewItem>
 
-            </ListView>
+
 
             
             <!-- Filter Control -->
