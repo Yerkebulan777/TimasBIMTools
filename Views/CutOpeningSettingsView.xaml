@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Height="750" Width="450" WindowState="Normal"
     x:Class="RevitTimasBIMTools.Views.CutOpeningSettingsView"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     xmlns:btl="clr-namespace:Btl.Controls;assembly=Btl.Controls.MyControls"
     WindowStartupLocation="CenterScreen" WindowStyle="None"
     ResizeMode="NoResize" Background="Gainsboro" 
@@ -48,18 +49,9 @@
 
                         <StackPanel x:Name="minSize" Orientation="Horizontal" Height="30">
                             <Label Content="Minimum side size" Width="125"/>
-                            <btl:SpinnerControl Name="spinnerMin" 
-                                                Value="10" Minimum="0" Maximum="100" 
-                                                Height="25"  Width="100" />
+                            <xctk:IntegerUpDown Name="sldSize" Minimum="5" Maximum="1000" />
                         </StackPanel>
                         
-                        <StackPanel x:Name="maxSize" Orientation="Horizontal" Height="30">
-                            <Label Content="Maximum side size" Width="125"/>
-                            <btl:SpinnerControl Name="spinnerMax" 
-                                                Value="10" Minimum="0" Maximum="100" 
-                                                Height="25"  Width="100" />
-                        </StackPanel>
-
                     </StackPanel>
                 </GroupBox>
             </ListViewItem>
