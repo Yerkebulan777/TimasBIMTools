@@ -17,10 +17,10 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
-    
+
     <Border BorderThickness="2.5" BorderBrush="Gray">
         <Grid Name="PageMainGrid" Background="SeaShell">
-            
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="Auto"/>
@@ -28,7 +28,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
-            
+
             <!--Header -->
             <Border  Grid.Row="0" Background="{DynamicResource FloralGradientBrush}" BorderThickness="0">
                 <Grid Grid.Row="0" VerticalAlignment="Center" >
@@ -62,8 +62,9 @@
 
             <!-- Options -->
             <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch">
-                <ListViewItem  >
-                    <GroupBox Header=" Element size " Margin="2.5" Padding="2.5">
+
+                <ListViewItem>
+                    <Border  BorderThickness="1" BorderBrush="Silver"  CornerRadius="2.5" Margin="2.5" Padding="2.5">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
                             <StackPanel x:Name="minSize" Orientation="Horizontal" Margin="2.5" >
@@ -81,8 +82,21 @@
                             </StackPanel>
 
                         </StackPanel>
-                    </GroupBox>
+                    </Border>
                 </ListViewItem>
+
+                <ListViewItem>
+                    <Border  BorderThickness="1" BorderBrush="Silver"  CornerRadius="2.5" Margin="2.5" Padding="2.5">
+                        <StackPanel x:Name="cutSize" Orientation="Horizontal" 
+                                    VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                            <Label Content="Cut offset" Width="100"/>
+                            <xctk:IntegerUpDown Name="sldCutSize"
+                                                Height="20" Width="65" TextAlignment="Center" 
+                                                Value="50" Minimum="0" Maximum="500" />
+                        </StackPanel>
+                    </Border>
+                </ListViewItem>
+
             </ListView>
 
 
@@ -90,7 +104,7 @@
             <WrapPanel Grid.Row="2" Style="{StaticResource VisibleAnimation}" 
                        Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="5" 
                        Visibility="{Binding  Path=IsDataEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
-                
+
                 <ComboBox Name="ComboDataFilter" Height="23" Width="150" SelectedIndex="0" Margin="5" 
                           SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                           ItemsSource="{Binding Path=UniqueElementNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -99,8 +113,8 @@
                           SelectedValue="{Binding Path=SelectedLevel, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
 
             </WrapPanel>
-            
-            
+
+
             <!-- DataGridView -->
             <ScrollViewer Grid.Row="3" >
                 <DataGrid Name="dataGridView" IsSynchronizedWithCurrentItem="True" Style="{StaticResource VisibleAnimation}"
@@ -182,7 +196,7 @@
                 </DockPanel>
             </Border>
 
-            
+
         </Grid>
     </Border>
 </Page>
