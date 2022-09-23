@@ -8,7 +8,7 @@ namespace RevitTimasBIMTools.RevitUtils
     {
         public void purgeFamiliesAndTypes(Document doc)
         {
-            // List of categories whose families will be purged
+            // List of Categories whose families will be purged
             List<int> categoriesToPurge = new List<int>
             {
                 (int)BuiltInCategory.OST_StructuralFraming,

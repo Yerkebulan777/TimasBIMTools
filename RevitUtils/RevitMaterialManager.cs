@@ -5,12 +5,11 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal class RevitMaterialManager
     {
-        public static Dictionary<string, string> GetAllConstructionStructureMaterials(Document doc)
+        public static SortedDictionary<string, string> GetAllConstructionStructureMaterials(Document doc)
         {
             Material material = null;
-            Dictionary<string, string> result = new Dictionary<string, string>();
             MaterialFunctionAssignment structure = MaterialFunctionAssignment.Structure;
-
+            SortedDictionary<string, string> result = new SortedDictionary<string, string>();
             Material categoryMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
             FilteredElementCollector collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls);
             CompoundStructure comStruct;

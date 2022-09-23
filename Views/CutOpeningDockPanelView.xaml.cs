@@ -22,15 +22,16 @@ namespace RevitTimasBIMTools.Views
     /// <summary> Логика взаимодействия для CutOpeningDockPanelView.xaml </summary>
     public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
-        public string DocumentGuid { get; set; } = null;
+        
         public View3D View3d { get; set; } = null;
 
         private bool disposedValue = false;
-        private readonly Mutex mutex = new Mutex();
         private DocumentModel documentModel = null;
+
+        private readonly Mutex mutex = new Mutex();
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
+        private readonly string currentDocumentId = Properties.Settings.Default.CurrentDocumentUniqueId;
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
-        private readonly CutOpeningSettingsView settingsView = SmartToolController.Services.GetRequiredService<CutOpeningSettingsView>();
 
 
         public CutOpeningDockPanelView()
@@ -57,18 +58,12 @@ namespace RevitTimasBIMTools.Views
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             View3d = args.View3d;
-            DocumentGuid = args.CurrentDocumentGuid;
-            documentModel = args.Documents.FirstOrDefault();
-            dataViewModel.DocumentGuid = args.CurrentDocumentGuid;
+            documentModel = args.DocumentModels.FirstOrDefault();
             if (documentModel.IsActive)
             {
+                ComboDocumentModels.ItemsSource = args.DocumentModels;
                 viewHandler.Completed -= OnContextViewHandlerCompleted;
-                //settingsView.ComboTargetCats.ItemsSource = args.Categories;
-                //settingsView.ComboRoundSymbol.ItemsSource = args.FamilySymbols;
-                //settingsView.ComboRectangSymbol.ItemsSource = args.FamilySymbols;
-                //settingsView.ComboStructMats.ItemsSource = args.StructureMaterials;
-                dataViewModel.DocumentModels = args.Documents.ToObservableCollection();
-                ActiveDocTitle.Content = documentModel.Document.Title.ToUpper();
+                ActiveDocTitle.Content = Properties.Settings.Default.TargetDocumentName.ToUpper();
             }
         }
 
@@ -89,12 +84,10 @@ namespace RevitTimasBIMTools.Views
                     })
                     .ContinueWith(app =>
                     {
-                        SortedList<double, Level> levels = new SortedList<double, Level>();
-                        foreach (Level lvl in RevitFilterManager.GetValidLevels(doc))
-                        {
-                            levels[lvl.ProjectElevation] = lvl;
-                        }
-                        ComboFloorFilter.ItemsSource = levels;
+                        
+                        ComboFloorFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
+
+
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
                 else
@@ -114,7 +107,7 @@ namespace RevitTimasBIMTools.Views
                 Task task = RevitTask.RunAsync(app =>
                 {
                     Document doc = app.ActiveUIDocument.Document;
-                    if (DocumentGuid.Equals(doc.ProjectInformation.UniqueId))
+                    if (currentDocumentId.Equals(doc.ProjectInformation.UniqueId))
                     {
                         if (mutex.WaitOne())
                         {

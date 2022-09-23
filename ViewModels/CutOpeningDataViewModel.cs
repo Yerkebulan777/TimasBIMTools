@@ -26,20 +26,44 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
-        public CutOpeningDockPanelView DockPanelView { get; set; } = null;
-        public string DocumentGuid { get; internal set; } = string.Empty;
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
+        private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
+        {
+            BuiltInCategory.OST_Conduit,
+            BuiltInCategory.OST_CableTray,
+            BuiltInCategory.OST_PipeCurves,
+            BuiltInCategory.OST_DuctCurves,
+            BuiltInCategory.OST_GenericModel,
+            BuiltInCategory.OST_MechanicalEquipment
+        };
 
-        private string guid = null;
+        public CutOpeningDockPanelView DockPanelView = null;
+        public readonly IList<Category> EngineerCategories = null;
+        public readonly IList<FamilySymbol> HostedFamilySymbols = null;
+        public readonly SortedDictionary<string, string> StructureMaterials=null;
+
+        private Document doc = null;
         private readonly object syncLocker = new object();
-        private IList<ElementModel> collection = new List<ElementModel>();
+        private readonly string documentId = Properties.Settings.Default.CurrentDocumentUniqueId;
         private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
         private readonly string rectangOpeningId = Properties.Settings.Default.RectangSymbolUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
 
+        private IList<ElementModel> collection = new List<ElementModel>();
 
         public CutOpeningDataViewModel()
         {
+            RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+
+            }).RunSynchronously(TaskScheduler.FromCurrentSynchronizationContext());
+
+            EngineerCategories = RevitFilterManager.GetCategories(doc, builtInCats).ToList();
+            StructureMaterials = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
+            HostedFamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc,  BuiltInCategory.OST_GenericModel).ToList();
+
+
             SnoopCommand = new AsyncRelayCommand(SnoopHandelCommandAsync);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
@@ -88,6 +112,13 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
+        #region Settings
+
+
+
+        #endregion
+
+
         #region DataGrid
 
         private bool? isSelected = false;
@@ -111,13 +142,6 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-
-        private ObservableCollection<DocumentModel> docModels = new ObservableCollection<DocumentModel>();
-        public ObservableCollection<DocumentModel> DocumentModels
-        {
-            get => docModels;
-            set => SetProperty(ref docModels, value);
-        }
 
 
         private ObservableCollection<ElementModel> modelCollection = new ObservableCollection<ElementModel>();
@@ -206,8 +230,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 Document doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
-                guid = doc.ProjectInformation.UniqueId;
-                if (DocumentGuid.Equals(guid))
+                string guid = doc.ProjectInformation.UniqueId;
+                if (documentId.Equals(guid))
                 {
                     manager.InitializeActiveDocument(doc);
                     ActivateFamilySimbol(doc, roundOpeningId);
@@ -258,8 +282,8 @@ namespace RevitTimasBIMTools.ViewModels
                 View3D view3d = DockPanelView.View3d;
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
-                guid = doc.ProjectInformation.UniqueId;
-                if (DocumentGuid.Equals(guid) && !ViewCollection.IsEmpty)
+                string guid = doc.ProjectInformation.UniqueId;
+                if (documentId.Equals(guid) && !ViewCollection.IsEmpty)
                 {
                     foreach (ElementModel model in ViewCollection)
                     {
@@ -317,6 +341,8 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
         #endregion
+
+
 
 
         public void Dispose()

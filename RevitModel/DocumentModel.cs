@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using System;
 using System.IO;
 
 namespace RevitTimasBIMTools.RevitModel
@@ -18,5 +19,11 @@ namespace RevitTimasBIMTools.RevitModel
             Title = Path.GetFileNameWithoutExtension(FilePath).Trim();
             Transform = link != null && document.IsLinked ? link.GetTotalTransform() : Transform.Identity;
         }
+
+        public override string ToString()
+        {
+            return Title;
+        }
+
     }
 }

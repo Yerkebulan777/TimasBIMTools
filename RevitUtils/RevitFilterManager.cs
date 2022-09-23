@@ -236,8 +236,9 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region LevelFilter
 
-        public static IEnumerable<Level> GetValidLevels(Document doc)
+        public static IDictionary<double, Level> GetValidLevels(Document doc)
         {
+            IDictionary<double, Level> result = new SortedDictionary<double, Level>();
             ICollection<ElementId> wallIds = GetInstancesOfCategory(doc, typeof(Wall), BuiltInCategory.OST_Walls).ToElementIds();
             ICollection<ElementId> floorIds = GetInstancesOfCategory(doc, typeof(Floor), BuiltInCategory.OST_Floors).ToElementIds();
             FilteredElementCollector collector = new FilteredElementCollector(doc);
@@ -253,18 +254,40 @@ namespace RevitTimasBIMTools.RevitUtils
                         collector = new FilteredElementCollector(doc, floorIds);
                         if (collector.WherePasses(levelFilter).Any())
                         {
-                            yield return level;
+                            result[level.ProjectElevation] = level;
                         }
                     }
                 }
                 else
                 {
-                    yield return level;
+                    result[level.ProjectElevation] = level;
+                }
+            }
+            return result;
+        }
+
+        #endregion
+
+
+        #region FamilyFilter
+
+        public static IEnumerable<FamilySymbol> GetHostedFamilySymbols(Document doc, BuiltInCategory bic)
+        {
+            FamilyPlacementType placement = FamilyPlacementType.OneLevelBasedHosted;
+            FilteredElementCollector collector = GetInstancesOfCategory(doc, typeof(FamilySymbol), bic);
+            foreach (FamilySymbol smb in collector)
+            {
+                Family fam = smb.Family;
+                if (fam.IsValidObject && fam.IsEditable)
+                {
+                    if (fam.FamilyPlacementType.Equals(placement))
+                    {
+                        yield return smb;
+                    }
                 }
             }
         }
 
         #endregion
-
     }
 }

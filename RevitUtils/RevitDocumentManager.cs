@@ -13,17 +13,16 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static IList<DocumentModel> GetDocumentCollection(Document doc)
         {
-            List<DocumentModel> docs = new List<DocumentModel> { new DocumentModel(doc) };
-
+            IList<DocumentModel> result = new List<DocumentModel> { new DocumentModel(doc) };
             foreach (RevitLinkInstance link in GetRevitLinkInstanceCollector(doc))
             {
                 Document linkDoc = link.GetLinkDocument();
                 if (linkDoc != null && linkDoc.IsValidObject)
                 {
-                    docs.Add(new DocumentModel(linkDoc, link));
+                    result.Add(new DocumentModel(linkDoc, link));
                 }
             }
-            return docs;
+            return result;
         }
     }
 }
