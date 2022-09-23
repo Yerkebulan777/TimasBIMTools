@@ -51,7 +51,7 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         try
                         {
-                            dockpaneExtEvent?.Raise();
+                            _ = (dockpaneExtEvent?.Raise());
                             dockpane.Show();
                         }
                         catch (Exception exc)
@@ -67,8 +67,8 @@ namespace RevitTimasBIMTools.CutOpening
 
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
         {
-            UIDocument uidoc = uiapp.ActiveUIDocument;
-            return uidoc != null && !uidoc.Document.IsFamilyDocument;
+            UIDocument uidoc = uiapp?.ActiveUIDocument;
+            return uidoc != null && uidoc.ActiveGraphicalView != null && !uidoc.Document.IsFamilyDocument;
         }
 
 
