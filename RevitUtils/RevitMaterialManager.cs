@@ -5,11 +5,11 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal class RevitMaterialManager
     {
-        public static SortedDictionary<string, string> GetAllConstructionStructureMaterials(Document doc)
+        public static SortedDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
         {
             Material material = null;
             MaterialFunctionAssignment structure = MaterialFunctionAssignment.Structure;
-            SortedDictionary<string, string> result = new SortedDictionary<string, string>();
+            SortedDictionary<string, Material> result = new SortedDictionary<string, Material>();
             Material categoryMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
             FilteredElementCollector collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls);
             CompoundStructure comStruct;
@@ -35,7 +35,7 @@ namespace RevitTimasBIMTools.RevitUtils
                                     {
                                         if (null != material)
                                         {
-                                            result[wallType.Name] = material.Name;
+                                            result[material.Name] = material;
                                         }
                                     }
                                     break;
@@ -70,7 +70,7 @@ namespace RevitTimasBIMTools.RevitUtils
                                     {
                                         if (null != material)
                                         {
-                                            result[floorType.Name] = material.Name;
+                                            result[material.Name] = material;
                                         }
                                     }
                                     break;
@@ -103,7 +103,7 @@ namespace RevitTimasBIMTools.RevitUtils
                                 {
                                     if (null != material)
                                     {
-                                        result[roofType.Name] = material.Name;
+                                        result[material.Name] = material;
                                     }
                                 }
                                 break;
