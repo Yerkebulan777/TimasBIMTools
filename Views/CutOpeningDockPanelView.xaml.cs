@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using Xceed.Wpf.Toolkit;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -103,7 +104,11 @@ namespace RevitTimasBIMTools.Views
 
         private void LimitSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            Logger.Info(sender.GetType().Name);
+            if (sender is IntegerUpDown controler)
+            {
+                Logger.Info(controler.Name + e.NewValue);
+            }
+            
         }
 
 
