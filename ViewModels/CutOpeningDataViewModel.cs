@@ -75,10 +75,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Settings
 
-        public Document targetDocument = null;
-        public Transform transform = null;
-        public RevitLinkInstance linkInstance = null;
-
+        private Document targetDocument = null;
         private DocumentModel docModel = null;
         public DocumentModel DocumentModel
         {
@@ -90,8 +87,6 @@ namespace RevitTimasBIMTools.ViewModels
                     if (docModel != null)
                     {
                         targetDocument = docModel.Document;
-                        linkInstance = docModel.LinkInstance;
-                        transform = docModel.Transform;
                     }
                 }
             }
