@@ -6,7 +6,6 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Animation.xaml"/>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Colors.xaml"/>
-        <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Button.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
     <Converters:ElementNameConverter x:Key="NameConverter"/>
@@ -82,20 +81,6 @@
         <Setter Property="MinWidth" Value="150" />
         <Setter Property="MaxWidth" Value="250" />
         <Setter Property="Height" Value="23" />
-    </Style>
-    <!--Slider-->
-    <Style TargetType="Slider">
-        <Setter Property="Margin" Value="10"/>
-        <Setter Property="Focusable" Value="True"/>
-        <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="IsSelectionRangeEnabled" Value="True" />
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="TickPlacement" Value="BottomRight"/>
-        <Setter Property="IsSnapToTickEnabled" Value="True"/>
-        <Setter Property="TickFrequency" Value="5"/>
-        <Setter Property="MaxWidth" Value="300"/>
-        <Setter Property="MinWidth" Value="100"/>
-        <Setter Property="Height" Value="25"/>
     </Style>
     <!--CenterHeaderTextBlock-->
     <Style TargetType="TextBlock" x:Key="CenterHeaderTextBlock">

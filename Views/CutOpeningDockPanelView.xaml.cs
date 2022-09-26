@@ -6,7 +6,6 @@ using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -104,11 +103,11 @@ namespace RevitTimasBIMTools.Views
 
         private void LimitSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (sender is IntegerUpDown controler)
+            if (sender is IntegerUpDown)
             {
                 //Logger.Info(controler.Name + e.NewValue);
             }
-            
+
         }
 
 
