@@ -15,14 +15,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using Level = Autodesk.Revit.DB.Level;
 
 namespace RevitTimasBIMTools.Views
 {
     /// <summary> Логика взаимодействия для CutOpeningDockPanelView.xaml </summary>
     public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
-        
+
         public View3D View3d { get; set; } = null;
 
         private bool disposedValue = false;
