@@ -75,11 +75,11 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Settings
 
-        private DocumentModel document = null;
+        private DocumentModel model = null;
         public DocumentModel DocumentModel
         {
-            get => document;
-            set => SetProperty(ref document, value);
+            get => model;
+            set => SetProperty(ref model, value);
         }
 
 
@@ -213,7 +213,7 @@ namespace RevitTimasBIMTools.ViewModels
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
                 string guid = doc.ProjectInformation.UniqueId;
-                manager.Initialize(doc, document, category, level);
+                manager.Initialize(doc, model, category, level);
                 if (documentId.Equals(guid))
                 {
                     ActivateFamilySimbol(doc, roundOpeningId);
