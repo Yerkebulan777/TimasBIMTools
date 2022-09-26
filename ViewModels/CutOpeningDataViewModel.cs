@@ -348,7 +348,6 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-
         public void Dispose()
         {
             manager?.Dispose();
