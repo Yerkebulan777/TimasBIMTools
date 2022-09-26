@@ -82,12 +82,26 @@ namespace RevitTimasBIMTools.ViewModels
             get => docModel;
             set
             {
-                if (SetProperty(ref docModel, value) )
+                if (SetProperty(ref docModel, value))
                 {
                     if (docModel != null)
                     {
                         targetDocument = docModel.Document;
                     }
+                }
+            }
+        }
+
+
+        private Category category = null;
+        public Category EngineerCategory
+        {
+            get => category;
+            set
+            {
+                if (SetProperty(ref category, value))
+                {
+
                 }
             }
         }
