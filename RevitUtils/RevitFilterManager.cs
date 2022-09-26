@@ -203,19 +203,6 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Category filter
 
-        public static IEnumerable<Category> GetCategories(Document doc, IList<BuiltInCategory> bics)
-        {
-            foreach (BuiltInCategory catId in bics)
-            {
-                Category cat = Category.GetCategory(doc, catId);
-                if (cat != null)
-                {
-                    yield return cat;
-                }
-            }
-        }
-
-
         public static IEnumerable<Category> GetCategories(Document doc, bool model = true)
         {
             foreach (ElementId catId in ParameterFilterUtilities.GetAllFilterableCategories())
@@ -230,6 +217,29 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
         }
+
+
+        public static IEnumerable<Category> GetEngineerCategories(Document doc)
+        {
+            IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
+            {
+                BuiltInCategory.OST_Conduit,
+                BuiltInCategory.OST_CableTray,
+                BuiltInCategory.OST_PipeCurves,
+                BuiltInCategory.OST_DuctCurves,
+                BuiltInCategory.OST_GenericModel,
+                BuiltInCategory.OST_MechanicalEquipment
+            };
+            foreach (BuiltInCategory catId in builtInCats)
+            {
+                Category cat = Category.GetCategory(doc, catId);
+                if (cat != null)
+                {
+                    yield return cat;
+                }
+            }
+        }
+
 
         #endregion
 

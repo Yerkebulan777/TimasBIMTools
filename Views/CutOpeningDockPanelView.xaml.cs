@@ -29,6 +29,7 @@ namespace RevitTimasBIMTools.Views
         private DocumentModel documentModel = null;
 
         private readonly Mutex mutex = new Mutex();
+        public IList<FamilySymbol> HostedFamilySymbols = new List<FamilySymbol>(25);
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string currentDocumentId = Properties.Settings.Default.CurrentDocumentUniqueId;
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
@@ -84,10 +85,12 @@ namespace RevitTimasBIMTools.Views
                     })
                     .ContinueWith(app =>
                     {
-                        
-                        ComboFloorFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
-
-
+                        ComboLevelFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
+                        ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
+                        ComboStructureMats.ItemsSource = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
+                        HostedFamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel).ToList();
+                        ComboRectangSymbol.ItemsSource = HostedFamilySymbols;
+                        ComboRoundedSymbol.ItemsSource = HostedFamilySymbols;
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
                 else

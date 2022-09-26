@@ -26,21 +26,8 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
-        public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
-        private readonly IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
-        {
-            BuiltInCategory.OST_Conduit,
-            BuiltInCategory.OST_CableTray,
-            BuiltInCategory.OST_PipeCurves,
-            BuiltInCategory.OST_DuctCurves,
-            BuiltInCategory.OST_GenericModel,
-            BuiltInCategory.OST_MechanicalEquipment
-        };
-
         public CutOpeningDockPanelView DockPanelView = null;
-        public readonly IList<Category> EngineerCategories = null;
-        public readonly IList<FamilySymbol> HostedFamilySymbols = null;
-        public readonly SortedDictionary<string, string> StructureMaterials=null;
+        public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
         private Document doc = null;
         private readonly object syncLocker = new object();
@@ -53,17 +40,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutOpeningDataViewModel()
         {
-            RevitTask.RunAsync(app =>
-            {
-                doc = app.ActiveUIDocument.Document;
-
-            }).RunSynchronously(TaskScheduler.FromCurrentSynchronizationContext());
-
-            EngineerCategories = RevitFilterManager.GetCategories(doc, builtInCats).ToList();
-            StructureMaterials = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
-            HostedFamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc,  BuiltInCategory.OST_GenericModel).ToList();
-
-
             SnoopCommand = new AsyncRelayCommand(SnoopHandelCommandAsync);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
