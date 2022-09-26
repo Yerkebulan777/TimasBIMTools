@@ -24,7 +24,6 @@ namespace RevitTimasBIMTools.CutOpening
                 try
                 {
                     uicontrol.RegisterDockablePane(paneId, SmartToolGeneralHelper.CutVoidToolName, view);
-                    dockpane = uicontrol.GetDockablePane(paneId);
                 }
                 catch (Exception exc)
                 {
@@ -32,6 +31,7 @@ namespace RevitTimasBIMTools.CutOpening
                 }
                 finally
                 {
+                    dockpane = uicontrol.GetDockablePane(paneId);
                     if (dockpane != null && dockpane.IsShown())
                     {
                         dockpane.Hide();
