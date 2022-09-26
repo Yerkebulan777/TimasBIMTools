@@ -67,7 +67,16 @@ namespace RevitTimasBIMTools.ViewModels
         public bool IsDataEnabled
         {
             get => isEnabledData;
-            set => SetProperty(ref isEnabledData, value);
+            set
+            {
+                if (value == false || model != null && category != null && level != null)
+                {
+                    if (SetProperty(ref isEnabledData, value))
+                    {
+                         IsOptionsEnabled = !isEnabledData;
+                    }
+                }
+            }
         }
 
         #endregion
