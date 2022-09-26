@@ -82,10 +82,10 @@ namespace RevitTimasBIMTools.Views
                     })
                     .ContinueWith(app =>
                     {
-                        ComboLevelFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
                         ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
                         ComboStructureMats.ItemsSource = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
                         HostedFamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel).ToList();
+                        ComboLevelFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
                         ComboRectangSymbol.ItemsSource = HostedFamilySymbols;
                         ComboRoundedSymbol.ItemsSource = HostedFamilySymbols;
                     }, TaskScheduler.FromCurrentSynchronizationContext());
