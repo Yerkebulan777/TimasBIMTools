@@ -23,12 +23,11 @@ namespace RevitTimasBIMTools.Views
     public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
 
-        public View3D View3d { get; set; } = null;
-
         private bool disposedValue = false;
-        private DocumentModel documentModel = null;
-
         private readonly Mutex mutex = new Mutex();
+        public View3D View3d { get; set; } = null;
+        public DocumentModel TargetDocModel = null;
+
         public IList<FamilySymbol> HostedFamilySymbols = new List<FamilySymbol>(25);
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string currentDocumentId = Properties.Settings.Default.CurrentDocumentUniqueId;
@@ -59,10 +58,11 @@ namespace RevitTimasBIMTools.Views
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             View3d = args.View3d;
-            documentModel = args.DocumentModels.FirstOrDefault();
-            ComboDocumentModels.ItemsSource = args.DocumentModels;
+            TargetDocModel = args.DocumentModels.FirstOrDefault();
             viewHandler.Completed -= OnContextViewHandlerCompleted;
-            ActiveDocTitle.Content = documentModel.Document.Title.ToUpper();
+            DocTitle.Content = TargetDocModel.Document.Title.ToUpper();
+            ComboDocumentModels.ItemsSource = args.DocumentModels;
+            ComboDocumentModels.SelectedIndex = 0;
         }
 
 
