@@ -34,6 +34,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private void OnCompleted(BaseCompletedEventArgs e)
         {
+            Properties.Settings.Default.Save();
             Completed?.Invoke(this, e);
         }
 
