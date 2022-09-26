@@ -71,7 +71,9 @@
             <!-- Options -->
             <!--Style="{StaticResource VisibleAnimation}"-->
             <!--Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}"-->
-            <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch" >
+            <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch" 
+                      Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}"
+                      Style="{StaticResource VisibleAnimation}" >
 
                 <ListViewItem>
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
@@ -123,14 +125,14 @@
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Minimum size: " Width="125"/>
-                                <xctk:IntegerUpDown Name="sldMinSize"
+                                <xctk:IntegerUpDown Name="MinSize" ValueChanged="LimitSize_ValueChanged"
                                                     Height="23" Width="65" TextAlignment="Center"
                                                     Value="50" Minimum="0" Maximum="100" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Maximum size: " Width="125"/>
-                                <xctk:IntegerUpDown Name="sldMaxSize"
+                                <xctk:IntegerUpDown Name="MaxSize" ValueChanged="LimitSize_ValueChanged"
                                                     Height="23" Width="65" TextAlignment="Center"
                                                     Value="250" Minimum="100" Maximum="1000" />
                             </WrapPanel>
@@ -143,7 +145,7 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                             <Label Content="Cut offset: " Width="125"/>
-                            <xctk:IntegerUpDown Name="sldCutSize"
+                            <xctk:IntegerUpDown Name="CutSize" ValueChanged="LimitSize_ValueChanged"
                                                 Height="23" Width="65" TextAlignment="Center" 
                                                 Value="50" Minimum="0" Maximum="500" />
                         </WrapPanel>

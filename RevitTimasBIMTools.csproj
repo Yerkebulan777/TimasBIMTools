@@ -249,6 +249,7 @@
     <Compile Include="Services\MutexServise.cs" />
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Services\Timer.cs" />
+    <Compile Include="ViewConverters\ElementNameConverter.cs" />
     <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\CutOpeningDockPanelView.xaml.cs">
@@ -300,7 +301,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Examples\" />
-    <Folder Include="ViewConverters\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

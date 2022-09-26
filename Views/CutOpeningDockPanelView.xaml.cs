@@ -6,6 +6,7 @@ using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -98,6 +99,11 @@ namespace RevitTimasBIMTools.Views
                     dataViewModel.IsDataEnabled = true;
                 }
             });
+        }
+
+        private void LimitSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            Logger.Info(sender.GetType().Name);
         }
 
 
