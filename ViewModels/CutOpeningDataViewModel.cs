@@ -75,21 +75,11 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Settings
 
-        private Document targetDocument = null;
-        private DocumentModel docModel = null;
+        private DocumentModel document = null;
         public DocumentModel DocumentModel
         {
-            get => docModel;
-            set
-            {
-                if (SetProperty(ref docModel, value))
-                {
-                    if (docModel != null)
-                    {
-                        targetDocument = docModel.Document;
-                    }
-                }
-            }
+            get => document;
+            set => SetProperty(ref document, value);
         }
 
 
@@ -97,13 +87,7 @@ namespace RevitTimasBIMTools.ViewModels
         public Category EngineerCategory
         {
             get => category;
-            set
-            {
-                if (SetProperty(ref category, value))
-                {
-
-                }
-            }
+            set => SetProperty(ref category, value);
         }
 
 
@@ -111,14 +95,7 @@ namespace RevitTimasBIMTools.ViewModels
         public Level SelectedLevel
         {
             get => level;
-            set
-            {
-                if (SetProperty(ref level, value) && level != null)
-                {
-                    Properties.Settings.Default.CurrentLevelUniqueId = level.UniqueId;
-                    Properties.Settings.Default.Save();
-                }
-            }
+            set => SetProperty(ref level, value);
         }
 
         #endregion
@@ -233,10 +210,10 @@ namespace RevitTimasBIMTools.ViewModels
             View3D view3d = DockPanelView.View3d;
             RevitElementModels = await RevitTask.RunAsync(app =>
             {
-                Document doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
+                Document doc = app.ActiveUIDocument.Document;
                 string guid = doc.ProjectInformation.UniqueId;
-                manager.InitializeActiveDocument(doc, docModel);
+                manager.Initialize(doc, document, category, level);
                 if (documentId.Equals(guid))
                 {
                     ActivateFamilySimbol(doc, roundOpeningId);

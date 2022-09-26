@@ -105,7 +105,7 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         [STAThread]
-        public void InitializeActiveDocument(Document doc, DocumentModel model)
+        public void Initialize(Document doc, DocumentModel model, Category category, Level level)
         {
             currentDocument = doc;
             units = doc.GetUnits();
