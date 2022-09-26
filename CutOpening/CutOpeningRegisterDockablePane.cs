@@ -1,7 +1,7 @@
 ﻿using Autodesk.Revit.UI;
 using RevitTimasBIMTools.Core;
+using RevitTimasBIMTools.Services;
 using System;
-using System.Text;
 using System.Windows;
 
 namespace RevitTimasBIMTools.CutOpening
@@ -10,7 +10,7 @@ namespace RevitTimasBIMTools.CutOpening
     {
         public void RegisterDockablePane(UIControlledApplication uicontrol, IDockablePaneProvider view, DockablePaneId paneId)
         {
-            StringBuilder builder = new StringBuilder();
+            DockablePane dockpane = null;
             if (!DockablePane.PaneIsRegistered(paneId))
             {
                 DockablePaneProviderData data = new DockablePaneProviderData
@@ -18,21 +18,24 @@ namespace RevitTimasBIMTools.CutOpening
                     FrameworkElement = view as FrameworkElement,
                 };
                 data.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette;
-                data.EditorInteraction = new EditorInteraction(EditorInteractionType.KeepAlive);
+                data.EditorInteraction = new EditorInteraction(EditorInteractionType.Dismiss);
                 data.InitialState.DockPosition = DockPosition.Tabbed;
                 data.VisibleByDefault = false;
                 try
                 {
                     uicontrol.RegisterDockablePane(paneId, SmartToolGeneralHelper.CutVoidToolName, view);
-                    builder.AppendLine($"Information:\nDockablePane registered");
+                    dockpane = uicontrol.GetDockablePane(paneId);
                 }
                 catch (Exception exc)
                 {
-                    builder.AppendLine($"ERROR:\nguid={paneId.Guid}\n{exc.Message}");
+                    Logger.Error($"ERROR:\nguid={paneId.Guid}\n{exc.Message}");
                 }
                 finally
                 {
-                    builder.Clear();
+                    if (dockpane != null && dockpane.IsShown())
+                    {
+                        dockpane.Hide();
+                    }
                 }
             }
         }
