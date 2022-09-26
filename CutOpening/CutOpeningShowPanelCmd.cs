@@ -51,9 +51,12 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         try
                         {
-                            if (dockpaneExtEvent?.Raise() != null && Properties.Settings.Default.IsStarted)
+                            if (null != dockpaneExtEvent?.Raise())
                             {
-                                dockpane.Show();
+                                if (Properties.Settings.Default.IsStarted)
+                                {
+                                    dockpane.Show();
+                                }
                             }
                         }
                         catch (Exception exc)

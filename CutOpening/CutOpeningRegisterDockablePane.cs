@@ -32,7 +32,6 @@ namespace RevitTimasBIMTools.CutOpening
                 }
                 finally
                 {
-                    //SendMessageManager.InfoMsg(builder.ToString());
                     builder.Clear();
                 }
             }
