@@ -14,13 +14,10 @@
     <Setting Name="CutOffsetInMm" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="MinSideSize" Type="System.Int32" Scope="User">
+    <Setting Name="MinSideSizeInMm" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="MaxSideSize" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
-    <Setting Name="Ratio" Type="System.Int32" Scope="User">
+    <Setting Name="MaxSideSizeInMm" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="СommunCatIdInt" Type="System.Int32" Scope="User">

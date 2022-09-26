@@ -219,8 +219,9 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static IEnumerable<Category> GetEngineerCategories(Document doc)
+        public static IDictionary<string, Category> GetEngineerCategories(Document doc)
         {
+            IDictionary<string, Category> result = new SortedDictionary<string, Category>();
             IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
             {
                 BuiltInCategory.OST_Conduit,
@@ -235,9 +236,10 @@ namespace RevitTimasBIMTools.RevitUtils
                 Category cat = Category.GetCategory(doc, catId);
                 if (cat != null)
                 {
-                    yield return cat;
+                    result[cat.Name] = cat; 
                 }
             }
+            return result;
         }
 
 

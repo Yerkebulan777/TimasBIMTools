@@ -74,36 +74,24 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int MinSideSize {
+        public int MinSideSizeInMm {
             get {
-                return ((int)(this["MinSideSize"]));
+                return ((int)(this["MinSideSizeInMm"]));
             }
             set {
-                this["MinSideSize"] = value;
+                this["MinSideSizeInMm"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int MaxSideSize {
+        public int MaxSideSizeInMm {
             get {
-                return ((int)(this["MaxSideSize"]));
+                return ((int)(this["MaxSideSizeInMm"]));
             }
             set {
-                this["MaxSideSize"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int Ratio {
-            get {
-                return ((int)(this["Ratio"]));
-            }
-            set {
-                this["Ratio"] = value;
+                this["MaxSideSizeInMm"] = value;
             }
         }
         

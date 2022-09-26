@@ -79,7 +79,8 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                             <Label Content="Project: " Width="125"/>
-                            <xctk:WatermarkComboBox Name="ComboDocumentModels" Height="23" Width="125" Watermark="Select project..."/>
+                            <xctk:WatermarkComboBox Name="ComboDocumentModels" Height="23" Width="125"
+                                                    Watermark="Select project..."/>
                         </WrapPanel>
                     </Border>
                 </ListViewItem>
@@ -90,7 +91,7 @@
                             <Label Content="Structure: " Width="125"/>
                             <xctk:WatermarkComboBox Name="ComboStructureMats" Height="23" Width="125"
                                                     DisplayMemberPath="Value.Name"
-                                                    Watermark="Select by material..."/>
+                                                    Watermark="Select material..."/>
                         </WrapPanel>
                     </Border>
                 </ListViewItem>
@@ -99,7 +100,9 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                             <Label Content="Category: " Width="125"/>
-                            <xctk:WatermarkComboBox Name="ComboEngineerCats" Height="23" Width="125" Watermark="Select category..."/>
+                            <xctk:WatermarkComboBox Name="ComboEngineerCats" Height="23" Width="125"
+                                                    DisplayMemberPath="Value.Name"
+                                                    Watermark="Select category..."/>
                         </WrapPanel>
                     </Border>
                 </ListViewItem>
@@ -125,14 +128,14 @@
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Minimum size: " Width="125"/>
-                                <xctk:IntegerUpDown Name="MinSize" ValueChanged="LimitSize_ValueChanged"
+                                <xctk:IntegerUpDown Name="MinSideSize" ValueChanged="Integer_ValueChanged"
                                                     Height="23" Width="65" TextAlignment="Center"
                                                     Value="50" Minimum="0" Maximum="100" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Maximum size: " Width="125"/>
-                                <xctk:IntegerUpDown Name="MaxSize" ValueChanged="LimitSize_ValueChanged"
+                                <xctk:IntegerUpDown Name="MaxSideSize" ValueChanged="Integer_ValueChanged"
                                                     Height="23" Width="65" TextAlignment="Center"
                                                     Value="250" Minimum="100" Maximum="1000" />
                             </WrapPanel>
@@ -145,7 +148,7 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                             <Label Content="Cut offset: " Width="125"/>
-                            <xctk:IntegerUpDown Name="CutSize" ValueChanged="LimitSize_ValueChanged"
+                            <xctk:IntegerUpDown Name="CutOffset" ValueChanged="Integer_ValueChanged"
                                                 Height="23" Width="65" TextAlignment="Center" 
                                                 Value="50" Minimum="0" Maximum="500" />
                         </WrapPanel>

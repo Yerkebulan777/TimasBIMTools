@@ -73,8 +73,8 @@ namespace RevitTimasBIMTools.CutOpening
         private const double minWidthSize = 150 / footToMm;
         private readonly IList<ElementId> hostIdList = new List<ElementId>(150);
 
-        private readonly int minSideSize = Properties.Settings.Default.MinSideSize;
-        private readonly int maxSideSize = Properties.Settings.Default.MaxSideSize;
+        private readonly int minSideSize = Properties.Settings.Default.MinSideSizeInMm;
+        private readonly int maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
         private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
         private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
         private readonly string linkDocumentTitle = Properties.Settings.Default.TargetDocumentName;

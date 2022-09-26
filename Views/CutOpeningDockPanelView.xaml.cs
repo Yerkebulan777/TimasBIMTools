@@ -101,13 +101,25 @@ namespace RevitTimasBIMTools.Views
             });
         }
 
-        private void LimitSize_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            if (sender is IntegerUpDown)
-            {
-                //Logger.Info(controler.Name + e.NewValue);
-            }
 
+        private void Integer_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (sender is IntegerUpDown controler && controler.Name is string name)
+            {
+                int value = Convert.ToInt32(e.NewValue);
+                if (name.Equals("MinSideSize"))
+                {
+                    Properties.Settings.Default.MinSideSizeInMm = value;
+                }
+                if (name.Equals("MaxSideSize"))
+                {
+                    Properties.Settings.Default.MaxSideSizeInMm = value;
+                }
+                if (name.Equals("CutOffset"))
+                {
+                    Properties.Settings.Default.CutOffsetInMm = value;
+                }
+            }
         }
 
 
