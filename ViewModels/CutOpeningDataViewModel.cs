@@ -134,7 +134,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-
         private ObservableCollection<ElementModel> modelCollection = new ObservableCollection<ElementModel>();
         public ObservableCollection<ElementModel> RevitElementModels
         {
