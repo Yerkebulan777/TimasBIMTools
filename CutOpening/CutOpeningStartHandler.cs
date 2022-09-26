@@ -25,7 +25,6 @@ namespace RevitTimasBIMTools.CutOpening
 
             Properties.Settings.Default.IsStarted = true;
             View3D view3d = RevitViewManager.Get3dView(uidoc);
-            Properties.Settings.Default.TargetDocumentName = doc.Title;
             Properties.Settings.Default.CurrentDocumentUniqueId = doc.ProjectInformation.UniqueId;
             IList<DocumentModel> docModels = RevitDocumentManager.GetDocumentCollection(doc);
             OnCompleted(new BaseCompletedEventArgs(docModels, view3d));

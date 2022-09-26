@@ -60,12 +60,9 @@ namespace RevitTimasBIMTools.Views
         {
             View3d = args.View3d;
             documentModel = args.DocumentModels.FirstOrDefault();
-            if (documentModel.IsActive)
-            {
-                ComboDocumentModels.ItemsSource = args.DocumentModels;
-                viewHandler.Completed -= OnContextViewHandlerCompleted;
-                ActiveDocTitle.Content = Properties.Settings.Default.TargetDocumentName.ToUpper();
-            }
+            ComboDocumentModels.ItemsSource = args.DocumentModels;
+            viewHandler.Completed -= OnContextViewHandlerCompleted;
+            ActiveDocTitle.Content = documentModel.Document.Title.ToUpper();
         }
 
 

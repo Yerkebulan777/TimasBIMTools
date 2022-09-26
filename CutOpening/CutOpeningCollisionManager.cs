@@ -59,9 +59,9 @@ namespace RevitTimasBIMTools.CutOpening
         private const string widthParamName = "ширина";
         private const string heightParamName = "высота";
 
-        private Document linkDocument = null;
+        private Document targetDocument = null;
         private Document currentDocument = null;
-        private Transform linkDocTransform = null;
+        private Transform documentTransform = null;
         private RevitLinkInstance linkInstance = null;
         private FilteredElementCollector collector = null;
 
@@ -69,7 +69,7 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly Transform identityTransform = Transform.Identity;
         private readonly StringBuilder stringBuilder = new StringBuilder(25);
         private readonly CopyPasteOptions copyOptions = new CopyPasteOptions();
-                
+
         private const double minWidthSize = 150 / footToMm;
         private readonly IList<ElementId> hostIdList = new List<ElementId>(150);
 
@@ -77,7 +77,6 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly int maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
         private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
         private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
-        private readonly string linkDocumentTitle = Properties.Settings.Default.TargetDocumentName;
         private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
 
 
@@ -106,11 +105,13 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         [STAThread]
-        public void InitializeActiveDocument(Document document)
+        public void InitializeActiveDocument(Document doc, DocumentModel model)
         {
-            currentDocument = document;
-            units = document.GetUnits();
-            GetTargetRevitLinkInstance(document);
+            currentDocument = doc;
+            units = doc.GetUnits();
+            targetDocument = model.Document;
+            linkInstance = model.LinkInstance;
+            documentTransform = model.Transform;
             Properties.Settings.Default.Upgrade();
             angleUnit = units.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
@@ -153,35 +154,6 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private void GetTargetRevitLinkInstance(Document document)
-        {
-            currentDocument = document;
-            if (!string.IsNullOrEmpty(linkDocumentTitle))
-            {
-                if (linkDocumentTitle.Equals(currentDocument.Title.Trim()))
-                {
-                    linkDocTransform = Transform.Identity;
-                    linkDocument = currentDocument;
-                    linkInstance = null;
-                }
-                collector = new FilteredElementCollector(currentDocument);
-                collector = collector.OfCategory(BuiltInCategory.OST_RvtLinks).OfClass(typeof(RevitLinkInstance));
-                foreach (Element elem in collector)
-                {
-                    if (elem is RevitLinkInstance instance)
-                    {
-                        Document doc = instance.GetLinkDocument();
-                        if (doc.IsLinked && linkDocumentTitle == doc.Title.Trim())
-                        {
-                            linkDocTransform = instance.GetTotalTransform();
-                            linkInstance = instance;
-                            linkDocument = doc;
-                        }
-                    }
-                }
-            }
-        }
-
 
         private FilteredElementCollector ValidWallCollector()
         {
@@ -206,7 +178,7 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     if (GetElementDirection(elem, out commDirection) && IsParallel(hostDirection, commDirection))
                     {
-                        intersectSolid = GetIntersectSolid(hostSolid, elem, linkDocTransform);
+                        intersectSolid = GetIntersectSolid(hostSolid, elem, documentTransform);
                         if (intersectSolid != null && intersectSolid.Volume > toleranceVolume)
                         {
                             centroidPoint = intersectSolid.ComputeCentroid();
@@ -576,12 +548,12 @@ namespace RevitTimasBIMTools.CutOpening
             modelList.Clear();
             transform?.Dispose();
             collector?.Dispose();
-            stringBuilder.Clear();
+            _ = stringBuilder.Clear();
             linkInstance?.Dispose();
-            linkDocument?.Dispose();
+            targetDocument?.Dispose();
             intersectSolid?.Dispose();
             currentDocument?.Dispose();
-            linkDocTransform?.Dispose();
+            documentTransform?.Dispose();
             ElementDataDictionary.OnSerializeData(dictDatabase);
         }
     }

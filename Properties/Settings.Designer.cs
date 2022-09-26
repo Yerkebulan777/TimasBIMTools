@@ -26,18 +26,6 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TargetDocumentName {
-            get {
-                return ((string)(this["TargetDocumentName"]));
-            }
-            set {
-                this["TargetDocumentName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string RectangSymbolUniqueId {
             get {
                 return ((string)(this["RectangSymbolUniqueId"]));

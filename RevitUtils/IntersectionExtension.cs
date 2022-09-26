@@ -69,7 +69,7 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 try
                 {
-                    // Create a linkDocTransform based on the incoming transform coordinate system and the bounding box coordinate system.
+                    // Create a transform based on the incoming transform coordinate system and the bounding box coordinate system.
                     Transform bboxTransform = (transform == null) ? boundBox.Transform : transform.Multiply(boundBox.Transform);
 
                     XYZ[] profilePts = new XYZ[4];

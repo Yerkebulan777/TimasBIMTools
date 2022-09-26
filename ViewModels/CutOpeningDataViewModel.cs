@@ -35,6 +35,7 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly string rectangOpeningId = Properties.Settings.Default.RectangSymbolUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
 
+
         private IList<ElementModel> collection = new List<ElementModel>();
 
         public CutOpeningDataViewModel()
@@ -43,21 +44,6 @@ namespace RevitTimasBIMTools.ViewModels
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             CanselCommand = new RelayCommand(CancelCallbackLogic);
-        }
-
-
-        private Level level = null;
-        public Level SelectedLevel
-        {
-            get => level;
-            set
-            {
-                if (SetProperty(ref level, value) && level != null)
-                {
-                    Properties.Settings.Default.CurrentLevelUniqueId = level.UniqueId;
-                    Properties.Settings.Default.Save();
-                }
-            }
         }
 
 
@@ -89,7 +75,42 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Settings
 
+        public Document targetDocument = null;
+        public Transform transform = null;
+        public RevitLinkInstance linkInstance = null;
 
+        private DocumentModel docModel = null;
+        public DocumentModel DocumentModel
+        {
+            get => docModel;
+            set
+            {
+                if (SetProperty(ref docModel, value) )
+                {
+                    if (docModel != null)
+                    {
+                        targetDocument = docModel.Document;
+                        linkInstance = docModel.LinkInstance;
+                        transform = docModel.Transform;
+                    }
+                }
+            }
+        }
+
+
+        private Level level = null;
+        public Level SelectedLevel
+        {
+            get => level;
+            set
+            {
+                if (SetProperty(ref level, value) && level != null)
+                {
+                    Properties.Settings.Default.CurrentLevelUniqueId = level.UniqueId;
+                    Properties.Settings.Default.Save();
+                }
+            }
+        }
 
         #endregion
 
@@ -206,9 +227,9 @@ namespace RevitTimasBIMTools.ViewModels
                 Document doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
                 string guid = doc.ProjectInformation.UniqueId;
+                manager.InitializeActiveDocument(doc, docModel);
                 if (documentId.Equals(guid))
                 {
-                    manager.InitializeActiveDocument(doc);
                     ActivateFamilySimbol(doc, roundOpeningId);
                     ActivateFamilySimbol(doc, rectangOpeningId);
                     collection = manager.GetCollisionCommunicateElements();
