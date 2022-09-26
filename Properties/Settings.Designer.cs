@@ -142,5 +142,17 @@ namespace RevitTimasBIMTools.Properties {
                 this["CurrentLevelUniqueId"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsStarted {
+            get {
+                return ((bool)(this["IsStarted"]));
+            }
+            set {
+                this["IsStarted"] = value;
+            }
+        }
     }
 }
