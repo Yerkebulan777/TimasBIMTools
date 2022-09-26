@@ -106,7 +106,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (sender is IntegerUpDown controler)
             {
-                Logger.Info(controler.Name + e.NewValue);
+                //Logger.Info(controler.Name + e.NewValue);
             }
             
         }
