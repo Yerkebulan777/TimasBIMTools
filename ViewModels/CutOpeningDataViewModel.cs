@@ -69,11 +69,11 @@ namespace RevitTimasBIMTools.ViewModels
             get => isEnabledData;
             set
             {
-                if (value == false || model != null && category != null && level != null)
+                if (value == false || (model != null && category != null && level != null))
                 {
                     if (SetProperty(ref isEnabledData, value))
                     {
-                         IsOptionsEnabled = !isEnabledData;
+                        IsOptionsEnabled = !isEnabledData;
                     }
                 }
             }
@@ -105,6 +105,21 @@ namespace RevitTimasBIMTools.ViewModels
         {
             get => level;
             set => SetProperty(ref level, value);
+        }
+
+
+        private FamilySymbol rectangle;
+        public FamilySymbol RectangSymbol
+        {
+            get => rectangle;
+            set => SetProperty(ref rectangle, value);
+        }
+
+        private FamilySymbol rounded;
+        public FamilySymbol RoundedSymbol
+        {
+            get => rounded;
+            set => SetProperty(ref rounded, value);
         }
 
         #endregion
