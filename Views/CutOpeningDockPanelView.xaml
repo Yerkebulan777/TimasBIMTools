@@ -40,7 +40,7 @@
             <!--Header -->
             <Border  Grid.Row="0" Background="{DynamicResource FloralGradientBrush}">
                 <Grid Grid.Row="0" VerticalAlignment="Center" >
-                    <Label Name="DocTitle" TextElement.FontSize="13" VerticalAlignment="Center" >
+                    <Label Name="ActiveDocTitle" TextElement.FontSize="13" VerticalAlignment="Center" >
                         <Label.BitmapEffect>
                             <DropShadowBitmapEffect/>
                         </Label.BitmapEffect>

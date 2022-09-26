@@ -26,7 +26,7 @@ namespace RevitTimasBIMTools.Views
         private bool disposedValue = false;
         private readonly Mutex mutex = new Mutex();
         public View3D View3d { get; set; } = null;
-        public DocumentModel TargetDocModel = null;
+        public DocumentModel ActiveDocModel = null;
 
         public IList<FamilySymbol> HostedFamilySymbols = new List<FamilySymbol>(25);
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
@@ -58,9 +58,9 @@ namespace RevitTimasBIMTools.Views
         private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             View3d = args.View3d;
-            TargetDocModel = args.DocumentModels.FirstOrDefault();
+            ActiveDocModel = args.DocumentModels.FirstOrDefault();
             viewHandler.Completed -= OnContextViewHandlerCompleted;
-            DocTitle.Content = TargetDocModel.Document.Title.ToUpper();
+            ActiveDocTitle.Content = ActiveDocModel.Title.ToUpper();
             ComboDocumentModels.ItemsSource = args.DocumentModels;
             ComboDocumentModels.SelectedIndex = 0;
         }
