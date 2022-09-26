@@ -29,7 +29,6 @@ namespace RevitTimasBIMTools.ViewModels
         public CutOpeningDockPanelView DockPanelView = null;
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
-        private Document doc = null;
         private readonly object syncLocker = new object();
         private readonly string documentId = Properties.Settings.Default.CurrentDocumentUniqueId;
         private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
