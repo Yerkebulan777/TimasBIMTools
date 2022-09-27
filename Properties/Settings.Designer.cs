@@ -133,12 +133,12 @@ namespace RevitTimasBIMTools.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection Test {
+        public global::System.Collections.Specialized.StringCollection ElementIds {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["Test"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["ElementIds"]));
             }
             set {
-                this["Test"] = value;
+                this["ElementIds"] = value;
             }
         }
     }
