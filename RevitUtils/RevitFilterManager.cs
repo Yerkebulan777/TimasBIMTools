@@ -12,7 +12,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Standert Filtered Element Collector
 
-        public static FilteredElementCollector GetInstancesOfCategory(Document doc, Type type, BuiltInCategory bic, bool? isInstances = null)
+        public static FilteredElementCollector GetElementsOfCategory(Document doc, Type type, BuiltInCategory bic, bool? isInstances = null)
         {
             return isInstances.HasValue
                 ? (bool)isInstances == true
@@ -33,91 +33,27 @@ namespace RevitTimasBIMTools.RevitUtils
                         new FilterStringEquals(), familyTypeName, true)));
         }
 
-
-        /// <summary>Contains functions that create appropriate FilterRule objects based on the parameters given </summary>
-        /// <param name="ruleSwitch"> 
-        /// 0 = CreateEqualsRule;
-        /// 1 = CreateGreaterOrEqualRule;
-        /// 2 = CreateGreaterOrEqualRule;
-        /// 3 = CreateNotEqualsRule;
-        /// </param>
-        /// <returns> FilteredElementCollector </returns>
-        public static FilteredElementCollector ParamFilterFactory(FilteredElementCollector collector, ElementId paramId, int value, int ruleSwitch = 0)
-        {
-            FilterRule filterRule;
-            switch (ruleSwitch)
-            {
-                case 0:
-                    filterRule = ParameterFilterRuleFactory.CreateEqualsRule(paramId, value);
-                    break;
-                case 1:
-                    filterRule = ParameterFilterRuleFactory.CreateGreaterOrEqualRule(paramId, value);
-                    break;
-                case 2:
-                    filterRule = ParameterFilterRuleFactory.CreateGreaterOrEqualRule(paramId, value);
-                    break;
-                case 3:
-                    filterRule = ParameterFilterRuleFactory.CreateNotEqualsRule(paramId, value);
-                    break;
-                default:
-                    return collector;
-            }
-            return collector.WherePasses(new ElementParameterFilter(filterRule));
-        }
-
-
-        public static FilteredElementCollector ParamFilterFactory(FilteredElementCollector collector, ElementId paramId, string value, int ruleSwitch = 0)
-        {
-            FilterRule filterRule;
-            switch (ruleSwitch)
-            {
-                case 0:
-                    filterRule = ParameterFilterRuleFactory.CreateContainsRule(paramId, value, false);
-                    break;
-                case 1:
-                    filterRule = ParameterFilterRuleFactory.CreateBeginsWithRule(paramId, value, false);
-                    break;
-                case 2:
-                    filterRule = ParameterFilterRuleFactory.CreateEndsWithRule(paramId, value, false);
-                    break;
-                case 3:
-                    filterRule = ParameterFilterRuleFactory.CreateNotEqualsRule(paramId, value, false);
-                    break;
-                default:
-                    return collector;
-            }
-            return collector.WherePasses(new ElementParameterFilter(filterRule));
-        }
-
-
-        public static FilteredElementCollector ParamFilterFactory(FilteredElementCollector collector, ElementId paramId, double value, int ruleSwitch = 0)
-        {
-            const double epsilon = 1.0e-3;
-            FilterRule filterRule;
-            switch (ruleSwitch)
-            {
-                case 0:
-                    filterRule = ParameterFilterRuleFactory.CreateEqualsRule(paramId, value, epsilon);
-                    break;
-                case 1:
-                    filterRule = ParameterFilterRuleFactory.CreateGreaterOrEqualRule(paramId, value, epsilon);
-                    break;
-                case 2:
-                    filterRule = ParameterFilterRuleFactory.CreateGreaterOrEqualRule(paramId, value, epsilon);
-                    break;
-                case 3:
-                    filterRule = ParameterFilterRuleFactory.CreateNotEqualsRule(paramId, value, epsilon);
-                    break;
-                default:
-                    return collector;
-            }
-            return collector.WherePasses(new ElementParameterFilter(filterRule));
-        }
-
-        #endregion // Filtered Element Collector
+        #endregion
 
 
         #region Advance Filtered Element Collector
+
+        public static IEnumerable<Element> GetInistancesByElementTypeId(Document doc, ElementId catId, ElementId typeId, bool inverted = false)
+        {
+            int typeIntId = typeId.IntegerValue;
+            ElementCategoryFilter filter = new ElementCategoryFilter(catId, inverted);
+            FilteredElementCollector collector = new FilteredElementCollector(doc).WherePasses(filter);
+            foreach (Element elem in collector.WhereElementIsNotElementType())
+            {
+                ElementId elemTypeId = elem.GetTypeId();
+                if (typeIntId.Equals(elemTypeId.IntegerValue))
+                {
+                    yield return elem;
+                }
+            }
+        }
+
+
         public static FamilySymbol FindFamilySymbol(Document doc, string familyName, string symbolName)
         {
             FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(Family));
@@ -205,6 +141,91 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
+        #region Parameter Filter Factory
+
+        /// <summary>Contains functions that create appropriate FilterRule objects based on the parameters given </summary>
+        /// <param name="ruleSwitch"> 
+        /// 0 = CreateEqualsRule;
+        /// 1 = CreateGreaterOrEqualRule;
+        /// 2 = CreateGreaterOrEqualRule;
+        /// 3 = CreateNotEqualsRule;
+        /// </param>
+        /// <returns> FilteredElementCollector </returns>
+        public static FilteredElementCollector ParamFilterFactory(FilteredElementCollector collector, ElementId paramId, int value, int ruleSwitch = 0)
+        {
+            FilterRule filterRule;
+            switch (ruleSwitch)
+            {
+                case 0:
+                    filterRule = ParameterFilterRuleFactory.CreateEqualsRule(paramId, value);
+                    break;
+                case 1:
+                    filterRule = ParameterFilterRuleFactory.CreateGreaterOrEqualRule(paramId, value);
+                    break;
+                case 2:
+                    filterRule = ParameterFilterRuleFactory.CreateGreaterOrEqualRule(paramId, value);
+                    break;
+                case 3:
+                    filterRule = ParameterFilterRuleFactory.CreateNotEqualsRule(paramId, value);
+                    break;
+                default:
+                    return collector;
+            }
+            return collector.WherePasses(new ElementParameterFilter(filterRule));
+        }
+
+
+        public static FilteredElementCollector ParamFilterFactory(FilteredElementCollector collector, ElementId paramId, string value, int ruleSwitch = 0)
+        {
+            FilterRule filterRule;
+            switch (ruleSwitch)
+            {
+                case 0:
+                    filterRule = ParameterFilterRuleFactory.CreateContainsRule(paramId, value, false);
+                    break;
+                case 1:
+                    filterRule = ParameterFilterRuleFactory.CreateBeginsWithRule(paramId, value, false);
+                    break;
+                case 2:
+                    filterRule = ParameterFilterRuleFactory.CreateEndsWithRule(paramId, value, false);
+                    break;
+                case 3:
+                    filterRule = ParameterFilterRuleFactory.CreateNotEqualsRule(paramId, value, false);
+                    break;
+                default:
+                    return collector;
+            }
+            return collector.WherePasses(new ElementParameterFilter(filterRule));
+        }
+
+
+        public static FilteredElementCollector ParamFilterFactory(FilteredElementCollector collector, ElementId paramId, double value, int ruleSwitch = 0)
+        {
+            const double epsilon = 1.0e-3;
+            FilterRule filterRule;
+            switch (ruleSwitch)
+            {
+                case 0:
+                    filterRule = ParameterFilterRuleFactory.CreateEqualsRule(paramId, value, epsilon);
+                    break;
+                case 1:
+                    filterRule = ParameterFilterRuleFactory.CreateGreaterOrEqualRule(paramId, value, epsilon);
+                    break;
+                case 2:
+                    filterRule = ParameterFilterRuleFactory.CreateGreaterOrEqualRule(paramId, value, epsilon);
+                    break;
+                case 3:
+                    filterRule = ParameterFilterRuleFactory.CreateNotEqualsRule(paramId, value, epsilon);
+                    break;
+                default:
+                    return collector;
+            }
+            return collector.WherePasses(new ElementParameterFilter(filterRule));
+        }
+
+        #endregion
+
+
         #region Category filter
 
         public static IEnumerable<Category> GetCategories(Document doc, bool model = true)
@@ -255,8 +276,8 @@ namespace RevitTimasBIMTools.RevitUtils
         public static IDictionary<double, Level> GetValidLevels(Document doc)
         {
             IDictionary<double, Level> result = new SortedDictionary<double, Level>();
-            ICollection<ElementId> wallIds = GetInstancesOfCategory(doc, typeof(Wall), BuiltInCategory.OST_Walls).ToElementIds();
-            ICollection<ElementId> floorIds = GetInstancesOfCategory(doc, typeof(Floor), BuiltInCategory.OST_Floors).ToElementIds();
+            ICollection<ElementId> wallIds = GetElementsOfCategory(doc, typeof(Wall), BuiltInCategory.OST_Walls).ToElementIds();
+            ICollection<ElementId> floorIds = GetElementsOfCategory(doc, typeof(Floor), BuiltInCategory.OST_Floors).ToElementIds();
             FilteredElementCollector collector = new FilteredElementCollector(doc);
             bool isValid = wallIds.Any() && floorIds.Any();
             foreach (Level level in collector.OfClass(typeof(Level)))
@@ -291,7 +312,7 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             FamilyPlacementType placement = FamilyPlacementType.OneLevelBasedHosted;
             IDictionary<string, FamilySymbol> result = new SortedDictionary<string, FamilySymbol>();
-            FilteredElementCollector collector = GetInstancesOfCategory(doc, typeof(FamilySymbol), bic);
+            FilteredElementCollector collector = GetElementsOfCategory(doc, typeof(FamilySymbol), bic);
             foreach (FamilySymbol smb in collector)
             {
                 Family fam = smb.Family;

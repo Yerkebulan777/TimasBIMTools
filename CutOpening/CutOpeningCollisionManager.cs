@@ -119,7 +119,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             BuiltInCategory bic = BuiltInCategory.OST_Walls;
             ElementId paramId = new ElementId(BuiltInParameter.WALL_ATTR_WIDTH_PARAM);
-            collector = RevitFilterManager.GetInstancesOfCategory(ActiveDocument, typeof(Wall), bic);
+            collector = RevitFilterManager.GetElementsOfCategory(ActiveDocument, typeof(Wall), bic);
             collector = RevitFilterManager.ParamFilterFactory(collector, paramId, minWidthSize, 1);
             collector = collector.WherePasses(new ElementLevelFilter(invalId, true));
             return collector;

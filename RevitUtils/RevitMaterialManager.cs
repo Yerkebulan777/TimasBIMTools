@@ -8,48 +8,45 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal class RevitMaterialManager
     {
-        public static StringCollection StructureElementUniqueIds = new StringCollection();
+        public static List<Element> StructureElementTypeList = new List<Element>(100);
         public static IDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
         {
             Material categoryMat = null;
             CompoundStructure compound = null;
-            StructureElementUniqueIds.Clear();
+            StructureElementTypeList.Clear();
             List<Element> elements = new List<Element>(100);
             IDictionary<string, Material> result = new SortedDictionary<string, Material>();
             Material roofMat = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
             Material wallMat = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
             Material floorMat = Category.GetCategory(doc, BuiltInCategory.OST_Floors).Material;
-            elements.AddRange(RevitFilterManager.GetInstancesOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs, false).ToElements());
-            elements.AddRange(RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls, false).ToElements());
-            elements.AddRange(RevitFilterManager.GetInstancesOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors, false).ToElements());
-            lock (StructureElementUniqueIds.SyncRoot)
+            StructureElementTypeList.AddRange(RevitFilterManager.GetElementsOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs, false));
+            StructureElementTypeList.AddRange(RevitFilterManager.GetElementsOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls, false));
+            StructureElementTypeList.AddRange(RevitFilterManager.GetElementsOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors, false));
+            foreach (Element elem in StructureElementTypeList)
             {
-                foreach (Element elem in elements)
+                if (elem is RoofType roofType)
                 {
-                    if (elem is RoofType roofType)
-                    {
-                        categoryMat = roofMat;
-                        compound = roofType.GetCompoundStructure();
-                    }
-                    else if (elem is WallType wallType)
-                    {
-                        categoryMat = wallMat;
-                        compound = wallType.GetCompoundStructure();
-                    }
-                    else if (elem is FloorType floorType)
-                    {
-                        categoryMat = floorMat;
-                        compound = floorType.GetCompoundStructure();
-                    }
-                    Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
-                    if (material != null)
-                    {
-                        result[material.Name] = material;
-                        _ = StructureElementUniqueIds.Add(elem.UniqueId);
-                    }
+                    categoryMat = roofMat;
+                    compound = roofType.GetCompoundStructure();
+                }
+                else if (elem is WallType wallType)
+                {
+                    categoryMat = wallMat;
+                    compound = wallType.GetCompoundStructure();
+                }
+                else if (elem is FloorType floorType)
+                {
+                    categoryMat = floorMat;
+                    compound = floorType.GetCompoundStructure();
+                }
+                Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
+                if (material != null)
+                {
+                    result[material.Name] = material;
+                    elements.Add(elem);
                 }
             }
-            elements.Clear();
+            StructureElementTypeList = elements;
             return result;
         }
 
@@ -61,34 +58,32 @@ namespace RevitTimasBIMTools.RevitUtils
             Material roofMat = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
             Material wallMat = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
             Material floorMat = Category.GetCategory(doc, BuiltInCategory.OST_Floors).Material;
-            lock (StructureElementUniqueIds.SyncRoot)
+
+            foreach (Element elem in StructureElementTypeList)
             {
-                foreach (string uid in StructureElementUniqueIds)
+                CompoundStructure compound = null;
+                if (elem is RoofType roofType)
                 {
-                    CompoundStructure compound = null;
-                    Element elem = doc.GetElement(uid);
-                    if (elem is RoofType roofType)
-                    {
-                        categoryMat = roofMat;
-                        compound = roofType.GetCompoundStructure();
-                    }
-                    else if (elem is WallType wallType)
-                    {
-                        categoryMat = wallMat;
-                        compound = wallType.GetCompoundStructure();
-                    }
-                    else if (elem is FloorType floorType)
-                    {
-                        categoryMat = floorMat;
-                        compound = floorType.GetCompoundStructure();
-                    }
-                    Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
-                    if (elem != null && material != null && material.Name == materialName)
-                    {
-                        result[elem.Category.Id] = elem.Id;
-                    }
+                    categoryMat = roofMat;
+                    compound = roofType.GetCompoundStructure();
+                }
+                else if (elem is WallType wallType)
+                {
+                    categoryMat = wallMat;
+                    compound = wallType.GetCompoundStructure();
+                }
+                else if (elem is FloorType floorType)
+                {
+                    categoryMat = floorMat;
+                    compound = floorType.GetCompoundStructure();
+                }
+                Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
+                if (material != null && material.Name == materialName)
+                {
+                    result[elem.Category.Id] = elem.Id;
                 }
             }
+
             return result;
         }
 

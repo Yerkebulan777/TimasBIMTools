@@ -8,7 +8,7 @@ namespace RevitTimasBIMTools.RevitUtils
     {
         public static FilteredElementCollector GetRevitLinkInstanceCollector(Document doc)
         {
-            return RevitFilterManager.GetInstancesOfCategory(doc, typeof(RevitLinkInstance), BuiltInCategory.OST_RvtLinks);
+            return RevitFilterManager.GetElementsOfCategory(doc, typeof(RevitLinkInstance), BuiltInCategory.OST_RvtLinks);
         }
 
         public static IList<DocumentModel> GetDocumentCollection(Document doc)
