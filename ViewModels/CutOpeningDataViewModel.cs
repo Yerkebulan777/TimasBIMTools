@@ -55,9 +55,12 @@ namespace RevitTimasBIMTools.ViewModels
             get => isEnabledOptions;
             set
             {
-                if (SetProperty(ref isEnabledOptions, value))
+                if (value != isEnabledOptions)
                 {
-                    IsDataEnabled = !isEnabledOptions;
+                    if (SetProperty(ref isEnabledOptions, value))
+                    {
+                        IsDataEnabled = !isEnabledOptions;
+                    }
                 }
             }
         }
@@ -69,7 +72,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => isEnabledData;
             set
             {
-                if (value == false || (model != null && category != null && level != null))
+                if (value == false || (model != null && category != null))
                 {
                     if (SetProperty(ref isEnabledData, value))
                     {
