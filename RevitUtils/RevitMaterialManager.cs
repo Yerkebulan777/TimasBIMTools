@@ -52,38 +52,41 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static IEnumerable<Element> GetStructureElementsByMaterial(Document doc, string materialName)
+        public static IEnumerable<Element> GetElementsByStructureMaterial(Document doc, string materialName)
         {
             Material categoryMat = null;
-            Material roofMat = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
-            Material wallMat = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
-            Material floorMat = Category.GetCategory(doc, BuiltInCategory.OST_Floors).Material;
-            foreach (string uid in StructureElementUniqueIds)
+            lock (StructureElementUniqueIds.SyncRoot)
             {
-                CompoundStructure compound = null;
-                Element elem = doc.GetElement(uid);
-                if (elem is RoofType roofType)
+                Material roofMat = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
+                Material wallMat = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
+                Material floorMat = Category.GetCategory(doc, BuiltInCategory.OST_Floors).Material;
+                foreach (string uid in StructureElementUniqueIds)
                 {
-                    categoryMat = roofMat;
-                    compound = roofType.GetCompoundStructure();
-                }
-                else if (elem is WallType wallType)
-                {
-                    categoryMat = wallMat;
-                    compound = wallType.GetCompoundStructure();
-                }
-                else if (elem is FloorType floorType)
-                {
-                    categoryMat = floorMat;
-                    compound = floorType.GetCompoundStructure();
-                }
-                if (compound != null)
-                {
-                    Material material = GetCompoundStructureMaterial(doc, compound);
-                    material = material ?? categoryMat;
-                    if (material.Name == materialName)
+                    CompoundStructure compound = null;
+                    Element elem = doc.GetElement(uid);
+                    if (elem is RoofType roofType)
                     {
-                        yield return elem;
+                        categoryMat = roofMat;
+                        compound = roofType.GetCompoundStructure();
+                    }
+                    else if (elem is WallType wallType)
+                    {
+                        categoryMat = wallMat;
+                        compound = wallType.GetCompoundStructure();
+                    }
+                    else if (elem is FloorType floorType)
+                    {
+                        categoryMat = floorMat;
+                        compound = floorType.GetCompoundStructure();
+                    }
+                    if (compound != null)
+                    {
+                        Material material = GetCompoundStructureMaterial(doc, compound);
+                        material = material ?? categoryMat;
+                        if (material.Name == materialName)
+                        {
+                            yield return elem;
+                        }
                     }
                 }
             }
@@ -104,5 +107,7 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             return material;
         }
+
+
     }
 }
