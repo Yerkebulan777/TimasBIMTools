@@ -66,7 +66,6 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-
         //public static IEnumerable<ElementId> GetElementIds(Document doc)
         //{
 
