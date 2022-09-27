@@ -5,41 +5,41 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal class RevitMaterialManager
     {
-        public static SortedDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
+        public static IDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
         {
-            List<Element> elements = new List<Element>(50);
+            List<Element> elements = new List<Element>(100);
+            IDictionary<string, Material> result = new SortedDictionary<string, Material>();
+            Material roofMat = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
+            Material wallMat = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
+            Material floorMat = Category.GetCategory(doc, BuiltInCategory.OST_Floors).Material;
             MaterialFunctionAssignment structureFunction = MaterialFunctionAssignment.Structure;
-            SortedDictionary<string, Material> result = new SortedDictionary<string, Material>();
-            Material roofMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
-            Material wallMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
-            Material floorMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Floors).Material;
             elements.AddRange(RevitFilterManager.GetInstancesOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs, false).ToElements());
             elements.AddRange(RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls, false).ToElements());
             elements.AddRange(RevitFilterManager.GetInstancesOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors, false).ToElements());
             foreach (Element elem in elements)
             {
                 Material material = null;
-                Material categoryMaterial = null;
-                CompoundStructure comStruct = null;
+                Material catMaterial = null;
+                CompoundStructure compound = null;
                 if (elem is WallType wallType)
                 {
-                    categoryMaterial = wallMaterial;
-                    comStruct = wallType.GetCompoundStructure();
+                    catMaterial = wallMat;
+                    compound = wallType.GetCompoundStructure();
                 }
                 else if (elem is FloorType floorType)
                 {
-                    categoryMaterial = floorMaterial;
-                    comStruct = floorType.GetCompoundStructure();
+                    catMaterial = floorMat;
+                    compound = floorType.GetCompoundStructure();
                 }
                 else if (elem is RoofType roofType)
                 {
-                    categoryMaterial = roofMaterial;
-                    comStruct = roofType.GetCompoundStructure();
+                    catMaterial = roofMat;
+                    compound = roofType.GetCompoundStructure();
                 }
 
-                if (comStruct != null)
+                if (compound != null)
                 {
-                    foreach (CompoundStructureLayer layer in comStruct.GetLayers())
+                    foreach (CompoundStructureLayer layer in compound.GetLayers())
                     {
                         if (structureFunction == layer.Function)
                         {
@@ -49,7 +49,7 @@ namespace RevitTimasBIMTools.RevitUtils
                             }
                             finally
                             {
-                                material = material ?? categoryMaterial;
+                                material = material ?? catMaterial;
                                 result[material.Name] = material;
                             }
                             break;
