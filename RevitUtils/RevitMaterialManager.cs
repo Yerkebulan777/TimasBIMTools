@@ -11,7 +11,6 @@ namespace RevitTimasBIMTools.RevitUtils
         public static StringCollection StructureElementUniqueIds = new StringCollection();
         public static IDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
         {
-            int min = int.MinValue;
             Material categoryMat = null;
             CompoundStructure compound = null;
             StructureElementUniqueIds.Clear();
@@ -41,7 +40,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     compound = floorType.GetCompoundStructure();
                 }
                 Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
-                if (material != null && min < StructureElementUniqueIds.Add(elem.UniqueId))
+                if (material != null && 100 < StructureElementUniqueIds.Add(elem.UniqueId))
                 {
                     result[material.Name] = material;
                 }
