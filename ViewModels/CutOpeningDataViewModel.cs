@@ -95,6 +95,14 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        private Material material;
+        public Material StructureMaterial
+        {
+            get => material;
+            set => SetProperty(ref material, value);
+        }
+
+
         private Category category = null;
         public Category EngineerCategory
         {
