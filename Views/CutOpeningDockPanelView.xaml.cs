@@ -30,7 +30,7 @@ namespace RevitTimasBIMTools.Views
 
         private IDictionary<string, FamilySymbol> familySymbols = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
-        private readonly string currentDocumentId = Properties.Settings.Default.CurrentDocumentUniqueId;
+        private readonly string documentId = Properties.Settings.Default.CurrentDocumentUniqueId;
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
 
 
@@ -50,7 +50,7 @@ namespace RevitTimasBIMTools.Views
             data.InitialState = new DockablePaneState
             {
                 DockPosition = DockPosition.Tabbed,
-                TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser
+                TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette
             };
         }
 
@@ -71,38 +71,42 @@ namespace RevitTimasBIMTools.Views
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
                 Document doc = null;
-                if (!dataViewModel.IsOptionsEnabled)
-                {
-                    Task t = RevitTask.RunAsync(async app =>
+                string docId = string.Empty;
+                Task task = !dataViewModel.IsOptionsEnabled
+                    ? RevitTask.RunAsync(async app =>
                     {
                         doc = app.ActiveUIDocument.Document;
                         dataViewModel.IsDataEnabled = false;
                         dataViewModel.IsOptionsEnabled = true;
+                        docId = doc.ProjectInformation.UniqueId;
                         await Task.Delay(1000).ConfigureAwait(true);
                     })
                     .ContinueWith(app =>
                     {
-                        ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
-                        ComboStructureMats.ItemsSource = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
-                        familySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
-                        ComboRectangSymbol.ItemsSource = familySymbols;
-                        ComboRoundedSymbol.ItemsSource = familySymbols;
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
-                }
-                else
-                {
-                    Task t = RevitTask.RunAsync(async app =>
+                        if (documentId.Equals(docId))
+                        {
+                            ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
+                            ComboStructureMats.ItemsSource = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
+                            familySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+                            ComboRectangSymbol.ItemsSource = familySymbols;
+                            ComboRoundedSymbol.ItemsSource = familySymbols;
+                        }
+                    }, TaskScheduler.FromCurrentSynchronizationContext())
+                    : RevitTask.RunAsync(async app =>
                     {
                         doc = app.ActiveUIDocument.Document;
                         dataViewModel.IsDataEnabled = true;
                         dataViewModel.IsOptionsEnabled = false;
+                        docId = doc.ProjectInformation.UniqueId;
                         await Task.Delay(1000).ConfigureAwait(true);
                     })
                     .ContinueWith(app =>
                     {
-                        ComboLevelFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
+                        if (documentId.Equals(docId))
+                        {
+                            ComboLevelFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
+                        }
                     }, TaskScheduler.FromCurrentSynchronizationContext());
-                }
             });
         }
 
@@ -136,7 +140,7 @@ namespace RevitTimasBIMTools.Views
                 Task task = RevitTask.RunAsync(app =>
                 {
                     Document doc = app.ActiveUIDocument.Document;
-                    if (currentDocumentId.Equals(doc.ProjectInformation.UniqueId))
+                    if (documentId.Equals(doc.ProjectInformation.UniqueId))
                     {
                         if (mutex.WaitOne())
                         {
