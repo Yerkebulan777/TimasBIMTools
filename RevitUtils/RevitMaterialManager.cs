@@ -43,11 +43,14 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 if (compound != null && min < StructureElementUniqueIds.Add(elem.UniqueId))
                 {
-                    Material material = GetCompoundStructureMaterial(doc, compound);
-                    material = material ?? categoryMat;
-                    result[material.Name] = material;
+                    Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
+                    if (material != null && material.IsValidObject)
+                    {
+                        result[material.Name] = material;
+                    }
                 }
             }
+            elements.Clear();
             return result;
         }
 
@@ -81,9 +84,8 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                     if (compound != null)
                     {
-                        Material material = GetCompoundStructureMaterial(doc, compound);
-                        material = material ?? categoryMat;
-                        if (material.Name == materialName)
+                        Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
+                        if (material != null && material.Name == materialName)
                         {
                             yield return elem;
                         }
@@ -93,7 +95,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        private static Material GetCompoundStructureMaterial(Document doc, CompoundStructure compound, double tolerance = 0)
+        private static Material GetCompoundStructureMaterial(Document doc, CompoundStructure compound, Material categoryMat, double tolerance = 0.005)
         {
             Material material = null;
             MaterialFunctionAssignment function = MaterialFunctionAssignment.Structure;
@@ -103,11 +105,10 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     material = doc.GetElement(layer.MaterialId) as Material;
                     tolerance = Math.Round(layer.Width, 3);
+                    material = material ?? categoryMat;
                 }
             }
             return material;
         }
-
-
     }
 }
