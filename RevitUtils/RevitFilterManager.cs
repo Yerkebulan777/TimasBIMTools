@@ -14,13 +14,11 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static FilteredElementCollector GetInstancesOfCategory(Document doc, Type type, BuiltInCategory bic, bool? isInstances = null)
         {
-            if (isInstances.HasValue)
-            {
-                return (bool)isInstances
+            return isInstances.HasValue
+                ? (bool)isInstances == true
                     ? new FilteredElementCollector(doc).OfClass(type).OfCategory(bic).WhereElementIsNotElementType()
-                    : new FilteredElementCollector(doc).OfClass(type).OfCategory(bic).WhereElementIsElementType();
-            }
-            return new FilteredElementCollector(doc).OfClass(type).OfCategory(bic);
+                    : new FilteredElementCollector(doc).OfClass(type).OfCategory(bic).WhereElementIsElementType()
+                : new FilteredElementCollector(doc).OfClass(type).OfCategory(bic);
         }
 
 

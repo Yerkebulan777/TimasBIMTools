@@ -5,22 +5,20 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal class RevitMaterialManager
     {
-
         public static SortedDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
         {
-            Material material = null;
-            Material categoryMaterial = null;
-            FilteredElementCollector collector = null;
             MaterialFunctionAssignment structure = MaterialFunctionAssignment.Structure;
             SortedDictionary<string, Material> result = new SortedDictionary<string, Material>();
+            Material roofMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
             Material wallMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
             Material floorMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Floors).Material;
-            Material roofMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
-            collector = collector.UnionWith(RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls, false));
+            FilteredElementCollector collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls, false);
             collector = collector.UnionWith(RevitFilterManager.GetInstancesOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors, false));
             collector = collector.UnionWith(RevitFilterManager.GetInstancesOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs, false));
             foreach (Element elem in collector)
             {
+                Material material = null;
+                Material categoryMaterial = null;
                 CompoundStructure comStruct = null;
                 if (elem is WallType wallType)
                 {
