@@ -9,7 +9,6 @@ namespace RevitTimasBIMTools.RevitUtils
     internal class RevitMaterialManager
     {
         public static StringCollection StructureElementUniqueIds = new StringCollection();
-
         public static IDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
         {
             int min = int.MinValue;
@@ -41,13 +40,10 @@ namespace RevitTimasBIMTools.RevitUtils
                     categoryMat = floorMat;
                     compound = floorType.GetCompoundStructure();
                 }
-                if (compound != null && min < StructureElementUniqueIds.Add(elem.UniqueId))
+                Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
+                if (material != null && min < StructureElementUniqueIds.Add(elem.UniqueId))
                 {
-                    Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
-                    if (material != null && material.IsValidObject)
-                    {
-                        result[material.Name] = material;
-                    }
+                    result[material.Name] = material;
                 }
             }
             elements.Clear();
@@ -82,13 +78,10 @@ namespace RevitTimasBIMTools.RevitUtils
                         categoryMat = floorMat;
                         compound = floorType.GetCompoundStructure();
                     }
-                    if (compound != null)
+                    Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
+                    if (material != null && material.Name == materialName)
                     {
-                        Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
-                        if (material != null && material.Name == materialName)
-                        {
-                            yield return elem;
-                        }
+                        yield return elem;
                     }
                 }
             }
@@ -98,14 +91,17 @@ namespace RevitTimasBIMTools.RevitUtils
         private static Material GetCompoundStructureMaterial(Document doc, CompoundStructure compound, Material categoryMat, double tolerance = 0.005)
         {
             Material material = null;
-            MaterialFunctionAssignment function = MaterialFunctionAssignment.Structure;
-            foreach (CompoundStructureLayer layer in compound.GetLayers())
+            if (compound != null)
             {
-                if (function == layer.Function && tolerance < layer.Width)
+                MaterialFunctionAssignment function = MaterialFunctionAssignment.Structure;
+                foreach (CompoundStructureLayer layer in compound.GetLayers())
                 {
-                    material = doc.GetElement(layer.MaterialId) as Material;
-                    tolerance = Math.Round(layer.Width, 3);
-                    material = material ?? categoryMat;
+                    if (function == layer.Function && tolerance < layer.Width)
+                    {
+                        material = doc.GetElement(layer.MaterialId) as Material;
+                        tolerance = Math.Round(layer.Width, 3);
+                        material = material ?? categoryMat;
+                    }
                 }
             }
             return material;
