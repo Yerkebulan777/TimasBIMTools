@@ -120,7 +120,7 @@ namespace RevitTimasBIMTools.ViewModels
                             foreach (KeyValuePair<ElementId, ElementId> item in RevitMaterialManager.GetTypeIdsByStructureMaterial(doc, material.Name))
                             {
                                 instances.AddRange(new FilteredElementCollector(doc).OfCategoryId(item.Key)
-                                    .WhereElementIsNotElementType().Where(e => e.GetTypeId().Equals(item.Value)).ToList<Element>());
+                                    .WhereElementIsNotElementType().Where(e => e.GetTypeId().Equals(item.Value)));
                             }
                         }
                         return instances;
