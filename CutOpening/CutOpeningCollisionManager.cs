@@ -59,10 +59,12 @@ namespace RevitTimasBIMTools.CutOpening
         private const string widthParamName = "ширина";
         private const string heightParamName = "высота";
 
-        private Document targetDocument = null;
-        private Document currentDocument = null;
-        private Transform documentTransform = null;
-        private RevitLinkInstance linkInstance = null;
+        public Document ActiveDocument = null;
+        public Document SelectedDocument = null;
+        public Transform DocumentTransform = null;
+        public RevitLinkInstance RvtlinkInstance = null;
+        public IEnumerable<Element> СonstructionElements = null;
+
         private FilteredElementCollector collector = null;
 
         private readonly ElementId invalId = ElementId.InvalidElementId;
@@ -105,20 +107,27 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         [STAThread]
-        public void Initialize(Document doc, DocumentModel model, Category category, Level level)
+        public void Initialize(Document doc)
         {
-            currentDocument = doc;
             units = doc.GetUnits();
-            targetDocument = model.Document;
-            linkInstance = model.LinkInstance;
-            documentTransform = model.Transform;
             Properties.Settings.Default.Upgrade();
             angleUnit = units.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
 
 
+        private FilteredElementCollector ValidWallCollector()
+        {
+            BuiltInCategory bic = BuiltInCategory.OST_Walls;
+            ElementId paramId = new ElementId(BuiltInParameter.WALL_ATTR_WIDTH_PARAM);
+            collector = RevitFilterManager.GetInstancesOfCategory(ActiveDocument, typeof(Wall), bic);
+            collector = RevitFilterManager.ParamFilterFactory(collector, paramId, minWidthSize, 1);
+            collector = collector.WherePasses(new ElementLevelFilter(invalId, true));
+            return collector;
+        }
+
+
         [STAThread]
-        public IList<ElementModel> GetCollisionCommunicateElements()
+        public IList<ElementModel> GetCollisionCommunicateElements(Document doc)
         {
             modelList.Clear();
             collector = ValidWallCollector();
@@ -132,7 +141,7 @@ namespace RevitTimasBIMTools.CutOpening
                     hostSolid = host.GetElementCenterSolid(options, identityTransform, centroidPoint);
                     if (hostSolid != null)
                     {
-                        foreach (ElementModel model in GetIntersectionElementModels(currentDocument))
+                        foreach (ElementModel model in GetIntersectionElementModels(doc))
                         {
                             elemId = host.Id;
                             if (!hostIdList.Contains(elemId))
@@ -155,15 +164,7 @@ namespace RevitTimasBIMTools.CutOpening
 
 
 
-        private FilteredElementCollector ValidWallCollector()
-        {
-            BuiltInCategory bic = BuiltInCategory.OST_Walls;
-            ElementId paramId = new ElementId(BuiltInParameter.WALL_ATTR_WIDTH_PARAM);
-            collector = RevitFilterManager.GetInstancesOfCategory(currentDocument, typeof(Wall), bic);
-            collector = RevitFilterManager.ParamFilterFactory(collector, paramId, minWidthSize, 1);
-            collector = collector.WherePasses(new ElementLevelFilter(invalId, true));
-            return collector;
-        }
+
 
 
         private IEnumerable<ElementModel> GetIntersectionElementModels(Document doc)
@@ -178,7 +179,7 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     if (GetElementDirection(elem, out commDirection) && IsParallel(hostDirection, commDirection))
                     {
-                        intersectSolid = GetIntersectSolid(hostSolid, elem, documentTransform);
+                        intersectSolid = GetIntersectSolid(hostSolid, elem, DocumentTransform);
                         if (intersectSolid != null && intersectSolid.Volume > toleranceVolume)
                         {
                             centroidPoint = intersectSolid.ComputeCentroid();
@@ -379,7 +380,7 @@ namespace RevitTimasBIMTools.CutOpening
                 widht = RoundSize(Math.Abs(bbox.Max.X - bbox.Min.X));
                 hight = RoundSize(Math.Abs(bbox.Max.Z - bbox.Min.Z));
                 result = new ElementTypeData(etype, hight, widht);
-                CreateDirectShape(currentDocument, elem, intersectSolid);
+                CreateDirectShape(ActiveDocument, elem, intersectSolid);
                 bbox.Dispose();
             }
             return result;
@@ -460,7 +461,7 @@ namespace RevitTimasBIMTools.CutOpening
             direction = XYZ.Zero;
 
             Reference reference = fi.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
-            reference = linkInstance != null ? reference.CreateLinkReference(linkInstance) : reference;
+            reference = RvtlinkInstance != null ? reference.CreateLinkReference(RvtlinkInstance) : reference;
 
             if (null != reference)
             {
@@ -549,11 +550,11 @@ namespace RevitTimasBIMTools.CutOpening
             transform?.Dispose();
             collector?.Dispose();
             _ = stringBuilder.Clear();
-            linkInstance?.Dispose();
-            targetDocument?.Dispose();
+            RvtlinkInstance?.Dispose();
+            SelectedDocument?.Dispose();
             intersectSolid?.Dispose();
-            currentDocument?.Dispose();
-            documentTransform?.Dispose();
+            ActiveDocument?.Dispose();
+            DocumentTransform?.Dispose();
             ElementDataDictionary.OnSerializeData(dictDatabase);
         }
     }

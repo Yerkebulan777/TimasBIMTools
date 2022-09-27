@@ -88,10 +88,18 @@ namespace RevitTimasBIMTools.ViewModels
         #region Settings
 
         private DocumentModel model = null;
-        public DocumentModel DocumentModel
+        public DocumentModel SelectedDocumentModel
         {
             get => model;
-            set => SetProperty(ref model, value);
+            set
+            {
+                if (SetProperty(ref model, value) && value != null)
+                {
+                    manager.SelectedDocument = model.Document;
+                    manager.DocumentTransform = model.Transform;
+                    manager.RvtlinkInstance = model.LinkInstance;
+                }
+            }
         }
 
 
@@ -99,7 +107,27 @@ namespace RevitTimasBIMTools.ViewModels
         public Material StructureMaterial
         {
             get => material;
-            set => SetProperty(ref material, value);
+            set
+            {
+                if (SetProperty(ref material, value) && value != null)
+                {
+                    _ = RevitTask.RunAsync(app =>
+                    {
+                        UIDocument uidoc = app.ActiveUIDocument;
+                        Document doc = app.ActiveUIDocument.Document;
+                        if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                        {
+                            List<Element> elements = new List<Element>();
+                            foreach (KeyValuePair<ElementId, ElementId> item in RevitMaterialManager.GetTypeIdsByStructureMaterial(doc, material.Name))
+                            {
+                                elements.AddRange(new FilteredElementCollector(doc).OfCategoryId(item.Key).WhereElementIsNotElementType()
+                                .Where(e => e.GetTypeId().Equals(item.Value)).ToList<Element>());
+                            }
+                        }
+                    });
+
+                }
+            }
         }
 
 
@@ -246,13 +274,12 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
-                string guid = doc.ProjectInformation.UniqueId;
-                manager.Initialize(doc, model, category, level);
-                if (documentId.Equals(guid))
+                if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
+                    manager.Initialize(doc);
                     ActivateFamilySimbol(doc, roundOpeningId);
                     ActivateFamilySimbol(doc, rectangOpeningId);
-                    collection = manager.GetCollisionCommunicateElements();
+                    collection = manager.GetCollisionCommunicateElements(doc);
                 }
                 RevitViewManager.Show3DView(uidoc, view3d);
                 return collection.ToObservableCollection();

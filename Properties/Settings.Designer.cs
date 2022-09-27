@@ -130,16 +130,5 @@ namespace RevitTimasBIMTools.Properties {
                 this["IsStarted"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection ElementIds {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["ElementIds"]));
-            }
-            set {
-                this["ElementIds"] = value;
-            }
-        }
     }
 }
