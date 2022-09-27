@@ -44,8 +44,8 @@ namespace RevitTimasBIMTools.RevitUtils
                     Material material = GetCompoundStructureMaterial(doc, compound, categoryMat);
                     if (material != null)
                     {
-                        _ = StructureElementUniqueIds.Add(elem.UniqueId);
                         result[material.Name] = material;
+                        _ = StructureElementUniqueIds.Add(elem.UniqueId);
                     }
                 }
             }
