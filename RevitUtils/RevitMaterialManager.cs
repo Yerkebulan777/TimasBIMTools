@@ -7,16 +7,16 @@ namespace RevitTimasBIMTools.RevitUtils
     {
         public static SortedDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
         {
+            List<Element> elements = new List<Element>(50);
             MaterialFunctionAssignment structure = MaterialFunctionAssignment.Structure;
             SortedDictionary<string, Material> result = new SortedDictionary<string, Material>();
             Material roofMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
             Material wallMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
             Material floorMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Floors).Material;
-            FilteredElementCollector roofcollector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs, false);
-            FilteredElementCollector wallcollector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls, false);
-            FilteredElementCollector floorcollector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors, false);
-            FilteredElementCollector collector = roofcollector.UnionWith(wallcollector).UnionWith(floorcollector);
-            foreach (Element elem in collector)
+            elements.AddRange(RevitFilterManager.GetInstancesOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs, false).ToElements());
+            elements.AddRange(RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls, false).ToElements());
+            elements.AddRange(RevitFilterManager.GetInstancesOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors, false).ToElements());
+            foreach (Element elem in elements)
             {
                 Material material = null;
                 Material categoryMaterial = null;
@@ -60,10 +60,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-
-            collector.Dispose();
             return result;
-
         }
 
 
