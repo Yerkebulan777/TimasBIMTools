@@ -10,8 +10,8 @@ namespace RevitTimasBIMTools.RevitUtils
         public static List<Element> StructureElementTypeList = new List<Element>(100);
         public static IDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
         {
-            CompoundStructure compound = null;
             StructureElementTypeList.Clear();
+            CompoundStructure compound = null;
             List<Element> elements = new List<Element>(100);
             IDictionary<string, Material> result = new SortedDictionary<string, Material>();
             StructureElementTypeList.AddRange(RevitFilterManager.GetElementsOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs, false));
@@ -64,7 +64,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 Material material = GetCompoundStructureMaterial(doc, elem, compound);
                 if (material != null && material.Name == materialName)
                 {
-                    _ = RevitFilterManager.GetInstancesByTypeId(doc, elem.Category.Id, elem.Id);
+                    result.AddRange(RevitFilterManager.GetInstancesByTypeId(doc, elem.Category.Id, elem.Id));
                 }
             }
             return result;
