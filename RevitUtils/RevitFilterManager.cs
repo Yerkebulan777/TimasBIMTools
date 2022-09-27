@@ -38,11 +38,10 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Advance Filtered Element Collector
 
-        public static IEnumerable<Element> GetInistancesByElementTypeId(Document doc, ElementId catId, ElementId typeId, bool inverted = false)
+        public static IEnumerable<Element> GetInistancesByElementTypeId(Document doc, ElementId catId, ElementId typeId)
         {
             int typeIntId = typeId.IntegerValue;
-            ElementCategoryFilter filter = new ElementCategoryFilter(catId, inverted);
-            FilteredElementCollector collector = new FilteredElementCollector(doc).WherePasses(filter);
+            FilteredElementCollector collector = new FilteredElementCollector(doc).OfCategoryId(catId);
             foreach (Element elem in collector.WhereElementIsNotElementType())
             {
                 ElementId elemTypeId = elem.GetTypeId();
@@ -328,5 +327,6 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
         #endregion
+
     }
 }
