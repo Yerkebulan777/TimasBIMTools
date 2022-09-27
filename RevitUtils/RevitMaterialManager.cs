@@ -47,21 +47,17 @@ namespace RevitTimasBIMTools.RevitUtils
                                 try
                                 {
                                     material = doc.GetElement(structLayer.MaterialId) as Material;
-                                    material = material ?? categoryMaterial;
                                 }
                                 finally
                                 {
-                                    if (null != material)
-                                    {
-                                        result[material.Name] = material;
-                                    }
+                                    material = material ?? categoryMaterial;
+                                    result[material.Name] = material;
                                 }
                                 break;
                             }
                         }
                     }
                 }
-
             }
 
             collector.Dispose();
