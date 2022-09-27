@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +12,14 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Standert Filtered Element Collector
 
-        public static FilteredElementCollector GetInstancesOfCategory(Document doc, Type type, BuiltInCategory bic)
+        public static FilteredElementCollector GetInstancesOfCategory(Document doc, Type type, BuiltInCategory bic, bool? isInstances = null)
         {
+            if (isInstances.HasValue)
+            {
+                return (bool)isInstances
+                    ? new FilteredElementCollector(doc).OfClass(type).OfCategory(bic).WhereElementIsNotElementType()
+                    : new FilteredElementCollector(doc).OfClass(type).OfCategory(bic).WhereElementIsElementType();
+            }
             return new FilteredElementCollector(doc).OfClass(type).OfCategory(bic);
         }
 
@@ -237,7 +242,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 Category cat = Category.GetCategory(doc, catId);
                 if (cat != null)
                 {
-                    result[cat.Name] = cat; 
+                    result[cat.Name] = cat;
                 }
             }
             return result;
