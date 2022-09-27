@@ -8,7 +8,7 @@ namespace RevitTimasBIMTools.RevitUtils
         public static SortedDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
         {
             List<Element> elements = new List<Element>(50);
-            MaterialFunctionAssignment structure = MaterialFunctionAssignment.Structure;
+            MaterialFunctionAssignment structureFunction = MaterialFunctionAssignment.Structure;
             SortedDictionary<string, Material> result = new SortedDictionary<string, Material>();
             Material roofMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
             Material wallMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
@@ -39,23 +39,20 @@ namespace RevitTimasBIMTools.RevitUtils
 
                 if (comStruct != null)
                 {
-                    foreach (CompoundStructureLayer structLayer in comStruct.GetLayers())
+                    foreach (CompoundStructureLayer layer in comStruct.GetLayers())
                     {
-                        if (structure == structLayer.Function)
+                        if (structureFunction == layer.Function)
                         {
-                            if (structure == structLayer.Function)
+                            try
                             {
-                                try
-                                {
-                                    material = doc.GetElement(structLayer.MaterialId) as Material;
-                                }
-                                finally
-                                {
-                                    material = material ?? categoryMaterial;
-                                    result[material.Name] = material;
-                                }
-                                break;
+                                material = doc.GetElement(layer.MaterialId) as Material;
                             }
+                            finally
+                            {
+                                material = material ?? categoryMaterial;
+                                result[material.Name] = material;
+                            }
+                            break;
                         }
                     }
                 }
