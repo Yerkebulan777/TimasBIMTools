@@ -153,7 +153,7 @@ namespace RevitTimasBIMTools.ViewModels
             manager.СonstructionElements = await RevitTask.RunAsync(app =>
             {
                 Document doc = app.ActiveUIDocument.Document;
-                List<Element> instances = new List<Element>(150);
+                List<Element> instances = new List<Element>(250);
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     foreach (KeyValuePair<ElementId, ElementId> item in RevitMaterialManager.GetTypeIdsByStructureMaterial(doc, materialName))
