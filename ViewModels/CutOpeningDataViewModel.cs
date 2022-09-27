@@ -111,20 +111,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref material, value) && value != null)
                 {
-                    manager.СonstructionElements = RevitTask.RunAsync(app =>
-                    {
-                        Document doc = app.ActiveUIDocument.Document;
-                        List<Element> instances = new List<Element>(150);
-                        if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                        {
-                            foreach (KeyValuePair<ElementId, ElementId> item in RevitMaterialManager.GetTypeIdsByStructureMaterial(doc, material.Name))
-                            {
-                                instances.AddRange(new FilteredElementCollector(doc).OfCategoryId(item.Key)
-                                    .WhereElementIsNotElementType().Where(e => e.GetTypeId().Equals(item.Value)));
-                            }
-                        }
-                        return instances;
-                    }).Result;
+                    _ = GetInstancesByMaterialName(material.Name);
                 }
             }
         }
@@ -159,6 +146,27 @@ namespace RevitTimasBIMTools.ViewModels
             get => rounded;
             set => SetProperty(ref rounded, value);
         }
+
+
+        private async Task GetInstancesByMaterialName(string materialName)
+        {
+            manager.СonstructionElements = await RevitTask.RunAsync(app =>
+            {
+                Document doc = app.ActiveUIDocument.Document;
+                List<Element> instances = new List<Element>(150);
+                if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    foreach (KeyValuePair<ElementId, ElementId> item in RevitMaterialManager.GetTypeIdsByStructureMaterial(doc, materialName))
+                    {
+                        instances.AddRange(new FilteredElementCollector(doc).OfCategoryId(item.Key)
+                            .WhereElementIsNotElementType().Where(e => e.GetTypeId().Equals(item.Value)));
+                    }
+                }
+                Logger.Info(instances.Count.ToString());
+                return instances;
+            });
+        }
+
 
         #endregion
 
