@@ -63,7 +63,7 @@ namespace RevitTimasBIMTools.CutOpening
         public Document SelectedDocument = null;
         public Transform DocumentTransform = null;
         public RevitLinkInstance RvtlinkInstance = null;
-        public IEnumerable<Element> СonstructionElements = null;
+        public IList<Element> СonstructionElements = null;
 
         private FilteredElementCollector collector = null;
 
