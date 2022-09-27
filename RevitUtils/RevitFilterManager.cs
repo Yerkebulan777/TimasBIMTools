@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -283,9 +284,10 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region FamilyFilter
 
-        public static IEnumerable<FamilySymbol> GetHostedFamilySymbols(Document doc, BuiltInCategory bic)
+        public static IDictionary<string, FamilySymbol> GetHostedFamilySymbols(Document doc, BuiltInCategory bic)
         {
             FamilyPlacementType placement = FamilyPlacementType.OneLevelBasedHosted;
+            IDictionary<string, FamilySymbol> result = new SortedDictionary<string, FamilySymbol>();
             FilteredElementCollector collector = GetInstancesOfCategory(doc, typeof(FamilySymbol), bic);
             foreach (FamilySymbol smb in collector)
             {
@@ -294,10 +296,11 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     if (fam.FamilyPlacementType.Equals(placement))
                     {
-                        yield return smb;
+                        result[smb.Name] = smb;
                     }
                 }
             }
+            return result;
         }
 
         #endregion

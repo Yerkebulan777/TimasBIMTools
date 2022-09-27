@@ -28,7 +28,7 @@ namespace RevitTimasBIMTools.Views
         public View3D View3d { get; set; } = null;
         public DocumentModel ActiveDocModel = null;
 
-        public IList<FamilySymbol> HostedFamilySymbols = new List<FamilySymbol>(25);
+        private IDictionary<string, FamilySymbol> familySymbols = null;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string currentDocumentId = Properties.Settings.Default.CurrentDocumentUniqueId;
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
@@ -70,9 +70,9 @@ namespace RevitTimasBIMTools.Views
         {
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
+                Document doc = null;
                 if (!dataViewModel.IsOptionsEnabled)
                 {
-                    Document doc = null;
                     Task t = RevitTask.RunAsync(async app =>
                     {
                         doc = app.ActiveUIDocument.Document;
@@ -84,16 +84,24 @@ namespace RevitTimasBIMTools.Views
                     {
                         ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
                         ComboStructureMats.ItemsSource = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
-                        HostedFamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel).ToList();
-                        ComboLevelFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
-                        ComboRectangSymbol.ItemsSource = HostedFamilySymbols;
-                        ComboRoundedSymbol.ItemsSource = HostedFamilySymbols;
+                        familySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+                        ComboRectangSymbol.ItemsSource = familySymbols;
+                        ComboRoundedSymbol.ItemsSource = familySymbols;
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
                 else
                 {
-                    dataViewModel.IsOptionsEnabled = false;
-                    dataViewModel.IsDataEnabled = true;
+                    Task t = RevitTask.RunAsync(async app =>
+                    {
+                        doc = app.ActiveUIDocument.Document;
+                        dataViewModel.IsDataEnabled = true;
+                        dataViewModel.IsOptionsEnabled = false;
+                        await Task.Delay(1000).ConfigureAwait(true);
+                    })
+                    .ContinueWith(app =>
+                    {
+                        ComboLevelFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
             });
         }
