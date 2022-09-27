@@ -130,5 +130,16 @@ namespace RevitTimasBIMTools.Properties {
                 this["IsStarted"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection Test {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["Test"]));
+            }
+            set {
+                this["Test"] = value;
+            }
+        }
     }
 }

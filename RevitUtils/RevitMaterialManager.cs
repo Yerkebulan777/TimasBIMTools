@@ -12,9 +12,10 @@ namespace RevitTimasBIMTools.RevitUtils
             Material roofMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Roofs).Material;
             Material wallMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Walls).Material;
             Material floorMaterial = Category.GetCategory(doc, BuiltInCategory.OST_Floors).Material;
-            FilteredElementCollector collector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls, false);
-            collector = collector.UnionWith(RevitFilterManager.GetInstancesOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors, false));
-            collector = collector.UnionWith(RevitFilterManager.GetInstancesOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs, false));
+            FilteredElementCollector roofcollector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs, false);
+            FilteredElementCollector wallcollector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls, false);
+            FilteredElementCollector floorcollector = RevitFilterManager.GetInstancesOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors, false);
+            FilteredElementCollector collector = roofcollector.UnionWith(wallcollector).UnionWith(floorcollector);
             foreach (Element elem in collector)
             {
                 Material material = null;
