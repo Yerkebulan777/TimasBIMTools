@@ -7,9 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Windows.Markup;
 using Document = Autodesk.Revit.DB.Document;
 using Reference = Autodesk.Revit.DB.Reference;
 
@@ -75,7 +73,7 @@ namespace RevitTimasBIMTools.CutOpening
         #region Templory Properties
 
         private XYZ centroidPoint = XYZ.Zero;
-        private XYZ commDirection = XYZ.BasisZ;
+        private XYZ intersectNormal = XYZ.BasisZ;
         private XYZ hostDirection = XYZ.BasisZ;
 
         private Solid hostSolid = null;
@@ -86,7 +84,7 @@ namespace RevitTimasBIMTools.CutOpening
         private ElementId elemId = ElementId.InvalidElementId;
         private BoundingBoxXYZ hostBox = new BoundingBoxXYZ();
 
-        private readonly StringBuilder stringBuilder = new StringBuilder(25);
+
         private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
         private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
 
@@ -158,14 +156,14 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 if (VerifyElementByLenght(element))
                 {
-                    if (GetElementDirection(element, out commDirection) && IsParallel(hostDirection, commDirection))
+                    if (GetElementDirection(element, out intersectNormal) && IsParallel(hostDirection, intersectNormal))
                     {
                         intersectSolid = GetIntersectSolid(hostSolid, element, SearchTransform);
                         if (intersectSolid != null && intersectSolid.Volume > toleranceVolume)
                         {
                             centroidPoint = intersectSolid.ComputeCentroid();
-                            ElementTypeData sizeData = DefineElementSize(element);
-                            yield return new ElementModel(element, sizeData, stringBuilder.ToString());
+                            ElementTypeData sizeData = DefineElementSize(element, intersectNormal);
+                            yield return new ElementModel(element, sizeData);
                         }
                     }
                 }
@@ -236,7 +234,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private ElementTypeData DefineElementSize(Element elem)
+        private ElementTypeData DefineElementSize(Element elem, XYZ direction)
         {
             Document doc = elem.Document;
             ElementTypeData structData = new ElementTypeData(null);
@@ -247,12 +245,12 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     return structData;
                 }
-                structData = GetSizeByParameter(elem, etype);
+                structData = GetSizeByParameter(elem, etype, direction);
                 if (structData.IsValidObject && dictDatabase.TryAdd(uniqueKey, structData))
                 {
                     return structData;
                 }
-                structData = GetSizeByGeometry(etype, commDirection);
+                structData = GetSizeByGeometry(etype, intersectNormal);
                 if (structData.IsValidObject && dictDatabase.TryAdd(uniqueKey, structData))
                 {
                     return structData;
@@ -262,7 +260,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private ElementTypeData GetSizeByParameter(Element elem, ElementType etype)
+        private ElementTypeData GetSizeByParameter(Element elem, ElementType etype, XYZ direction)
         {
             int catIdInt = elem.Category.Id.IntegerValue;
             if (Enum.IsDefined(typeof(BuiltInCategory), catIdInt))
@@ -303,9 +301,7 @@ namespace RevitTimasBIMTools.CutOpening
                         }
                     default:
                         {
-                            widht = GetLengthValueBySimilarParameterName(elem, widthParamName);
-                            hight = GetLengthValueBySimilarParameterName(elem, heightParamName);
-                            return new ElementTypeData(etype, hight, widht);
+                            return GetSizeByGeometry(etype, direction);
                         }
                 }
             }
@@ -327,38 +323,12 @@ namespace RevitTimasBIMTools.CutOpening
             BoundingBoxXYZ bbox = intersectSolid?.GetBoundingBox();
             if (bbox != null)
             {
-                widht = RoundSize(Math.Abs(bbox.Max.X - bbox.Min.X));
-                hight = RoundSize(Math.Abs(bbox.Max.Z - bbox.Min.Z));
+                widht = Math.Abs(bbox.Max.X - bbox.Min.X);
+                hight = Math.Abs(bbox.Max.Z - bbox.Min.Z);
                 result = new ElementTypeData(etype, hight, widht);
                 bbox.Dispose();
             }
             return result;
-        }
-
-
-        private double GetLengthValueBySimilarParameterName(Element elem, string paramName)
-        {
-            double value = invalIdInt;
-            int tolerance = int.MaxValue;
-            char[] delimiters = new[] { ' ', '_', '-' };
-            foreach (Parameter param in elem.GetOrderedParameters())
-            {
-                Definition definition = param.Definition;
-                if (param.HasValue && definition.ParameterType == lenParamType)
-                {
-                    string name = definition.Name;
-                    string[] strArray = name.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-                    if (strArray.Contains(paramName, StringComparer.CurrentCultureIgnoreCase))
-                    {
-                        int tmp = param.IsShared ? name.Length : name.Length + strArray.Length;
-                        if (tolerance > tmp && UnitFormatUtils.TryParse(units, UnitType.UT_Length, param.AsValueString(), out value))
-                        {
-                            tolerance = tmp;
-                        }
-                    }
-                }
-            }
-            return value;
         }
 
 
@@ -393,13 +363,34 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private double RoundSize(double value, int digit = 5)
+        #region Other methods
+
+        private double GetLengthValueBySimilarParameterName(Element elem, string paramName)
         {
-            return Math.Round(value * footToMm / digit, MidpointRounding.AwayFromZero) * digit / footToMm;
+            double value = invalIdInt;
+            int tolerance = int.MaxValue;
+            char[] delimiters = new[] { ' ', '_', '-' };
+            foreach (Parameter param in elem.GetOrderedParameters())
+            {
+                Definition definition = param.Definition;
+                if (param.HasValue && definition.ParameterType == lenParamType)
+                {
+                    string name = definition.Name;
+                    string[] strArray = name.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+                    if (strArray.Contains(paramName, StringComparer.CurrentCultureIgnoreCase))
+                    {
+                        int tmp = param.IsShared ? name.Length : name.Length + strArray.Length;
+                        if (tolerance > tmp && UnitFormatUtils.TryParse(units, UnitType.UT_Length, param.AsValueString(), out value))
+                        {
+                            tolerance = tmp;
+                        }
+                    }
+                }
+            }
+            return value;
         }
 
 
-        #region Other methods
         private void CreateDirectShape(Document doc, Element elem, Solid solid)
         {
             using (Transaction trans = new Transaction(doc, "Create DirectShape"))
@@ -517,7 +508,6 @@ namespace RevitTimasBIMTools.CutOpening
             modelList.Clear();
             transform?.Dispose();
             collector?.Dispose();
-            _ = stringBuilder.Clear();
             SearchLinkInstance?.Dispose();
             SearchDocument?.Dispose();
             intersectSolid?.Dispose();

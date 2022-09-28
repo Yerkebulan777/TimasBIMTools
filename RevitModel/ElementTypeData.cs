@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 using Autodesk.Revit.DB;
 
 
@@ -7,6 +8,7 @@ namespace RevitTimasBIMTools.RevitModel
     [DataContract]
     public struct ElementTypeData
     {
+        private const double footToMm = 304.8;
         public ElementTypeData(ElementType elemtype, double height = 0, double width = 0, string description = null)
         {
             IsValidObject = elemtype != null && elemtype.IsValidObject;
@@ -26,8 +28,8 @@ namespace RevitTimasBIMTools.RevitModel
                 SymbolName = string.Empty;
             }
 
-            Height = height;
-            Width = width;
+            Height = RoundSize(height);
+            Width = RoundSize(width);
         }
 
         [DataMember]
@@ -54,6 +56,12 @@ namespace RevitTimasBIMTools.RevitModel
 
         [IgnoreDataMember]
         public string Description { get; set; }
+
+
+        private double RoundSize(double value, int digit = 5)
+        {
+            return Math.Round(value * footToMm / digit, MidpointRounding.AwayFromZero) * digit / footToMm;
+        }
 
     }
 }
