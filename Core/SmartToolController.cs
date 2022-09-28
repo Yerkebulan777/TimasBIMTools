@@ -55,7 +55,7 @@ namespace RevitTimasBIMTools.Core
             uiface.Initialize(cntrapp);
             controller = cntrapp;
 
-            Dispatcher.CurrentDispatcher.Thread.Name = "UIRevitGeneralThread";
+            Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
             cntrapp.ControlledApplication.ApplicationInitialized += DockablePaneRegisters;
             cntrapp.ControlledApplication.DocumentClosed += OnDocumentClosed; ;
 

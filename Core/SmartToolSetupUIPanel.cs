@@ -6,20 +6,18 @@ namespace RevitTimasBIMTools.Core
 {
     public sealed class SmartToolSetupUIPanel
     {
-        public readonly string AppDirectory = $@"{commonAppData}\Autodesk\Revit\Addins\2019\RevitTimasBIMTools";
-        private static readonly string commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-        private readonly string voidPanePath = CutOpeningShowPanelCmd.GetPath();
+        public readonly string AppDirectory = $@"{SmartToolGeneralHelper.AppDataPath}\Autodesk\Revit\Addins\2019\RevitTimasBIMTools";
+        private readonly string cutOpeningPane = CutOpeningShowPanelCmd.GetPath();
         private const string buttomText = SmartToolGeneralHelper.CutVoidToolName;
         private const string ribbonPanelName = "Automation";
         private const string buttomName = "BtnVoidManager";
-
 
         public void Initialize(UIControlledApplication uicontrol)
         {
             // Create ribbon tab and ribbon panels
             try { uicontrol.CreateRibbonTab(SmartToolGeneralHelper.ApplicationName); } catch { }
             RibbonPanel ribbonPanel = uicontrol.CreateRibbonPanel(SmartToolGeneralHelper.ApplicationName, ribbonPanelName);
-            PushButtonData buttonData = new PushButtonData(buttomName, buttomText, SmartToolGeneralHelper.AssemblyLocation, voidPanePath)
+            PushButtonData buttonData = new PushButtonData(buttomName, buttomText, SmartToolGeneralHelper.AssemblyLocation, cutOpeningPane)
             {
                 ToolTip = "Cut opening purgeMng",
                 LargeImage = SmartToolGeneralHelper.GetImageSource(),
@@ -27,7 +25,7 @@ namespace RevitTimasBIMTools.Core
             };
 
             PushButton showButton = ribbonPanel.AddItem(buttonData) as PushButton;
-            showButton.AvailabilityClassName = voidPanePath;
+            showButton.AvailabilityClassName = cutOpeningPane;
             if (showButton != null)
             {
                 ribbonPanel.AddSeparator();

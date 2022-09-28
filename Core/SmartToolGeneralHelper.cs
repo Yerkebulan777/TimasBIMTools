@@ -21,6 +21,7 @@ namespace RevitTimasBIMTools.Core
         public static readonly string AssemblyDirectory = Path.GetDirectoryName(AssemblyLocation);
         public static readonly string AssemblyName = Path.GetFileNameWithoutExtension(AssemblyLocation);
         public static readonly string DocumentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        public static readonly string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
         public static readonly string LogPath = Path.Combine(DocumentPath, "RevitAsync.log");
 
         #region IconConvertToImageSource
