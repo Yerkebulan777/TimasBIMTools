@@ -37,8 +37,7 @@ namespace RevitTimasBIMTools.CutOpening
         private const int invalIdInt = -1;
         private const double toleranceVolume = 0.005;
         private const double rightAngle = Math.PI / 2;
-        private const string widthParamName = "ширина";
-        private const string heightParamName = "высота";
+        private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
 
         #endregion
 
@@ -53,19 +52,21 @@ namespace RevitTimasBIMTools.CutOpening
         public IList<Element> SearchElementList = null;
         public RevitLinkInstance SearchLinkInstance = null;
 
+        private CancellationToken cancelToken = CutOpeningDataViewModel.CancelToken;
+
         private readonly int minSideSize = Properties.Settings.Default.MinSideSizeInMm;
         private readonly int maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
         private readonly int cutOffsetSize = Properties.Settings.Default.CutOffsetInMm;
+        //private readonly string widthParamName = "ширина";
+        //private readonly string heightParamName = "высота";
 
         #endregion
 
 
-
         private readonly IList<ElementId> hostIdList = new List<ElementId>(150);
-
-        private CancellationToken cancelToken = CutOpeningDataViewModel.CancelToken;
-
-        private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
+        
+        
+        private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
 
 
         #region Templory Properties
@@ -84,7 +85,7 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
-        private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
+        
 
         private double angleRadians = 0;
         private double angleHorisontDegrees = 0;
