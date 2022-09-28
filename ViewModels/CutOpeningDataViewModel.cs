@@ -31,8 +31,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         private readonly object syncLocker = new object();
         private readonly string documentId = Properties.Settings.Default.CurrentDocumentUniqueId;
-        private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
-        private readonly string rectangOpeningId = Properties.Settings.Default.RectangSymbolUniqueId;
+        //private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
+        //private readonly string rectangOpeningId = Properties.Settings.Default.IsStarted;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
 
 
@@ -95,9 +95,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref model, value) && value != null)
                 {
-                    manager.SelectedDocument = model.Document;
-                    manager.DocumentTransform = model.Transform;
-                    manager.RvtlinkInstance = model.LinkInstance;
+                    manager.SearchDocument = model.Document;
+                    manager.SearchTransform = model.Transform;
+                    manager.SearchLinkInstance = model.LinkInstance;
                 }
             }
         }
@@ -118,22 +118,21 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         private Category category = null;
-        public Category SystemCategory
+        public Category SearchCategory
         {
             get => category;
             set
             {
                 if (SetProperty(ref category, value) && value != null)
                 {
-                    Properties.Settings.Default.MEPSystemCatIdInt = category.Id.IntegerValue;
-                    Properties.Settings.Default.Save();
+                    manager.SearchCategoryId = category.Id;
                 }
             }
         }
 
 
         private Level level = null;
-        public Level SelectedLevel
+        public Level SearchLevel
         {
             get => level;
             set => SetProperty(ref level, value);
@@ -153,6 +152,8 @@ namespace RevitTimasBIMTools.ViewModels
             get => rounded;
             set => SetProperty(ref rounded, value);
         }
+
+
 
 
         private async Task GetInstancesByMaterialName(string materialName)

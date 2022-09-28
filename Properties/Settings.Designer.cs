@@ -25,73 +25,13 @@ namespace RevitTimasBIMTools.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string RectangSymbolUniqueId {
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsStarted {
             get {
-                return ((string)(this["RectangSymbolUniqueId"]));
+                return ((bool)(this["IsStarted"]));
             }
             set {
-                this["RectangSymbolUniqueId"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string RoundSymbolUniqueId {
-            get {
-                return ((string)(this["RoundSymbolUniqueId"]));
-            }
-            set {
-                this["RoundSymbolUniqueId"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int CutOffsetInMm {
-            get {
-                return ((int)(this["CutOffsetInMm"]));
-            }
-            set {
-                this["CutOffsetInMm"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int MinSideSizeInMm {
-            get {
-                return ((int)(this["MinSideSizeInMm"]));
-            }
-            set {
-                this["MinSideSizeInMm"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int MaxSideSizeInMm {
-            get {
-                return ((int)(this["MaxSideSizeInMm"]));
-            }
-            set {
-                this["MaxSideSizeInMm"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int MEPSystemCatIdInt {
-            get {
-                return ((int)(this["MEPSystemCatIdInt"]));
-            }
-            set {
-                this["MEPSystemCatIdInt"] = value;
+                this["IsStarted"] = value;
             }
         }
         
@@ -109,25 +49,37 @@ namespace RevitTimasBIMTools.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string CurrentLevelUniqueId {
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int MinSideSizeInMm {
             get {
-                return ((string)(this["CurrentLevelUniqueId"]));
+                return ((int)(this["MinSideSizeInMm"]));
             }
             set {
-                this["CurrentLevelUniqueId"] = value;
+                this["MinSideSizeInMm"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool IsStarted {
+        [global::System.Configuration.DefaultSettingValueAttribute("250")]
+        public int MaxSideSizeInMm {
             get {
-                return ((bool)(this["IsStarted"]));
+                return ((int)(this["MaxSideSizeInMm"]));
             }
             set {
-                this["IsStarted"] = value;
+                this["MaxSideSizeInMm"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int CutOffsetInMm {
+            get {
+                return ((int)(this["CutOffsetInMm"]));
+            }
+            set {
+                this["CutOffsetInMm"] = value;
             }
         }
     }
