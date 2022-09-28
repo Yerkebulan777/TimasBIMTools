@@ -26,6 +26,7 @@ namespace RevitTimasBIMTools.CutOpening
             DetailLevel = ViewDetailLevel.Medium
         };
 
+        private readonly Transform identityTransform = Transform.Identity;
         private readonly ParameterType lenParamType = ParameterType.Length;
         private readonly CopyPasteOptions copyOptions = new CopyPasteOptions();
 
@@ -54,26 +55,19 @@ namespace RevitTimasBIMTools.CutOpening
         public IList<Element> SearchElementList = null;
         public RevitLinkInstance SearchLinkInstance = null;
 
-        #endregion
-
-
-        private readonly ElementId invalId = ElementId.InvalidElementId;
-        private readonly Transform identityTransform = Transform.Identity;
-
-
-
-        private const double minWidthSize = 150 / footToMm;
-        private readonly IList<ElementId> hostIdList = new List<ElementId>(150);
-
-        private CancellationToken cancelToken = CutOpeningDataViewModel.CancelToken;
         private readonly int minSideSize = Properties.Settings.Default.MinSideSizeInMm;
         private readonly int maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
         private readonly int cutOffsetSize = Properties.Settings.Default.CutOffsetInMm;
+
+        #endregion
+
+
+
+        private readonly IList<ElementId> hostIdList = new List<ElementId>(150);
+
+        private CancellationToken cancelToken = CutOpeningDataViewModel.CancelToken;
+
         private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
-
-        private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
-
-        private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
 
 
         #region Templory Properties
@@ -85,11 +79,14 @@ namespace RevitTimasBIMTools.CutOpening
         private Solid hostSolid = null;
         private Solid intersectSolid = null;
         private string uniqueKey = string.Empty;
+        private Transform transform = Transform.Identity;
         private FilteredElementCollector collector = null;
         private ElementId elemId = ElementId.InvalidElementId;
         private BoundingBoxXYZ hostBox = new BoundingBoxXYZ();
+
         private readonly StringBuilder stringBuilder = new StringBuilder(25);
-        private Transform transform = Transform.Identity;
+        private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
+        private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
 
         private double angleRadians = 0;
         private double angleHorisontDegrees = 0;
@@ -174,9 +171,9 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool VerifyElementByLenght(Element elem)
+        private bool VerifyElementByLenght(Element elem, double minimum = 0.5)
         {
-            return !(elem.Location is LocationCurve) || elem.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() > minWidthSize;
+            return !(elem.Location is LocationCurve) || elem.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() > minimum;
         }
 
 
