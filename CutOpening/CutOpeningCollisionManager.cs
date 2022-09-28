@@ -9,7 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows.Markup;
 using Document = Autodesk.Revit.DB.Document;
+using Reference = Autodesk.Revit.DB.Reference;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -152,18 +154,18 @@ namespace RevitTimasBIMTools.CutOpening
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBox.GetOutLine());
             LogicalAndFilter intersectFilter = new LogicalAndFilter(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(SearchCategoryId);
-            foreach (Element elem in collector)
+            foreach (Element element in collector)
             {
-                if (elem.IsValidObject && VerifyElementByLenght(elem))
+                if (VerifyElementByLenght(element))
                 {
-                    if (GetElementDirection(elem, out commDirection) && IsParallel(hostDirection, commDirection))
+                    if (GetElementDirection(element, out commDirection) && IsParallel(hostDirection, commDirection))
                     {
-                        intersectSolid = GetIntersectSolid(hostSolid, elem, SearchTransform);
+                        intersectSolid = GetIntersectSolid(hostSolid, element, SearchTransform);
                         if (intersectSolid != null && intersectSolid.Volume > toleranceVolume)
                         {
                             centroidPoint = intersectSolid.ComputeCentroid();
-                            ElementTypeData sizeData = DefineElementSize(elem);
-                            yield return new ElementModel(elem, sizeData, stringBuilder.ToString());
+                            ElementTypeData sizeData = DefineElementSize(element);
+                            yield return new ElementModel(element, sizeData, stringBuilder.ToString());
                         }
                     }
                 }
@@ -171,7 +173,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool VerifyElementByLenght(Element elem, double minimum = 0.5)
+        private bool VerifyElementByLenght(Element elem, double minimum = 1.5)
         {
             return !(elem.Location is LocationCurve) || elem.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() > minimum;
         }
@@ -187,8 +189,8 @@ namespace RevitTimasBIMTools.CutOpening
             }
             else if (elem.Location is LocationCurve curve)
             {
-                Curve line = curve.Curve;
-                direction = (line.GetEndPoint(0) - line.GetEndPoint(1)).Normalize();
+                Line line = curve.Curve as Line;
+                direction = line.Direction.Normalize();
             }
             return direction.IsAlmostEqualTo(XYZ.Zero) == false;
         }
@@ -237,82 +239,100 @@ namespace RevitTimasBIMTools.CutOpening
         private ElementTypeData DefineElementSize(Element elem)
         {
             Document doc = elem.Document;
-            if (doc.GetElement(elem.GetTypeId()) is ElementType etype && etype.IsValidObject)
+            ElementTypeData structData = new ElementTypeData(null);
+            if (doc.GetElement(elem.GetTypeId()) is ElementType etype)
             {
-                uniqueKey = etype.UniqueId;
-                //if (dictDatabase.TryGetValue(uniqueKey, out structData) && structData.IsValidDataObject)
-                //{
-                //    return structData;
-                //}
-                //structData = GetSizeByParameter(hostInstance, etype);
-                //if (structData.IsValidDataObject && dictDatabase.TryAdd(uniqueKey.Normalize(), structData))
-                //{
-                //    return structData;
-                //}
-                object result = GetSizeByGeometry(etype, elem, commDirection);
-                //stringBuilder.AppendLine($"Solid volume {hostSolid.Volume} {hostDirection} {commDirection}");
-                if (result is ElementTypeData data && data.IsValidObject)
+                uniqueKey = etype.UniqueId.Normalize();
+                if (dictDatabase.TryGetValue(uniqueKey, out structData))
                 {
-                    _ = dictDatabase.TryAdd(uniqueKey, data);
-                    return data;
+                    return structData;
+                }
+                structData = GetSizeByParameter(elem, etype);
+                if (structData.IsValidObject && dictDatabase.TryAdd(uniqueKey, structData))
+                {
+                    return structData;
+                }
+                structData = GetSizeByGeometry(etype, commDirection);
+                if (structData.IsValidObject && dictDatabase.TryAdd(uniqueKey, structData))
+                {
+                    return structData;
+                }
+            }
+            return structData;
+        }
+
+
+        private ElementTypeData GetSizeByParameter(Element elem, ElementType etype)
+        {
+            int catIdInt = elem.Category.Id.IntegerValue;
+            if (Enum.IsDefined(typeof(BuiltInCategory), catIdInt))
+            {
+                BuiltInCategory builtInCategory = (BuiltInCategory)catIdInt;
+                switch (builtInCategory)
+                {
+                    case BuiltInCategory.OST_PipeCurves:
+                        {
+                            diameter = elem.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM).AsDouble();
+                            return new ElementTypeData(etype, diameter, diameter);
+                        }
+                    case BuiltInCategory.OST_DuctCurves:
+                        {
+                            Parameter diameterParam = elem.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM);
+                            if (diameterParam != null && diameterParam.HasValue)
+                            {
+                                diameter = diameterParam.AsDouble();
+                                return new ElementTypeData(etype, diameter, diameter);
+                            }
+                            else
+                            {
+                                hight = elem.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM).AsDouble();
+                                widht = elem.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM).AsDouble();
+                                return new ElementTypeData(etype, hight, widht);
+                            }
+                        }
+                    case BuiltInCategory.OST_Conduit:
+                        {
+                            diameter = elem.get_Parameter(BuiltInParameter.RBS_CONDUIT_DIAMETER_PARAM).AsDouble();
+                            return new ElementTypeData(etype, diameter, diameter);
+                        }
+                    case BuiltInCategory.OST_CableTray:
+                        {
+                            hight = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM).AsDouble();
+                            widht = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM).AsDouble();
+                            return new ElementTypeData(etype, hight, widht);
+                        }
+                    default:
+                        {
+                            widht = GetLengthValueBySimilarParameterName(elem, widthParamName);
+                            hight = GetLengthValueBySimilarParameterName(elem, heightParamName);
+                            return new ElementTypeData(etype, hight, widht);
+                        }
                 }
             }
             return new ElementTypeData(null);
         }
 
 
-        private object GetSizeByParameter(Element elem, ElementType etype)
+        private ElementTypeData GetSizeByGeometry(ElementType etype, XYZ direction)
         {
-            object resultData = null;
-            if (elem.IsValidObject)
+            transform = identityTransform;
+            direction = ResetDirectionToPositive(direction);
+            ElementTypeData result = new ElementTypeData(null);
+            angleHorisontDegrees = ConvertRadiansToDegrees(GetHorizontAngleRadiansByNormal(direction));
+            angleVerticalDegrees = ConvertRadiansToDegrees(GetVerticalAngleRadiansByNormal(direction));
+            Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngle(angleHorisontDegrees), centroidPoint);
+            Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngle(angleVerticalDegrees), centroidPoint);
+            intersectSolid = angleHorisontDegrees == 0 ? intersectSolid : SolidUtils.CreateTransformed(intersectSolid, horizont);
+            intersectSolid = angleVerticalDegrees == 0 ? intersectSolid : SolidUtils.CreateTransformed(intersectSolid, vertical);
+            BoundingBoxXYZ bbox = intersectSolid?.GetBoundingBox();
+            if (bbox != null)
             {
-                int catIdInt = elem.Category.Id.IntegerValue;
-                if (Enum.IsDefined(typeof(BuiltInCategory), catIdInt))
-                {
-                    BuiltInCategory builtInCategory = (BuiltInCategory)catIdInt;
-                    switch (builtInCategory)
-                    {
-                        case BuiltInCategory.OST_PipeCurves:
-                            {
-                                diameter = elem.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM).AsDouble();
-                                return new ElementTypeData(etype, diameter, diameter);
-                            }
-                        case BuiltInCategory.OST_DuctCurves:
-                            {
-                                Parameter diameterParam = elem.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM);
-                                if (diameterParam != null && diameterParam.HasValue)
-                                {
-                                    diameter = diameterParam.AsDouble();
-                                    return new ElementTypeData(etype, diameter, diameter);
-                                }
-                                else
-                                {
-                                    hight = elem.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM).AsDouble();
-                                    widht = elem.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM).AsDouble();
-                                    return new ElementTypeData(etype, hight, widht);
-                                }
-                            }
-                        case BuiltInCategory.OST_Conduit:
-                            {
-                                diameter = elem.get_Parameter(BuiltInParameter.RBS_CONDUIT_DIAMETER_PARAM).AsDouble();
-                                return new ElementTypeData(etype, diameter, diameter);
-                            }
-                        case BuiltInCategory.OST_CableTray:
-                            {
-                                hight = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM).AsDouble();
-                                widht = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM).AsDouble();
-                                return new ElementTypeData(etype, hight, widht);
-                            }
-                        default:
-                            {
-                                widht = GetLengthValueBySimilarParameterName(elem, widthParamName);
-                                hight = GetLengthValueBySimilarParameterName(elem, heightParamName);
-                                return new ElementTypeData(etype, hight, widht);
-                            }
-                    }
-                }
+                widht = RoundSize(Math.Abs(bbox.Max.X - bbox.Min.X));
+                hight = RoundSize(Math.Abs(bbox.Max.Z - bbox.Min.Z));
+                result = new ElementTypeData(etype, hight, widht);
+                bbox.Dispose();
             }
-            return resultData;
+            return result;
         }
 
 
@@ -339,31 +359,6 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
             return value;
-        }
-
-
-        private object GetSizeByGeometry(ElementType etype, Element elem, XYZ direction)
-        {
-            object result = null;
-            _ = stringBuilder.Clear();
-            transform = identityTransform;
-            direction = ResetDirectionToPositive(direction);
-            angleHorisontDegrees = ConvertRadiansToDegrees(GetHorizontAngleRadiansByNormal(direction));
-            angleVerticalDegrees = ConvertRadiansToDegrees(GetVerticalAngleRadiansByNormal(direction));
-            Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngle(angleHorisontDegrees), centroidPoint);
-            Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngle(angleVerticalDegrees), centroidPoint);
-            intersectSolid = angleHorisontDegrees == 0 ? intersectSolid : SolidUtils.CreateTransformed(intersectSolid, horizont);
-            intersectSolid = angleVerticalDegrees == 0 ? intersectSolid : SolidUtils.CreateTransformed(intersectSolid, vertical);
-            BoundingBoxXYZ bbox = intersectSolid?.GetBoundingBox();
-            if (bbox != null)
-            {
-                widht = RoundSize(Math.Abs(bbox.Max.X - bbox.Min.X));
-                hight = RoundSize(Math.Abs(bbox.Max.Z - bbox.Min.Z));
-                result = new ElementTypeData(etype, hight, widht);
-                CreateDirectShape(ActiveDocument, elem, intersectSolid);
-                bbox.Dispose();
-            }
-            return result;
         }
 
 
