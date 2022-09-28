@@ -10,6 +10,9 @@ namespace RevitTimasBIMTools.RevitUtils
     internal sealed class RevitFilterManager
     {
 
+        public static List<Element> ElementTypeList = new List<Element>(100);
+
+
         #region Standert Filtered Element Collector
 
         public static FilteredElementCollector GetElementsOfCategory(Document doc, Type type, BuiltInCategory bic, bool? isInstances = null)
@@ -225,6 +228,95 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
+        #region Material Filter
+
+
+        public static IDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
+        {
+            ElementTypeList.Clear();
+            CompoundStructure compound = null;
+            List<Element> elements = new List<Element>(100);
+            IDictionary<string, Material> result = new SortedDictionary<string, Material>();
+            ElementTypeList.AddRange(GetElementsOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs, false));
+            ElementTypeList.AddRange(GetElementsOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls, false));
+            ElementTypeList.AddRange(GetElementsOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors, false));
+            foreach (Element elem in ElementTypeList)
+            {
+                if (elem is RoofType roofType)
+                {
+                    compound = roofType.GetCompoundStructure();
+                }
+                else if (elem is WallType wallType)
+                {
+                    compound = wallType.GetCompoundStructure();
+                }
+                else if (elem is FloorType floorType)
+                {
+                    compound = floorType.GetCompoundStructure();
+                }
+                Material material = GetCompoundStructureMaterial(doc, elem, compound);
+                if (material != null)
+                {
+                    result[material.Name] = material;
+                    elements.Add(elem);
+                }
+            }
+            ElementTypeList = elements;
+            return result;
+        }
+
+
+        public static IList<Element> GetTypeIdsByStructureMaterial(Document doc, string materialName)
+        {
+            List<Element> result = new List<Element>(100);
+            foreach (Element elem in ElementTypeList)
+            {
+                CompoundStructure compound = null;
+                if (elem is RoofType roofType)
+                {
+                    compound = roofType.GetCompoundStructure();
+                }
+                else if (elem is WallType wallType)
+                {
+                    compound = wallType.GetCompoundStructure();
+                }
+                else if (elem is FloorType floorType)
+                {
+                    compound = floorType.GetCompoundStructure();
+                }
+                Material material = GetCompoundStructureMaterial(doc, elem, compound);
+                if (material != null && material.Name == materialName)
+                {
+                    result.AddRange(GetInstancesByTypeId(doc, elem.Category.Id, elem.Id));
+                }
+            }
+            return result;
+        }
+
+
+        private static Material GetCompoundStructureMaterial(Document doc, Element element, CompoundStructure compound)
+        {
+            Material material = null;
+            if (compound != null)
+            {
+                double tolerance = 0.05;
+                MaterialFunctionAssignment function = MaterialFunctionAssignment.Structure;
+                foreach (CompoundStructureLayer layer in compound.GetLayers())
+                {
+                    if (function == layer.Function && tolerance < layer.Width)
+                    {
+                        material = doc.GetElement(layer.MaterialId) as Material;
+                        material = material ?? element.Category.Material;
+                        tolerance = Math.Round(layer.Width, 3);
+                    }
+                }
+            }
+            return material;
+        }
+
+        #endregion
+
+
         #region Category filter
 
         public static IEnumerable<Category> GetCategories(Document doc, bool model = true)
@@ -268,6 +360,9 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #endregion
+
+
+
 
 
         #region LevelFilter

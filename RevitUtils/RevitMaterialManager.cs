@@ -73,10 +73,10 @@ namespace RevitTimasBIMTools.RevitUtils
 
         private static Material GetCompoundStructureMaterial(Document doc, Element element, CompoundStructure compound)
         {
-            double tolerance = 0;
             Material material = null;
             if (compound != null)
             {
+                double tolerance = 0.05;
                 MaterialFunctionAssignment function = MaterialFunctionAssignment.Structure;
                 foreach (CompoundStructureLayer layer in compound.GetLayers())
                 {

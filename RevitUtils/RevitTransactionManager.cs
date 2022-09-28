@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using System;
 
 namespace RevitTimasBIMTools.RevitUtils
@@ -11,17 +10,17 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             using (SubTransaction transaction = new SubTransaction(document))
             {
-                transaction.Start();
+                _ = transaction.Start();
                 try
                 {
                     action?.Invoke();
-                    transaction.Commit();
+                    _ = transaction.Commit();
                 }
                 catch (Exception)
                 {
                     if (!transaction.HasEnded())
                     {
-                        transaction.RollBack();
+                        _ = transaction.RollBack();
                     }
                 }
             }
@@ -37,13 +36,13 @@ namespace RevitTimasBIMTools.RevitUtils
                     try
                     {
                         action?.Invoke();
-                        transaction.Commit();
+                        _ = transaction.Commit();
                     }
                     catch (Exception)
                     {
                         if (!transaction.HasEnded())
                         {
-                            transaction.RollBack();
+                            _ = transaction.RollBack();
                         }
                     }
                     finally { }

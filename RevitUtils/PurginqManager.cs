@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using RevitTimasBIMTools.Services;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,33 +7,40 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal class RevitPurginqManager
     {
-        public void purgeFamiliesAndTypes(Document doc)
+        public void PurgeConstructionElementTypes(Document doc)
         {
-            // List of Categories whose families will be purged
-            List<int> categoriesToPurge = new List<int>
+            //  Categories whose types will be purged
+            List<BuiltInCategory> purgeBuiltInCats = new List<BuiltInCategory>
             {
-                (int)BuiltInCategory.OST_StructuralFraming,
-                (int)BuiltInCategory.OST_Walls
+                BuiltInCategory.OST_Roofs,
+                BuiltInCategory.OST_Walls,
+                BuiltInCategory.OST_Floors,
             };
 
-            List<ElementId> typesToDelete = new List<ElementId>();
 
-            // Check all instance types whose category is contained in the category list	
-            foreach (ElementType et in new FilteredElementCollector(doc)
-                     .OfClass(typeof(ElementType)).Cast<ElementType>()
-                     .Where(q => q.Category != null && categoriesToPurge.Contains(q.Category.Id.IntegerValue)))
+            ElementMulticategoryFilter multiCat = new ElementMulticategoryFilter(purgeBuiltInCats);
+
+            ICollection<ElementId> typesToDelete = new FilteredElementCollector(doc).OfClass(typeof(ElementType)).WherePasses(multiCat).ToElementIds();
+
+            FilteredElementCollector collector = new FilteredElementCollector(doc).WherePasses(multiCat).WhereElementIsNotElementType();
+
+            int count = typesToDelete.Count;
+
+            foreach (Element e in collector)
             {
-                // if there are no simbols with this type, add it to the list for deletion
-                if (new FilteredElementCollector(doc).WhereElementIsNotElementType()
-                    .Where(q => q.GetTypeId() == et.Id).Count() == 0)
+                ElementId typeId = e.GetTypeId();
+                if (typesToDelete.Contains(typeId))
                 {
-                    typesToDelete.Add(et.Id);
+                    if (typesToDelete.Remove(typeId))
+                    {
+                        count--;
+                    }
                 }
             }
 
-            using (TransactionGroup tg = new TransactionGroup(doc, "Purge families"))
+            using (TransactionGroup tg = new TransactionGroup(doc, "Purge types"))
             {
-                tg.Start();
+                TransactionStatus status = tg.Start();
                 foreach (ElementId id in typesToDelete)
                 {
                     using (Transaction t = new Transaction(doc, "delete type"))
@@ -40,43 +48,31 @@ namespace RevitTimasBIMTools.RevitUtils
                         // Do not delete type if it would modelList in error such as
                         // "Last type in system family "Stacked Wall" cannot be deleted."
                         FailureHandlingOptions failOpt = t.GetFailureHandlingOptions();
-                        failOpt.SetClearAfterRollback(true);
-                        failOpt.SetFailuresPreprocessor(new RollbackIfErrorOccurs());
+                        failOpt = failOpt.SetClearAfterRollback(true);
+                        failOpt = failOpt.SetFailuresPreprocessor(new RollbackIfErrorOccurs());
                         t.SetFailureHandlingOptions(failOpt);
 
-                        t.Start();
-                        try
+                        if (TransactionStatus.Started == t.Start())
                         {
-                            doc.Delete(id);
+                            try
+                            {
+                                status = doc.Delete(id).Any() ? t.Commit() : t.RollBack();
+                            }
+                            catch
+                            {
+                                if (!t.HasEnded())
+                                {
+                                    status = t.RollBack();
+                                }
+                            }
                         }
-                        catch
-                        { }
-                        t.Commit();
                     }
                 }
 
-                // Delete families that now have no types
-                IList<ElementId> familiesToDelete = new List<ElementId>();
-                foreach (Family family in new FilteredElementCollector(doc)
-                    .OfClass(typeof(Family)).Cast<Family>()
-                    .Where(q => categoriesToPurge.Contains(q.FamilyCategory.Id.IntegerValue)))
-                {
-                    // add family to list if there are no instances of any type of this family
-                    if (new FilteredElementCollector(doc).OfClass(typeof(FamilyInstance))
-                        .Cast<FamilyInstance>().Where(q => q.Symbol.Family.Id == family.Id).Count() == 0)
-                    {
-                        familiesToDelete.Add(family.Id);
-                    }
-                }
+                status = tg.Assimilate();
 
-                using (Transaction t = new Transaction(doc, "delete families"))
-                {
-                    t.Start();
-                    doc.Delete(familiesToDelete);
-                    t.Commit();
-                }
+                Logger.Info($"All element types deleted count {count}");
 
-                tg.Assimilate();
             }
         }
 
@@ -85,14 +81,9 @@ namespace RevitTimasBIMTools.RevitUtils
             public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
             {
                 // if there are any failures, rollback the transaction
-                if (failuresAccessor.GetFailureMessages().Count > 0)
-                {
-                    return FailureProcessingResult.ProceedWithRollBack;
-                }
-                else
-                {
-                    return FailureProcessingResult.Continue;
-                }
+                return failuresAccessor.GetFailureMessages().Count > 0
+                    ? FailureProcessingResult.ProceedWithRollBack
+                    : FailureProcessingResult.Continue;
             }
         }
     }
