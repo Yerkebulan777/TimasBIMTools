@@ -19,7 +19,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private Units units = null;
         private DisplayUnitType angleUnit;
-        private readonly Options options = new Options
+        private readonly Options options = new()
         {
             ComputeReferences = true,
             IncludeNonVisibleObjects = false,
@@ -28,7 +28,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private readonly Transform identityTransform = Transform.Identity;
         private readonly ParameterType lenParamType = ParameterType.Length;
-        private readonly CopyPasteOptions copyOptions = new CopyPasteOptions();
+        private readonly CopyPasteOptions copyOptions = new();
 
         #endregion
 
@@ -36,7 +36,6 @@ namespace RevitTimasBIMTools.CutOpening
         #region Constant Properties
 
         private const int invalIdInt = -1;
-        private const double footToMm = 304.8;
         private const double toleranceVolume = 0.005;
         private const double rightAngle = Math.PI / 2;
         private const string widthParamName = "ширина";
@@ -82,7 +81,7 @@ namespace RevitTimasBIMTools.CutOpening
         private Transform transform = Transform.Identity;
         private FilteredElementCollector collector = null;
         private ElementId elemId = ElementId.InvalidElementId;
-        private BoundingBoxXYZ hostBox = new BoundingBoxXYZ();
+        private BoundingBoxXYZ hostBox = new();
 
 
         private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
@@ -150,7 +149,7 @@ namespace RevitTimasBIMTools.CutOpening
         private IEnumerable<ElementModel> GetIntersectionElementModels(Document doc)
         {
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBox.GetOutLine());
-            LogicalAndFilter intersectFilter = new LogicalAndFilter(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
+            LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(SearchCategoryId);
             foreach (Element element in collector)
             {
@@ -173,7 +172,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private bool VerifyElementByLenght(Element elem, double minimum = 1.5)
         {
-            return !(elem.Location is LocationCurve) || elem.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() > minimum;
+            return elem.Location is not LocationCurve || elem.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() > minimum;
         }
 
 
@@ -204,7 +203,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             intersectSolid = null;
             double tolerance = toleranceVolume;
-            transform = transform ?? identityTransform;
+            transform ??= identityTransform;
             GeometryElement geomElement = elem.get_Geometry(options);
             BooleanOperationsType unionType = BooleanOperationsType.Union;
             BooleanOperationsType intersectType = BooleanOperationsType.Intersect;
@@ -237,7 +236,7 @@ namespace RevitTimasBIMTools.CutOpening
         private ElementTypeData DefineElementSize(Element elem, XYZ direction)
         {
             Document doc = elem.Document;
-            ElementTypeData structData = new ElementTypeData(null);
+            ElementTypeData structData = new(null);
             if (doc.GetElement(elem.GetTypeId()) is ElementType etype)
             {
                 uniqueKey = etype.UniqueId.Normalize();
@@ -313,7 +312,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             transform = identityTransform;
             direction = ResetDirectionToPositive(direction);
-            ElementTypeData result = new ElementTypeData(null);
+            ElementTypeData result = new(null);
             angleHorisontDegrees = ConvertRadiansToDegrees(GetHorizontAngleRadiansByNormal(direction));
             angleVerticalDegrees = ConvertRadiansToDegrees(GetVerticalAngleRadiansByNormal(direction));
             Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngle(angleHorisontDegrees), centroidPoint);
@@ -393,22 +392,20 @@ namespace RevitTimasBIMTools.CutOpening
 
         private void CreateDirectShape(Document doc, Element elem, Solid solid)
         {
-            using (Transaction trans = new Transaction(doc, "Create DirectShape"))
+            using Transaction trans = new(doc, "Create DirectShape");
+            try
             {
-                try
-                {
-                    _ = trans.Start();
-                    DirectShape ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_GenericModel));
-                    ds.ApplicationDataId = elem.UniqueId;
-                    ds.Name = "Intersection by " + elem.Name;
-                    ds.SetShape(new GeometryObject[] { solid });
-                    _ = trans.Commit();
-                }
-                catch (Exception exc)
-                {
-                    _ = trans.RollBack();
-                    Logger.Error(exc.Message);
-                }
+                _ = trans.Start();
+                DirectShape ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_GenericModel));
+                ds.ApplicationDataId = elem.UniqueId;
+                ds.Name = "Intersection by " + elem.Name;
+                ds.SetShape(new GeometryObject[] { solid });
+                _ = trans.Commit();
+            }
+            catch (Exception exc)
+            {
+                _ = trans.RollBack();
+                Logger.Error(exc.Message);
             }
         }
 
@@ -425,24 +422,22 @@ namespace RevitTimasBIMTools.CutOpening
             if (null != reference)
             {
                 Document doc = fi.Document;
-                using (Transaction transaction = new Transaction(doc))
+                using Transaction transaction = new(doc);
+                _ = transaction.Start("Create Temporary Sketch Plane");
+                try
                 {
-                    _ = transaction.Start("Create Temporary Sketch Plane");
-                    try
+                    SketchPlane sketch = SketchPlane.Create(doc, reference);
+                    if (null != sketch)
                     {
-                        SketchPlane sketch = SketchPlane.Create(doc, reference);
-                        if (null != sketch)
-                        {
-                            Plane plan = sketch.GetPlane();
-                            direction = plan.Normal;
-                            origin = plan.Origin;
-                            flag = true;
-                        }
+                        Plane plan = sketch.GetPlane();
+                        direction = plan.Normal;
+                        origin = plan.Origin;
+                        flag = true;
                     }
-                    finally
-                    {
-                        _ = transaction.RollBack();
-                    }
+                }
+                finally
+                {
+                    _ = transaction.RollBack();
                 }
             }
             return flag;
