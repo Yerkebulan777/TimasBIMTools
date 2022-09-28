@@ -14,7 +14,7 @@ namespace RevitTimasBIMTools.CutOpening
     [Regeneration(RegenerationOption.Manual)]
     internal sealed class CutOpeningShowPanelCmd : IExternalCommand, IExternalCommandAvailability
     {
-        private DockablePane dockpane = null;
+        private readonly bool isStarted = Properties.Settings.Default.IsStarted;
         private readonly DockablePaneId dockpid = SmartToolController.DockPaneId;
         private readonly CutOpeningStartHandler dockpaneHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
         private readonly IDockablePaneProvider provider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
@@ -27,11 +27,11 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
-            ExternalEvent dockpaneExtEvent = ExternalEvent.Create(dockpaneHandler);
-            if (dockpid != null && DockablePane.PaneIsRegistered(dockpid))
+            if (DockablePane.PaneIsRegistered(dockpid))
             {
-                dockpane = dockpane ?? uiapp.GetDockablePane(dockpid);
-                if (dockpane != null && provider is CutOpeningDockPanelView viewpane)
+                DockablePane dockpane = uiapp.GetDockablePane(dockpid);
+                ExternalEvent dockpaneExtEvent = ExternalEvent.Create(dockpaneHandler);
+                if (provider is CutOpeningDockPanelView viewpane)
                 {
                     if (dockpane.IsShown())
                     {
@@ -40,7 +40,7 @@ namespace RevitTimasBIMTools.CutOpening
                             dockpane.Hide();
                             dockpane.Dispose();
                             viewpane.Dispose();
-                            dockpaneExtEvent?.Dispose();
+                            dockpaneExtEvent.Dispose();
                         }
                         catch (Exception exc)
                         {
@@ -49,15 +49,10 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                     else
                     {
+                        _ = dockpaneExtEvent.Raise();
                         try
                         {
-                            if (null != dockpaneExtEvent?.Raise())
-                            {
-                                if (Properties.Settings.Default.IsStarted)
-                                {
-                                    dockpane.Show();
-                                }
-                            }
+                            dockpane.Show();
                         }
                         catch (Exception exc)
                         {

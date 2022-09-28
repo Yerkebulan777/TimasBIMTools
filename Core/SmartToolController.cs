@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using Revit.Async.Interfaces;
 using RevitTimasBIMTools.CutOpening;
+using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
@@ -16,7 +17,7 @@ using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Core
 {
-    public class SmartToolController : IExternalApplication
+    public sealed class SmartToolController : IExternalApplication
     {
         private UIControlledApplication controller = null;
         public static IServiceProvider Services = CreateServiceProvider();
@@ -39,6 +40,7 @@ namespace RevitTimasBIMTools.Core
 
             services = services.AddTransient<CutOpeningCollisionManager>();
             services = services.AddTransient<CutOpeningDataViewModel>();
+            services = services.AddTransient<RevitPurginqManager>();
 
             return services.BuildServiceProvider();
         }

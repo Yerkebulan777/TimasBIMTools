@@ -21,7 +21,7 @@ namespace RevitTimasBIMTools.Core
             RibbonPanel ribbonPanel = uicontrol.CreateRibbonPanel(SmartToolGeneralHelper.ApplicationName, ribbonPanelName);
             PushButtonData buttonData = new PushButtonData(buttomName, buttomText, SmartToolGeneralHelper.AssemblyLocation, voidPanePath)
             {
-                ToolTip = "Cut opening manager",
+                ToolTip = "Cut opening purgeMng",
                 LargeImage = SmartToolGeneralHelper.GetImageSource(),
                 LongDescription = "Описание команды кнопки"
             };

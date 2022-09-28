@@ -210,7 +210,6 @@
     <Compile Include="RevitModel\RevitHostConstruction.cs" />
     <Compile Include="CutOpening\CutOpeningCollisionManager.cs" />
     <Compile Include="RevitUtils\ProjectLoctionManager.cs" />
-    <Compile Include="RevitUtils\RevitMaterialManager.cs" />
     <Compile Include="RevitUtils\RevitViewManager.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />

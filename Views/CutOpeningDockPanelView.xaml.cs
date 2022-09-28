@@ -86,7 +86,7 @@ namespace RevitTimasBIMTools.Views
                         if (documentId.Equals(docId))
                         {
                             ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
-                            ComboStructureMats.ItemsSource = RevitMaterialManager.GetAllConstructionStructureMaterials(doc);
+                            ComboStructureMats.ItemsSource = RevitFilterManager.GetAllConstructionStructureMaterials(doc);
                             familySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
                             ComboRectangSymbol.ItemsSource = familySymbols;
                             ComboRoundedSymbol.ItemsSource = familySymbols;

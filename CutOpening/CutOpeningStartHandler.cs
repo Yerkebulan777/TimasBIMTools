@@ -1,5 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Microsoft.Extensions.DependencyInjection;
+using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using System;
@@ -10,6 +12,7 @@ namespace RevitTimasBIMTools.CutOpening
 {
     public sealed class CutOpeningStartHandler : IExternalEventHandler
     {
+        private readonly RevitPurginqManager purgeManager = SmartToolController.Services.GetRequiredService<RevitPurginqManager>();
         public event EventHandler<BaseCompletedEventArgs> Completed;
 
         [STAThread]
@@ -24,6 +27,7 @@ namespace RevitTimasBIMTools.CutOpening
             }
 
             Properties.Settings.Default.IsStarted = true;
+            purgeManager.PurgeConstructionElementTypes(doc);
             View3D view3d = RevitViewManager.Get3dView(uidoc);
             Properties.Settings.Default.CurrentDocumentUniqueId = doc.ProjectInformation.UniqueId;
             IList<DocumentModel> docModels = RevitDocumentManager.GetDocumentCollection(doc);
