@@ -15,28 +15,24 @@ namespace RevitTimasBIMTools.CutOpening
 {
     internal sealed class CutOpeningCollisionManager : IDisposable
     {
-        #region Static members
+        #region Parameter Properties
 
         private Units units = null;
         private DisplayUnitType angleUnit;
-        private readonly Options options = GetGeometryOptions();
-        private static readonly char[] delimiters = new[] { ' ', '_', '-' };
-        private static readonly ParameterType lenParamType = ParameterType.Length;
-
-        private static CancellationToken cancelToken = CutOpeningDataViewModel.CancelToken;
-
-        private static Options GetGeometryOptions()
+        private readonly Options options = new Options
         {
-            return new Options
-            {
-                ComputeReferences = true,
-                IncludeNonVisibleObjects = false,
-                DetailLevel = ViewDetailLevel.Medium
-            };
-        }
+            ComputeReferences = true,
+            IncludeNonVisibleObjects = false,
+            DetailLevel = ViewDetailLevel.Medium
+        };
+
+        private readonly ParameterType lenParamType = ParameterType.Length;
+        private readonly CopyPasteOptions copyOptions = new CopyPasteOptions();
 
         #endregion
 
+
+        #region Constant Properties
 
         private const int invalIdInt = -1;
         private const double footToMm = 304.8;
@@ -45,6 +41,10 @@ namespace RevitTimasBIMTools.CutOpening
         private const string widthParamName = "ширина";
         private const string heightParamName = "высота";
 
+        #endregion
+
+
+        #region Input Properties
 
         public Document ActiveDocument = null;
         public Document SearchDocument = null;
@@ -54,18 +54,21 @@ namespace RevitTimasBIMTools.CutOpening
         public IList<Element> SearchElementList = null;
         public RevitLinkInstance SearchLinkInstance = null;
 
+        #endregion
+
 
         private readonly ElementId invalId = ElementId.InvalidElementId;
         private readonly Transform identityTransform = Transform.Identity;
-        private readonly StringBuilder stringBuilder = new StringBuilder(25);
-        private readonly CopyPasteOptions copyOptions = new CopyPasteOptions();
+
+
 
         private const double minWidthSize = 150 / footToMm;
         private readonly IList<ElementId> hostIdList = new List<ElementId>(150);
 
+        private CancellationToken cancelToken = CutOpeningDataViewModel.CancelToken;
         private readonly int minSideSize = Properties.Settings.Default.MinSideSizeInMm;
         private readonly int maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
-        private readonly int cutOffsetInMm = Properties.Settings.Default.CutOffsetInMm;
+        private readonly int cutOffsetSize = Properties.Settings.Default.CutOffsetInMm;
         private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
 
         private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
@@ -73,7 +76,7 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
 
 
-        #region Templory properties
+        #region Templory Properties
 
         private XYZ centroidPoint = XYZ.Zero;
         private XYZ commDirection = XYZ.BasisZ;
@@ -85,6 +88,7 @@ namespace RevitTimasBIMTools.CutOpening
         private FilteredElementCollector collector = null;
         private ElementId elemId = ElementId.InvalidElementId;
         private BoundingBoxXYZ hostBox = new BoundingBoxXYZ();
+        private readonly StringBuilder stringBuilder = new StringBuilder(25);
         private Transform transform = Transform.Identity;
 
         private double angleRadians = 0;
@@ -319,6 +323,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             double value = invalIdInt;
             int tolerance = int.MaxValue;
+            char[] delimiters = new[] { ' ', '_', '-' };
             foreach (Parameter param in elem.GetOrderedParameters())
             {
                 Definition definition = param.Definition;

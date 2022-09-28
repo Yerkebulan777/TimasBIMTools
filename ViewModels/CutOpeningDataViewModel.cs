@@ -197,7 +197,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref cutOffset, value))
                 {
-                    Properties.Settings.Default.CutOffsetInMm = minSize;
+                    Properties.Settings.Default.CutOffsetInMm = cutOffset;
                 }
             }
         }
