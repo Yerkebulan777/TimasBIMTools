@@ -19,7 +19,7 @@ namespace RevitTimasBIMTools.RevitUtils
             return (bbox.Min + bbox.Max) * 0.5;
         }
 
-        public static Solid GetElementCenterSolid(this Element element, Options geoOptions, Transform global, XYZ centre, double tolerance = 0.5)
+        public static Solid GetElementSolidByCenter(this Element element, Options geoOptions, Transform global, XYZ centre, double tolerance = 0.5)
         {
             Solid result = null;
             double maxDistance = double.MaxValue;

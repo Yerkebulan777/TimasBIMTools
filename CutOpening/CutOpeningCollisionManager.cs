@@ -16,13 +16,13 @@ namespace RevitTimasBIMTools.CutOpening
     internal sealed class CutOpeningCollisionManager : IDisposable
     {
         #region Static members
-        private static Units units = null;
-        private static DisplayUnitType angleUnit;
+
+        private Units units = null;
+        private DisplayUnitType angleUnit;
         private readonly Options options = GetGeometryOptions();
         private static readonly char[] delimiters = new[] { ' ', '_', '-' };
         private static readonly ParameterType lenParamType = ParameterType.Length;
-        private static readonly int sizeReserveInMm = Properties.Settings.Default.CutOffsetInMm;
-        private static readonly ElementMulticategoryFilter multicategoryFilter = GetMulticategoryFilter();
+        
         private static CancellationToken cancelToken = CutOpeningDataViewModel.CancelToken;
 
         private static Options GetGeometryOptions()
@@ -35,26 +35,12 @@ namespace RevitTimasBIMTools.CutOpening
             };
         }
 
-        private static ElementMulticategoryFilter GetMulticategoryFilter()
-        {
-            List<BuiltInCategory> builtInCats = new List<BuiltInCategory>
-            {
-                BuiltInCategory.OST_Conduit,
-                BuiltInCategory.OST_Furniture,
-                BuiltInCategory.OST_CableTray,
-                BuiltInCategory.OST_PipeCurves,
-                BuiltInCategory.OST_DuctCurves,
-                BuiltInCategory.OST_MechanicalEquipment
-            };
-            return new ElementMulticategoryFilter(builtInCats);
-        }
         #endregion
 
-        private bool canceled = false;
 
         private const int invalIdInt = -1;
         private const double footToMm = 304.8;
-        private const double toleranceVolume = 0.0005;
+        private const double toleranceVolume = 0.005;
         private const double rightAngle = Math.PI / 2;
         private const string widthParamName = "ширина";
         private const string heightParamName = "высота";
@@ -62,10 +48,8 @@ namespace RevitTimasBIMTools.CutOpening
         public Document ActiveDocument = null;
         public Document SelectedDocument = null;
         public Transform DocumentTransform = null;
+        public IList<Element> SearchElementList = null;
         public RevitLinkInstance RvtlinkInstance = null;
-        public IList<Element> СonstructionElements = null;
-
-        private FilteredElementCollector collector = null;
 
         private readonly ElementId invalId = ElementId.InvalidElementId;
         private readonly Transform identityTransform = Transform.Identity;
@@ -77,9 +61,13 @@ namespace RevitTimasBIMTools.CutOpening
 
         private readonly int minSideSize = Properties.Settings.Default.MinSideSizeInMm;
         private readonly int maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
+        private readonly int sizeReserveInMm = Properties.Settings.Default.CutOffsetInMm;
+        private readonly int systemCatIntId = Properties.Settings.Default.MEPSystemCatIdInt;
         private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
-        private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
+        
         private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
+
+        private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
 
 
         #region Templory properties
@@ -88,12 +76,12 @@ namespace RevitTimasBIMTools.CutOpening
         private XYZ commDirection = XYZ.BasisZ;
         private XYZ hostDirection = XYZ.BasisZ;
 
-
         private Solid hostSolid = null;
         private Solid intersectSolid = null;
         private string uniqueKey = string.Empty;
+        private FilteredElementCollector collector = null;
         private ElementId elemId = ElementId.InvalidElementId;
-        private BoundingBoxXYZ hostBbox = new BoundingBoxXYZ();
+        private BoundingBoxXYZ hostBox = new BoundingBoxXYZ();
         private Transform transform = Transform.Identity;
 
         private double angleRadians = 0;
@@ -115,30 +103,17 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private FilteredElementCollector ValidWallCollector()
-        {
-            BuiltInCategory bic = BuiltInCategory.OST_Walls;
-            ElementId paramId = new ElementId(BuiltInParameter.WALL_ATTR_WIDTH_PARAM);
-            collector = RevitFilterManager.GetElementsOfCategory(ActiveDocument, typeof(Wall), bic);
-            collector = RevitFilterManager.ParamFilterFactory(collector, paramId, minWidthSize, 1);
-            collector = collector.WherePasses(new ElementLevelFilter(invalId, true));
-            return collector;
-        }
-
-
         [STAThread]
         public IList<ElementModel> GetCollisionCommunicateElements(Document doc)
         {
             modelList.Clear();
-            collector = ValidWallCollector();
-            foreach (Element host in collector)
+            foreach (Element host in SearchElementList)
             {
-                canceled = cancelToken.IsCancellationRequested;
-                if (false == canceled && host is Wall wall)
+                if (!cancelToken.IsCancellationRequested)
                 {
-                    hostDirection = wall.Orientation;
-                    centroidPoint = host.GetMiddlePointByBoundingBox(ref hostBbox);
-                    hostSolid = host.GetElementCenterSolid(options, identityTransform, centroidPoint);
+                    centroidPoint = host.GetMiddlePointByBoundingBox(ref hostBox);
+                    hostDirection = host is Wall wall ? wall.Orientation : XYZ.BasisZ;
+                    hostSolid = host.GetElementSolidByCenter(options, identityTransform, centroidPoint);
                     if (hostSolid != null)
                     {
                         foreach (ElementModel model in GetIntersectionElementModels(doc))
@@ -163,16 +138,11 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-
-
-
-
         private IEnumerable<ElementModel> GetIntersectionElementModels(Document doc)
         {
-            ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
+            ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBox.GetOutLine());
             LogicalAndFilter intersectFilter = new LogicalAndFilter(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
-            collector = new FilteredElementCollector(doc).WherePasses(intersectFilter);
-            collector = collector.WherePasses(multicategoryFilter);
+            collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(new ElementId(systemCatIntId));
             foreach (Element elem in collector)
             {
                 if (elem.IsValidObject && VerifyElementByLenght(elem))
@@ -422,13 +392,6 @@ namespace RevitTimasBIMTools.CutOpening
         {
             return Math.Round(value * footToMm / digit, MidpointRounding.AwayFromZero) * digit / footToMm;
         }
-
-
-
-
-
-
-
 
 
         #region Other methods

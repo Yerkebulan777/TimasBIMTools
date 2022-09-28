@@ -17,7 +17,7 @@
     <Setting Name="MaxSideSizeInMm" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="СommunCatIdInt" Type="System.Int32" Scope="User">
+    <Setting Name="MEPSystemCatIdInt" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="CurrentDocumentUniqueId" Type="System.String" Scope="User">

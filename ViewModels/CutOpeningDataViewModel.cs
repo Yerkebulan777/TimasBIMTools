@@ -118,10 +118,17 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         private Category category = null;
-        public Category EngineerCategory
+        public Category SystemCategory
         {
             get => category;
-            set => SetProperty(ref category, value);
+            set
+            {
+                if (SetProperty(ref category, value) && value != null)
+                {
+                    Properties.Settings.Default.MEPSystemCatIdInt = category.Id.IntegerValue;
+                    Properties.Settings.Default.Save();
+                }
+            }
         }
 
 
@@ -150,7 +157,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async Task GetInstancesByMaterialName(string materialName)
         {
-            manager.СonstructionElements = await RevitTask.RunAsync(app =>
+            manager.SearchElementList = await RevitTask.RunAsync(app =>
             {
                 IList<Element> instances = null;
                 Document doc = app.ActiveUIDocument.Document;

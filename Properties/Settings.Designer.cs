@@ -86,12 +86,12 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int СommunCatIdInt {
+        public int MEPSystemCatIdInt {
             get {
-                return ((int)(this["СommunCatIdInt"]));
+                return ((int)(this["MEPSystemCatIdInt"]));
             }
             set {
-                this["СommunCatIdInt"] = value;
+                this["MEPSystemCatIdInt"] = value;
             }
         }
         
