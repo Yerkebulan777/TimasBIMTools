@@ -45,15 +45,15 @@ namespace RevitTimasBIMTools.CutOpening
         private const string widthParamName = "ширина";
         private const string heightParamName = "высота";
 
-        
+
         public Document ActiveDocument = null;
         public Document SearchDocument = null;
-        public ElementId SearchLevelId = null;
         public Transform SearchTransform = null;
         public ElementId SearchCategoryId = null;
+        public int SearchLevelIntId = invalIdInt;
         public IList<Element> SearchElementList = null;
         public RevitLinkInstance SearchLinkInstance = null;
-        
+
 
         private readonly ElementId invalId = ElementId.InvalidElementId;
         private readonly Transform identityTransform = Transform.Identity;
@@ -112,11 +112,12 @@ namespace RevitTimasBIMTools.CutOpening
             modelList.Clear();
             foreach (Element host in SearchElementList)
             {
-                if (!cancelToken.IsCancellationRequested)
+                if (cancelToken.IsCancellationRequested)
                 {
-                    ElementId levelId = host.LevelId;
-
-
+                    break;
+                }
+                if (SearchLevelIntId == host.LevelId.IntegerValue)
+                {
                     centroidPoint = host.GetMiddlePointByBoundingBox(ref hostBox);
                     hostDirection = host is Wall wall ? wall.Orientation : XYZ.BasisZ;
                     hostSolid = host.GetElementSolidByCenter(options, identityTransform, centroidPoint);
@@ -133,6 +134,7 @@ namespace RevitTimasBIMTools.CutOpening
                         }
                     }
                 }
+
             }
             return modelList;
         }

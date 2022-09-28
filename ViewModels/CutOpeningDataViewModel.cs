@@ -139,7 +139,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref level, value) && value != null)
                 {
-                    manager.SearchLevelId = level.Id;
+                    manager.SearchLevelIntId = level.Id.IntegerValue;
                 }
             }
         }

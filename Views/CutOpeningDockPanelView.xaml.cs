@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using Xceed.Wpf.Toolkit;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -133,6 +132,7 @@ namespace RevitTimasBIMTools.Views
                 });
             }
         }
+
 
 
         private void Dispatcher_ShutdownStarted(object sender, EventArgs e)
