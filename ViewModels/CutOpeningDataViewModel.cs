@@ -135,7 +135,13 @@ namespace RevitTimasBIMTools.ViewModels
         public Level SearchLevel
         {
             get => level;
-            set => SetProperty(ref level, value);
+            set
+            {
+                if (SetProperty(ref level, value) && value != null)
+                {
+                    manager.SearchLevelId = level.Id;
+                }
+            }
         }
 
 
@@ -146,6 +152,7 @@ namespace RevitTimasBIMTools.ViewModels
             set => SetProperty(ref rectangle, value);
         }
 
+
         private FamilySymbol rounded;
         public FamilySymbol RoundedSymbol
         {
@@ -154,8 +161,51 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        private int minSize = Properties.Settings.Default.MinSideSizeInMm;
+        public int MinSideSize
+        {
+            get => minSize;
+            set
+            {
+                if (SetProperty(ref minSize, value))
+                {
+                    Properties.Settings.Default.MinSideSizeInMm = minSize;
+                }
+            }
+        }
 
 
+        private int maxSize = Properties.Settings.Default.MaxSideSizeInMm;
+        public int MaxSideSize
+        {
+            get => maxSize;
+            set
+            {
+                if (SetProperty(ref maxSize, value))
+                {
+                    Properties.Settings.Default.MaxSideSizeInMm = minSize;
+                }
+            }
+        }
+
+
+        private int cutOffset = Properties.Settings.Default.CutOffsetInMm;
+        public int CutOffsetSize
+        {
+            get => cutOffset;
+            set
+            {
+                if (SetProperty(ref cutOffset, value))
+                {
+                    Properties.Settings.Default.CutOffsetInMm = minSize;
+                }
+            }
+        }
+
+        #endregion
+
+
+        #region Methods
         private async Task GetInstancesByMaterialName(string materialName)
         {
             manager.SearchElementList = await RevitTask.RunAsync(app =>
@@ -170,7 +220,6 @@ namespace RevitTimasBIMTools.ViewModels
                 return instances;
             });
         }
-
 
         #endregion
 
@@ -288,8 +337,8 @@ namespace RevitTimasBIMTools.ViewModels
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     manager.Initialize(doc);
-                    ActivateFamilySimbol(doc, roundOpeningId);
-                    ActivateFamilySimbol(doc, rectangOpeningId);
+                    ActivateFamilySimbol(RectangSymbol);
+                    ActivateFamilySimbol(RoundedSymbol);
                     collection = manager.GetCollisionCommunicateElements(doc);
                 }
                 RevitViewManager.Show3DView(uidoc, view3d);
@@ -298,15 +347,11 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void ActivateFamilySimbol(Document doc, string simbolId)
+        private void ActivateFamilySimbol(FamilySymbol symbol)
         {
-            if (!string.IsNullOrEmpty(simbolId))
+            if (symbol != null && !symbol.IsActive)
             {
-                Element element = doc.GetElement(simbolId);
-                if (element is FamilySymbol symbol && !symbol.IsActive)
-                {
-                    symbol.Activate();
-                }
+                symbol.Activate();
             }
         }
 

@@ -111,26 +111,6 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void Integer_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            if (sender is IntegerUpDown controler && controler.Name is string name)
-            {
-                int value = Convert.ToInt32(e.NewValue);
-                if (name.Equals("MinSideSize"))
-                {
-                    Properties.Settings.Default.MinSideSizeInMm = value;
-                }
-                if (name.Equals("MaxSideSize"))
-                {
-                    Properties.Settings.Default.MaxSideSizeInMm = value;
-                }
-                if (name.Equals("CutOffset"))
-                {
-                    Properties.Settings.Default.CutOffsetInMm = value;
-                }
-            }
-        }
-
 
         [STAThread]
         private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
