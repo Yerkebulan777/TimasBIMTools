@@ -28,7 +28,6 @@ namespace RevitTimasBIMTools.CutOpening
 
         private readonly Transform identityTransform = Transform.Identity;
         private readonly ParameterType lenParamType = ParameterType.Length;
-        private readonly CopyPasteOptions copyOptions = new();
 
         #endregion
 
