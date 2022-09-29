@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -230,7 +231,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Material Filter
 
-        public static IDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc, ICollection<ElementId> typeIds)
+        public static IDictionary<string, Material> GetConstructionCoreMaterials(Document doc, ICollection<ElementId> typeIds)
         {
             CompoundStructure compound = null;
             IDictionary<string, Material> result = new SortedDictionary<string, Material>();
@@ -259,9 +260,10 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static IList<Element> GetTypeIdsByStructureMaterial(Document doc, ICollection<ElementId> typeIds, string matName)
+        public static IList<Element> GetInstancesByCoreMaterial(Document doc, ICollection<ElementId> typeIds, string matName)
         {
             List<Element> result = new(100);
+
             foreach (ElementId eid in typeIds)
             {
                 CompoundStructure compound = null;
@@ -284,6 +286,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     result.AddRange(GetInstancesByTypeId(doc, elem.Category.Id, elem.Id));
                 }
             }
+
             return result;
         }
 

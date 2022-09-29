@@ -57,7 +57,6 @@ namespace RevitTimasBIMTools.Views
             dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
             dataViewModel.DocumentModels = args.DocumentModels.ToObservableCollection();
             viewHandler.Completed -= OnContextHandlerCompleted;
-            Properties.Settings.Default.Upgrade();
         }
 
 
@@ -79,7 +78,7 @@ namespace RevitTimasBIMTools.Views
                         if (documentId.Equals(doc.ProjectInformation.UniqueId))
                         {
                             ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
-                            ComboStructureMats.ItemsSource = RevitFilterManager.GetAllConstructionStructureMaterials(doc, dataViewModel.ConstructionTypeIds);
+                            ComboStructureMats.ItemsSource = RevitFilterManager.GetConstructionCoreMaterials(doc, dataViewModel.ConstructionTypeIds);
                             familySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
                             ComboRectangSymbol.ItemsSource = familySymbols;
                             ComboRoundedSymbol.ItemsSource = familySymbols;

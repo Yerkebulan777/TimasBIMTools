@@ -254,12 +254,13 @@ namespace RevitTimasBIMTools.ViewModels
                 Document doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    instances = RevitFilterManager.GetTypeIdsByStructureMaterial(doc, ConstructionTypeIds, materialName);
+                    instances = RevitFilterManager.GetInstancesByCoreMaterial(doc, ConstructionTypeIds, materialName);
                 }
             }).ContinueWith(app =>
             {
                 manager.SearchElementList = instances;
             }, TaskScheduler.FromCurrentSynchronizationContext());
+            Logger.Info($"\tFound => {instances.Count} element count");
         }
 
 
