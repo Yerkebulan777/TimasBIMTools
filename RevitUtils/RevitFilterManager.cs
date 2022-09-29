@@ -261,8 +261,8 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static IList<Element> GetInstancesByCoreMaterial(Document doc, IDictionary<int, ElementId> typeIds, string matName)
         {
-            List<Element> result = new(100);
             CompoundStructure compound = null;
+            List<Element> result = new(100);
             foreach (KeyValuePair<int, ElementId> item in typeIds)
             {
                 Element elem = doc.GetElement(item.Value);
@@ -284,7 +284,6 @@ namespace RevitTimasBIMTools.RevitUtils
                     result.AddRange(GetInstancesByTypeId(doc, elem.Category.Id, elem.Id));
                 }
             }
-
             return result;
         }
 

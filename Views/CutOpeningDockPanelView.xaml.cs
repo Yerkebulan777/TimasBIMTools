@@ -60,6 +60,7 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        [STAThread]
         private void ShowSettingsCmd_Click(object sender, RoutedEventArgs e)
         {
             Dispatcher.CurrentDispatcher.Invoke(() =>
