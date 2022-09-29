@@ -26,17 +26,15 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
-        public CutOpeningDockPanelView DockPanelView = null;
-        public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
+        public View3D View3d { get; set; } = null;
+        public CutOpeningDockPanelView DockPanelView { get; set; } = null;
+        public ICollection<ElementId> ConstructionTypeIds { get; set; } = null;
+        public CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
-        private Task task;
-        //private readonly View3D view3d;
-        private readonly object syncLocker = new();
-        private readonly string documentId = Properties.Settings.Default.CurrentDocumentUniqueId;
-        
+        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
-
-
+        private readonly object syncLocker = new();
+        private Task task;
 
         public CutOpeningDataViewModel()
         {
@@ -71,7 +69,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => isEnabledData;
             set
             {
-                if (value == false || (model != null && category != null))
+                if (value == false || (docModel != null && category != null))
                 {
                     if (SetProperty(ref isEnabledData, value))
                     {
@@ -86,17 +84,31 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Set settings
 
-        private DocumentModel model = null;
-        public DocumentModel SearchDocumentModel
+        private IList<DocumentModel> docModels = null;
+        public IList<DocumentModel> DocumentModels
         {
-            get => model;
+            get => docModels;
             set
             {
-                if (SetProperty(ref model, value) && value != null)
+                if(SetProperty(ref docModels, value))
                 {
-                    manager.SearchDocument = model.Document;
-                    manager.SearchTransform = model.Transform;
-                    manager.SearchLinkInstance = model.LinkInstance;
+                    DocumentModel = docModels.FirstOrDefault();
+                }
+            }
+        }
+
+
+        private DocumentModel docModel = null;
+        public DocumentModel DocumentModel
+        {
+            get => docModel;
+            set
+            {
+                if (SetProperty(ref docModel, value) && value != null)
+                {
+                    manager.SearchDocument = docModel.Document;
+                    manager.SearchTransform = docModel.Transform;
+                    manager.SearchLinkInstance = docModel.LinkInstance;
                 }
             }
         }
@@ -222,7 +234,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         #endregion
-
 
 
         #region Methods
@@ -392,7 +403,6 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                View3D view3d = DockPanelView.View3d;
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
                 string guid = doc.ProjectInformation.UniqueId;
@@ -408,7 +418,7 @@ namespace RevitTimasBIMTools.ViewModels
                                 try
                                 {
                                     // Set Openning Logic with doc regenerate and transaction RollBack                                   
-                                    view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
+                                    View3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, View3d);
                                     RevitViewManager.SetColorElement(uidoc, elem);
                                 }
                                 finally

@@ -18,7 +18,7 @@ namespace RevitTimasBIMTools.RevitModel
             LinkInstance = linkInstance;
             FilePath = document.PathName;
             IsActive = document.IsLinked ? false : true;
-            Title = Path.GetFileNameWithoutExtension(FilePath).Trim();
+            Title = Path.GetFileNameWithoutExtension(FilePath).ToUpper().Trim();
             Transform = linkInstance != null && document.IsLinked ? linkInstance.GetTotalTransform() : Transform.Identity;
         }
 

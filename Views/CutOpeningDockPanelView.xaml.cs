@@ -21,15 +21,11 @@ namespace RevitTimasBIMTools.Views
     /// <summary> Логика взаимодействия для CutOpeningDockPanelView.xaml </summary>
     public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
-
         private bool disposedValue = false;
         private readonly Mutex mutex = new Mutex();
-        public View3D View3d { get; set; } = null;
-        public DocumentModel ActiveDocModel = null;
-
         private IDictionary<string, FamilySymbol> familySymbols = null;
+        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
-        private readonly string documentId = Properties.Settings.Default.CurrentDocumentUniqueId;
         private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
 
 
@@ -38,7 +34,7 @@ namespace RevitTimasBIMTools.Views
             InitializeComponent();
             DataContext = dataViewModel;
             dataViewModel.DockPanelView = this;
-            viewHandler.Completed += OnContextViewHandlerCompleted;
+            viewHandler.Completed += OnContextHandlerCompleted;
             Dispatcher.CurrentDispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
         }
 
@@ -54,14 +50,12 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void OnContextViewHandlerCompleted(object sender, BaseCompletedEventArgs args)
+        private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
-            View3d = args.View3d;
-            ActiveDocModel = args.DocumentModels.FirstOrDefault();
-            viewHandler.Completed -= OnContextViewHandlerCompleted;
-            ActiveDocTitle.Content = ActiveDocModel.Title.ToUpper();
-            ComboDocumentModels.ItemsSource = args.DocumentModels;
-            ComboDocumentModels.SelectedIndex = 0;
+            dataViewModel.View3d = args.View3d;
+            dataViewModel.DocumentModels = args.DocumentModels;
+            dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
+            viewHandler.Completed -= OnContextHandlerCompleted;
         }
 
 

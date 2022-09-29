@@ -38,12 +38,12 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string CurrentDocumentUniqueId {
+        public string ActiveDocumentUniqueId {
             get {
-                return ((string)(this["CurrentDocumentUniqueId"]));
+                return ((string)(this["ActiveDocumentUniqueId"]));
             }
             set {
-                this["CurrentDocumentUniqueId"] = value;
+                this["ActiveDocumentUniqueId"] = value;
             }
         }
         

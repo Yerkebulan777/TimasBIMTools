@@ -5,7 +5,7 @@
     <Setting Name="IsStarted" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="CurrentDocumentUniqueId" Type="System.String" Scope="User">
+    <Setting Name="ActiveDocumentUniqueId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="MinSideSizeInMm" Type="System.Int32" Scope="User">
