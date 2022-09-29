@@ -2,12 +2,10 @@
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
-using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Document = Autodesk.Revit.DB.Document;
 using Reference = Autodesk.Revit.DB.Reference;
 
@@ -48,11 +46,8 @@ namespace RevitTimasBIMTools.CutOpening
         public Document SearchDocument = null;
         public Transform SearchTransform = null;
         public ElementId SearchCategoryId = null;
-        public int SearchLevelIntId = invalIdInt;
         public IList<Element> SearchElementList = null;
         public RevitLinkInstance SearchLinkInstance = null;
-
-        private CancellationToken cancelToken = CutOpeningDataViewModel.CancelToken;
 
         private readonly int minSideSize = Properties.Settings.Default.MinSideSizeInMm;
         private readonly int maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
@@ -62,12 +57,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #endregion
 
-
-        private readonly IList<ElementId> hostIdList = new List<ElementId>(150);
-        
-        
         private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
-
 
         #region Templory Properties
 
@@ -80,12 +70,10 @@ namespace RevitTimasBIMTools.CutOpening
         private string uniqueKey = string.Empty;
         private Transform transform = Transform.Identity;
         private FilteredElementCollector collector = null;
-        private ElementId elemId = ElementId.InvalidElementId;
+        //private readonly ElementId elemId = ElementId.InvalidElementId;
         private BoundingBoxXYZ hostBox = new();
 
-
         private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
-        
 
         private double angleRadians = 0;
         private double angleHorisontDegrees = 0;
@@ -98,25 +86,13 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         [STAThread]
-        public void Initialize(Document doc)
+        public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level)
         {
-            units = doc.GetUnits();
-            Properties.Settings.Default.Upgrade();
-            angleUnit = units.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
-        }
-
-
-        [STAThread]
-        public IList<ElementModel> GetCollisionCommunicateElements(Document doc)
-        {
-            modelList.Clear();
+            InitializeUnits(doc);
+            int levelIntId = level.Id.IntegerValue;
             foreach (Element host in SearchElementList)
             {
-                if (cancelToken.IsCancellationRequested)
-                {
-                    break;
-                }
-                if (SearchLevelIntId == host.LevelId.IntegerValue)
+                if (levelIntId == host.LevelId.IntegerValue)
                 {
                     centroidPoint = host.GetMiddlePointByBoundingBox(ref hostBox);
                     hostDirection = host is Wall wall ? wall.Orientation : XYZ.BasisZ;
@@ -125,24 +101,19 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         foreach (ElementModel model in GetIntersectionElementModels(doc))
                         {
-                            elemId = host.Id;
-                            if (!hostIdList.Contains(elemId))
-                            {
-                                hostIdList.Add(elemId);
-                            }
-                            modelList.Add(model);
+                            //elemId = host.Id;
+                            yield return model;
                         }
                     }
                 }
-
             }
-            return modelList;
         }
 
 
-        public bool CutOpening(IList<ElementId> hostIds)
+        private void InitializeUnits(Document doc)
         {
-            return false;
+            units = doc.GetUnits();
+            angleUnit = units.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
 
 
@@ -167,6 +138,12 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                 }
             }
+        }
+
+
+        public bool CutOpening(IList<ElementId> hostIds)
+        {
+            return false;
         }
 
 

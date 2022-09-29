@@ -29,18 +29,20 @@ namespace RevitTimasBIMTools.ViewModels
         public CutOpeningDockPanelView DockPanelView = null;
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
-        private readonly object syncLocker = new object();
+        private Task task;
+        private readonly View3D view3d;
+        private readonly object syncLocker = new();
         private readonly string documentId = Properties.Settings.Default.CurrentDocumentUniqueId;
         //private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
         //private readonly string rectangOpeningId = Properties.Settings.Default.IsStarted;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
 
 
-        private IList<ElementModel> collection = new List<ElementModel>();
+
 
         public CutOpeningDataViewModel()
         {
-            SnoopCommand = new AsyncRelayCommand(SnoopHandelCommandAsync);
+            view3d = DockPanelView.View3d;
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             CanselCommand = new RelayCommand(CancelCallbackLogic);
@@ -85,7 +87,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Settings
+        #region Set settings
 
         private DocumentModel model = null;
         public DocumentModel SearchDocumentModel
@@ -111,7 +113,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref material, value) && value != null)
                 {
-                    _ = GetInstancesByMaterialName(material.Name);
+                    GetInstancesByMaterialName(material.Name);
                 }
             }
         }
@@ -131,25 +133,17 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private Level level = null;
-        public Level SearchLevel
-        {
-            get => level;
-            set
-            {
-                if (SetProperty(ref level, value) && value != null)
-                {
-                    manager.SearchLevelIntId = level.Id.IntegerValue;
-                }
-            }
-        }
-
-
         private FamilySymbol rectangle;
         public FamilySymbol RectangSymbol
         {
             get => rectangle;
-            set => SetProperty(ref rectangle, value);
+            set
+            {
+                if (SetProperty(ref rectangle, value))
+                {
+                    ActivateFamilySimbol(rectangle);
+                }
+            }
         }
 
 
@@ -157,7 +151,13 @@ namespace RevitTimasBIMTools.ViewModels
         public FamilySymbol RoundedSymbol
         {
             get => rounded;
-            set => SetProperty(ref rounded, value);
+            set
+            {
+                if (SetProperty(ref rounded, value))
+                {
+                    ActivateFamilySimbol(rounded);
+                }
+            }
         }
 
 
@@ -170,6 +170,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref minSize, value))
                 {
                     Properties.Settings.Default.MinSideSizeInMm = minSize;
+                    Properties.Settings.Default.Save();
                 }
             }
         }
@@ -184,6 +185,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref maxSize, value))
                 {
                     Properties.Settings.Default.MaxSideSizeInMm = minSize;
+                    Properties.Settings.Default.Save();
                 }
             }
         }
@@ -198,6 +200,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref cutOffset, value))
                 {
                     Properties.Settings.Default.CutOffsetInMm = cutOffset;
+                    Properties.Settings.Default.Save();
                 }
             }
         }
@@ -205,21 +208,70 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Methods
-        private async Task GetInstancesByMaterialName(string materialName)
+        #region Set filter and snoop data
+
+        private Level level = null;
+        public Level SearchLevel
         {
-            manager.SearchElementList = await RevitTask.RunAsync(app =>
+            get => level;
+            set
             {
-                IList<Element> instances = null;
+                if (SetProperty(ref level, value) && value != null)
+                {
+                    Properties.Settings.Default.Upgrade();
+                    SnoopIntersectionDataByLevel(level);
+                }
+            }
+        }
+
+        #endregion
+
+
+
+        #region Methods
+
+        private void GetInstancesByMaterialName(string materialName)
+        {
+            IList<Element> instances = null;
+            task = RevitTask.RunAsync(app =>
+            {
                 Document doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     instances = RevitFilterManager.GetTypeIdsByStructureMaterial(doc, materialName);
                 }
-                Logger.Info(instances.Count.ToString());
-                return instances;
-            });
+            }).ContinueWith(app =>
+            {
+                manager.SearchElementList = instances;
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
+
+
+        private void SnoopIntersectionDataByLevel(Level level)
+        {
+            IEnumerable<ElementModel> data = null;
+            task = RevitTask.RunAsync(app =>
+            {
+                Document doc = app.ActiveUIDocument.Document;
+                if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    data = manager.GetCollisionByLevel(doc, level);
+                }
+            }).ContinueWith(app =>
+            {
+                RevitElementModels = data.ToObservableCollection();
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+
+        private void ActivateFamilySimbol(FamilySymbol symbol)
+        {
+            if (symbol != null && !symbol.IsActive)
+            {
+                symbol.Activate();
+            }
+        }
+
 
         #endregion
 
@@ -248,7 +300,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private ObservableCollection<ElementModel> modelCollection = new ObservableCollection<ElementModel>();
+        private ObservableCollection<ElementModel> modelCollection = new();
         public ObservableCollection<ElementModel> RevitElementModels
         {
             get => modelCollection;
@@ -257,7 +309,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref modelCollection, value))
                 {
                     ViewCollection = CollectionViewSource.GetDefaultView(value);
-                    UniqueElementNames = GetUniqueStringList(value);
+                    UniqueItemNames = GetUniqueStringList(value);
                 }
             }
         }
@@ -301,7 +353,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         private IList<string> uniqueNames = null;
-        public IList<string> UniqueElementNames
+        public IList<string> UniqueItemNames
         {
             get => uniqueNames;
             set => SetProperty(ref uniqueNames, value);
@@ -315,47 +367,13 @@ namespace RevitTimasBIMTools.ViewModels
         private bool FilterModelCollection(object obj)
         {
             return string.IsNullOrEmpty(FilterText)
-            || !(obj is ElementModel model) || model.SymbolName.Contains(FilterText)
+            || obj is not ElementModel model || model.SymbolName.Contains(FilterText)
             || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
             || model.SymbolName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
 
-
-        #region SnoopCommand
-
-        public ICommand SnoopCommand { get; private set; }
-        private async Task SnoopHandelCommandAsync()
-        {
-            RevitElementModels?.Clear();
-            View3D view3d = DockPanelView.View3d;
-            RevitElementModels = await RevitTask.RunAsync(app =>
-            {
-                UIDocument uidoc = app.ActiveUIDocument;
-                Document doc = app.ActiveUIDocument.Document;
-                if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    manager.Initialize(doc);
-                    ActivateFamilySimbol(RectangSymbol);
-                    ActivateFamilySimbol(RoundedSymbol);
-                    collection = manager.GetCollisionCommunicateElements(doc);
-                }
-                RevitViewManager.Show3DView(uidoc, view3d);
-                return collection.ToObservableCollection();
-            });
-        }
-
-
-        private void ActivateFamilySimbol(FamilySymbol symbol)
-        {
-            if (symbol != null && !symbol.IsActive)
-            {
-                symbol.Activate();
-            }
-        }
-
-        #endregion
 
 
         #region SelectItemCommand
@@ -407,7 +425,7 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                     // seletAll update by ViewItems
                     // boolSet to buttom IsDataEnabled
-                    UniqueElementNames = GetUniqueStringList(RevitElementModels);
+                    UniqueItemNames = GetUniqueStringList(RevitElementModels);
                 }
             });
 
@@ -422,7 +440,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private void CancelCallbackLogic()
         {
-            CancellationTokenSource cts = new CancellationTokenSource();
+            CancellationTokenSource cts = new();
             lock (syncLocker)
             {
                 try
@@ -445,7 +463,6 @@ namespace RevitTimasBIMTools.ViewModels
         public void Dispose()
         {
             manager?.Dispose();
-            collection?.Clear();
             RevitElementModels.Clear();
             FilterText = string.Empty;
         }
