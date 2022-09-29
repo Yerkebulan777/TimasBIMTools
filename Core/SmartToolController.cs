@@ -69,7 +69,6 @@ namespace RevitTimasBIMTools.Core
         {
             cntrapp.ControlledApplication.ApplicationInitialized -= DockablePaneRegisters;
             cntrapp.ControlledApplication.DocumentClosed -= OnDocumentClosed;
-            Properties.Settings.Default.Reset();
             return Result.Succeeded;
         }
 

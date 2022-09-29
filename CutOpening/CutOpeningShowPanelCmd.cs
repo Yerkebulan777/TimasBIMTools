@@ -14,11 +14,9 @@ namespace RevitTimasBIMTools.CutOpening
     [Regeneration(RegenerationOption.Manual)]
     internal sealed class CutOpeningShowPanelCmd : IExternalCommand, IExternalCommandAvailability
     {
-        private readonly bool isStarted = Properties.Settings.Default.IsStarted;
         private readonly DockablePaneId dockpid = SmartToolController.DockPaneId;
         private readonly CutOpeningStartHandler dockpaneHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
         private readonly IDockablePaneProvider provider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
-
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             return Execute(commandData.Application, ref message);

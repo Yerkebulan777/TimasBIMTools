@@ -46,34 +46,42 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Visibility
 
-        private bool isEnabledOptions = false;
+        private bool started;
+        public bool IsStarted
+        {
+            get => started;
+            set => SetProperty(ref started, value);
+        }
+
+
+        private bool enabledOptions = false;
         public bool IsOptionsEnabled
         {
-            get => isEnabledOptions;
+            get => enabledOptions;
             set
             {
-                if (value != isEnabledOptions)
+                if (value != enabledOptions)
                 {
-                    if (SetProperty(ref isEnabledOptions, value))
+                    if (SetProperty(ref enabledOptions, value))
                     {
-                        IsDataEnabled = !isEnabledOptions;
+                        IsDataEnabled = !enabledOptions;
                     }
                 }
             }
         }
 
 
-        private bool isEnabledData = false;
+        private bool enabledData = false;
         public bool IsDataEnabled
         {
-            get => isEnabledData;
+            get => enabledData;
             set
             {
                 if (value == false || (docModel != null && category != null))
                 {
-                    if (SetProperty(ref isEnabledData, value))
+                    if (SetProperty(ref enabledData, value))
                     {
-                        IsOptionsEnabled = !isEnabledData;
+                        IsOptionsEnabled = !enabledData;
                     }
                 }
             }
@@ -90,7 +98,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => docModels;
             set
             {
-                if(SetProperty(ref docModels, value))
+                if (SetProperty(ref docModels, value))
                 {
                     DocumentModel = docModels.FirstOrDefault();
                 }
@@ -217,7 +225,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Set filter and snoop data
+        #region Set filter data
 
         private Level level = null;
         public Level SearchLevel
@@ -441,8 +449,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region CloseCommand
         public ICommand CanselCommand { get; private set; }
-        
-
         private void CancelCallbackLogic()
         {
             CancellationTokenSource cts = new();

@@ -26,7 +26,6 @@ namespace RevitTimasBIMTools.CutOpening
                 return;
             }
 
-            Properties.Settings.Default.IsStarted = true;
             View3D view3d = RevitViewManager.Get3dView(uidoc);
             ICollection<ElementId> validIds = purgeManager.PurgeAndGetValidConstructionTypeIds(doc);
             Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
