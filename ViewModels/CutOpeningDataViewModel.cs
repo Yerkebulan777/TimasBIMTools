@@ -479,7 +479,7 @@ namespace RevitTimasBIMTools.ViewModels
             manager?.Dispose();
             FilterText = string.Empty;
             RevitElementModels.Clear();
-            ViewCollection = new ListCollectionView(RevitElementModels);
+            ViewCollection.Refresh();
             Logger.Info($"ViewCollection Is empty = >{ViewCollection.IsEmpty}");
         }
     }
