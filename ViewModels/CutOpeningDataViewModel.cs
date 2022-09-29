@@ -331,7 +331,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private ICollectionView viewCollect = new CollectionView(new List<ElementModel>());
+        private ICollectionView viewCollect = new ListCollectionView(new List<ElementModel>());
         public ICollectionView ViewCollection
         {
             get => viewCollect;
@@ -340,11 +340,11 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref viewCollect, value))
                 {
                     IsAllSelectChecked = false;
-                    ViewCollection.SortDescriptions.Clear();
-                    ViewCollection.GroupDescriptions.Clear();
-                    ViewCollection.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
-                    ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
-                    ViewCollection.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
+                    viewCollect.SortDescriptions.Clear();
+                    viewCollect.GroupDescriptions.Clear();
+                    viewCollect.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
+                    viewCollect.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                    viewCollect.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
                 }
             }
         }
@@ -477,8 +477,10 @@ namespace RevitTimasBIMTools.ViewModels
         public void Dispose()
         {
             manager?.Dispose();
-            RevitElementModels?.Clear();
             FilterText = string.Empty;
+            RevitElementModels.Clear();
+            ViewCollection = new ListCollectionView(RevitElementModels);
+            Logger.Info($"ViewCollection Is empty = >{ViewCollection.IsEmpty}");
         }
     }
 }
