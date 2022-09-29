@@ -84,6 +84,12 @@ namespace RevitTimasBIMTools.CutOpening
 
         #endregion
 
+        private void InitializeUnits(Document doc)
+        {
+            units = doc.GetUnits();
+            angleUnit = units.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
+        }
+
 
         [STAThread]
         public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level)
@@ -107,13 +113,6 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                 }
             }
-        }
-
-
-        private void InitializeUnits(Document doc)
-        {
-            units = doc.GetUnits();
-            angleUnit = units.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
 
 
