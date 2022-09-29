@@ -67,6 +67,7 @@ namespace RevitTimasBIMTools.Views
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
                 Document doc = null;
+                dataViewModel.RevitElementModels.Clear();
                 Task task = !dataViewModel.IsOptionsEnabled
                     ? RevitTask.RunAsync(async app =>
                     {
