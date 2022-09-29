@@ -477,7 +477,7 @@ namespace RevitTimasBIMTools.ViewModels
         public void Dispose()
         {
             manager?.Dispose();
-            RevitElementModels.Clear();
+            RevitElementModels?.Clear();
             FilterText = string.Empty;
         }
     }

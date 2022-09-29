@@ -143,7 +143,7 @@ namespace RevitTimasBIMTools.Views
                 {
                     Content = null;
                     DataContext = null;
-                    dataViewModel.Dispose();
+                    dataViewModel?.Dispose();
                     Properties.Settings.Default.Reset();
                     //ComboDocs.SelectionChanged -= ComboDocs_SelectionChanged;
                     for (int i = 0; i < PageMainGrid.Children.Count; i++)

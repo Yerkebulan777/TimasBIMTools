@@ -467,12 +467,11 @@ namespace RevitTimasBIMTools.CutOpening
         public void Dispose()
         {
             transform?.Dispose();
-            collector?.Dispose();
-            SearchLinkInstance?.Dispose();
             SearchDocument?.Dispose();
             intersectSolid?.Dispose();
             ActiveDocument?.Dispose();
             SearchTransform?.Dispose();
+            SearchLinkInstance?.Dispose();
             ElementDataDictionary.OnSerializeData(dictDatabase);
         }
     }

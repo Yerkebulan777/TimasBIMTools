@@ -35,7 +35,7 @@
                      Visibility="{Binding Path=IsStarted, Converter={StaticResource BoolToViz}}">
                 <Grid Grid.Row="0" VerticalAlignment="Center" >
                     <Label Name="ActiveDocTitle" TextElement.FontSize="13" VerticalAlignment="Center"
-                           Content="{Binding Path=DocumentModel, Mode=OneWay, UpdateSourceTrigger=Explicit}">
+                           Content="{Binding Path=SelectedDocModel, Mode=OneWay, UpdateSourceTrigger=Explicit}">
                         <Label.BitmapEffect>
                             <DropShadowBitmapEffect/>
                         </Label.BitmapEffect>
