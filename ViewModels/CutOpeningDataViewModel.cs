@@ -33,8 +33,7 @@ namespace RevitTimasBIMTools.ViewModels
         //private readonly View3D view3d;
         private readonly object syncLocker = new();
         private readonly string documentId = Properties.Settings.Default.CurrentDocumentUniqueId;
-        //private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
-        //private readonly string rectangOpeningId = Properties.Settings.Default.IsStarted;
+        
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
 
 
