@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -250,11 +249,16 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     compound = floorType.GetCompoundStructure();
                 }
-                Material material = GetCompoundStructureMaterial(doc, elem, compound);
-                if (material != null)
+
+                if (GetInstancesByTypeId(doc, elem.Category.Id, elem.Id).Any())
                 {
-                    result[material.Name] = material;
+                    Material material = GetCompoundStructureMaterial(doc, elem, compound);
+                    if (material != null)
+                    {
+                        result[material.Name] = material;
+                    }
                 }
+
             }
             return result;
         }
