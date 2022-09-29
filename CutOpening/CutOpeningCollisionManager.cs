@@ -220,12 +220,7 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     return structData;
                 }
-                structData = GetSizeByParameter(elem, etype, direction);
-                if (structData.IsValidObject && dictDatabase.TryAdd(uniqueKey, structData))
-                {
-                    return structData;
-                }
-                structData = GetSizeByGeometry(etype, intersectNormal);
+                structData = GetSectionSize(elem, etype, direction);
                 if (structData.IsValidObject && dictDatabase.TryAdd(uniqueKey, structData))
                 {
                     return structData;
@@ -235,7 +230,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private ElementTypeData GetSizeByParameter(Element elem, ElementType etype, XYZ direction)
+        private ElementTypeData GetSectionSize(Element elem, ElementType etype, XYZ direction)
         {
             int catIdInt = elem.Category.Id.IntegerValue;
             if (Enum.IsDefined(typeof(BuiltInCategory), catIdInt))
