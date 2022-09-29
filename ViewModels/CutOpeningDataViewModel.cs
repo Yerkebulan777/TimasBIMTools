@@ -28,7 +28,7 @@ namespace RevitTimasBIMTools.ViewModels
     {
         public View3D View3d { get; set; } = null;
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
-        public ICollection<ElementId> ConstructionTypeIds { get; internal set; } = null;
+        public IDictionary<int, ElementId> ConstructionTypeIds { get; internal set; } = null;
         public CancellationToken CancelToken { get; internal set; } = CancellationToken.None;
 
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;

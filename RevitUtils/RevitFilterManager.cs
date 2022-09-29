@@ -230,13 +230,13 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Material Filter
 
-        public static IDictionary<string, Material> GetConstructionCoreMaterials(Document doc, ICollection<ElementId> typeIds)
+        public static IDictionary<string, Material> GetConstructionCoreMaterials(Document doc, IDictionary<int, ElementId> typeIds)
         {
             CompoundStructure compound = null;
-            IDictionary<string, Material> result = new SortedDictionary<string, Material>();
-            foreach (ElementId eid in typeIds)
+            SortedDictionary<string, Material> result = new();
+            foreach (KeyValuePair<int, ElementId> item in typeIds)
             {
-                Element elem = doc.GetElement(eid);
+                Element elem = doc.GetElement(item.Value);
                 if (elem is RoofType roofType)
                 {
                     compound = roofType.GetCompoundStructure();
@@ -264,14 +264,13 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static IList<Element> GetInstancesByCoreMaterial(Document doc, ICollection<ElementId> typeIds, string matName)
+        public static IList<Element> GetInstancesByCoreMaterial(Document doc, IDictionary<int, ElementId> typeIds, string matName)
         {
             List<Element> result = new(100);
-
-            foreach (ElementId eid in typeIds)
+            CompoundStructure compound = null;
+            foreach (KeyValuePair<int, ElementId> item in typeIds)
             {
-                CompoundStructure compound = null;
-                Element elem = doc.GetElement(eid);
+                Element elem = doc.GetElement(item.Value);
                 if (elem is RoofType roofType)
                 {
                     compound = roofType.GetCompoundStructure();

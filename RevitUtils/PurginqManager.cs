@@ -1,5 +1,5 @@
 ﻿using Autodesk.Revit.DB;
-using System;
+using RevitTimasBIMTools.Services;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,8 +7,7 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitPurginqManager
     {
-
-        public ICollection<ElementId> PurgeAndGetValidConstructionTypeIds(Document doc)
+        public IDictionary<int, ElementId> PurgeAndGetValidConstructionTypeIds(Document doc)
         {
             //  Categories whose types will be purged
             List<BuiltInCategory> purgeBuiltInCats = new()
@@ -18,33 +17,35 @@ namespace RevitTimasBIMTools.RevitUtils
                 BuiltInCategory.OST_Floors,
             };
 
+            bool flag = false;
+
             ElementMulticategoryFilter multiCat = new(purgeBuiltInCats);
 
-            ICollection<ElementId> validTypeIds = new FilteredElementCollector(doc).OfClass(typeof(ElementType)).WherePasses(multiCat).ToElementIds();
+            IDictionary<int, ElementId> validTypeIds = new Dictionary<int, ElementId>(25);
 
-            FilteredElementCollector collector = new FilteredElementCollector(doc).WherePasses(multiCat).WhereElementIsNotElementType();
+            IDictionary<int, ElementId> invalidTypeIds = new FilteredElementCollector(doc).OfClass(typeof(ElementType)).WherePasses(multiCat).ToDictionary(x => x.Id.IntegerValue, x => x.Id);
 
-            IList<ElementId> typeIdsToDelete = new List<ElementId>(Convert.ToInt16(validTypeIds.Count * 0.25));
-
-            foreach (Element e in collector)
+            foreach (Element e in new FilteredElementCollector(doc).WherePasses(multiCat).WhereElementIsNotElementType())
             {
                 ElementId typeId = e.GetTypeId();
-                if (!validTypeIds.Contains(typeId))
+                int typeIdKey = typeId.IntegerValue;
+                if (!validTypeIds.ContainsKey(typeIdKey))
                 {
-                    if (validTypeIds.Remove(typeId))
-                    {
-                        typeIdsToDelete.Add(typeId);
-                    }
+                    validTypeIds[typeIdKey] = typeId;
                 }
             }
 
+            foreach (KeyValuePair<int, ElementId> item in validTypeIds)
+            {
+                flag = invalidTypeIds.Remove(item.Key);
+            }
+
+
             using TransactionGroup tg = new(doc, "Purge types");
             TransactionStatus status = tg.Start();
-            foreach (ElementId id in typeIdsToDelete)
+            foreach (KeyValuePair<int, ElementId> item in invalidTypeIds)
             {
-                using Transaction t = new(doc, "delete type");
-                // Do not delete type if it would modelList in error such as
-                // "Last type in system family "Stacked Wall" cannot be deleted."
+                using Transaction t = new(doc, "\tDelete type");
                 FailureHandlingOptions failOpt = t.GetFailureHandlingOptions();
                 failOpt = failOpt.SetClearAfterRollback(true);
                 failOpt = failOpt.SetFailuresPreprocessor(new RollbackIfErrorOccurs());
@@ -54,7 +55,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     try
                     {
-                        status = doc.Delete(id).Any() ? t.Commit() : t.RollBack();
+                        status = doc.Delete(item.Value).Any() ? t.Commit() : t.RollBack();
                     }
                     catch
                     {
@@ -66,9 +67,10 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
             status = tg.Assimilate();
-
+            Logger.Info($"Deleted {invalidTypeIds.Count}");
             return validTypeIds;
         }
+
 
         public class RollbackIfErrorOccurs : IFailuresPreprocessor
         {
