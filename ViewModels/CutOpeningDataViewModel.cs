@@ -88,7 +88,7 @@ namespace RevitTimasBIMTools.ViewModels
         #region Settings
 
         private DocumentModel model = null;
-        public DocumentModel SelectedDocumentModel
+        public DocumentModel SearchDocumentModel
         {
             get => model;
             set
