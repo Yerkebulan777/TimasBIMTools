@@ -339,6 +339,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref viewCollect, value))
                 {
+                    IsAllSelectChecked = false;
                     ViewCollection.SortDescriptions.Clear();
                     ViewCollection.GroupDescriptions.Clear();
                     ViewCollection.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
