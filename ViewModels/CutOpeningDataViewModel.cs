@@ -260,7 +260,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 manager.SearchElementList = instances;
             }, TaskScheduler.FromCurrentSynchronizationContext());
-            Logger.Info($"\tFound => {instances.Count} element count");
+
         }
 
 

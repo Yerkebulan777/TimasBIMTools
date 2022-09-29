@@ -249,16 +249,11 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     compound = floorType.GetCompoundStructure();
                 }
-
-                if (GetInstancesByTypeId(doc, elem.Category.Id, elem.Id).Any())
+                Material material = GetCompoundStructureMaterial(doc, elem, compound);
+                if (material != null)
                 {
-                    Material material = GetCompoundStructureMaterial(doc, elem, compound);
-                    if (material != null)
-                    {
-                        result[material.Name] = material;
-                    }
+                    result[material.Name] = material;
                 }
-
             }
             return result;
         }
