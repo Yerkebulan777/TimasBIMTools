@@ -9,7 +9,6 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,7 +21,7 @@ namespace RevitTimasBIMTools.Views
     public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
         private bool disposedValue = false;
-        private readonly Mutex mutex = new Mutex();
+        private readonly Mutex mutex = new();
         private IDictionary<string, FamilySymbol> familySymbols = null;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
@@ -79,7 +78,7 @@ namespace RevitTimasBIMTools.Views
                         if (documentId.Equals(docId))
                         {
                             ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
-                            ComboStructureMats.ItemsSource = RevitFilterManager.GetAllConstructionStructureMaterials(doc);
+                            ComboStructureMats.ItemsSource = RevitFilterManager.GetAllConstructionStructureMaterials(doc, dataViewModel.ConstructionTypeIds);
                             familySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
                             ComboRectangSymbol.ItemsSource = familySymbols;
                             ComboRoundedSymbol.ItemsSource = familySymbols;
@@ -102,7 +101,6 @@ namespace RevitTimasBIMTools.Views
                     }, TaskScheduler.FromCurrentSynchronizationContext());
             });
         }
-
 
 
         [STAThread]

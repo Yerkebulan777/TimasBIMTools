@@ -28,8 +28,8 @@ namespace RevitTimasBIMTools.ViewModels
     {
         public View3D View3d { get; set; } = null;
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
-        public ICollection<ElementId> ConstructionTypeIds { get; set; } = null;
-        public CancellationToken CancelToken { get; set; } = CancellationToken.None;
+        public ICollection<ElementId> ConstructionTypeIds { get; internal set; } = null;
+        public CancellationToken CancelToken { get; internal set; } = CancellationToken.None;
 
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
@@ -246,7 +246,7 @@ namespace RevitTimasBIMTools.ViewModels
                 Document doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    instances = RevitFilterManager.GetTypeIdsByStructureMaterial(doc, materialName);
+                    instances = RevitFilterManager.GetTypeIdsByStructureMaterial(doc, ConstructionTypeIds, materialName);
                 }
             }).ContinueWith(app =>
             {
@@ -382,7 +382,6 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-
         #region SelectItemCommand
         public ICommand SelectItemCommand { get; private set; }
         private void SelectAllVaueHandelCommand()
@@ -442,7 +441,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region CloseCommand
         public ICommand CanselCommand { get; private set; }
-
+        
 
         private void CancelCallbackLogic()
         {
@@ -458,7 +457,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (CancelToken.IsCancellationRequested)
                     {
-                        _ = Task.Delay(1000).ContinueWith((action) => Logger.Warning("Task cansceled"));
+                        task = Task.Delay(1000).ContinueWith((action) => Logger.Warning("Task cansceled"));
                     }
                 }
             }

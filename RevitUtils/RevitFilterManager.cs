@@ -10,7 +10,7 @@ namespace RevitTimasBIMTools.RevitUtils
     internal sealed class RevitFilterManager
     {
 
-        public static List<Element> ElementTypeList = new List<Element>(100);
+        public static List<Element> ElementTypeList = new(100);
 
 
         #region Standert Filtered Element Collector
@@ -108,7 +108,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static List<View3D> Get3DViews(Document document, bool template = false, string name = null)
         {
-            List<View3D> elements = new List<View3D>();
+            List<View3D> elements = new();
             int invalidId = ElementId.InvalidElementId.IntegerValue;
             FilteredElementCollector collector = new FilteredElementCollector(document).OfClass(typeof(View3D));
             foreach (View3D view in collector)
@@ -230,18 +230,13 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Material Filter
 
-
-        public static IDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc)
+        public static IDictionary<string, Material> GetAllConstructionStructureMaterials(Document doc, ICollection<ElementId> typeIds)
         {
-            ElementTypeList.Clear();
             CompoundStructure compound = null;
-            List<Element> elements = new List<Element>(100);
             IDictionary<string, Material> result = new SortedDictionary<string, Material>();
-            ElementTypeList.AddRange(GetElementsOfCategory(doc, typeof(RoofType), BuiltInCategory.OST_Roofs, false));
-            ElementTypeList.AddRange(GetElementsOfCategory(doc, typeof(WallType), BuiltInCategory.OST_Walls, false));
-            ElementTypeList.AddRange(GetElementsOfCategory(doc, typeof(FloorType), BuiltInCategory.OST_Floors, false));
-            foreach (Element elem in ElementTypeList)
+            foreach (ElementId eid in typeIds)
             {
+                Element elem = doc.GetElement(eid);
                 if (elem is RoofType roofType)
                 {
                     compound = roofType.GetCompoundStructure();
@@ -258,20 +253,19 @@ namespace RevitTimasBIMTools.RevitUtils
                 if (material != null)
                 {
                     result[material.Name] = material;
-                    elements.Add(elem);
                 }
             }
-            ElementTypeList = elements;
             return result;
         }
 
 
-        public static IList<Element> GetTypeIdsByStructureMaterial(Document doc, string materialName)
+        public static IList<Element> GetTypeIdsByStructureMaterial(Document doc, ICollection<ElementId> typeIds, string matName)
         {
-            List<Element> result = new List<Element>(100);
-            foreach (Element elem in ElementTypeList)
+            List<Element> result = new(100);
+            foreach (ElementId eid in typeIds)
             {
                 CompoundStructure compound = null;
+                Element elem = doc.GetElement(eid);
                 if (elem is RoofType roofType)
                 {
                     compound = roofType.GetCompoundStructure();
@@ -285,7 +279,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     compound = floorType.GetCompoundStructure();
                 }
                 Material material = GetCompoundStructureMaterial(doc, elem, compound);
-                if (material != null && material.Name == materialName)
+                if (material != null && material.Name == matName)
                 {
                     result.AddRange(GetInstancesByTypeId(doc, elem.Category.Id, elem.Id));
                 }
@@ -306,7 +300,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     if (function == layer.Function && tolerance < layer.Width)
                     {
                         material = doc.GetElement(layer.MaterialId) as Material;
-                        material = material ?? element.Category.Material;
+                        material ??= element.Category.Material;
                         tolerance = Math.Round(layer.Width, 3);
                     }
                 }
@@ -324,7 +318,7 @@ namespace RevitTimasBIMTools.RevitUtils
             foreach (ElementId catId in ParameterFilterUtilities.GetAllFilterableCategories())
             {
                 Category cat = Category.GetCategory(doc, catId);
-                if (cat is Category && cat.AllowsBoundParameters)
+                if (cat is not null && cat.AllowsBoundParameters)
                 {
                     if (cat.CategoryType == CategoryType.Model && model)
                     {
@@ -372,13 +366,13 @@ namespace RevitTimasBIMTools.RevitUtils
             IDictionary<double, Level> result = new SortedDictionary<double, Level>();
             ICollection<ElementId> wallIds = GetElementsOfCategory(doc, typeof(Wall), BuiltInCategory.OST_Walls).ToElementIds();
             ICollection<ElementId> floorIds = GetElementsOfCategory(doc, typeof(Floor), BuiltInCategory.OST_Floors).ToElementIds();
-            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            FilteredElementCollector collector = new(doc);
             bool isValid = wallIds.Any() && floorIds.Any();
             foreach (Level level in collector.OfClass(typeof(Level)))
             {
                 if (isValid)
                 {
-                    ElementLevelFilter levelFilter = new ElementLevelFilter(level.Id);
+                    ElementLevelFilter levelFilter = new(level.Id);
                     collector = new FilteredElementCollector(doc, wallIds);
                     if (collector.WherePasses(levelFilter).Any())
                     {
