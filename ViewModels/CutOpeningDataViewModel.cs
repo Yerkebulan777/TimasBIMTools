@@ -30,7 +30,7 @@ namespace RevitTimasBIMTools.ViewModels
         public static CancellationToken CancelToken { get; set; } = CancellationToken.None;
 
         private Task task;
-        private readonly View3D view3d;
+        //private readonly View3D view3d;
         private readonly object syncLocker = new();
         private readonly string documentId = Properties.Settings.Default.CurrentDocumentUniqueId;
         //private readonly string roundOpeningId = Properties.Settings.Default.RoundSymbolUniqueId;
@@ -39,10 +39,8 @@ namespace RevitTimasBIMTools.ViewModels
 
 
 
-
         public CutOpeningDataViewModel()
         {
-            view3d = DockPanelView.View3d;
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             CanselCommand = new RelayCommand(CancelCallbackLogic);
@@ -113,7 +111,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref material, value) && value != null)
                 {
-                    GetInstancesByMaterialName(material.Name);
+                    GetInstancesByMaterial(material.Name);
                 }
             }
         }
@@ -230,7 +228,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        private void GetInstancesByMaterialName(string materialName)
+        private void GetInstancesByMaterial(string materialName)
         {
             IList<Element> instances = null;
             task = RevitTask.RunAsync(app =>
@@ -271,7 +269,6 @@ namespace RevitTimasBIMTools.ViewModels
                 symbol.Activate();
             }
         }
-
 
         #endregion
 
