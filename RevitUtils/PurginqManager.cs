@@ -67,7 +67,6 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
             status = tg.Assimilate();
-            Logger.Info($"Deleted {invalidTypeIds.Count}");
             return validTypeIds;
         }
 
