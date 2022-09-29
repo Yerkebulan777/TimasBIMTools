@@ -38,7 +38,7 @@ namespace RevitTimasBIMTools.Views
             Dispatcher.CurrentDispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
         }
 
-
+        [STAThread]
         public void SetupDockablePane(DockablePaneProviderData data)
         {
             data.FrameworkElement = this;
@@ -50,6 +50,7 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        [STAThread]
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             dataViewModel.IsStarted = true;
@@ -124,7 +125,6 @@ namespace RevitTimasBIMTools.Views
                 });
             }
         }
-
 
 
         private void Dispatcher_ShutdownStarted(object sender, EventArgs e)
