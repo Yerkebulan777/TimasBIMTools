@@ -15,7 +15,7 @@ namespace RevitTimasBIMTools.RevitUtils
     {
         public static ConcurrentDictionary<string, ElementTypeData> ElementTypeSizeDictionary = new ConcurrentDictionary<string, ElementTypeData>();
         private static readonly DataContractJsonSerializer formater = new DataContractJsonSerializer(typeof(Dictionary<int, ElementTypeData>));
-        private static readonly string dataPath = Path.Combine(SmartToolGeneralHelper.AssemblyDirectory, nameof(ElementDataDictionary));
+        private static readonly string dataPath = Path.Combine(SmartToolGeneralHelper.DocumentPath, nameof(ElementDataDictionary));
         
 
         [STAThread]
