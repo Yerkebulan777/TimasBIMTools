@@ -56,7 +56,7 @@ namespace RevitTimasBIMTools.Views
             dataViewModel.IsStarted = true;
             dataViewModel.View3d = args.View3d;
             dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
-            dataViewModel.DocumentModels = args.DocumentModels.ToObservableCollection();
+            dataViewModel.DocModelCollection = args.DocumentModels.ToObservableCollection();
             viewHandler.Completed -= OnContextHandlerCompleted;
         }
 

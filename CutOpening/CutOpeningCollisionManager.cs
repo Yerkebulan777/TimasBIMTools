@@ -25,8 +25,6 @@ namespace RevitTimasBIMTools.CutOpening
         };
 
         private readonly Transform identityTransform = Transform.Identity;
-        private readonly ParameterType lenParamType = ParameterType.Length;
-
         #endregion
 
 
@@ -57,7 +55,8 @@ namespace RevitTimasBIMTools.CutOpening
 
         #endregion
 
-        private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
+
+        
 
         #region Templory Properties
 
@@ -73,7 +72,8 @@ namespace RevitTimasBIMTools.CutOpening
         //private readonly ElementId elemId = ElementId.InvalidElementId;
         private BoundingBoxXYZ hostBox = new();
 
-        private readonly IList<ElementModel> modelList = new List<ElementModel>(300);
+
+        private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
 
         private double angleRadians = 0;
         private double angleHorisontDegrees = 0;
@@ -335,110 +335,110 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Other methods
 
-        private double GetLengthValueBySimilarParameterName(Element elem, string paramName)
-        {
-            double value = invalIdInt;
-            int tolerance = int.MaxValue;
-            char[] delimiters = new[] { ' ', '_', '-' };
-            foreach (Parameter param in elem.GetOrderedParameters())
-            {
-                Definition definition = param.Definition;
-                if (param.HasValue && definition.ParameterType == lenParamType)
-                {
-                    string name = definition.Name;
-                    string[] strArray = name.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-                    if (strArray.Contains(paramName, StringComparer.CurrentCultureIgnoreCase))
-                    {
-                        int tmp = param.IsShared ? name.Length : name.Length + strArray.Length;
-                        if (tolerance > tmp && UnitFormatUtils.TryParse(units, UnitType.UT_Length, param.AsValueString(), out value))
-                        {
-                            tolerance = tmp;
-                        }
-                    }
-                }
-            }
-            return value;
-        }
+        //private double GetLengthValueBySimilarParameterName(Element elem, string paramName)
+        //{
+        //    double value = invalIdInt;
+        //    int tolerance = int.MaxValue;
+        //    char[] delimiters = new[] { ' ', '_', '-' };
+        //    foreach (Parameter param in elem.GetOrderedParameters())
+        //    {
+        //        Definition definition = param.Definition;
+        //        if (param.HasValue && definition.ParameterType == lenParamType)
+        //        {
+        //            string name = definition.Name;
+        //            string[] strArray = name.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+        //            if (strArray.Contains(paramName, StringComparer.CurrentCultureIgnoreCase))
+        //            {
+        //                int tmp = param.IsShared ? name.Length : name.Length + strArray.Length;
+        //                if (tolerance > tmp && UnitFormatUtils.TryParse(units, UnitType.UT_Length, param.AsValueString(), out value))
+        //                {
+        //                    tolerance = tmp;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return value;
+        //}
 
 
-        private void CreateDirectShape(Document doc, Element elem, Solid solid)
-        {
-            using Transaction trans = new(doc, "Create DirectShape");
-            try
-            {
-                _ = trans.Start();
-                DirectShape ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_GenericModel));
-                ds.ApplicationDataId = elem.UniqueId;
-                ds.Name = "Intersection by " + elem.Name;
-                ds.SetShape(new GeometryObject[] { solid });
-                _ = trans.Commit();
-            }
-            catch (Exception exc)
-            {
-                _ = trans.RollBack();
-                Logger.Error(exc.Message);
-            }
-        }
+        //private void CreateDirectShape(Document doc, Element elem, Solid solid)
+        //{
+        //    using Transaction trans = new(doc, "Create DirectShape");
+        //    try
+        //    {
+        //        _ = trans.Start();
+        //        DirectShape ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_GenericModel));
+        //        ds.ApplicationDataId = elem.UniqueId;
+        //        ds.Name = "Intersection by " + elem.Name;
+        //        ds.SetShape(new GeometryObject[] { solid });
+        //        _ = trans.Commit();
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        _ = trans.RollBack();
+        //        Logger.Error(exc.Message);
+        //    }
+        //}
 
 
-        private bool GetFamilyInstanceReferencePlane(FamilyInstance fi, out XYZ origin, out XYZ direction)
-        {
-            bool flag = false;
-            origin = XYZ.Zero;
-            direction = XYZ.Zero;
+        //private bool GetFamilyInstanceReferencePlane(FamilyInstance fi, out XYZ origin, out XYZ direction)
+        //{
+        //    bool flag = false;
+        //    origin = XYZ.Zero;
+        //    direction = XYZ.Zero;
 
-            Reference reference = fi.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
-            reference = SearchLinkInstance != null ? reference.CreateLinkReference(SearchLinkInstance) : reference;
+        //    Reference reference = fi.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
+        //    reference = SearchLinkInstance != null ? reference.CreateLinkReference(SearchLinkInstance) : reference;
 
-            if (null != reference)
-            {
-                Document doc = fi.Document;
-                using Transaction transaction = new(doc);
-                _ = transaction.Start("Create Temporary Sketch Plane");
-                try
-                {
-                    SketchPlane sketch = SketchPlane.Create(doc, reference);
-                    if (null != sketch)
-                    {
-                        Plane plan = sketch.GetPlane();
-                        direction = plan.Normal;
-                        origin = plan.Origin;
-                        flag = true;
-                    }
-                }
-                finally
-                {
-                    _ = transaction.RollBack();
-                }
-            }
-            return flag;
-        }
-
-
-        private double GetRotationAngleFromTransform(Transform transform)
-        {
-            double x = transform.BasisX.X;
-            double y = transform.BasisY.Y;
-            double z = transform.BasisZ.Z;
-            double trace = x + y + z;
-            return Math.Acos((trace - 1) / 2.0);
-        }
+        //    if (null != reference)
+        //    {
+        //        Document doc = fi.Document;
+        //        using Transaction transaction = new(doc);
+        //        _ = transaction.Start("Create Temporary Sketch Plane");
+        //        try
+        //        {
+        //            SketchPlane sketch = SketchPlane.Create(doc, reference);
+        //            if (null != sketch)
+        //            {
+        //                Plane plan = sketch.GetPlane();
+        //                direction = plan.Normal;
+        //                origin = plan.Origin;
+        //                flag = true;
+        //            }
+        //        }
+        //        finally
+        //        {
+        //            _ = transaction.RollBack();
+        //        }
+        //    }
+        //    return flag;
+        //}
 
 
-        private static IEnumerable<CurveLoop> GetCountours(Solid solid, Element elem)
-        {
-            try
-            {
-                Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, elem.get_BoundingBox(null).Min);
-                ExtrusionAnalyzer analyzer = ExtrusionAnalyzer.Create(solid, plane, XYZ.BasisZ);
-                Face face = analyzer.GetExtrusionBase();
-                return face.GetEdgesAsCurveLoops();
-            }
-            catch (Autodesk.Revit.Exceptions.InvalidOperationException)
-            {
-                return Enumerable.Empty<CurveLoop>();
-            }
-        }
+        //private double GetRotationAngleFromTransform(Transform transform)
+        //{
+        //    double x = transform.BasisX.X;
+        //    double y = transform.BasisY.Y;
+        //    double z = transform.BasisZ.Z;
+        //    double trace = x + y + z;
+        //    return Math.Acos((trace - 1) / 2.0);
+        //}
+
+
+        //private static IEnumerable<CurveLoop> GetCountours(Solid solid, Element elem)
+        //{
+        //    try
+        //    {
+        //        Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, elem.get_BoundingBox(null).Min);
+        //        ExtrusionAnalyzer analyzer = ExtrusionAnalyzer.Create(solid, plane, XYZ.BasisZ);
+        //        Face face = analyzer.GetExtrusionBase();
+        //        return face.GetEdgesAsCurveLoops();
+        //    }
+        //    catch (Autodesk.Revit.Exceptions.InvalidOperationException)
+        //    {
+        //        return Enumerable.Empty<CurveLoop>();
+        //    }
+        //}
 
         #endregion
 
@@ -454,24 +454,18 @@ namespace RevitTimasBIMTools.CutOpening
 
         /// Общий алгоритм проверки пользователем елементов
         /*
-         * Отдельный класс
-         * Первая проверка остается
-         * Вторая проверка в цикле выполнения
          * Объединения елементов в одной точке в один большой bbox если они пересекаются
          * Объединения проема если пересекаются bbox или находятся очень близко
-         * Создать новое семейство в цикле с возможностью изменения размеров
-         * Сoхранение состояния в цикле по ходу выполнения с отменой действия
-         * В цикле открывается окно с видом в плане и настройками проема (настройки размеров сохраняются по ходу)
-         * TransGroup и subtransaction с doc regenerate и предосмотр с закрытием окна
-         * Реализовать автосинхронизацию при окончания выполнение или остановке
-         * Кнопки = (продолжить/создать/остановить)
+         * Создать новое семейство проема с возможностью изменения размеров => CutOffset сохраняется
+         * Реализовать автосинхронизацию при окончание выполнение или изменения проекта
+         * Кнопки = (показать/создать/остановить)
          * Необходимо использовать Dispose()
          */
 
 
+        [STAThread]
         public void Dispose()
         {
-            modelList.Clear();
             transform?.Dispose();
             collector?.Dispose();
             SearchLinkInstance?.Dispose();

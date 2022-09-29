@@ -93,21 +93,21 @@ namespace RevitTimasBIMTools.ViewModels
         #region Set settings
 
         private ObservableCollection<DocumentModel> docModels = null;
-        public ObservableCollection<DocumentModel> DocumentModels
+        public ObservableCollection<DocumentModel> DocModelCollection
         {
             get => docModels;
             set
             {
                 if (SetProperty(ref docModels, value))
                 {
-                    DocumentModel = docModels.FirstOrDefault();
+                    SelectedDocModel = docModels.FirstOrDefault();
                 }
             }
         }
 
 
         private DocumentModel docModel = null;
-        public DocumentModel DocumentModel
+        public DocumentModel SelectedDocModel
         {
             get => docModel;
             set
@@ -137,7 +137,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         private Category category = null;
-        public Category SearchCategory
+        public Category SelectedCategory
         {
             get => category;
             set
@@ -473,6 +473,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
+        [STAThread]
         public void Dispose()
         {
             manager?.Dispose();

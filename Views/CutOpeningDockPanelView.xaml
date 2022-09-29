@@ -70,35 +70,31 @@
 
                 <ListViewItem>
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
-                        <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                            <Label Content="Project: " Width="125"/>
-                            <xctk:WatermarkComboBox Name="ComboDocumentModels" Height="23" Width="125"
-                                                    ItemsSource="{Binding Path=DocumentModels}"
-                                                    SelectedItem="{Binding Path=DocumentModel}"
-                                                    Watermark="Select project..." />
-                        </WrapPanel>
-                    </Border>
-                </ListViewItem>
+                        <StackPanel>
 
-                <ListViewItem>
-                    <Border Style="{StaticResource GroupBoxBorderStyle}" >
-                        <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                            <Label Content="Structure: " Width="125"/>
-                            <xctk:WatermarkComboBox Name="ComboStructureMats" Height="23" Width="125"
+                            <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Project: " Width="125"/>
+                                <xctk:WatermarkComboBox Name="ComboDocumentModels" Height="23" Width="125"
+                                                    ItemsSource="{Binding Path=DocModelCollection}"
+                                                    SelectedItem="{Binding Path=SelectedDocModel}"
+                                                    Watermark="Select project..." />
+                            </WrapPanel>
+
+                            <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Category: " Width="125"/>
+                                <xctk:WatermarkComboBox Name="ComboEngineerCats" Height="23" Width="125"
+                                                    DisplayMemberPath="Value.Name" Watermark="Select category..."
+                                                    SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedCategory}" />
+                            </WrapPanel>
+
+                            <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Structure: " Width="125"/>
+                                <xctk:WatermarkComboBox Name="ComboStructureMats" Height="23" Width="125"
                                                     DisplayMemberPath="Value.Name" Watermark="Select material..."
                                                     SelectedValuePath="Value" SelectedValue="{Binding Path=StructureMaterial}" />
-                        </WrapPanel>
-                    </Border>
-                </ListViewItem>
-
-                <ListViewItem>
-                    <Border Style="{StaticResource GroupBoxBorderStyle}" >
-                        <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                            <Label Content="Category: " Width="125"/>
-                            <xctk:WatermarkComboBox Name="ComboEngineerCats" Height="23" Width="125"
-                                                    DisplayMemberPath="Value.Name" Watermark="Select category..."
-                                                    SelectedValuePath="Value" SelectedValue="{Binding Path=SearchCategory}" />
-                        </WrapPanel>
+                            </WrapPanel>
+                            
+                        </StackPanel>
                     </Border>
                 </ListViewItem>
 
