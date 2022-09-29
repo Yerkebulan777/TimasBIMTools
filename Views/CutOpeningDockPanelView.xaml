@@ -9,7 +9,7 @@
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelView" 
     d:Height="Auto" d:Width="300" mc:Ignorable="d"
-    Background="LightSlateGray">
+    Background="WhiteSmoke">
 
     <Page.Resources>
         <ResourceDictionary>
@@ -21,14 +21,7 @@
 
     <Border BorderThickness="2.5" BorderBrush="Gray">
         <Grid Name="PageMainGrid">
-            <Grid.Background>
-                <LinearGradientBrush EndPoint="0,0" StartPoint="0,1">
-                    <GradientStop Offset="0" Color="WhiteSmoke"/>
-                    <GradientStop Offset="0.5" Color="SeaShell" />
-                    <GradientStop Offset="1" Color="WhiteSmoke"/>
-                </LinearGradientBrush>
-            </Grid.Background>
-
+ 
             <Grid.RowDefinitions>
                 <RowDefinition Height="45"/>
                 <RowDefinition Height="Auto"/>
