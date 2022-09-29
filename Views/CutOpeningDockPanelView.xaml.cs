@@ -63,19 +63,17 @@ namespace RevitTimasBIMTools.Views
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
                 Document doc = null;
-                string docId = string.Empty;
                 Task task = !dataViewModel.IsOptionsEnabled
                     ? RevitTask.RunAsync(async app =>
                     {
                         doc = app.ActiveUIDocument.Document;
                         dataViewModel.IsDataEnabled = false;
                         dataViewModel.IsOptionsEnabled = true;
-                        docId = doc.ProjectInformation.UniqueId;
                         await Task.Delay(1000).ConfigureAwait(true);
                     })
                     .ContinueWith(app =>
                     {
-                        if (documentId.Equals(docId))
+                        if (documentId.Equals(doc.ProjectInformation.UniqueId))
                         {
                             ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
                             ComboStructureMats.ItemsSource = RevitFilterManager.GetAllConstructionStructureMaterials(doc, dataViewModel.ConstructionTypeIds);
@@ -89,12 +87,11 @@ namespace RevitTimasBIMTools.Views
                         doc = app.ActiveUIDocument.Document;
                         dataViewModel.IsDataEnabled = true;
                         dataViewModel.IsOptionsEnabled = false;
-                        docId = doc.ProjectInformation.UniqueId;
                         await Task.Delay(1000).ConfigureAwait(true);
                     })
                     .ContinueWith(app =>
                     {
-                        if (documentId.Equals(docId))
+                        if (documentId.Equals(doc.ProjectInformation.UniqueId))
                         {
                             ComboLevelFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
                         }
