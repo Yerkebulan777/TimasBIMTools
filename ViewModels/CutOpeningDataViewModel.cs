@@ -84,8 +84,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Set settings
 
-        private IList<DocumentModel> docModels = null;
-        public IList<DocumentModel> DocumentModels
+        private ObservableCollection<DocumentModel> docModels = null;
+        public ObservableCollection<DocumentModel> DocumentModels
         {
             get => docModels;
             set
