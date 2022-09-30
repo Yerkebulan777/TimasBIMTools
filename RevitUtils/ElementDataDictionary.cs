@@ -28,9 +28,10 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static void OnSerializeData(ConcurrentDictionary<string, ElementTypeData> dictionary)
         {
-            if (dictionary.Count > 0)
+            Dictionary<string, ElementTypeData> data = dictionary.ToDictionary(k => k.Key, v => v.Value);
+            if (data.Count > 0)
             {
-                SerializeSizeData(dictionary.ToDictionary(k => k.Key, v => v.Value), dataPath);
+                SerializeSizeData(data, dataPath);
             }
         }
 
@@ -62,10 +63,6 @@ namespace RevitTimasBIMTools.RevitUtils
             catch (Exception exc)
             {
                 Logger.Error(nameof(SerializeSizeData) + exc.Message);
-            }
-            finally
-            {
-                Logger.Info(data.Values.ToString());
             }
         }
 
