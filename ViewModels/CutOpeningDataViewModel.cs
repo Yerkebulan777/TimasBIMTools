@@ -477,9 +477,16 @@ namespace RevitTimasBIMTools.ViewModels
         public void Dispose()
         {
             manager?.Dispose();
-            FilterText = string.Empty;
-            RevitElementModels.Clear();
             ViewCollection.Refresh();
+            if (ViewCollection is ListCollectionView list)
+            {
+                FilterText = string.Empty;
+                RevitElementModels.Clear();
+                foreach (object item in list)
+                {
+                    list.Remove(item);
+                }
+            }
             Logger.Info($"ViewCollection Is empty = >{ViewCollection.IsEmpty}");
         }
     }

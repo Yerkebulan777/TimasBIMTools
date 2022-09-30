@@ -134,21 +134,23 @@ namespace RevitTimasBIMTools.Views
             Dispose();
         }
 
-
+        
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    Content = null;
-                    DataContext = null;
-                    dataViewModel?.Dispose();
-                    Properties.Settings.Default.Reset();
-                    for (int i = 0; i < PageMainGrid.Children.Count; i++)
+                    Task task = Task.Run(() =>
                     {
-                        PageMainGrid.Children.Remove(PageMainGrid.Children[i]);
-                    }
+                        Properties.Settings.Default.Reset();
+                    })
+                    .ContinueWith(_ =>
+                    {
+                        DataContext = null;
+                        dataViewModel?.Dispose();
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+
                     // TODO: освободить управляемое состояние (управляемые объекты)
                 }
                 // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения
@@ -157,7 +159,7 @@ namespace RevitTimasBIMTools.Views
             }
         }
 
-
+        [STAThread]
         public void Dispose()
         {
             Dispose(true);
@@ -165,7 +167,6 @@ namespace RevitTimasBIMTools.Views
             GC.WaitForPendingFinalizers();
             //GC.SuppressFinalize(this);
         }
-
 
     }
 }

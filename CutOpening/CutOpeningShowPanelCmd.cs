@@ -36,8 +36,8 @@ namespace RevitTimasBIMTools.CutOpening
                         try
                         {
                             dockpane.Hide();
-                            dockpane.Dispose();
                             viewpane.Dispose();
+                            dockpane.Dispose();
                         }
                         catch (Exception exc)
                         {
