@@ -28,7 +28,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static void OnSerializeData(ConcurrentDictionary<string, ElementTypeData> dictionary)
         {
-            if (!string.IsNullOrEmpty(dataPath) && dictionary.Count > 0)
+            if (dictionary.Count > 0)
             {
                 SerializeSizeData(dictionary.ToDictionary(k => k.Key, v => v.Value), dataPath);
             }
