@@ -16,17 +16,16 @@ namespace RevitTimasBIMTools.Services
         private static ILog mainlogger;
         private const string caption = "Timas BIM Tools";
         private static readonly StringBuilder sb = new StringBuilder();
-        private static readonly string myDocumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        private static readonly string documentPath = Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.Personal));
+        private static readonly string logFilePath = Path.Combine(documentPath, "TimasBIMToolLog", "Revit.log");
         public static void InitMainLogger(Type type)
         {
             string name = type.ToString();
             log4net.Repository.ILoggerRepository repository = log4net.LogManager.CreateRepository(name);
             mainlogger = log4net.LogManager.GetLogger(name, type);
-            string documentPath = Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.Personal));
-            string LogFilePath = Path.Combine(documentPath, "TimasBIMToolLog", "Revit.log");
             RollingFileAppender LogFile = new RollingFileAppender
             {
-                File = LogFilePath,
+                File = logFilePath,
                 MaxSizeRollBackups = 10,
                 RollingStyle = RollingFileAppender.RollingMode.Size,
                 DatePattern = "_dd-MM-yyyy",
@@ -53,7 +52,7 @@ namespace RevitTimasBIMTools.Services
             mainlogger?.Error("Error", ex);
             sb.AppendLine($"\n{ex.Message}");
             Debug.WriteLine($"\n{ex.Message}");
-            File.AppendAllText(myDocumentsPath + "log.txt", sb.ToString());
+            File.AppendAllText(logFilePath, sb.ToString());
             sb.Clear();
         }
 
@@ -62,7 +61,7 @@ namespace RevitTimasBIMTools.Services
             mainlogger?.Error(text, ex);
             sb.AppendLine($"\n{text}\n{ex.Message}");
             Debug.WriteLine($"\n{text}\n{ex.Message}");
-            File.AppendAllText(myDocumentsPath + "log.txt", sb.ToString());
+            File.AppendAllText(logFilePath, sb.ToString());
             sb.Clear();
         }
 
@@ -71,7 +70,7 @@ namespace RevitTimasBIMTools.Services
             sb.AppendLine(text);
             Debug.WriteLine(text);
             mainlogger?.Info(text);
-            File.AppendAllText(myDocumentsPath + "log.txt", sb.ToString());
+            File.AppendAllText(logFilePath, sb.ToString());
             sb.Clear();
         }
 
