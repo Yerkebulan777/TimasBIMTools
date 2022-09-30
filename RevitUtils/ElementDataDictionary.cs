@@ -13,10 +13,10 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class ElementDataDictionary
     {
-        public static ConcurrentDictionary<string, ElementTypeData> ElementTypeSizeDictionary = new ConcurrentDictionary<string, ElementTypeData>();
-        private static readonly DataContractJsonSerializer formater = new DataContractJsonSerializer(typeof(Dictionary<int, ElementTypeData>));
-        private static readonly string dataPath = Path.Combine(SmartToolGeneralHelper.DocumentPath, "ElementTypeSizeData.json") ;
-        
+        public static ConcurrentDictionary<string, ElementTypeData> ElementTypeSizeDictionary = new();
+        private static readonly DataContractJsonSerializer formater = new(typeof(Dictionary<int, ElementTypeData>));
+        private static readonly string dataPath = Path.Combine(SmartToolGeneralHelper.DocumentPath, "DataBase", "TypeSizeData.json");
+
 
         public static void OnSerializeData(ConcurrentDictionary<string, ElementTypeData> dictionary)
         {
@@ -42,12 +42,10 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 if (!File.Exists(Path.GetDirectoryName(path)))
                 {
-                    Directory.CreateDirectory(path);
+                    _ = Directory.CreateDirectory(path);
                 }
-                using (FileStream file = new FileStream(path, FileMode.OpenOrCreate))
-                {
-                    formater.WriteObject(file, data);
-                }
+                using FileStream file = new(path, FileMode.OpenOrCreate);
+                formater.WriteObject(file, data);
             }
             catch (Exception exc)
             {
@@ -66,15 +64,13 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 try
                 {
-                    using (FileStream file = File.OpenRead(path))
+                    using FileStream file = File.OpenRead(path);
+                    object result = formater.ReadObject(file);
+                    if (result is not null and Dictionary<string, ElementTypeData> dict)
                     {
-                        object result = formater.ReadObject(file);
-                        if (result != null && result is Dictionary<string, ElementTypeData> dict)
+                        foreach (KeyValuePair<string, ElementTypeData> item in dict)
                         {
-                            foreach (KeyValuePair<string, ElementTypeData> item in dict)
-                            {
-                                ElementTypeSizeDictionary.TryAdd(item.Key, item.Value);
-                            }
+                            _ = ElementTypeSizeDictionary.TryAdd(item.Key, item.Value);
                         }
                     }
                 }
