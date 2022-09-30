@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Path = System.IO.Path;
 
@@ -17,12 +18,10 @@ namespace RevitTimasBIMTools.RevitUtils
 
         [JsonExtensionData]
         private Dictionary<string, ElementTypeData> dataDict { get; set; }
+        private static readonly string fileName = Path.Combine(SmartToolGeneralHelper.DocumentPath, @"TypeSizeData.json");
+        private static readonly JsonSerializerSettings options = new() { NullValueHandling = NullValueHandling.Ignore };
 
         public static ConcurrentDictionary<string, ElementTypeData> ElementTypeSizeDictionary = new();
-
-        private static readonly string dataPath = Path.Combine(SmartToolGeneralHelper.DocumentPath, @"TypeSizeData.json");
-
-
 
         [STAThread]
         public void SerializeData(ConcurrentDictionary<string, ElementTypeData> sourceDict)
@@ -31,19 +30,19 @@ namespace RevitTimasBIMTools.RevitUtils
             dataDict = sourceDict.ToDictionary(k => k.Key, v => v.Value);
             if (dataDict.Count > 0)
             {
-                string json = JsonConvert.SerializeObject(dataDict, Formatting.Indented);
-                //string json = JsonSerializer.Serialize(dataDict, options);
                 try
                 {
-                    //File.WriteAllText(dataPath, json);
+                    using MemoryStream stream = new(capacity: 100);
+                    using StreamWriter writer = new(stream, Encoding.UTF8);
+                    using JsonTextWriter jsonWriter = new(writer);
+                    JsonSerializer.CreateDefault(options).Serialize(jsonWriter, dataDict);
+                    jsonWriter.Flush();
+                    stream.Position = 0;
+                    File.WriteAllBytes(fileName, stream.ToArray());
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(nameof(SerializeData) + exc.Message);
-                }
-                finally
-                {
-                    //Logger.Info(json);
+                    Logger.Error(nameof(SerializeData) + ":\t" + exc.Message);
                 }
             }
         }
@@ -51,7 +50,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public void DeserialiseSizeData()
         {
-            if (File.Exists(dataPath))
+            if (File.Exists(fileName))
             {
                 try
                 {
