@@ -15,10 +15,9 @@ namespace RevitTimasBIMTools.RevitUtils
     {
         public static ConcurrentDictionary<string, ElementTypeData> ElementTypeSizeDictionary = new ConcurrentDictionary<string, ElementTypeData>();
         private static readonly DataContractJsonSerializer formater = new DataContractJsonSerializer(typeof(Dictionary<int, ElementTypeData>));
-        private static readonly string dataPath = Path.Combine(SmartToolGeneralHelper.DocumentPath, nameof(ElementDataDictionary));
+        private static readonly string dataPath = Path.Combine(SmartToolGeneralHelper.DocumentPath, "ElementTypeSizeData.json") ;
         
 
-        [STAThread]
         public static void OnSerializeData(ConcurrentDictionary<string, ElementTypeData> dictionary)
         {
             if (!string.IsNullOrEmpty(dataPath) && dictionary.Count > 0)
@@ -28,7 +27,6 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        [STAThread]
         public static void OnDeserialiseSizeData()
         {
             if (!string.IsNullOrEmpty(dataPath))
@@ -53,7 +51,7 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             catch (Exception exc)
             {
-                Logger.Error(exc.Message);
+                Logger.Error(nameof(SerializeSizeData) + exc.Message);
             }
             finally
             {
@@ -82,12 +80,10 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(exc.Message);
+                    Logger.Error(nameof(DeserialiseSizeData) + exc.Message);
                 }
                 finally { Task.Delay(100).Wait(); }
             }
         }
-
-
     }
 }
