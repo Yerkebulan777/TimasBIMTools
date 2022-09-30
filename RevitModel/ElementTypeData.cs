@@ -5,7 +5,6 @@ using Autodesk.Revit.DB;
 
 namespace RevitTimasBIMTools.RevitModel
 {
-    [DataContract]
     public struct ElementTypeData
     {
         private const double footToMm = 304.8;
@@ -32,29 +31,21 @@ namespace RevitTimasBIMTools.RevitModel
             Width = RoundSize(width);
         }
 
-        [DataMember]
+
         public bool IsValidObject { get; }
 
-        [DataMember]
         public int CategoryIdInt { get; }
 
-        [DataMember]
         public string CategoryName { get; }
 
-        [DataMember]
         public string FamilyName { get; }
 
-        [DataMember]
         public string SymbolName { get; }
 
-
-        [DataMember]
         public double Height { get; set; }
 
-        [DataMember]
         public double Width { get; set; }
 
-        [IgnoreDataMember]
         public string Description { get; set; }
 
 
