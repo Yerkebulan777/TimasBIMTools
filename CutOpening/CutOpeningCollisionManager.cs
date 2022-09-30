@@ -63,7 +63,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private Solid hostSolid = null;
         private Solid intersectSolid = null;
-        private string uniqueKey = string.Empty;
+        private string unique = string.Empty;
         private Transform transform = Transform.Identity;
         private FilteredElementCollector collector = null;
         private BoundingBoxXYZ hostBox = new();
@@ -210,11 +210,11 @@ namespace RevitTimasBIMTools.CutOpening
             ElementTypeData structData = new(null);
             if (doc.GetElement(elem.GetTypeId()) is ElementType etype)
             {
-                uniqueKey = etype.UniqueId.Normalize();
-                if (!dictDatabase.TryGetValue(uniqueKey, out structData))
+                unique = etype.UniqueId.Normalize();
+                if (!dictDatabase.TryGetValue(unique, out structData))
                 {
                     structData = GetSectionSize(elem, etype, direction);
-                    if (dictDatabase.TryAdd(uniqueKey, structData))
+                    if (dictDatabase.TryAdd(unique, structData))
                     {
                         dataBase.SerializeData(dictDatabase);
                     }
