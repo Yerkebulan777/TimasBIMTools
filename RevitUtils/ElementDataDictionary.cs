@@ -57,27 +57,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 string json = JsonSerializer.Serialize(data, options);
                 using JsonDocument jdoc = JsonDocument.Parse(json, docOptions);
                 using Utf8JsonWriter writer = new(fs, options: writerOptions);
-
-                JsonElement root = jdoc.RootElement;
-
-                if (root.ValueKind == JsonValueKind.Object)
-                {
-                    writer.WriteStartObject();
-                }
-                else
-                {
-                    return;
-                }
-
-                foreach (JsonProperty property in root.EnumerateObject())
-                {
-                    property.WriteTo(writer);
-                }
-
-                writer.WriteEndObject();
-
-                writer.Flush();
-
+                jdoc.WriteTo(writer);
             }
             catch (Exception exc)
             {
@@ -85,7 +65,7 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             finally
             {
-                Task.Delay(100).Wait();
+                Logger.Info(data.Values.ToString());
             }
         }
 

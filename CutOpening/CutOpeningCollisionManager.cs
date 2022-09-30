@@ -471,6 +471,7 @@ namespace RevitTimasBIMTools.CutOpening
             ActiveDocument?.Dispose();
             SearchTransform?.Dispose();
             SearchLinkInstance?.Dispose();
+            Logger.Info(dictDatabase.Values.Count.ToString());
             ElementDataDictionary.OnSerializeData(dictDatabase);
         }
     }
