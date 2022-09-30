@@ -5,9 +5,7 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
-using Reference = Autodesk.Revit.DB.Reference;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -55,8 +53,6 @@ namespace RevitTimasBIMTools.CutOpening
 
         #endregion
 
-
-        
 
         #region Templory Properties
 
@@ -472,7 +468,8 @@ namespace RevitTimasBIMTools.CutOpening
             SearchTransform?.Dispose();
             SearchLinkInstance?.Dispose();
             Logger.Log(dictDatabase.Values.Count.ToString());
-            ElementDataDictionary.OnSerializeData(dictDatabase);
+            var data = new ElementDataDictionary();
+            data.OnSerializeData(dictDatabase);
         }
     }
 }
