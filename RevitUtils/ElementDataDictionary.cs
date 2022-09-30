@@ -17,7 +17,7 @@ namespace RevitTimasBIMTools.RevitUtils
     {
         public static ConcurrentDictionary<string, ElementTypeData> ElementTypeSizeDictionary = new();
 
-        private static readonly string dataPath = Path.Combine(SmartToolGeneralHelper.DocumentPath, "DataBase", @"TypeSizeData.json");
+        private static readonly string dataPath = Path.Combine(SmartToolGeneralHelper.DocumentPath, @"TypeSizeData.json");
 
         private static readonly JsonDocumentOptions docOptions = new() { CommentHandling = JsonCommentHandling.Skip };
         private static readonly JsonWriterOptions writerOptions = new() { Indented = true };
