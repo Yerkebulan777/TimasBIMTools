@@ -40,9 +40,10 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             try
             {
-                if (!File.Exists(Path.GetDirectoryName(path)))
+                string directory = Path.GetDirectoryName(path);
+                if (!File.Exists(directory))
                 {
-                    _ = Directory.CreateDirectory(path);
+                    _ = Directory.CreateDirectory(directory);
                 }
                 using FileStream file = new(path, FileMode.OpenOrCreate);
                 formater.WriteObject(file, data);
