@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -246,6 +247,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
+        [STAThread]
         private void GetInstancesByMaterial(string materialName)
         {
             IList<Element> instances = null;
@@ -263,7 +265,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         }
 
-
+        [STAThread]
         private void SnoopIntersectionDataByLevel(Level level)
         {
             IEnumerable<ElementModel> data = null;
@@ -276,7 +278,7 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }).ContinueWith(app =>
             {
-                RevitElementModels = data.ToObservableCollection();
+                ElementModelData = data.ToObservableCollection();
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -305,7 +307,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (value.HasValue)
                     {
                         bool val = (bool)value;
-                        foreach (ElementModel model in ViewCollection)
+                        foreach (ElementModel model in DataViewCollection)
                         {
                             model.IsSelected = val;
                         }
@@ -316,35 +318,39 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private ObservableCollection<ElementModel> modelCollection = new();
-        public ObservableCollection<ElementModel> RevitElementModels
+        private ObservableCollection<ElementModel> dataModels = new();
+        public ObservableCollection<ElementModel> ElementModelData
         {
-            get => modelCollection;
+            get => dataModels;
             set
             {
-                if (SetProperty(ref modelCollection, value))
+                if (SetProperty(ref dataModels, value))
                 {
-                    ViewCollection = CollectionViewSource.GetDefaultView(value);
+                    DataViewCollection = CollectionViewSource.GetDefaultView(value);
                     UniqueItemNames = GetUniqueStringList(value);
+                    DataViewCollection.Refresh();
                 }
             }
         }
 
 
-        private ICollectionView viewCollect = new ListCollectionView(new List<ElementModel>());
-        public ICollectionView ViewCollection
+        private ICollectionView dataView = new ListCollectionView(new List<ElementModel>());
+        public ICollectionView DataViewCollection
         {
-            get => viewCollect;
+            get => dataView;
             set
             {
-                if (SetProperty(ref viewCollect, value))
+                if (SetProperty(ref dataView, value))
                 {
                     IsAllSelectChecked = false;
-                    viewCollect.SortDescriptions.Clear();
-                    viewCollect.GroupDescriptions.Clear();
-                    viewCollect.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
-                    viewCollect.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
-                    viewCollect.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
+                    using (dataView.DeferRefresh())
+                    {
+                        dataView.SortDescriptions.Clear();
+                        dataView.GroupDescriptions.Clear();
+                        dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
+                        dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                        dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
+                    }
                 }
             }
         }
@@ -362,9 +368,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref filterText, value))
                 {
-                    ViewCollection.Filter = FilterModelCollection;
+                    DataViewCollection.Filter = FilterModelCollection;
                     SelectAllVaueHandelCommand();
-                    ViewCollection.Refresh();
+                    DataViewCollection.Refresh();
                 }
             }
         }
@@ -396,8 +402,8 @@ namespace RevitTimasBIMTools.ViewModels
         public ICommand SelectItemCommand { get; private set; }
         private void SelectAllVaueHandelCommand()
         {
-            IEnumerable<ElementModel> items = ViewCollection.OfType<ElementModel>();
-            ElementModel firstItem = ViewCollection.OfType<ElementModel>().FirstOrDefault();
+            IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
+            ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
             IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem?.IsSelected : null;
         }
 
@@ -415,11 +421,11 @@ namespace RevitTimasBIMTools.ViewModels
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
                 string guid = doc.ProjectInformation.UniqueId;
-                if (documentId.Equals(guid) && !ViewCollection.IsEmpty)
+                if (documentId.Equals(guid) && !DataViewCollection.IsEmpty)
                 {
-                    foreach (ElementModel model in ViewCollection)
+                    foreach (ElementModel model in DataViewCollection)
                     {
-                        if (model.IsSelected && RevitElementModels.Remove(model))
+                        if (model.IsSelected && ElementModelData.Remove(model))
                         {
                             Element elem = doc.GetElement(new ElementId(model.IdInt));
                             lock (syncLocker)
@@ -440,7 +446,7 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                     // seletAll update by ViewItems
                     // boolSet to buttom IsDataEnabled
-                    UniqueItemNames = GetUniqueStringList(RevitElementModels);
+                    UniqueItemNames = GetUniqueStringList(ElementModelData);
                 }
             });
 
@@ -477,17 +483,14 @@ namespace RevitTimasBIMTools.ViewModels
         public void Dispose()
         {
             manager?.Dispose();
-            ViewCollection.Refresh();
-            if (ViewCollection is ListCollectionView list)
+            ElementModelData.Clear();
+            if (DataViewCollection is ListCollectionView list)
             {
-                FilterText = string.Empty;
-                RevitElementModels.Clear();
                 foreach (object item in list)
                 {
                     list.Remove(item);
                 }
             }
-            Logger.Info($"ViewCollection Is empty = >{ViewCollection.IsEmpty}");
         }
     }
 }

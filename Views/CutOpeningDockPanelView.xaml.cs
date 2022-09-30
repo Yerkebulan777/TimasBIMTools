@@ -67,7 +67,7 @@ namespace RevitTimasBIMTools.Views
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
                 Document doc = null;
-                dataViewModel.RevitElementModels.Clear();
+                dataViewModel.ElementModelData.Clear();
                 Task task = !dataViewModel.IsOptionsEnabled
                     ? RevitTask.RunAsync(async app =>
                     {
@@ -105,7 +105,6 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        [STAThread]
         private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (sender is DataGridRow row && row.DataContext is ElementModel model)
@@ -134,23 +133,21 @@ namespace RevitTimasBIMTools.Views
             Dispose();
         }
 
-        
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    Task task = Task.Run(() =>
+                    Task task = RevitTask.RunAsync(app =>
                     {
                         Properties.Settings.Default.Reset();
                     })
-                    .ContinueWith(_ =>
+                    .ContinueWith(app =>
                     {
-                        DataContext = null;
                         dataViewModel?.Dispose();
                     }, TaskScheduler.FromCurrentSynchronizationContext());
-
                     // TODO: освободить управляемое состояние (управляемые объекты)
                 }
                 // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения
@@ -159,7 +156,7 @@ namespace RevitTimasBIMTools.Views
             }
         }
 
-        [STAThread]
+
         public void Dispose()
         {
             Dispose(true);

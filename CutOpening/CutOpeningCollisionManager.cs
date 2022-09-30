@@ -91,7 +91,6 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        [STAThread]
         public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level)
         {
             InitializeUnits(doc);
