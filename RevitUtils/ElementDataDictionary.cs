@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows.Shapes;
 using Path = System.IO.Path;
 
 namespace RevitTimasBIMTools.RevitUtils
@@ -26,45 +27,34 @@ namespace RevitTimasBIMTools.RevitUtils
             WriteIndented = true
         };
 
-
-        public void OnSerializeData(ConcurrentDictionary<string, ElementTypeData> dictionary)
+        [STAThread]
+        public void SerializeData(ConcurrentDictionary<string, ElementTypeData> dict)
         {
-            Dictionary<string, ElementTypeData> data = dictionary.ToDictionary(k => k.Key, v => v.Value);
+            Dictionary<string, ElementTypeData> data = dict.ToDictionary(k => k.Key, v => v.Value);
             if (data.Count > 0)
             {
-                SerializeSizeData(data, dataPath);
+                string json = JsonSerializer.Serialize(data, options);
+                try
+                {
+                    File.WriteAllText(dataPath, json);
+                    //using FileStream fs = File.OpenWrite(path);
+                    //using JsonDocument jdoc = JsonDocument.Parse(json, docOptions);
+                    //using Utf8JsonWriter writer = new(fs, options: writerOptions);
+                    //jdoc.WriteTo(writer);
+                }
+                catch (Exception exc)
+                {
+                    Logger.Error(nameof(SerializeData) + exc.Message);
+                }
+                finally
+                {
+                    Logger.Info(json);
+                }
             }
         }
 
-
-        private void SerializeSizeData(Dictionary<string, ElementTypeData> data, string path)
-        {
-            string directory = Path.GetDirectoryName(path);
-            if (!File.Exists(directory))
-            {
-                _ = Directory.CreateDirectory(directory);
-            }
-            string json = JsonSerializer.Serialize(data, options);
-            try
-            {
-                File.WriteAllText(path, json);
-                //using FileStream fs = File.OpenWrite(path);
-                //using JsonDocument jdoc = JsonDocument.Parse(json, docOptions);
-                //using Utf8JsonWriter writer = new(fs, options: writerOptions);
-                //jdoc.WriteTo(writer);
-            }
-            catch (Exception exc)
-            {
-                Logger.Error(nameof(SerializeSizeData) + exc.Message);
-            }
-            finally
-            {
-                Logger.Info(json);
-            }
-        }
-
-
-        public void OnDeserialiseSizeData()
+        
+        public void DeserialiseSizeData()
         {
             if (File.Exists(dataPath))
             {
@@ -74,7 +64,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(nameof(OnDeserialiseSizeData) + exc.Message);
+                    Logger.Error(nameof(DeserialiseSizeData) + exc.Message);
                 }
                 finally { Task.Delay(100).Wait(); }
             }

@@ -56,6 +56,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Templory Properties
 
+        ElementDataDictionary dataBase;
         private XYZ centroidPoint = XYZ.Zero;
         private XYZ intersectNormal = XYZ.BasisZ;
         private XYZ hostDirection = XYZ.BasisZ;
@@ -65,11 +66,9 @@ namespace RevitTimasBIMTools.CutOpening
         private string uniqueKey = string.Empty;
         private Transform transform = Transform.Identity;
         private FilteredElementCollector collector = null;
-        //private readonly ElementId elemId = ElementId.InvalidElementId;
         private BoundingBoxXYZ hostBox = new();
 
-
-        private readonly ConcurrentDictionary<string, ElementTypeData> dictDatabase = ElementDataDictionary.ElementTypeSizeDictionary;
+        private ConcurrentDictionary<string, ElementTypeData> dictDatabase { get; set; } = ElementDataDictionary.ElementTypeSizeDictionary;
 
         private double angleRadians = 0;
         private double angleHorisontDegrees = 0;
@@ -82,6 +81,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private void InitializeUnits(Document doc)
         {
+            dataBase = new();
             units = doc.GetUnits();
             angleUnit = units.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
@@ -211,14 +211,13 @@ namespace RevitTimasBIMTools.CutOpening
             if (doc.GetElement(elem.GetTypeId()) is ElementType etype)
             {
                 uniqueKey = etype.UniqueId.Normalize();
-                if (dictDatabase.TryGetValue(uniqueKey, out structData))
+                if (!dictDatabase.TryGetValue(uniqueKey, out structData))
                 {
-                    return structData;
-                }
-                structData = GetSectionSize(elem, etype, direction);
-                if (structData.IsValidObject && dictDatabase.TryAdd(uniqueKey, structData))
-                {
-                    return structData;
+                    structData = GetSectionSize(elem, etype, direction);
+                    if (dictDatabase.TryAdd(uniqueKey, structData))
+                    {
+                        dataBase.SerializeData(dictDatabase);
+                    }
                 }
             }
             return structData;
@@ -468,8 +467,7 @@ namespace RevitTimasBIMTools.CutOpening
             SearchTransform?.Dispose();
             SearchLinkInstance?.Dispose();
             Logger.Log(dictDatabase.Values.Count.ToString());
-            var data = new ElementDataDictionary();
-            data.OnSerializeData(dictDatabase);
+
         }
     }
 }
