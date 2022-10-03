@@ -247,6 +247,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
+
         [STAThread]
         private void GetInstancesByMaterial(string materialName)
         {
@@ -262,8 +263,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 manager.SearchElementList = instances;
             }, TaskScheduler.FromCurrentSynchronizationContext());
-
         }
+
 
         [STAThread]
         private void SnoopIntersectionDataByLevel(Level level)

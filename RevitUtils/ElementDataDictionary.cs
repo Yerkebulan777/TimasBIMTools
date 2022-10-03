@@ -32,7 +32,7 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 try
                 {
-                    using MemoryStream stream = new(capacity: 100);
+                    using MemoryStream stream = new(capacity: 10);
                     using StreamWriter writer = new(stream, Encoding.UTF8);
                     using JsonTextWriter jsonWriter = new(writer);
                     JsonSerializer.CreateDefault(options).Serialize(jsonWriter, dataDict);
