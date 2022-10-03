@@ -159,9 +159,9 @@ namespace RevitTimasBIMTools.Views
         public void Dispose()
         {
             Dispose(true);
-            //GC.Collect();
-            //GC.WaitForPendingFinalizers();
-            GC.SuppressFinalize(this);
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            //GC.SuppressFinalize(this);
         }
 
     }

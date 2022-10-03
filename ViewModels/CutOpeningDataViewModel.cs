@@ -50,7 +50,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Visibility
 
-        private bool started;
+        private bool started = false;
         public bool IsStarted
         {
             get => started;

@@ -234,25 +234,28 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             CompoundStructure compound = null;
             SortedDictionary<string, Material> result = new();
-            foreach (KeyValuePair<int, ElementId> item in typeIds)
+            if (typeIds != null && typeIds.Count < 0)
             {
-                Element elem = doc.GetElement(item.Value);
-                if (elem is RoofType roofType)
+                foreach (KeyValuePair<int, ElementId> item in typeIds)
                 {
-                    compound = roofType.GetCompoundStructure();
-                }
-                else if (elem is WallType wallType)
-                {
-                    compound = wallType.GetCompoundStructure();
-                }
-                else if (elem is FloorType floorType)
-                {
-                    compound = floorType.GetCompoundStructure();
-                }
-                Material material = GetCompoundStructureMaterial(doc, elem, compound);
-                if (material != null)
-                {
-                    result[material.Name] = material;
+                    Element elem = doc.GetElement(item.Value);
+                    if (elem is RoofType roofType)
+                    {
+                        compound = roofType.GetCompoundStructure();
+                    }
+                    else if (elem is WallType wallType)
+                    {
+                        compound = wallType.GetCompoundStructure();
+                    }
+                    else if (elem is FloorType floorType)
+                    {
+                        compound = floorType.GetCompoundStructure();
+                    }
+                    Material material = GetCompoundStructureMaterial(doc, elem, compound);
+                    if (material != null)
+                    {
+                        result[material.Name] = material;
+                    }
                 }
             }
             return result;
