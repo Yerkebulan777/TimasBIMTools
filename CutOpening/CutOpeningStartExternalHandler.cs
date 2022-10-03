@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace RevitTimasBIMTools.CutOpening
 {
-    public sealed class CutOpeningStartHandler : IExternalEventHandler
+    public sealed class CutOpeningStartExternalHandler : IExternalEventHandler
     {
         private readonly RevitPurginqManager purgeManager = SmartToolController.Services.GetRequiredService<RevitPurginqManager>();
         public event EventHandler<BaseCompletedEventArgs> Completed;
@@ -42,7 +42,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public string GetName()
         {
-            return nameof(CutOpeningStartHandler);
+            return nameof(CutOpeningStartExternalHandler);
         }
     }
 

@@ -213,7 +213,7 @@
     <Compile Include="Services\Logger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
     <Compile Include="CutOpening\CutOpeningRegisterDockablePane.cs" />
-    <Compile Include="CutOpening\CutOpeningStartHandler.cs" />
+    <Compile Include="CutOpening\CutOpeningStartExternalHandler.cs" />
     <Compile Include="CutOpening\CutOpeningShowPanelCmd.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

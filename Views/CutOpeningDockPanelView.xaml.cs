@@ -25,7 +25,7 @@ namespace RevitTimasBIMTools.Views
         private IDictionary<string, FamilySymbol> familySymbols = null;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
-        private readonly CutOpeningStartHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartHandler>();
+        private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
 
 
         public CutOpeningDockPanelView()

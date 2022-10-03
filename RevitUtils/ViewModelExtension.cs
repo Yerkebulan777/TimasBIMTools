@@ -8,14 +8,14 @@ namespace RevitTimasBIMTools.RevitUtils
     {
         public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> source)
         {
-            return new ObservableCollection<T>(source);
+            return source != null ? new ObservableCollection<T>(source) : new ObservableCollection<T>();
         }
+
 
         public static ObservableCollection<T> ToObservableCollection<T>(this IList<T> source)
         {
-            return new ObservableCollection<T>(source);
+            return source != null ? new ObservableCollection<T>(source) : new ObservableCollection<T>();
         }
-
 
     }
 }
