@@ -234,7 +234,7 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             CompoundStructure compound = null;
             SortedDictionary<string, Material> result = new();
-            if (typeIds != null && typeIds.Count < 0)
+            if (typeIds != null && typeIds.Count > 0)
             {
                 foreach (KeyValuePair<int, ElementId> item in typeIds)
                 {

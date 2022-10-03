@@ -32,7 +32,7 @@ namespace RevitTimasBIMTools.Core
             services = services.AddSingleton<IRevitTask, RevitTask>();
             services = services.AddSingleton<SmartToolGeneralHelper>();
             services = services.AddSingleton<CutOpeningRegisterDockablePane>();
-            services = services.AddSingleton<CutOpeningStartExternalHandler>();
+            services = services.AddSingleton<CutOpeningStartExternalHandler>(); /// Try To Scope()
 
             services = services.AddTransient<IDockablePaneProvider, CutOpeningDockPanelView>();
             services = services.AddTransient<CutOpeningCollisionManager>();
