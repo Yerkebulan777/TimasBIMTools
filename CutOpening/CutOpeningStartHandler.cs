@@ -26,11 +26,10 @@ namespace RevitTimasBIMTools.CutOpening
                 return;
             }
 
-            View3D view3d = RevitViewManager.Get3dView(uidoc);
             IDictionary<int, ElementId> validIds = purgeManager.PurgeAndGetValidConstructionTypeIds(doc);
             Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
             IList<DocumentModel> docModels = RevitDocumentManager.GetDocumentCollection(doc);
-            OnCompleted(new BaseCompletedEventArgs(docModels, view3d, validIds));
+            OnCompleted(new BaseCompletedEventArgs(docModels, validIds));
         }
 
 
@@ -50,13 +49,11 @@ namespace RevitTimasBIMTools.CutOpening
 
     public class BaseCompletedEventArgs : EventArgs
     {
-        public View3D View3d { get; }
         public IList<DocumentModel> DocumentModels { get; }
         public IDictionary<int, ElementId> ConstructionTypeIds { get; }
 
-        public BaseCompletedEventArgs(IList<DocumentModel> docs, View3D view3d, IDictionary<int, ElementId> validIds)
+        public BaseCompletedEventArgs(IList<DocumentModel> docs, IDictionary<int, ElementId> validIds)
         {
-            View3d = view3d;
             DocumentModels = docs;
             ConstructionTypeIds = validIds;
         }

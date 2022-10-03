@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
@@ -27,7 +28,7 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
-        public View3D View3d { get; set; } = null;
+        
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
         public IDictionary<int, ElementId> ConstructionTypeIds { get; internal set; } = null;
         public CancellationToken CancelToken { get; internal set; } = CancellationToken.None;
@@ -35,6 +36,7 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly object syncLocker = new();
+        View3D view3d { get; set; } = null;
         private Task task;
 
         public CutOpeningDataViewModel()
@@ -51,7 +53,13 @@ namespace RevitTimasBIMTools.ViewModels
         public bool IsStarted
         {
             get => started;
-            set => SetProperty(ref started, value);
+            set
+            {
+                if (SetProperty(ref started, value))
+                {
+                    GetGeneral3DView();
+                }
+            }
         }
 
 
@@ -247,6 +255,18 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
+        void GetGeneral3DView()
+        {
+            task = RevitTask.RunAsync(app =>
+            {
+                Document doc = app.ActiveUIDocument.Document;
+                if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
+                }
+            });
+        }
+
 
         [STAThread]
         private void GetInstancesByMaterial(string materialName)
@@ -434,7 +454,7 @@ namespace RevitTimasBIMTools.ViewModels
                                 try
                                 {
                                     // Set Openning Logic with doc regenerate and transaction RollBack                                   
-                                    View3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, View3d);
+                                    view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
                                     RevitViewManager.SetColorElement(uidoc, elem);
                                 }
                                 finally

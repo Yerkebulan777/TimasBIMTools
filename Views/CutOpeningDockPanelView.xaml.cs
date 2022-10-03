@@ -54,7 +54,6 @@ namespace RevitTimasBIMTools.Views
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             dataViewModel.IsStarted = true;
-            dataViewModel.View3d = args.View3d;
             dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
             dataViewModel.DocModelCollection = args.DocumentModels.ToObservableCollection();
             viewHandler.Completed -= OnContextHandlerCompleted;
