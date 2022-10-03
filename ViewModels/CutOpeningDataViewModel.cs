@@ -255,6 +255,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
+        [STAThread]
         void GetGeneral3DView()
         {
             task = RevitTask.RunAsync(app =>
