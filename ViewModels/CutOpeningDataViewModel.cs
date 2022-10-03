@@ -39,6 +39,7 @@ namespace RevitTimasBIMTools.ViewModels
         View3D view3d { get; set; } = null;
         private Task task;
 
+
         public CutOpeningDataViewModel()
         {
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);

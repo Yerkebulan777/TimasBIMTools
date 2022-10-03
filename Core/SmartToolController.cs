@@ -1,5 +1,4 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Events;
+﻿using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
@@ -21,7 +20,7 @@ namespace RevitTimasBIMTools.Core
     {
         private UIControlledApplication controller = null;
         public static IServiceProvider Services = CreateServiceProvider();
-        public static readonly DockablePaneId DockPaneId = new DockablePaneId(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
+        public static readonly DockablePaneId DockPaneId = new(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
         private readonly CutOpeningRegisterDockablePane dockManager = Services.GetRequiredService<CutOpeningRegisterDockablePane>();
         private readonly IDockablePaneProvider provider = Services.GetRequiredService<IDockablePaneProvider>();
 
@@ -48,7 +47,7 @@ namespace RevitTimasBIMTools.Core
         public Result OnStartup(UIControlledApplication cntrapp)
         {
             Logger.InitMainLogger(typeof(SmartToolController));
-            SmartToolSetupUIPanel uiface = new SmartToolSetupUIPanel();
+            SmartToolSetupUIPanel uiface = new();
             RevitTask.Initialize(cntrapp);
             uiface.Initialize(cntrapp);
             controller = cntrapp;
@@ -59,7 +58,6 @@ namespace RevitTimasBIMTools.Core
 
             return Result.Succeeded;
         }
-
 
 
         [STAThread]
