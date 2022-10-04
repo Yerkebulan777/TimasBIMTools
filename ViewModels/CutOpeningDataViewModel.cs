@@ -290,16 +290,13 @@ namespace RevitTimasBIMTools.ViewModels
             task = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-            })
-            .ContinueWith(app =>
-            {
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     EngineerCategories = RevitFilterManager.GetEngineerCategories(doc);
                     StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constructionTypeIds);
                     FamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
                 }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            });
         }
 
 
@@ -309,14 +306,11 @@ namespace RevitTimasBIMTools.ViewModels
             task = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-            })
-            .ContinueWith(app =>
-            {
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     ValidLevels = RevitFilterManager.GetValidLevels(doc);
                 }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            });
         }
 
 
@@ -326,14 +320,11 @@ namespace RevitTimasBIMTools.ViewModels
             task = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-            })
-            .ContinueWith(app =>
-            {
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, constructionTypeIds, matName);
                 }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            });
         }
 
 
@@ -343,14 +334,11 @@ namespace RevitTimasBIMTools.ViewModels
             task = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-            })
-            .ContinueWith(app =>
-            {
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     ElementModelData = manager.GetCollisionByLevel(doc, level, docModel, category, elements).ToObservableCollection();
                 }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            });
         }
 
 
