@@ -9,7 +9,7 @@ namespace RevitTimasBIMTools.RevitModel
     {
         public readonly int IdInt;
         public readonly int LevelId;
-        public readonly int HostIdInt;
+        
 
         private readonly ElementTypeData elemTypeData;
         public ElementModel(Element instance, ElementTypeData data, int hostIdInt = 0, string description = null)
@@ -31,7 +31,7 @@ namespace RevitTimasBIMTools.RevitModel
             }
         }
 
-
+        public int HostIdInt {get; internal set; }
         public string SymbolName { get; private set; }
         public string FamilyName { get; private set; }
         public string CategoryName { get; private set; }

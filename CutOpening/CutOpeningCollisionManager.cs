@@ -48,6 +48,7 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly int minSideSize = Properties.Settings.Default.MinSideSizeInMm;
         private readonly int maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
         private readonly int cutOffsetSize = Properties.Settings.Default.CutOffsetInMm;
+
         //private readonly string widthParamName = "ширина";
         //private readonly string heightParamName = "высота";
 
@@ -56,7 +57,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Templory Properties
 
-        ElementDataDictionary dataBase;
+        private ElementDataDictionary dataBase;
         private XYZ centroidPoint = XYZ.Zero;
         private XYZ intersectNormal = XYZ.BasisZ;
         private XYZ hostDirection = XYZ.BasisZ;
@@ -68,6 +69,7 @@ namespace RevitTimasBIMTools.CutOpening
         private FilteredElementCollector collector = null;
         private BoundingBoxXYZ hostBox = new();
 
+        private IDictionary<XYZ, ElementModel> tempDict { get; set; } = null;
         private ConcurrentDictionary<string, ElementTypeData> dictDatabase { get; set; } = ElementDataDictionary.ElementTypeSizeDictionary;
 
         private double angleRadians = 0;
@@ -100,10 +102,12 @@ namespace RevitTimasBIMTools.CutOpening
                     hostSolid = host.GetElementSolidByCenter(options, identityTransform, centroidPoint);
                     if (hostSolid != null)
                     {
-                        IList<ElementModel> temp = new List<ElementModel>(3);
+                        int hostIdInt = host.Id.IntegerValue;
+                        tempDict = new Dictionary<XYZ, ElementModel>(5);
                         foreach (ElementModel model in GetIntersectionElementModels(doc))
                         {
-                            //elemId = host.Id;
+                            tempDict[centroidPoint] = model;
+                            model.HostIdInt = hostIdInt;
                             yield return model;
                         }
                     }
@@ -174,8 +178,8 @@ namespace RevitTimasBIMTools.CutOpening
         private Solid GetIntersectSolid(Solid hostSolid, Element elem, Transform transform = null)
         {
             intersectSolid = null;
-            double tolerance = toleranceVolume;
             transform ??= identityTransform;
+            double tolerance = toleranceVolume;
             GeometryElement geomElement = elem.get_Geometry(options);
             BooleanOperationsType unionType = BooleanOperationsType.Union;
             BooleanOperationsType intersectType = BooleanOperationsType.Intersect;
