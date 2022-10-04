@@ -36,6 +36,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
+        private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
         private readonly object syncLocker = new();
 
         private View3D view3d { get; set; } = null;
@@ -44,9 +45,19 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutOpeningDataViewModel()
         {
+            viewHandler.Completed += OnContextHandlerCompleted;
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             CanselCommand = new RelayCommand(CancelCallbackLogic);
+        }
+
+        [STAThread]
+        private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
+        {
+            IsStarted = true;
+            ConstructionTypeIds = args.ConstructionTypeIds;
+            DocModelCollection = args.DocumentModels.ToObservableCollection();
+            viewHandler.Completed -= OnContextHandlerCompleted;
         }
 
 

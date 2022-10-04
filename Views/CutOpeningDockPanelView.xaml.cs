@@ -25,7 +25,6 @@ namespace RevitTimasBIMTools.Views
         private IDictionary<string, FamilySymbol> familySymbols = null;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
-        private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
 
 
         public CutOpeningDockPanelView()
@@ -34,7 +33,6 @@ namespace RevitTimasBIMTools.Views
             DataContext = dataViewModel;
             dataViewModel.DockPanelView = this;
             Properties.Settings.Default.Reset();
-            viewHandler.Completed += OnContextHandlerCompleted;
             Dispatcher.CurrentDispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
         }
 
@@ -47,16 +45,6 @@ namespace RevitTimasBIMTools.Views
                 DockPosition = DockPosition.Tabbed,
                 TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette
             };
-        }
-
-
-        [STAThread]
-        private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
-        {
-            dataViewModel.IsStarted = true;
-            dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
-            dataViewModel.DocModelCollection = args.DocumentModels.ToObservableCollection();
-            viewHandler.Completed -= OnContextHandlerCompleted;
         }
 
 
