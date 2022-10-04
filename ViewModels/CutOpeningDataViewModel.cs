@@ -18,7 +18,6 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -42,7 +41,6 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
-        
 
 
         public CutOpeningDataViewModel()
@@ -54,6 +52,7 @@ namespace RevitTimasBIMTools.ViewModels
             CanselCommand = new RelayCommand(CancelCallbackLogic);
         }
 
+
         [STAThread]
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
@@ -62,6 +61,7 @@ namespace RevitTimasBIMTools.ViewModels
             DocModelCollection = args.DocumentModels.ToObservableCollection();
             constructionTypeIds = args.ConstructionTypeIds;
         }
+
 
         public ICommand ShowSettingsCommand { get; private set; }
 
