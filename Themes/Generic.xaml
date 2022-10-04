@@ -9,7 +9,6 @@
     </ResourceDictionary.MergedDictionaries>
 
     <Converters:ElementNameConverter x:Key="ElementNameConverter"/>
-    <Converters:FootToMmConverter x:Key="FootToMmConverter"/>
     <BooleanToVisibilityConverter x:Key="BoolToViz"/>
 
     <!--DropShadowEffect-->

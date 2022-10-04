@@ -217,7 +217,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private double minSize = 50 / footToMm;
+        private double minSize = 50;
         public double MinSideSize
         {
             get => minSize;
@@ -225,14 +225,14 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref minSize, value))
                 {
-                    Properties.Settings.Default.MinSideSizeInMm = minSize;
+                    Properties.Settings.Default.MinSideSizeInMm = minSize / footToMm;
                     Properties.Settings.Default.Save();
                 }
             }
         }
 
 
-        private double maxSize = 250 / footToMm;
+        private double maxSize = 250;
         public double MaxSideSize
         {
             get => maxSize;
@@ -240,14 +240,14 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref maxSize, value))
                 {
-                    Properties.Settings.Default.MaxSideSizeInMm = minSize;
+                    Properties.Settings.Default.MaxSideSizeInMm = maxSize / footToMm;
                     Properties.Settings.Default.Save();
                 }
             }
         }
 
 
-        private double cutOffset = 50 / footToMm;
+        private double cutOffset = 50;
         public double CutOffsetSize
         {
             get => cutOffset;
@@ -255,7 +255,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref cutOffset, value))
                 {
-                    Properties.Settings.Default.CutOffsetInMm = cutOffset;
+                    Properties.Settings.Default.CutOffsetInMm = cutOffset / footToMm;
                     Properties.Settings.Default.Save();
                 }
             }
