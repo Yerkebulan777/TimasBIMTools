@@ -84,7 +84,7 @@ namespace RevitTimasBIMTools.Core
         private void OnIdStart(object sender, IdlingEventArgs e)
         {
             controller.Idling -= OnIdStart;
-            generalHelper.IsActivated = true;
+            generalHelper.IsActive = true;
         }
 
     }

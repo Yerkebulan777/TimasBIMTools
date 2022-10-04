@@ -14,6 +14,7 @@ namespace RevitTimasBIMTools.CutOpening
     [Regeneration(RegenerationOption.Manual)]
     internal sealed class CutOpeningShowPanelCmd : IExternalCommand, IExternalCommandAvailability
     {
+        private DockablePaneId dockpid { get; set; } = null;
         private readonly SmartToolGeneralHelper generalHelper = SmartToolController.Services.GetRequiredService<SmartToolGeneralHelper>();
         private readonly CutOpeningStartExternalHandler dockpaneHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
         private readonly IDockablePaneProvider provider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
@@ -25,7 +26,7 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
-            DockablePaneId dockpid = generalHelper.DockPaneId;
+            dockpid = generalHelper.DockPaneId;
             if (DockablePane.PaneIsRegistered(dockpid))
             {
                 DockablePane dockpane = uiapp.GetDockablePane(dockpid);
@@ -72,7 +73,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
         {
-            return generalHelper.IsActivated && uiapp?.ActiveUIDocument.Document.IsFamilyDocument == false;
+            return generalHelper.IsActive && uiapp?.ActiveUIDocument.Document.IsFamilyDocument == false;
         }
 
 
