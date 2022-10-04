@@ -17,7 +17,6 @@ namespace RevitTimasBIMTools.Views
     {
         private bool disposedValue = false;
         private readonly Mutex mutex = new();
-
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
 
@@ -98,9 +97,9 @@ namespace RevitTimasBIMTools.Views
         public void Dispose()
         {
             Dispose(true);
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            //GC.SuppressFinalize(this);
+            //GC.Collect();
+            //GC.WaitForPendingFinalizers();
+            GC.SuppressFinalize(this);
         }
 
     }

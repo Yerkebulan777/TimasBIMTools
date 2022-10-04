@@ -84,7 +84,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (documentId.Equals(doc.ProjectInformation.UniqueId))
                         {
-                            DockPanelView.ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
+                            EngineerCategories = RevitFilterManager.GetEngineerCategories(doc);
                             DockPanelView.ComboStructureMats.ItemsSource = RevitFilterManager.GetConstructionCoreMaterials(doc, constructionTypeIds);
                             familySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
                             DockPanelView.ComboRectangSymbol.ItemsSource = familySymbols;
@@ -185,8 +185,32 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        private IDictionary<string, Category> categories;
+        public IDictionary<string, Category> EngineerCategories
+        {
+            get => categories;
+            set => SetProperty(ref categories, value);
+        }
+
+
+        private Category category = null;
+        public Category SelectedCategory
+        {
+            get => category;
+            set => SetProperty(ref category, value);
+        }
+
+
+        private IDictionary<string, Material> structMats;
+        public IDictionary<string, Material> StructureMaterials
+        {
+            get => structMats;
+            set => SetProperty(ref structMats, value);
+        }
+
+
         private Material material;
-        public Material StructureMaterial
+        public Material SelectedMaterial
         {
             get => material;
             set
@@ -198,13 +222,6 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-
-        private Category category = null;
-        public Category SelectedCategory
-        {
-            get => category;
-            set => SetProperty(ref category, value);
-        }
 
 
         private FamilySymbol rectangle;
