@@ -153,6 +153,12 @@
                     </Border>
                 </ListViewItem>
 
+                <ListViewItem>
+                    <WrapPanel>
+                        <CheckBox Name="AplySettings" Content="Apply" IsChecked="{Binding Path=IsOptionsEnabled}" />
+                    </WrapPanel>
+                </ListViewItem>
+
             </ListView>
 
 
