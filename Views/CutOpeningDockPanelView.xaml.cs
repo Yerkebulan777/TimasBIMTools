@@ -48,9 +48,6 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-
-
-
         private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (sender is DataGridRow row && row.DataContext is ElementModel model)

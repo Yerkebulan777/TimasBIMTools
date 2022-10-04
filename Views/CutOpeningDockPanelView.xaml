@@ -44,7 +44,8 @@
                     <ToggleButton Name="settingsBtn" Height="40" Width="60"
                                   HorizontalAlignment="Right" VerticalAlignment="Center"
                                   Background="Transparent" BorderBrush="Transparent"
-                                  Command="">
+                                  Command="{Binding Path=ShowSettingsCommand}"
+                                  CommandParameter="{Binding Path=IsStarted}">
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
                                 <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
