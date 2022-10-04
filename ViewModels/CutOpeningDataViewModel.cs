@@ -268,14 +268,19 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private void GetGeneral3DView()
         {
+            UIDocument uidoc = null;
             task = RevitTask.RunAsync(app =>
             {
+                uidoc = app.ActiveUIDocument;
                 doc = app.ActiveUIDocument.Document;
+            })
+            .ContinueWith(app =>
+            {
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
+                    view3d = RevitViewManager.Get3dView(uidoc);
                 }
-            });
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
 
