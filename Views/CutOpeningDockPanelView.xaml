@@ -155,7 +155,7 @@
 
                 <ListViewItem>
                     <WrapPanel>
-                        <CheckBox Name="AplySettings" Content="Apply" IsChecked="{Binding Path=IsOptionsEnabled}" />
+                        <CheckBox Name="AplySettings" Content="Apply" IsChecked="{Binding Path=IsOptionsEnabled, Mode=TwoWay, Delay=3}" />
                     </WrapPanel>
                 </ListViewItem>
 
