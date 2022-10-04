@@ -279,6 +279,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         private void SetItemsToDataSettings()
         {
             task = RevitTask.RunAsync(app =>
