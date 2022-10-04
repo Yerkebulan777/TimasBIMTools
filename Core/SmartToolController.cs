@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using Revit.Async.Interfaces;
@@ -18,10 +19,10 @@ namespace RevitTimasBIMTools.Core
 {
     public sealed class SmartToolController : IExternalApplication
     {
-        private UIControlledApplication controller = null;
         public static IServiceProvider Services = CreateServiceProvider();
-        public static readonly DockablePaneId DockPaneId = new(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
+        private UIControlledApplication controller { get; set; } = null;
         private readonly CutOpeningRegisterDockablePane dockManager = Services.GetRequiredService<CutOpeningRegisterDockablePane>();
+        private readonly SmartToolGeneralHelper generalHelper = Services.GetRequiredService<SmartToolGeneralHelper>();
         private readonly IDockablePaneProvider provider = Services.GetRequiredService<IDockablePaneProvider>();
 
         [STAThread]
@@ -32,7 +33,8 @@ namespace RevitTimasBIMTools.Core
             services = services.AddSingleton<IRevitTask, RevitTask>();
             services = services.AddSingleton<SmartToolGeneralHelper>();
             services = services.AddSingleton<CutOpeningRegisterDockablePane>();
-            services = services.AddSingleton<CutOpeningStartExternalHandler>(); /// Try To Scope()
+
+            services = services.AddScoped<CutOpeningStartExternalHandler>(); /// Try To Scope()
 
             services = services.AddTransient<IDockablePaneProvider, CutOpeningDockPanelView>();
             services = services.AddTransient<CutOpeningCollisionManager>();
@@ -54,17 +56,17 @@ namespace RevitTimasBIMTools.Core
 
             Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
             cntrapp.ControlledApplication.ApplicationInitialized += DockablePaneRegisters;
-            cntrapp.ControlledApplication.DocumentClosed += OnDocumentClosed; ;
+            cntrapp.Idling += new EventHandler<IdlingEventArgs>(OnIdStart);
 
             return Result.Succeeded;
         }
+
 
 
         [STAThread]
         public Result OnShutdown(UIControlledApplication cntrapp)
         {
             cntrapp.ControlledApplication.ApplicationInitialized -= DockablePaneRegisters;
-            cntrapp.ControlledApplication.DocumentClosed -= OnDocumentClosed;
             return Result.Succeeded;
         }
 
@@ -76,26 +78,13 @@ namespace RevitTimasBIMTools.Core
             {
                 RenderOptions.ProcessRenderMode = RenderMode.Default;
             }
-            dockManager.RegisterDockablePane(controller, provider, DockPaneId);
+            dockManager.RegisterDockablePane(controller, provider, generalHelper.DockPaneId);
         }
 
-
-        [STAThread]
-        private void OnDocumentClosed(object sender, DocumentClosedEventArgs e)
+        private void OnIdStart(object sender, IdlingEventArgs e)
         {
-            try
-            {
-                DockablePane dockpane = controller.GetDockablePane(DockPaneId);
-                if (dockpane.IsShown())
-                {
-                    dockpane.Hide();
-                    dockpane.Dispose();
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            controller.Idling -= OnIdStart;
+            generalHelper.IsActivated = true;
         }
 
     }

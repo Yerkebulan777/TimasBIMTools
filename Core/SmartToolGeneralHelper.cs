@@ -1,4 +1,5 @@
-﻿using RevitTimasBIMTools.Properties;
+﻿using Autodesk.Revit.UI;
+using RevitTimasBIMTools.Properties;
 using System;
 using System.Drawing;
 using System.IO;
@@ -14,6 +15,7 @@ namespace RevitTimasBIMTools.Core
 {
     internal sealed class SmartToolGeneralHelper
     {
+        
         public const string ApplicationName = "Smart BIM Tools";
         public const string CutVoidToolName = "Cut Opening Manager";
         public static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
@@ -23,6 +25,9 @@ namespace RevitTimasBIMTools.Core
         public static readonly string DocumentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         public static readonly string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
         public static readonly string LogPath = Path.Combine(DocumentPath, "RevitAsync.log");
+
+        public DockablePaneId DockPaneId { get; } = new(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
+        public bool IsActivated { get; internal set; } = false;
 
         #region IconConvertToImageSource
         [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]
