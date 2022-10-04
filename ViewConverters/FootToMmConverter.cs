@@ -6,7 +6,7 @@ namespace RevitTimasBIMTools.ViewConverters
 {
     internal class FootToMmConverter : IValueConverter
     {
-        private const double footToMm = 12 * 25.4;
+        private const double footToMm = 304.8;
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return value is double val ? System.Convert.ToInt16(val / footToMm) : 0;

@@ -77,11 +77,8 @@ namespace RevitTimasBIMTools.Views
             {
                 if (disposing)
                 {
-                    Task task = RevitTask.RunAsync(app =>
-                    {
-                        Properties.Settings.Default.Reset();
-                    })
-                    .ContinueWith(app =>
+                    Task task = Task.Run(Properties.Settings.Default.Reset)
+                    .ContinueWith(_ =>
                     {
                         dataViewModel?.Dispose();
                     }, TaskScheduler.FromCurrentSynchronizationContext());

@@ -37,6 +37,7 @@ namespace RevitTimasBIMTools.ViewModels
         private IDictionary<int, ElementId> constTypeIds { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
+        private const double footToMm = 304.8;
         private readonly object syncLocker = new();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
@@ -85,7 +86,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => enabledOpts;
             set
             {
-                if (started && value)
+                if (started)
                 {
                     if (SetProperty(ref enabledOpts, value))
                     {
@@ -216,7 +217,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private double minSize = Properties.Settings.Default.MinSideSizeInMm;
+        private double minSize = 50 / footToMm;
         public double MinSideSize
         {
             get => minSize;
@@ -231,7 +232,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private double maxSize = Properties.Settings.Default.MaxSideSizeInMm;
+        private double maxSize = 250 / footToMm;
         public double MaxSideSize
         {
             get => maxSize;
@@ -246,7 +247,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private double cutOffset = Properties.Settings.Default.CutOffsetInMm;
+        private double cutOffset = 50 / footToMm;
         public double CutOffsetSize
         {
             get => cutOffset;
