@@ -35,12 +35,12 @@ namespace RevitTimasBIMTools.ViewModels
         private IDictionary<int, ElementId> constructionTypeIds { get; set; } = null;
         private IDictionary<string, FamilySymbol> familySymbols { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
-        
+
+        private readonly object syncLocker = new();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
-        private readonly object syncLocker = new();
-
+        
         private View3D view3d { get; set; } = null;
         private Task task { get; set; } = null;
 
@@ -75,9 +75,9 @@ namespace RevitTimasBIMTools.ViewModels
                 Task task = !IsOptionsEnabled
                     ? RevitTask.RunAsync(async app =>
                     {
-                        doc = app.ActiveUIDocument.Document;
                         IsDataEnabled = false;
                         IsOptionsEnabled = true;
+                        doc = app.ActiveUIDocument.Document;
                         await Task.Delay(1000).ConfigureAwait(true);
                     })
                     .ContinueWith(app =>
@@ -93,9 +93,9 @@ namespace RevitTimasBIMTools.ViewModels
                     }, TaskScheduler.FromCurrentSynchronizationContext())
                     : RevitTask.RunAsync(async app =>
                     {
-                        doc = app.ActiveUIDocument.Document;
                         IsDataEnabled = true;
                         IsOptionsEnabled = false;
+                        doc = app.ActiveUIDocument.Document;
                         await Task.Delay(1000).ConfigureAwait(true);
                     })
                     .ContinueWith(app =>
@@ -107,7 +107,6 @@ namespace RevitTimasBIMTools.ViewModels
                     }, TaskScheduler.FromCurrentSynchronizationContext());
             });
         }
-
 
 
         #region Visibility
