@@ -70,7 +70,7 @@ namespace RevitTimasBIMTools.CutOpening
         private BoundingBoxXYZ intanceBox = new();
         private BoundingBoxXYZ hostBox = new();
 
-        private IDictionary<XYZ, Element> tempDict { get; set; } = null;
+        private IDictionary<XYZ, Solid> tempDict { get; set; } = null;
         private ConcurrentDictionary<string, ElementTypeData> dictDatabase { get; set; } = ElementDataDictionary.ElementTypeSizeDictionary;
 
         private readonly double minimum = 0;
@@ -116,25 +116,25 @@ namespace RevitTimasBIMTools.CutOpening
         private IEnumerable<ElementModel> GetIntersectionElementModels(Document doc, ElementId catId, Transform transform, Element host)
         {
             int hostIdInt = host.Id.IntegerValue;
-            tempDict = new Dictionary<XYZ, Element>(5);
+            tempDict = new Dictionary<XYZ, Solid>(5);
             centroidPoint = host.GetMiddlePointByBoundingBox(ref hostBox);
             hostDirection = host is Wall wall ? wall.Orientation : XYZ.BasisZ;
             hostSolid = host.GetElementSolidByCenter(options, identityTransform, centroidPoint);
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(catId);
-            foreach (Element element in collector)
+            foreach (Element instance in collector)
             {
-                if (hostSolid != null && VerifyElementByLenght(element))
+                if (hostSolid != null && VerifyElementByLenght(instance))
                 {
-                    if (GetElementDirection(element, out intersectNormal) && IsParallel(hostDirection, intersectNormal))
+                    if (GetElementDirection(instance, out intersectNormal) && IsParallel(hostDirection, intersectNormal))
                     {
-                        intersectSolid = GetIntersectSolid(hostSolid, element, transform);
+                        intersectSolid = GetIntersectSolid(hostSolid, instance, transform);
                         if (intersectSolid != null && intersectSolid.Volume > toleranceVolume)
                         {
-                            if (IsValidElement(element, intersectSolid, hostDirection, out ElementTypeData sizeData))
+                            if (IsValidElement(instance, intersectSolid, hostDirection, out ElementTypeData sizeData))
                             {
-                                yield return new ElementModel(element, sizeData, hostIdInt);
+                                yield return new ElementModel(instance, sizeData, hostIdInt);
                             }
                         }
                     }
@@ -149,7 +149,7 @@ namespace RevitTimasBIMTools.CutOpening
             intanceBox = element.get_BoundingBox(null);
             centroidPoint = intersectSolid.ComputeCentroid();
             sizeData = DefineElementSize(element, intersectNormal);
-            foreach (KeyValuePair<XYZ, Element> item in tempDict)
+            foreach (KeyValuePair<XYZ, Solid> item in tempDict)
             {
                 distance = centroidPoint.DistanceTo(item.Key);
                 if (distance < minimum)
@@ -167,13 +167,6 @@ namespace RevitTimasBIMTools.CutOpening
         {
             return new ElementTypeData(null);
         }
-
-
-
-        //public bool CutOpening(IList<ElementId> hostIds)
-        //{
-        //    return false;
-        //}
 
 
         private bool VerifyElementByLenght(Element elem)
@@ -199,7 +192,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private Solid GetIntersectSolid(Solid hostSolid, Element elem, Transform transform = null)
+        private Solid GetIntersectSolid(Solid source, Element elem, Transform transform = null)
         {
             intersectSolid = null;
             transform ??= identityTransform;
@@ -213,7 +206,7 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     try
                     {
-                        solid = BooleanOperationsUtils.ExecuteBooleanOperation(hostSolid, solid, intersectType);
+                        solid = BooleanOperationsUtils.ExecuteBooleanOperation(source, solid, intersectType);
                         if (intersectSolid != null && solid != null && solid.Faces.Size > 0)
                         {
                             solid = BooleanOperationsUtils.ExecuteBooleanOperation(intersectSolid, solid, unionType);
@@ -313,13 +306,12 @@ namespace RevitTimasBIMTools.CutOpening
             Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngle(angleVerticalDegrees), centroidPoint);
             intersectSolid = angleHorisontDegrees == 0 ? intersectSolid : SolidUtils.CreateTransformed(intersectSolid, horizont);
             intersectSolid = angleVerticalDegrees == 0 ? intersectSolid : SolidUtils.CreateTransformed(intersectSolid, vertical);
-            BoundingBoxXYZ bbox = intersectSolid?.GetBoundingBox();
-            if (bbox != null)
+            intanceBox = intersectSolid?.GetBoundingBox();
+            if (intanceBox != null)
             {
-                widht = Math.Abs(bbox.Max.X - bbox.Min.X);
-                hight = Math.Abs(bbox.Max.Z - bbox.Min.Z);
+                widht = Math.Abs(intanceBox.Max.X - intanceBox.Min.X);
+                hight = Math.Abs(intanceBox.Max.Z - intanceBox.Min.Z);
                 result = new ElementTypeData(etype, hight, widht);
-                bbox.Dispose();
             }
             return result;
         }
