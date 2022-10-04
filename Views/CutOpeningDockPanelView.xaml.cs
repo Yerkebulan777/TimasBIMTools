@@ -22,7 +22,7 @@ namespace RevitTimasBIMTools.Views
     {
         private bool disposedValue = false;
         private readonly Mutex mutex = new();
-        private IDictionary<string, FamilySymbol> familySymbols = null;
+        
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
 
@@ -48,48 +48,7 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        [STAThread]
-        private void ShowSettingsCmd_Click(object sender, RoutedEventArgs e)
-        {
-            Dispatcher.CurrentDispatcher.Invoke(() =>
-            {
-                Document doc = null;
-                dataViewModel.ElementModelData.Clear();
-                Task task = !dataViewModel.IsOptionsEnabled
-                    ? RevitTask.RunAsync(async app =>
-                    {
-                        doc = app.ActiveUIDocument.Document;
-                        dataViewModel.IsDataEnabled = false;
-                        dataViewModel.IsOptionsEnabled = true;
-                        await Task.Delay(1000).ConfigureAwait(true);
-                    })
-                    .ContinueWith(app =>
-                    {
-                        if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                        {
-                            ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
-                            ComboStructureMats.ItemsSource = RevitFilterManager.GetConstructionCoreMaterials(doc, dataViewModel.ConstructionTypeIds);
-                            familySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
-                            ComboRectangSymbol.ItemsSource = familySymbols;
-                            ComboRoundedSymbol.ItemsSource = familySymbols;
-                        }
-                    }, TaskScheduler.FromCurrentSynchronizationContext())
-                    : RevitTask.RunAsync(async app =>
-                    {
-                        doc = app.ActiveUIDocument.Document;
-                        dataViewModel.IsDataEnabled = true;
-                        dataViewModel.IsOptionsEnabled = false;
-                        await Task.Delay(1000).ConfigureAwait(true);
-                    })
-                    .ContinueWith(app =>
-                    {
-                        if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                        {
-                            ComboLevelFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
-                        }
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
-            });
-        }
+
 
 
         private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

@@ -18,8 +18,10 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Document = Autodesk.Revit.DB.Document;
 
 
@@ -28,24 +30,25 @@ namespace RevitTimasBIMTools.ViewModels
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
-        public IDictionary<int, ElementId> ConstructionTypeIds { get; internal set; } = null;
         
-
         private IList<Element> elements { get; set; } = null;
+        private IDictionary<int, ElementId> constructionTypeIds { get; set; } = null;
+        private IDictionary<string, FamilySymbol> familySymbols { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
-
+        
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
         private readonly object syncLocker = new();
 
         private View3D view3d { get; set; } = null;
-        private Task task;
+        private Task task { get; set; } = null;
 
 
         public CutOpeningDataViewModel()
         {
             viewHandler.Completed += OnContextHandlerCompleted;
+            ShowSettingsCommand = new RelayCommand(ShowSettingsHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             CanselCommand = new RelayCommand(CancelCallbackLogic);
@@ -55,10 +58,56 @@ namespace RevitTimasBIMTools.ViewModels
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             IsStarted = true;
-            ConstructionTypeIds = args.ConstructionTypeIds;
-            DocModelCollection = args.DocumentModels.ToObservableCollection();
             viewHandler.Completed -= OnContextHandlerCompleted;
+            DocModelCollection = args.DocumentModels.ToObservableCollection();
+            constructionTypeIds = args.ConstructionTypeIds;
         }
+
+        public ICommand ShowSettingsCommand { get; private set; }
+
+        [STAThread]
+        private void ShowSettingsHandelCommand()
+        {
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                Document doc = null;
+                ElementModelData.Clear();
+                Task task = !IsOptionsEnabled
+                    ? RevitTask.RunAsync(async app =>
+                    {
+                        doc = app.ActiveUIDocument.Document;
+                        IsDataEnabled = false;
+                        IsOptionsEnabled = true;
+                        await Task.Delay(1000).ConfigureAwait(true);
+                    })
+                    .ContinueWith(app =>
+                    {
+                        if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                        {
+                            DockPanelView.ComboEngineerCats.ItemsSource = RevitFilterManager.GetEngineerCategories(doc);
+                            DockPanelView.ComboStructureMats.ItemsSource = RevitFilterManager.GetConstructionCoreMaterials(doc, constructionTypeIds);
+                            familySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+                            DockPanelView.ComboRectangSymbol.ItemsSource = familySymbols;
+                            DockPanelView.ComboRoundedSymbol.ItemsSource = familySymbols;
+                        }
+                    }, TaskScheduler.FromCurrentSynchronizationContext())
+                    : RevitTask.RunAsync(async app =>
+                    {
+                        doc = app.ActiveUIDocument.Document;
+                        IsDataEnabled = true;
+                        IsOptionsEnabled = false;
+                        await Task.Delay(1000).ConfigureAwait(true);
+                    })
+                    .ContinueWith(app =>
+                    {
+                        if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                        {
+                            DockPanelView.ComboLevelFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
+                        }
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+            });
+        }
+
 
 
         #region Visibility
@@ -277,7 +326,7 @@ namespace RevitTimasBIMTools.ViewModels
                 Document doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, ConstructionTypeIds, materialName);
+                    elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, constructionTypeIds, materialName);
                 }
             });
         }
