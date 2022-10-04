@@ -1,7 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
@@ -28,15 +27,18 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
-        
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
         public IDictionary<int, ElementId> ConstructionTypeIds { get; internal set; } = null;
-        public CancellationToken CancelToken { get; internal set; } = CancellationToken.None;
+        
+
+        private IList<Element> elements { get; set; } = null;
+        private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly object syncLocker = new();
-        View3D view3d { get; set; } = null;
+
+        private View3D view3d { get; set; } = null;
         private Task task;
 
 
@@ -120,15 +122,7 @@ namespace RevitTimasBIMTools.ViewModels
         public DocumentModel SelectedDocModel
         {
             get => docModel;
-            set
-            {
-                if (SetProperty(ref docModel, value) && value != null)
-                {
-                    manager.SearchDocument = docModel.Document;
-                    manager.SearchTransform = docModel.Transform;
-                    manager.SearchLinkInstance = docModel.LinkInstance;
-                }
-            }
+            set => SetProperty(ref docModel, value);
         }
 
 
@@ -150,13 +144,7 @@ namespace RevitTimasBIMTools.ViewModels
         public Category SelectedCategory
         {
             get => category;
-            set
-            {
-                if (SetProperty(ref category, value) && value != null)
-                {
-                    manager.SearchCategoryId = category.Id;
-                }
-            }
+            set => SetProperty(ref category, value);
         }
 
 
@@ -257,7 +245,7 @@ namespace RevitTimasBIMTools.ViewModels
         #region Methods
 
         [STAThread]
-        void GetGeneral3DView()
+        private void GetGeneral3DView()
         {
             task = RevitTask.RunAsync(app =>
             {
@@ -273,18 +261,14 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private void GetInstancesByMaterial(string materialName)
         {
-            IList<Element> instances = null;
             task = RevitTask.RunAsync(app =>
             {
                 Document doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    instances = RevitFilterManager.GetInstancesByCoreMaterial(doc, ConstructionTypeIds, materialName);
+                    elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, ConstructionTypeIds, materialName);
                 }
-            }).ContinueWith(app =>
-            {
-                manager.SearchElementList = instances;
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            });
         }
 
 
@@ -297,7 +281,7 @@ namespace RevitTimasBIMTools.ViewModels
                 Document doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    data = manager.GetCollisionByLevel(doc, level);
+                    data = manager.GetCollisionByLevel(doc, level, docModel, category, elements);
                 }
             }).ContinueWith(app =>
             {
@@ -487,11 +471,11 @@ namespace RevitTimasBIMTools.ViewModels
                 try
                 {
                     cts.Cancel(true);
-                    CancelToken = cts.Token;
+                    cancelToken = cts.Token;
                 }
                 catch (AggregateException)
                 {
-                    if (CancelToken.IsCancellationRequested)
+                    if (cancelToken.IsCancellationRequested)
                     {
                         task = Task.Delay(1000).ContinueWith((action) => Logger.Warning("Task cansceled"));
                     }
