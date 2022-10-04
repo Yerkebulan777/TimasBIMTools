@@ -37,10 +37,10 @@ namespace RevitTimasBIMTools.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("50")]
-        public int MinSideSizeInMm {
+        [global::System.Configuration.DefaultSettingValueAttribute("0.164042")]
+        public double MinSideSizeInMm {
             get {
-                return ((int)(this["MinSideSizeInMm"]));
+                return ((double)(this["MinSideSizeInMm"]));
             }
             set {
                 this["MinSideSizeInMm"] = value;
@@ -49,10 +49,10 @@ namespace RevitTimasBIMTools.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("250")]
-        public int MaxSideSizeInMm {
+        [global::System.Configuration.DefaultSettingValueAttribute("0.82021")]
+        public double MaxSideSizeInMm {
             get {
-                return ((int)(this["MaxSideSizeInMm"]));
+                return ((double)(this["MaxSideSizeInMm"]));
             }
             set {
                 this["MaxSideSizeInMm"] = value;
@@ -61,10 +61,10 @@ namespace RevitTimasBIMTools.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("50")]
-        public int CutOffsetInMm {
+        [global::System.Configuration.DefaultSettingValueAttribute("0.164042")]
+        public double CutOffsetInMm {
             get {
-                return ((int)(this["CutOffsetInMm"]));
+                return ((double)(this["CutOffsetInMm"]));
             }
             set {
                 this["CutOffsetInMm"] = value;

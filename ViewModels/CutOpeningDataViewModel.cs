@@ -176,8 +176,8 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private int minSize = Properties.Settings.Default.MinSideSizeInMm;
-        public int MinSideSize
+        private double minSize = Properties.Settings.Default.MinSideSizeInMm;
+        public double MinSideSize
         {
             get => minSize;
             set
@@ -191,8 +191,8 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private int maxSize = Properties.Settings.Default.MaxSideSizeInMm;
-        public int MaxSideSize
+        private double maxSize = Properties.Settings.Default.MaxSideSizeInMm;
+        public double MaxSideSize
         {
             get => maxSize;
             set
@@ -206,8 +206,8 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private int cutOffset = Properties.Settings.Default.CutOffsetInMm;
-        public int CutOffsetSize
+        private double cutOffset = Properties.Settings.Default.CutOffsetInMm;
+        public double CutOffsetSize
         {
             get => cutOffset;
             set

@@ -44,9 +44,9 @@ namespace RevitTimasBIMTools.CutOpening
         private ElementId searchCatId = null;
         private RevitLinkInstance searchInstance = null;
 
-        private readonly int minSideSize = Properties.Settings.Default.MinSideSizeInMm;
-        private readonly int maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
-        private readonly int cutOffsetSize = Properties.Settings.Default.CutOffsetInMm;
+        private readonly double minSideSize = Properties.Settings.Default.MinSideSizeInMm;
+        private readonly double maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
+        private readonly double cutOffsetSize = Properties.Settings.Default.CutOffsetInMm;
 
         //private readonly string widthParamName = "ширина";
         //private readonly string heightParamName = "высота";

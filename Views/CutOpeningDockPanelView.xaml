@@ -126,16 +126,14 @@
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Minimum size: " Width="125"/>
-                                <xctk:IntegerUpDown Name="MinSideSize" Minimum="0" Maximum="100" 
-                                                    Value="{Binding Path=MinSideSize, Mode=TwoWay}"
-                                                    Height="23" Width="65" TextAlignment="Center" />
+                                <xctk:IntegerUpDown Name="MinSideSize" Minimum="0" Maximum="100" Height="23" Width="65" TextAlignment="Center" 
+                                                    Value="{Binding Path=MinSideSize, Mode=TwoWay, Converter={StaticResource FootToMmConverter}}" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Maximum size: " Width="125"/>
-                                <xctk:IntegerUpDown Name="MaxSideSize" Minimum="100" Maximum="1000" 
-                                                    Value="{Binding Path=MaxSideSize, Mode=TwoWay}"
-                                                    Height="23" Width="65" TextAlignment="Center" />
+                                <xctk:IntegerUpDown Name="MaxSideSize" Minimum="100" Maximum="1000" Height="23" Width="65" TextAlignment="Center" 
+                                                    Value="{Binding Path=MaxSideSize, Mode=TwoWay, Converter={StaticResource FootToMmConverter}}" />
                             </WrapPanel>
 
                         </StackPanel>
@@ -146,9 +144,8 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                             <Label Content="Cut offset: " Width="125"/>
-                            <xctk:IntegerUpDown Name="CutOffset" Minimum="0" Maximum="500" 
-                                                Value="{Binding Path=CutOffsetSize, Mode=TwoWay}"
-                                                Height="23" Width="65" TextAlignment="Center" />
+                            <xctk:IntegerUpDown Name="CutOffset" Minimum="0" Maximum="500" Height="23" Width="65" TextAlignment="Center" 
+                                                Value="{Binding Path=CutOffsetSize, Mode=TwoWay, Converter={StaticResource FootToMmConverter}}" />
                         </WrapPanel>
                     </Border>
                 </ListViewItem>

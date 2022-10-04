@@ -5,14 +5,14 @@
     <Setting Name="ActiveDocumentUniqueId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="MinSideSizeInMm" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">50</Value>
+    <Setting Name="MinSideSizeInMm" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.164042</Value>
     </Setting>
-    <Setting Name="MaxSideSizeInMm" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">250</Value>
+    <Setting Name="MaxSideSizeInMm" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.82021</Value>
     </Setting>
-    <Setting Name="CutOffsetInMm" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">50</Value>
+    <Setting Name="CutOffsetInMm" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.164042</Value>
     </Setting>
   </Settings>
 </SettingsFile>
