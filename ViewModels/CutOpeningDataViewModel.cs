@@ -85,7 +85,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => enabledOpts;
             set
             {
-                if (!value && started)
+                if (started && value)
                 {
                     if (SetProperty(ref enabledOpts, value))
                     {
