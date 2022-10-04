@@ -34,7 +34,7 @@ namespace RevitTimasBIMTools.ViewModels
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private IList<Element> elements { get; set; } = null;
-        private IDictionary<int, ElementId> constructionTypeIds { get; set; } = null;
+        private IDictionary<int, ElementId> constTypeIds { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
         private readonly object syncLocker = new();
@@ -59,7 +59,7 @@ namespace RevitTimasBIMTools.ViewModels
             IsStarted = true;
             viewHandler.Completed -= OnContextHandlerCompleted;
             DocModelCollection = args.DocumentModels.ToObservableCollection();
-            constructionTypeIds = args.ConstructionTypeIds;
+            constTypeIds = args.ConstructionTypeIds;
         }
 
 
@@ -293,7 +293,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     EngineerCategories = RevitFilterManager.GetEngineerCategories(doc);
-                    StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constructionTypeIds);
+                    StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constTypeIds);
                     FamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
                 }
             });
@@ -322,7 +322,7 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, constructionTypeIds, matName);
+                    elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, constTypeIds, matName);
                 }
             });
         }
