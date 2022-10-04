@@ -30,7 +30,6 @@ namespace RevitTimasBIMTools.ViewModels
     {
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
 
-
         private Task task { get; set; } = null;
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
