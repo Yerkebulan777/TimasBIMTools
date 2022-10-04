@@ -30,7 +30,9 @@ namespace RevitTimasBIMTools.ViewModels
     public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
     {
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
-        
+
+        private Task task { get; set; } = null;
+        private View3D view3d { get; set; } = null;
         private IList<Element> elements { get; set; } = null;
         private IDictionary<int, ElementId> constructionTypeIds { get; set; } = null;
         private IDictionary<string, FamilySymbol> familySymbols { get; set; } = null;
@@ -41,8 +43,6 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
         
-        private View3D view3d { get; set; } = null;
-        private Task task { get; set; } = null;
 
 
         public CutOpeningDataViewModel()
@@ -72,7 +72,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 Document doc = null;
                 ElementModelData.Clear();
-                Task task = !IsOptionsEnabled
+                task = !IsOptionsEnabled
                     ? RevitTask.RunAsync(async app =>
                     {
                         IsDataEnabled = false;
