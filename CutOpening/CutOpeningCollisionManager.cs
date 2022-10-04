@@ -154,7 +154,6 @@ namespace RevitTimasBIMTools.CutOpening
                 distance = centroidPoint.DistanceTo(item.Key);
                 if (distance < minimum)
                 {
-                    
                     sizeData = GetSizeByBoundingBox(intanceBox, hostDirection);
                     return false;
                 }
