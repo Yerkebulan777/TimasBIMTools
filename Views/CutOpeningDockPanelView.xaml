@@ -44,7 +44,7 @@
                     <ToggleButton Name="settingsBtn" Height="40" Width="60"
                                   HorizontalAlignment="Right" VerticalAlignment="Center"
                                   Background="Transparent" BorderBrush="Transparent"
-                                  Command="{Binding Path=ShowSettingsCommand}"
+                                  Command="{Binding Path=SettingsCommand}"
                                   CommandParameter="{Binding Path=IsStarted}">
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
@@ -67,7 +67,7 @@
 
             <!-- Options -->
             <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch" 
-                      Visibility="{Binding  Path=IsOptionsEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}"
+                      Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}"
                       Style="{StaticResource VisibleAnimation}" >
 
                 <ListViewItem>
@@ -85,15 +85,17 @@
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Category: " Width="125"/>
                                 <xctk:WatermarkComboBox Name="ComboEngineerCats" Height="23" Width="125"
-                                                    DisplayMemberPath="Value.Name" Watermark="Select category..."
-                                                    SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedCategory}" />
+                                                        DisplayMemberPath="Value.Name" Watermark="Select category..."
+                                                        ItemsSource="{Binding Path=EngineerCategories, Mode=OneWay}"
+                                                        SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedCategory}" />
                             </WrapPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Structure: " Width="125"/>
-                                <xctk:WatermarkComboBox Name="ComboStructureMats" Height="23" Width="125"
-                                                    DisplayMemberPath="Value.Name" Watermark="Select material..."
-                                                    SelectedValuePath="Value" SelectedValue="{Binding Path=StructureMaterial}" />
+                                <xctk:WatermarkComboBox Name="ComboStructureMats" Height="23" Width="125" 
+                                                        DisplayMemberPath="Value.Name" Watermark="Select material..."
+                                                        ItemsSource="{Binding Path=StructureMaterials, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedMaterial}" />
                             </WrapPanel>
                             
                         </StackPanel>
@@ -105,17 +107,17 @@
                         <StackPanel>
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Rectangle opening:" Width="125" />
-                                <xctk:WatermarkComboBox x:Name="ComboRectangSymbol" Height="23" Width="125" 
-                                                        SelectedItem="{Binding Path=RectangSymbol}"
-                                                        DisplayMemberPath="Value.Name"
-                                                        Watermark="Select family..."/>
+                                <xctk:WatermarkComboBox Name="ComboRectangSymbol" Height="23" Width="125"
+                                                        DisplayMemberPath="Value.Name" Watermark="Select family..."
+                                                        ItemsSource="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        SelectedValuePath="Value" SelectedValue="{Binding Path=RectangSymbol}" />
                             </WrapPanel>
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Round opening: " Width="125" />
-                                <xctk:WatermarkComboBox x:Name="ComboRoundedSymbol" Height="23" Width="125"
-                                                        SelectedItem="{Binding Path=RoundedSymbol}"
-                                                        DisplayMemberPath="Value.Name"
-                                                        Watermark="Select family..."/>
+                                <xctk:WatermarkComboBox Name="ComboRoundedSymbol" Height="23" Width="125"
+                                                        DisplayMemberPath="Value.Name" Watermark="Select family..."
+                                                        ItemsSource="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                        SelectedValuePath="Value" SelectedValue="{Binding Path=RoundedSymbol}" />
                             </WrapPanel>
                         </StackPanel>
                     </Border>
@@ -165,15 +167,14 @@
                        Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="5" 
                        Visibility="{Binding  Path=IsDataEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
 
-                <xctk:WatermarkComboBox Name="ComboLevelFilter" Height="23" Width="125" Margin="5" 
-                                        Watermark="Select level..."
-                                        SelectedIndex="-1" DisplayMemberPath="Value.Name" SelectedValuePath="Value"
-                                        SelectedValue="{Binding Path=SearchLevel, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
+                <xctk:WatermarkComboBox Name="ComboLevelFilter" Height="23" Width="125" Margin="5" Watermark="Select level..."
+                                        ItemsSource="{Binding Path=ValidLevels, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                        SelectedValue="{Binding Path=SelectedLevel, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" 
+                                        DisplayMemberPath="Value.Name" SelectedValuePath="Value"/>
 
-                <xctk:WatermarkComboBox Name="ComboDataFilter" Height="23" Width="125" SelectedIndex="0" Margin="5" 
-                                        Watermark="Filter by..."
-                                        SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                        ItemsSource="{Binding Path=UniqueItemNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                <xctk:WatermarkComboBox Name="ComboDataFilter" Height="23" Width="125" Margin="5" Watermark="Filter by..."
+                                        ItemsSource="{Binding Path=UniqueItemNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                        SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             </WrapPanel>
 

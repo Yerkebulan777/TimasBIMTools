@@ -30,11 +30,12 @@ namespace RevitTimasBIMTools.ViewModels
     {
         public CutOpeningDockPanelView DockPanelView { get; set; } = null;
 
+
         private Task task { get; set; } = null;
+        private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private IList<Element> elements { get; set; } = null;
         private IDictionary<int, ElementId> constructionTypeIds { get; set; } = null;
-        private IDictionary<string, FamilySymbol> familySymbols { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
         private readonly object syncLocker = new();
@@ -46,7 +47,7 @@ namespace RevitTimasBIMTools.ViewModels
         public CutOpeningDataViewModel()
         {
             viewHandler.Completed += OnContextHandlerCompleted;
-            ShowSettingsCommand = new RelayCommand(ShowSettingsHandelCommand);
+            SettingsCommand = new RelayCommand(SettingsHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             CanselCommand = new RelayCommand(CancelCallbackLogic);
@@ -60,52 +61,6 @@ namespace RevitTimasBIMTools.ViewModels
             viewHandler.Completed -= OnContextHandlerCompleted;
             DocModelCollection = args.DocumentModels.ToObservableCollection();
             constructionTypeIds = args.ConstructionTypeIds;
-        }
-
-
-        public ICommand ShowSettingsCommand { get; private set; }
-
-        [STAThread]
-        private void ShowSettingsHandelCommand()
-        {
-            Dispatcher.CurrentDispatcher.Invoke(() =>
-            {
-                Document doc = null;
-                ElementModelData.Clear();
-                task = !IsOptionsEnabled
-                    ? RevitTask.RunAsync(async app =>
-                    {
-                        IsDataEnabled = false;
-                        IsOptionsEnabled = true;
-                        doc = app.ActiveUIDocument.Document;
-                        await Task.Delay(1000).ConfigureAwait(true);
-                    })
-                    .ContinueWith(app =>
-                    {
-                        if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                        {
-                            EngineerCategories = RevitFilterManager.GetEngineerCategories(doc);
-                            DockPanelView.ComboStructureMats.ItemsSource = RevitFilterManager.GetConstructionCoreMaterials(doc, constructionTypeIds);
-                            familySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
-                            DockPanelView.ComboRectangSymbol.ItemsSource = familySymbols;
-                            DockPanelView.ComboRoundedSymbol.ItemsSource = familySymbols;
-                        }
-                    }, TaskScheduler.FromCurrentSynchronizationContext())
-                    : RevitTask.RunAsync(async app =>
-                    {
-                        IsDataEnabled = true;
-                        IsOptionsEnabled = false;
-                        doc = app.ActiveUIDocument.Document;
-                        await Task.Delay(1000).ConfigureAwait(true);
-                    })
-                    .ContinueWith(app =>
-                    {
-                        if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                        {
-                            DockPanelView.ComboLevelFilter.ItemsSource = RevitFilterManager.GetValidLevels(doc);
-                        }
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
-            });
         }
 
 
@@ -125,17 +80,18 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool enabledOptions = false;
-        public bool IsOptionsEnabled
+        private bool enabledOpts = false;
+        public bool IsOptionEnabled
         {
-            get => enabledOptions;
+            get => enabledOpts;
             set
             {
-                if (value != enabledOptions)
+                if (!value && started)
                 {
-                    if (SetProperty(ref enabledOptions, value))
+                    if (SetProperty(ref enabledOpts, value))
                     {
-                        IsDataEnabled = !enabledOptions;
+                        IsDataEnabled = false;
+                        SetItemsToDataSettings();
                     }
                 }
             }
@@ -148,11 +104,12 @@ namespace RevitTimasBIMTools.ViewModels
             get => enabledData;
             set
             {
-                if (value == false || (docModel != null && category != null))
+                if (!value || (docModel != null && category != null))
                 {
                     if (SetProperty(ref enabledData, value))
                     {
-                        IsOptionsEnabled = !enabledData;
+                        IsOptionEnabled = false;
+                        SetValidLevelsToData();
                     }
                 }
             }
@@ -161,7 +118,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Set settings
+        #region Settings
 
         private ObservableCollection<DocumentModel> docModels = null;
         public ObservableCollection<DocumentModel> DocModelCollection
@@ -217,11 +174,19 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref material, value) && value != null)
                 {
-                    GetInstancesByMaterial(material.Name);
+                    GetInstancesByCoreMaterialInType(material.Name);
                 }
             }
         }
 
+
+        private IDictionary<string, FamilySymbol> familySymbols;
+
+        public IDictionary<string, FamilySymbol> FamilySymbols
+        {
+            get => familySymbols;
+            set => SetProperty(ref familySymbols, value);
+        }
 
 
         private FamilySymbol rectangle;
@@ -299,25 +264,6 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Set filter data
-
-        private Level level = null;
-        public Level SearchLevel
-        {
-            get => level;
-            set
-            {
-                if (SetProperty(ref level, value) && value != null)
-                {
-                    Properties.Settings.Default.Upgrade();
-                    SnoopIntersectionDataByLevel(level);
-                }
-            }
-        }
-
-        #endregion
-
-
         #region Methods
 
         [STAThread]
@@ -325,7 +271,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             task = RevitTask.RunAsync(app =>
             {
-                Document doc = app.ActiveUIDocument.Document;
+                doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
@@ -334,34 +280,71 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
-        private void GetInstancesByMaterial(string materialName)
+        private void SetItemsToDataSettings()
         {
             task = RevitTask.RunAsync(app =>
             {
-                Document doc = app.ActiveUIDocument.Document;
+                doc = app.ActiveUIDocument.Document;
+            })
+            .ContinueWith(app =>
+            {
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, constructionTypeIds, materialName);
+                    EngineerCategories = RevitFilterManager.GetEngineerCategories(doc);
+                    StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constructionTypeIds);
+                    FamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
                 }
-            });
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+
+        [STAThread]
+        private void SetValidLevelsToData()
+        {
+            task = RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+            })
+            .ContinueWith(app =>
+            {
+                if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    ValidLevels = RevitFilterManager.GetValidLevels(doc);
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+
+        [STAThread]
+        private void GetInstancesByCoreMaterialInType(string matName)
+        {
+            task = RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+            })
+            .ContinueWith(app =>
+            {
+                if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, constructionTypeIds, matName);
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
 
         [STAThread]
         private void SnoopIntersectionDataByLevel(Level level)
         {
-            IEnumerable<ElementModel> data = null;
             task = RevitTask.RunAsync(app =>
             {
-                Document doc = app.ActiveUIDocument.Document;
+                doc = app.ActiveUIDocument.Document;
+            })
+            .ContinueWith(app =>
+            {
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    data = manager.GetCollisionByLevel(doc, level, docModel, category, elements);
+                    ElementModelData = manager.GetCollisionByLevel(doc, level, docModel, category, elements).ToObservableCollection();
                 }
-            }).ContinueWith(app =>
-            {
-                ElementModelData = data.ToObservableCollection();
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -441,7 +424,29 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region TextFilter
+        #region DataFilter
+
+        private IDictionary<double, Level> allLevels;
+        public IDictionary<double, Level> ValidLevels
+        {
+            get => allLevels;
+            set => SetProperty(ref allLevels, value);
+        }
+
+
+        private Level level = null;
+        public Level SelectedLevel
+        {
+            get => level;
+            set
+            {
+                if (SetProperty(ref level, value) && value != null)
+                {
+                    Properties.Settings.Default.Upgrade();
+                    SnoopIntersectionDataByLevel(level);
+                }
+            }
+        }
 
         private string filterText = string.Empty;
         public string FilterText
@@ -476,6 +481,29 @@ namespace RevitTimasBIMTools.ViewModels
             || obj is not ElementModel model || model.SymbolName.Contains(FilterText)
             || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
             || model.SymbolName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        #endregion
+
+
+        #region SettingsCommand
+
+        public ICommand SettingsCommand { get; private set; }
+
+        [STAThread]
+        private void SettingsHandelCommand()
+        {
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                if (!IsOptionEnabled)
+                {
+                    IsOptionEnabled = true;
+                }
+                else
+                {
+                    IsDataEnabled = true;
+                }
+            });
         }
 
         #endregion
