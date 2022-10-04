@@ -100,6 +100,7 @@ namespace RevitTimasBIMTools.CutOpening
                     hostSolid = host.GetElementSolidByCenter(options, identityTransform, centroidPoint);
                     if (hostSolid != null)
                     {
+                        IList<ElementModel> temp = new List<ElementModel>(3);
                         foreach (ElementModel model in GetIntersectionElementModels(doc))
                         {
                             //elemId = host.Id;

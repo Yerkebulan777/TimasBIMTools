@@ -7,16 +7,17 @@ namespace RevitTimasBIMTools.RevitModel
 {
     public sealed class ElementModel : ObservableObject, IRevitElementModel
     {
-        public readonly int IdInt = 0;
-        public readonly int LevelId = 0;
-        private readonly Element instance = null;
+        public readonly int IdInt;
+        public readonly int LevelId;
+        public readonly int HostIdInt;
+
         private readonly ElementTypeData elemTypeData;
-        public ElementModel(Element elem, ElementTypeData data, string description = null)
+        public ElementModel(Element instance, ElementTypeData data, int hostIdInt = 0, string description = null)
         {
-            instance = elem;
             if (instance.IsValidObject)
             {
                 elemTypeData = data;
+                HostIdInt = hostIdInt;
                 IdInt = instance.Id.IntegerValue;
                 LevelId = instance.LevelId.IntegerValue;
                 CategoryName = instance.Category.Name;
@@ -56,7 +57,7 @@ namespace RevitTimasBIMTools.RevitModel
             {
                 int h = (int)Math.Round(elemTypeData.Height * 304.8);
                 int w = (int)Math.Round(elemTypeData.Width * 304.8);
-                return $"{w}x{h}(h)".Trim().Normalize();
+                return $"{w}x{h}(h)".Normalize();
             }
             return string.Empty;
         }

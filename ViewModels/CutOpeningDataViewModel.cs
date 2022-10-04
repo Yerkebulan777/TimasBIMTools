@@ -443,8 +443,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
-                string guid = doc.ProjectInformation.UniqueId;
-                if (documentId.Equals(guid) && !DataViewCollection.IsEmpty)
+                if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     foreach (ElementModel model in DataViewCollection)
                     {
