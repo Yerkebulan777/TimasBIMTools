@@ -234,7 +234,7 @@ namespace RevitTimasBIMTools.RevitUtils
         public static IDictionary<string, Material> GetConstructionCoreMaterials(Document doc, IDictionary<int, ElementId> typeIds)
         {
             CompoundStructure compound = null;
-            IDictionary<string, Material> result = new ConcurrentDictionary<string, Material>();
+            IDictionary<string, Material> result = new SortedDictionary<string, Material>();
             if (typeIds != null && typeIds.Count > 0)
             {
                 foreach (KeyValuePair<int, ElementId> item in typeIds)
@@ -338,7 +338,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static IDictionary<string, Category> GetEngineerCategories(Document doc)
         {
-            IDictionary<string, Category> result = new ConcurrentDictionary<string, Category>();
+            IDictionary<string, Category> result = new SortedDictionary<string, Category>();
             IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
             {
                 BuiltInCategory.OST_Conduit,

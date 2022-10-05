@@ -40,11 +40,10 @@ namespace RevitTimasBIMTools.ViewModels
 
         private double size = 0;
         private const double footToMm = 304.8;
-        private readonly object syncLocker = new();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
-        //private readonly ConcurrentExclusiveSchedulerPair taskSchedulerPair = new();
+        private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
 
 
         public CutOpeningDataViewModel()
@@ -143,7 +142,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => docModel;
             set
             {
-                if(SetProperty(ref docModel, value) && docModel != null)
+                if (SetProperty(ref docModel, value) && docModel != null)
                 {
                     manager.SearchDoc = docModel.Document;
                     manager.SearchTrans = docModel.Transform;
@@ -544,19 +543,17 @@ namespace RevitTimasBIMTools.ViewModels
                         if (model.IsSelected && ElementModelData.Remove(model))
                         {
                             Element elem = doc.GetElement(new ElementId(model.IdInt));
-                            lock (syncLocker)
+                            try
                             {
-                                try
-                                {
-                                    // Set Openning Logic with doc regenerate and transaction RollBack                                   
-                                    view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
-                                    RevitViewManager.SetColorElement(uidoc, elem);
-                                }
-                                finally
-                                {
-                                    Task.Delay(1000).Wait();
-                                }
+                                // Set Openning Logic with doc regenerate and transaction RollBack                                   
+                                view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
+                                RevitViewManager.SetColorElement(uidoc, elem);
                             }
+                            finally
+                            {
+                                Task.Delay(1000).Wait();
+                            }
+
                             break;
                         }
                     }
@@ -572,26 +569,25 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region CloseCommand
+
         public ICommand CanselCommand { get; private set; }
         private void CancelCallbackLogic()
         {
             CancellationTokenSource cts = new();
-            lock (syncLocker)
+            try
             {
-                try
+                cts.Cancel(true);
+                cancelToken = cts.Token;
+            }
+            catch (AggregateException)
+            {
+                if (cancelToken.IsCancellationRequested)
                 {
-                    cts.Cancel(true);
-                    cancelToken = cts.Token;
-                }
-                catch (AggregateException)
-                {
-                    if (cancelToken.IsCancellationRequested)
-                    {
-                        task = Task.Delay(1000).ContinueWith((action) => Logger.Warning("Task cansceled"));
-                    }
+                    task = Task.Delay(1000).ContinueWith((action) => Logger.Warning("Task cansceled"));
                 }
             }
         }
+
         #endregion
 
 
