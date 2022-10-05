@@ -93,6 +93,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (SetProperty(ref enabledOpts, value))
                     {
                         IsDataEnabled = !enabledOpts;
+                        ElementModelData.Clear();
                         SetItemsToDataSettings();
                     }
                 }
@@ -111,6 +112,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (SetProperty(ref enabledData, value))
                     {
                         IsOptionEnabled = !enabledData;
+                        DataViewCollection.Refresh();
                         SetValidLevelsToData();
                     }
                 }
@@ -203,7 +205,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => material;
             set
             {
-                if (SetProperty(ref material, value) && value != null)
+                if (SetProperty(ref material, value) && material != null)
                 {
                     GetInstancesByCoreMaterialInType(material.Name);
                 }
