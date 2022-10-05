@@ -40,10 +40,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private double size = 0;
         private const double footToMm = 304.8;
-
-        private readonly Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
         private readonly SynchronizationContext context = SynchronizationContext.Current;
-        private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
@@ -164,7 +161,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SynchronizationContext.Current == context)
                 {
-                    _ = SetProperty(ref categories, value);
+                    if (SetProperty(ref categories, value))
+                    {
+                        Logger.Info("Right!");
+                    }
                 }
                 else
                 {
@@ -216,7 +216,20 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<string, FamilySymbol> FamilySymbols
         {
             get => familySymbols;
-            set => SetProperty(ref familySymbols, value);
+            set
+            {
+                if (SynchronizationContext.Current == context)
+                {
+                    if (SetProperty(ref familySymbols, value))
+                    {
+                        Logger.Info("Right!");
+                    }
+                }
+                else
+                {
+                    context.Send(delegate { _ = SetProperty(ref familySymbols, value); }, null);
+                }
+            }
         }
 
 
@@ -299,13 +312,6 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Methods
-
-        private void RaisePropertyChanged(object param)
-        {
-
-            OnPropertyChanged((PropertyChangedEventArgs)param);
-        }
-
 
         private void GetGeneral3DView()
         {
