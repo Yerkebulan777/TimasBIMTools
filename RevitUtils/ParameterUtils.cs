@@ -79,7 +79,7 @@ namespace RevitTimasBIMTools.RevitUtils
             string value;
             switch (_parameter.StorageType)
             {
-                // database value, internal units, e.g. feet:
+                // database value, internal revitUnits, e.g. feet:
                 case StorageType.Double:
                     value = RealString(_parameter.AsDouble());
                     break;

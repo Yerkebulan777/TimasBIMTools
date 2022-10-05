@@ -70,5 +70,17 @@ namespace RevitTimasBIMTools.Properties {
                 this["CutOffsetInMm"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int CategoryIntId {
+            get {
+                return ((int)(this["CategoryIntId"]));
+            }
+            set {
+                this["CategoryIntId"] = value;
+            }
+        }
     }
 }

@@ -6,7 +6,7 @@ namespace RevitTimasBIMTools.RevitUtils
     internal sealed class UnitManager
     {
         /// <summary>
-        ///     Base units currently used internally by Revit.
+        ///     Base revitUnits currently used internally by Revit.
         /// </summary>
         private enum BaseUnit
         {

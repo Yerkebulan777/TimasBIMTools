@@ -140,7 +140,15 @@ namespace RevitTimasBIMTools.ViewModels
         public DocumentModel SelectedDocModel
         {
             get => docModel;
-            set => SetProperty(ref docModel, value);
+            set
+            {
+                if(SetProperty(ref docModel, value))
+                {
+                    manager.SearchDoc = docModel.Document;
+                    manager.SearchTrans = docModel.Transform;
+                    manager.SearchInstance = docModel.LinkInstance;
+                }
+            }
         }
 
 
@@ -156,7 +164,14 @@ namespace RevitTimasBIMTools.ViewModels
         public Category SelectedCategory
         {
             get => category;
-            set => SetProperty(ref category, value);
+            set
+            {
+                if (SetProperty(ref category, value))
+                {
+                    Properties.Settings.Default.CategoryIntId = category.Id.IntegerValue;
+                    Properties.Settings.Default.Save();
+                }
+            }
         }
 
 
@@ -271,7 +286,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        //[STAThread]
         private void GetGeneral3DView()
         {
             task = RevitTask.RunAsync(app =>
@@ -282,11 +296,9 @@ namespace RevitTimasBIMTools.ViewModels
                     view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
                 }
             });
-            task.RunSynchronously();
         }
 
 
-        //[STAThread]
         private void SetItemsToDataSettings()
         {
             task = RevitTask.RunAsync(app =>
@@ -302,7 +314,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        //[STAThread]
         private void SetValidLevelsToData()
         {
             task = RevitTask.RunAsync(app =>
@@ -316,7 +327,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        //[STAThread]
         private void GetInstancesByCoreMaterialInType(string matName)
         {
             task = RevitTask.RunAsync(app =>
@@ -330,15 +340,16 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        //[STAThread]
+
         private void SnoopIntersectionDataByLevel(Level level)
         {
             task = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
+                Properties.Settings.Default.Upgrade();
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    ElementModelData = manager.GetCollisionByLevel(doc, level, docModel, category, elements).ToObservableCollection();
+                    ElementModelData = manager.GetCollisionByLevel(doc, level, elements).ToObservableCollection();
                 }
             });
         }
@@ -437,11 +448,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref level, value) && value != null)
                 {
-                    task = Task.Run(Properties.Settings.Default.Upgrade)
-                    .ContinueWith(_ =>
-                    {
-                        SnoopIntersectionDataByLevel(level);
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                    SnoopIntersectionDataByLevel(level);
                 }
             }
         }

@@ -13,7 +13,7 @@ namespace RevitTimasBIMTools.CutOpening
     {
         #region Parameter Properties
 
-        private Units units = null;
+        private Units revitUnits = null;
         private DisplayUnitType angleUnit;
         private readonly Options options = new()
         {
@@ -38,16 +38,18 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Input Properties
 
-        private int levelIntId = 0;
-        private Document searchDoc = null;
-        private Transform searchTrans = null;
-        private ElementId searchCatId = null;
-        private RevitLinkInstance searchInstance = null;
+        public int LevelIntId { get; internal set; } = -1;
+        public Document SearchDoc { get; internal set; } = null;
+        public Transform SearchTrans { get; internal set; } = null;
+        public ElementId SearchCatId { get; internal set; } = null;
+        public RevitLinkInstance SearchInstance { get; internal set; } = null;
 
+
+        private readonly int categoryIntId = Properties.Settings.Default.CategoryIntId;
         private readonly double minSideSize = Properties.Settings.Default.MinSideSizeInMm;
         private readonly double maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
         private readonly double cutOffsetSize = Properties.Settings.Default.CutOffsetInMm;
-
+        
         //private readonly string widthParamName = "ширина";
         //private readonly string heightParamName = "высота";
 
@@ -55,7 +57,6 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         #region Templory Properties
-
 
         private ElementDataDictionary dataBase;
         private XYZ centroidPoint = XYZ.Zero;
@@ -83,27 +84,25 @@ namespace RevitTimasBIMTools.CutOpening
 
         #endregion
 
-        private void InitializeUnits(Document doc)
+
+        private void Initialize(Document doc)
         {
             dataBase = new();
-            units = doc.GetUnits();
-            angleUnit = units.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
+            revitUnits = doc.GetUnits();
+            SearchCatId = new ElementId(categoryIntId);
+            angleUnit = revitUnits.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
 
 
-        public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level, DocumentModel source, Category category, IList<Element> elements)
+        public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level, IList<Element> elements)
         {
-            InitializeUnits(doc);
-            searchCatId = category.Id;
-            searchDoc = source.Document;
-            searchTrans = source.Transform;
-            searchInstance = source.LinkInstance;
-            levelIntId = level.Id.IntegerValue;
+            Initialize(doc);
+            LevelIntId = level.Id.IntegerValue;
             foreach (Element host in elements)
             {
-                if (levelIntId == host.LevelId.IntegerValue)
+                if (LevelIntId == host.LevelId.IntegerValue)
                 {
-                    foreach (ElementModel model in GetIntersectionElementModels(doc, searchCatId, searchTrans, host))
+                    foreach (ElementModel model in GetIntersectionElementModels(doc, SearchCatId, SearchTrans, host))
                     {
                         yield return model;
                     }
@@ -370,7 +369,7 @@ namespace RevitTimasBIMTools.CutOpening
         //            if (strArray.Contains(paramName, StringComparer.CurrentCultureIgnoreCase))
         //            {
         //                int tmp = param.IsShared ? name.Length : name.Length + strArray.Length;
-        //                if (minimum > tmp && UnitFormatUtils.TryParse(units, UnitType.UT_Length, param.AsValueString(), out value))
+        //                if (minimum > tmp && UnitFormatUtils.TryParse(revitUnits, UnitType.UT_Length, param.AsValueString(), out value))
         //                {
         //                    minimum = tmp;
         //                }
@@ -408,7 +407,7 @@ namespace RevitTimasBIMTools.CutOpening
         //    direction = XYZ.Zero;
 
         //    Reference reference = fi.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
-        //    reference = searchInstance != null ? reference.CreateLinkReference(searchInstance) : reference;
+        //    reference = SearchInstance != null ? reference.CreateLinkReference(SearchInstance) : reference;
 
         //    if (null != reference)
         //    {
@@ -488,10 +487,10 @@ namespace RevitTimasBIMTools.CutOpening
         {
             dictDatabase.Clear();
             transform?.Dispose();
-            searchDoc?.Dispose();
+            SearchDoc?.Dispose();
             intersectSolid?.Dispose();
-            searchInstance?.Dispose();
-            searchTrans?.Dispose();
+            SearchInstance?.Dispose();
+            SearchTrans?.Dispose();
 
             Logger.Log(dictDatabase.Values.Count.ToString());
         }
