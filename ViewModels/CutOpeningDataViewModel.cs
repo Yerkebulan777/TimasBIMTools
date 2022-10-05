@@ -37,13 +37,13 @@ namespace RevitTimasBIMTools.ViewModels
         private IDictionary<int, ElementId> constTypeIds { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
-        double size = 0;
+        private double size = 0;
         private const double footToMm = 304.8;
         private readonly object syncLocker = new();
-        
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
+        private readonly ConcurrentExclusiveSchedulerPair taskSchedulerPair = new();
 
 
         public CutOpeningDataViewModel()
@@ -274,21 +274,21 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private void GetGeneral3DView()
         {
-            task = RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
                 }
-            });
+            }).RunSynchronously();
         }
 
 
         [STAThread]
         private void SetItemsToDataSettings()
         {
-            task = RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
@@ -297,48 +297,49 @@ namespace RevitTimasBIMTools.ViewModels
                     StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constTypeIds);
                     FamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
                 }
-            });
+            }).RunSynchronously();
         }
 
 
         [STAThread]
         private void SetValidLevelsToData()
         {
-            task = RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     ValidLevels = RevitFilterManager.GetValidLevels(doc);
                 }
-            });
+            }).RunSynchronously();
         }
 
 
         [STAThread]
         private void GetInstancesByCoreMaterialInType(string matName)
         {
-            task = RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, constTypeIds, matName);
                 }
-            });
+            }).RunSynchronously();
         }
 
 
+        [STAThread]
         private void SnoopIntersectionDataByLevel(Level level)
         {
-            task = RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     ElementModelData = manager.GetCollisionByLevel(doc, level, docModel, category, elements).ToObservableCollection();
                 }
-            });
+            }).RunSynchronously();
         }
 
 
