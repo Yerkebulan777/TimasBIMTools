@@ -40,6 +40,7 @@ namespace RevitTimasBIMTools.ViewModels
         double size = 0;
         private const double footToMm = 304.8;
         private readonly object syncLocker = new();
+        
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
