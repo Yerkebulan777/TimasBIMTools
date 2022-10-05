@@ -37,6 +37,7 @@ namespace RevitTimasBIMTools.ViewModels
         private IDictionary<int, ElementId> constTypeIds { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
+        double size = 0;
         private const double footToMm = 304.8;
         private readonly object syncLocker = new();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
@@ -225,7 +226,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref minSize, value))
                 {
-                    Properties.Settings.Default.MinSideSizeInMm = minSize / footToMm;
+                    size = minSize / footToMm;
+                    Properties.Settings.Default.MinSideSizeInMm = size;
                     Properties.Settings.Default.Save();
                 }
             }
@@ -240,7 +242,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref maxSize, value))
                 {
-                    Properties.Settings.Default.MaxSideSizeInMm = maxSize / footToMm;
+                    size = minSize / footToMm;
+                    Properties.Settings.Default.MaxSideSizeInMm = size;
                     Properties.Settings.Default.Save();
                 }
             }
@@ -255,7 +258,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref cutOffset, value))
                 {
-                    Properties.Settings.Default.CutOffsetInMm = cutOffset / footToMm;
+                    size = minSize / footToMm;
+                    Properties.Settings.Default.CutOffsetInMm = size;
                     Properties.Settings.Default.Save();
                 }
             }
@@ -324,7 +328,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
         private void SnoopIntersectionDataByLevel(Level level)
         {
             task = RevitTask.RunAsync(app =>

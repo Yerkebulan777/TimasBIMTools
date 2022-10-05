@@ -44,7 +44,8 @@
                     <ToggleButton Name="settingsBtn" Height="40" Width="60"
                                   HorizontalAlignment="Right" VerticalAlignment="Center"
                                   Background="Transparent" BorderBrush="Transparent"
-                                  Command="{Binding Path=SettingsCommand}"
+                                  IsChecked="{Binding Path=IsOptionEnabled, Mode=TwoWay}"
+                                  Command="{Binding Path=SettingsCommand, Mode=TwoWay}"
                                   CommandParameter="{Binding Path=IsStarted}">
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
