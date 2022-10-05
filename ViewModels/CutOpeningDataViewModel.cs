@@ -139,6 +139,36 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        private IDictionary<string, Category> categories;
+        public IDictionary<string, Category> EngineerCategories
+        {
+            get => categories;
+            set => SetProperty(ref categories, value);
+        }
+
+
+        private IDictionary<string, Material> structMats;
+        public IDictionary<string, Material> StructureMaterials
+        {
+            get => structMats;
+            set => SetProperty(ref structMats, value);
+        }
+
+
+        private IDictionary<string, FamilySymbol> familySymbols;
+        public IDictionary<string, FamilySymbol> FamilySymbols
+        {
+            get => familySymbols;
+            set
+            {
+                if (SetProperty(ref familySymbols, value))
+                {
+                    Logger.Log(nameof(FamilySymbols));
+                }
+            }
+        }
+
+
         private DocumentModel docModel = null;
         public DocumentModel SelectedDocModel
         {
@@ -151,20 +181,6 @@ namespace RevitTimasBIMTools.ViewModels
                     manager.SearchTrans = docModel.Transform;
                     manager.SearchInstance = docModel.LinkInstance;
                     CommandManager.InvalidateRequerySuggested();
-                }
-            }
-        }
-
-
-        private IDictionary<string, Category> categories;
-        public IDictionary<string, Category> EngineerCategories
-        {
-            get => categories;
-            set
-            {
-                if (SetProperty(ref categories, value))
-                {
-                    Logger.Log(nameof(EngineerCategories));
                 }
             }
         }
@@ -185,14 +201,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<string, Material> structMats;
-        public IDictionary<string, Material> StructureMaterials
-        {
-            get => structMats;
-            set => SetProperty(ref structMats, value);
-        }
-
-
         private Material material;
         public Material SelectedMaterial
         {
@@ -209,21 +217,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<string, FamilySymbol> familySymbols;
-
-        public IDictionary<string, FamilySymbol> FamilySymbols
-        {
-            get => familySymbols;
-            set
-            {
-                if (SetProperty(ref familySymbols, value))
-                {
-                    Logger.Log(nameof(FamilySymbols));
-                }
-            }
-        }
-
-
         private FamilySymbol rectangle;
         public FamilySymbol RectangSymbol
         {
@@ -232,6 +225,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref rectangle, value))
                 {
+                    Properties.Settings.Default.RectangSymbol = rectangle.UniqueId;
+                    Properties.Settings.Default.Save();
                     ActivateFamilySimbol(rectangle);
                 }
             }
@@ -246,6 +241,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref rounded, value))
                 {
+                    Properties.Settings.Default.RoundedSymbol = rounded.UniqueId;
+                    Properties.Settings.Default.Save();
                     ActivateFamilySimbol(rounded);
                 }
             }
@@ -617,6 +614,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             manager?.Dispose();
             ElementModelData.Clear();
+
             if (DataViewCollection is ListCollectionView list)
             {
                 foreach (object item in list)

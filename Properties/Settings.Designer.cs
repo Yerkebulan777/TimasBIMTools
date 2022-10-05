@@ -73,7 +73,7 @@ namespace RevitTimasBIMTools.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
         public int CategoryIntId {
             get {
                 return ((int)(this["CategoryIntId"]));
@@ -92,6 +92,30 @@ namespace RevitTimasBIMTools.Properties {
             }
             set {
                 this["CoreMaterialName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RectangSymbol {
+            get {
+                return ((string)(this["RectangSymbol"]));
+            }
+            set {
+                this["RectangSymbol"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RoundedSymbol {
+            get {
+                return ((string)(this["RoundedSymbol"]));
+            }
+            set {
+                this["RoundedSymbol"] = value;
             }
         }
     }
