@@ -91,9 +91,11 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (SetProperty(ref enabledOpts, value))
                     {
-                        IsDataEnabled = !enabledOpts;
                         ElementModelData.Clear();
-                        SetItemsToDataSettings();
+                        IsDataEnabled = !enabledOpts;
+                        SetMEPCategoriesToData();
+                        SetCoreMaterialsToData();
+                        SetFamilySymbolsToData();
                     }
                 }
             }
@@ -200,6 +202,8 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref material, value) && material != null)
                 {
                     GetInstancesByCoreMaterialInType(material.Name);
+                    Properties.Settings.Default.CoreMaterialName = material.Name;
+                    Properties.Settings.Default.Save();
                 }
             }
         }
@@ -310,17 +314,44 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void SetItemsToDataSettings()
+        private async void SetMEPCategoriesToData()
         {
-            task = RevitTask.RunAsync(app =>
+            EngineerCategories = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    EngineerCategories = RevitFilterManager.GetEngineerCategories(doc);
-                    StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constTypeIds);
-                    FamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+                    return RevitFilterManager.GetEngineerCategories(doc);
                 }
+                return null;
+            });
+        }
+
+
+        private async void SetCoreMaterialsToData()
+        {
+            StructureMaterials = await RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+                if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    return RevitFilterManager.GetConstructionCoreMaterials(doc, constTypeIds);
+                }
+                return null;
+            });
+        }
+
+
+        private async void SetFamilySymbolsToData()
+        {
+            FamilySymbols = await RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+                if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    return RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+                }
+                return null;
             });
         }
 
