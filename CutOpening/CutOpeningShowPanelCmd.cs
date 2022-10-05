@@ -3,7 +3,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
 using System;
 
@@ -46,26 +45,29 @@ namespace RevitTimasBIMTools.CutOpening
                             dockpane.Dispose();
                             dockpaneExtEvent.Dispose();
                         }
-                        catch (Exception exc)
+                        catch
                         {
-                            Logger.Error("Show panel error:\t" + exc.Message);
+                            return Result.Failed;
                         }
                     }
                     else
                     {
                         ExternalEventRequest signal = dockpaneExtEvent.Raise();
-                        if (signal.Equals(0))
+                        switch (signal)
                         {
-                            try
-                            {
-                                dockpane.Show();
-                            }
-                            catch (Exception exc)
-                            {
-                                Logger.Error("Show panel error:\t" + exc.Message);
-                            }
+                            case ExternalEventRequest.Accepted:
+                                try
+                                {
+                                    dockpane.Show();
+                                }
+                                catch
+                                {
+                                    return Result.Failed;
+                                }
+                                return Result.Succeeded;
+                            default:
+                                return Result.Failed;
                         }
-                        Logger.Info(signal.ToString());
                     }
                 }
             }
