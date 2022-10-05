@@ -15,9 +15,10 @@ namespace RevitTimasBIMTools.CutOpening
     internal sealed class CutOpeningShowPanelCmd : IExternalCommand, IExternalCommandAvailability
     {
         private DockablePaneId dockpid { get; set; } = null;
+
+        private readonly IServiceProvider provider = SmartToolController.Services;
         private readonly SmartToolGeneralHelper generalHelper = SmartToolController.Services.GetRequiredService<SmartToolGeneralHelper>();
-        private readonly CutOpeningStartExternalHandler dockpaneHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
-        private readonly IDockablePaneProvider provider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
+        private readonly IDockablePaneProvider dockProvider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             return Execute(commandData.Application, ref message);
@@ -29,10 +30,13 @@ namespace RevitTimasBIMTools.CutOpening
             dockpid = generalHelper.DockPaneId;
             if (DockablePane.PaneIsRegistered(dockpid))
             {
+
                 DockablePane dockpane = uiapp.GetDockablePane(dockpid);
-                ExternalEvent dockpaneExtEvent = ExternalEvent.Create(dockpaneHandler);
-                if (provider is CutOpeningDockPanelView viewpane)
+                if (dockProvider is CutOpeningDockPanelView viewpane)
                 {
+                    using IServiceScope scope = provider.CreateScope();
+                    CutOpeningStartExternalHandler dockpaneHandler = scope.ServiceProvider.GetRequiredService<CutOpeningStartExternalHandler>();
+                    ExternalEvent dockpaneExtEvent = ExternalEvent.Create(dockpaneHandler);
                     if (dockpane.IsShown())
                     {
                         try
@@ -40,33 +44,32 @@ namespace RevitTimasBIMTools.CutOpening
                             dockpane.Hide();
                             viewpane.Dispose();
                             dockpane.Dispose();
+                            dockpaneExtEvent.Dispose();
                         }
                         catch (Exception exc)
                         {
                             Logger.Error("Show panel error:\t" + exc.Message);
-                        }
-                        finally
-                        {
-                            dockpaneExtEvent.Dispose();
                         }
                     }
                     else
                     {
-                        try
+                        ExternalEventRequest signal = dockpaneExtEvent.Raise();
+                        if (signal.Equals(0))
                         {
-                            dockpane.Show();
+                            try
+                            {
+                                dockpane.Show();
+                            }
+                            catch (Exception exc)
+                            {
+                                Logger.Error("Show panel error:\t" + exc.Message);
+                            }
                         }
-                        catch (Exception exc)
-                        {
-                            Logger.Error("Show panel error:\t" + exc.Message);
-                        }
-                        finally
-                        {
-                            _ = dockpaneExtEvent.Raise();
-                        }
+                        Logger.Info(signal.ToString());
                     }
                 }
             }
+
             return Result.Succeeded;
         }
 

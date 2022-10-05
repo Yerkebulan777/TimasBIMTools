@@ -39,6 +39,7 @@ namespace RevitTimasBIMTools.ViewModels
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
 
+        //private readonly 
         private readonly SynchronizationContext context = SynchronizationContext.Current;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
