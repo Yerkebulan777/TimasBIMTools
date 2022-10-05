@@ -271,21 +271,21 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        [STAThread]
+        //[STAThread]
         private void GetGeneral3DView()
         {
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
                 }
-            }).RunSynchronously();
+            });
         }
 
 
-        [STAThread]
+        //[STAThread]
         private void SetItemsToDataSettings()
         {
             RevitTask.RunAsync(app =>
@@ -301,7 +301,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
+        //[STAThread]
         private void SetValidLevelsToData()
         {
             RevitTask.RunAsync(app =>
@@ -311,11 +311,11 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     ValidLevels = RevitFilterManager.GetValidLevels(doc);
                 }
-            }).RunSynchronously();
+            }).Wait();
         }
 
 
-        [STAThread]
+        //[STAThread]
         private void GetInstancesByCoreMaterialInType(string matName)
         {
             RevitTask.RunAsync(app =>
@@ -325,11 +325,11 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, constTypeIds, matName);
                 }
-            }).RunSynchronously();
+            }).Wait();
         }
 
 
-        [STAThread]
+        //[STAThread]
         private void SnoopIntersectionDataByLevel(Level level)
         {
             RevitTask.RunAsync(app =>
@@ -339,7 +339,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     ElementModelData = manager.GetCollisionByLevel(doc, level, docModel, category, elements).ToObservableCollection();
                 }
-            }).RunSynchronously();
+            }).Wait();
         }
 
 
