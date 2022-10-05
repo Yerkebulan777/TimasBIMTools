@@ -274,21 +274,22 @@ namespace RevitTimasBIMTools.ViewModels
         //[STAThread]
         private void GetGeneral3DView()
         {
-            RevitTask.RunAsync(app =>
+            task = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
                 }
-            }).Dispose();
+            });
+            task.RunSynchronously();
         }
 
 
         //[STAThread]
         private void SetItemsToDataSettings()
         {
-            RevitTask.RunAsync(app =>
+            task = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
@@ -297,49 +298,49 @@ namespace RevitTimasBIMTools.ViewModels
                     StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constTypeIds);
                     FamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
                 }
-            }).Dispose();
+            });
         }
 
 
         //[STAThread]
         private void SetValidLevelsToData()
         {
-            RevitTask.RunAsync(app =>
+            task = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     ValidLevels = RevitFilterManager.GetValidLevels(doc);
                 }
-            }).Dispose();
+            });
         }
 
 
         //[STAThread]
         private void GetInstancesByCoreMaterialInType(string matName)
         {
-            RevitTask.RunAsync(app =>
+            task = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, constTypeIds, matName);
                 }
-            }).Dispose();
+            });
         }
 
 
         //[STAThread]
         private void SnoopIntersectionDataByLevel(Level level)
         {
-            RevitTask.RunAsync(app =>
+            task = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     ElementModelData = manager.GetCollisionByLevel(doc, level, docModel, category, elements).ToObservableCollection();
                 }
-            }).Dispose();
+            });
         }
 
 
@@ -436,8 +437,11 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref level, value) && value != null)
                 {
-                    Properties.Settings.Default.Upgrade();
-                    SnoopIntersectionDataByLevel(level);
+                    task = Task.Run(Properties.Settings.Default.Upgrade)
+                    .ContinueWith(_ =>
+                    {
+                        SnoopIntersectionDataByLevel(level);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
             }
         }
