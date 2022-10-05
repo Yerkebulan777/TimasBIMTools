@@ -156,7 +156,13 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<string, Category> EngineerCategories
         {
             get => categories;
-            set => SetProperty(ref categories, value);
+            set
+            {
+                if(SetProperty(ref categories, value))
+                {
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }
         }
 
 

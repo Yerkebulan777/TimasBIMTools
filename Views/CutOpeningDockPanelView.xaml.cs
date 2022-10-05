@@ -24,10 +24,8 @@ namespace RevitTimasBIMTools.Views
         public CutOpeningDockPanelView()
         {
             InitializeComponent();
-            DataContext = dataViewModel;
-            dataViewModel.DockPanelView = this;
-            Properties.Settings.Default.Reset();
-            Dispatcher.CurrentDispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
+            Loaded += DockPanelView_Loaded;
+            Dispatcher.CurrentDispatcher.ShutdownStarted += OnShutdownStarted;
         }
 
 
@@ -40,6 +38,18 @@ namespace RevitTimasBIMTools.Views
                 DockPosition = DockPosition.Tabbed,
                 TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette
             };
+        }
+
+
+        [STAThread]
+        private void DockPanelView_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Loaded -= DockPanelView_Loaded;
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                DataContext = dataViewModel;
+                dataViewModel.DockPanelView = this;
+            }, syncContext);
         }
 
 
@@ -65,9 +75,9 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void Dispatcher_ShutdownStarted(object sender, EventArgs e)
+        private void OnShutdownStarted(object sender, EventArgs e)
         {
-            Dispatcher.ShutdownStarted -= Dispatcher_ShutdownStarted;
+            Dispatcher.ShutdownStarted -= OnShutdownStarted;
             Dispose();
         }
 
