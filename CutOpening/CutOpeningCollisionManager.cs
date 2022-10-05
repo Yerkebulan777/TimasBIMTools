@@ -94,7 +94,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level, IList<Element> elements)
+        public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level, ConcurrentQueue<Element> elements)
         {
             Initialize(doc);
             LevelIntId = level.Id.IntegerValue;

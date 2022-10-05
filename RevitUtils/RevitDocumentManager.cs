@@ -11,9 +11,9 @@ namespace RevitTimasBIMTools.RevitUtils
             return RevitFilterManager.GetElementsOfCategory(doc, typeof(RevitLinkInstance), BuiltInCategory.OST_RvtLinks);
         }
 
-        public static IList<DocumentModel> GetDocumentCollection(Document doc)
+        public static ICollection<DocumentModel> GetDocumentCollection(Document doc)
         {
-            IList<DocumentModel> result = new List<DocumentModel> { new DocumentModel(doc) };
+            ICollection<DocumentModel> result = new List<DocumentModel> { new DocumentModel(doc) };
             foreach (RevitLinkInstance link in GetRevitLinkInstanceCollector(doc))
             {
                 Document linkDoc = link.GetLinkDocument();

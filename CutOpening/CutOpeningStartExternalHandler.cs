@@ -28,7 +28,7 @@ namespace RevitTimasBIMTools.CutOpening
 
             IDictionary<int, ElementId> validIds = purgeManager.PurgeAndGetValidConstructionTypeIds(doc);
             Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
-            IList<DocumentModel> docModels = RevitDocumentManager.GetDocumentCollection(doc);
+            ICollection<DocumentModel> docModels = RevitDocumentManager.GetDocumentCollection(doc);
             OnCompleted(new BaseCompletedEventArgs(docModels, validIds));
         }
 
@@ -49,10 +49,10 @@ namespace RevitTimasBIMTools.CutOpening
 
     public class BaseCompletedEventArgs : EventArgs
     {
-        public IList<DocumentModel> DocumentModels { get; }
+        public ICollection<DocumentModel> DocumentModels { get; }
         public IDictionary<int, ElementId> ConstructionTypeIds { get; }
 
-        public BaseCompletedEventArgs(IList<DocumentModel> docs, IDictionary<int, ElementId> validIds)
+        public BaseCompletedEventArgs(ICollection<DocumentModel> docs, IDictionary<int, ElementId> validIds)
         {
             DocumentModels = docs;
             ConstructionTypeIds = validIds;

@@ -19,7 +19,7 @@ namespace RevitTimasBIMTools.Views
         private readonly Mutex mutex = new();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
-
+        private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
 
         public CutOpeningDockPanelView()
         {
@@ -82,7 +82,7 @@ namespace RevitTimasBIMTools.Views
                     .ContinueWith(_ =>
                     {
                         dataViewModel?.Dispose();
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                    }, syncContext);
                     // TODO: освободить управляемое состояние (управляемые объекты)
                 }
                 // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения
