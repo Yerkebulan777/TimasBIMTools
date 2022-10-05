@@ -297,7 +297,7 @@ namespace RevitTimasBIMTools.ViewModels
                     StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constTypeIds);
                     FamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
                 }
-            }).RunSynchronously();
+            }).Wait();
         }
 
 
