@@ -31,6 +31,7 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        [STAThread]
         public void SetupDockablePane(DockablePaneProviderData data)
         {
             data.FrameworkElement = this;

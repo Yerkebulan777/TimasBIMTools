@@ -38,16 +38,17 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Input Properties
 
-        private int levelIntId = 0;
-        private Document searchDoc = null;
-        private Transform searchTrans = null;
-        private ElementId searchCatId = null;
-        private RevitLinkInstance searchInstance = null;
+        private int levelIntId { get; set; } = -1;
+        private Document searchDoc { get; set; } = null;
+        private Transform searchTrans { get; set; } = null;
+        private ElementId searchCatId { get; set; } = null;
+        private RevitLinkInstance searchInstance { get; set; } = null;
 
+        private readonly int categoryIntId = Properties.Settings.Default.CategoryIntId;
         private readonly double minSideSize = Properties.Settings.Default.MinSideSizeInMm;
         private readonly double maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
         private readonly double cutOffsetSize = Properties.Settings.Default.CutOffsetInMm;
-
+        
         //private readonly string widthParamName = "ширина";
         //private readonly string heightParamName = "высота";
 
@@ -55,7 +56,6 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         #region Templory Properties
-
 
         private ElementDataDictionary dataBase;
         private XYZ centroidPoint = XYZ.Zero;
@@ -83,18 +83,19 @@ namespace RevitTimasBIMTools.CutOpening
 
         #endregion
 
-        private void InitializeUnits(Document doc)
+
+        private void Initialize(Document doc)
         {
             dataBase = new();
             units = doc.GetUnits();
+            searchCatId = new ElementId(categoryIntId);
             angleUnit = units.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
 
 
-        public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level, DocumentModel source, Category category, IList<Element> elements)
+        public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level, DocumentModel source, IList<Element> elements)
         {
-            InitializeUnits(doc);
-            searchCatId = category.Id;
+            Initialize(doc);
             searchDoc = source.Document;
             searchTrans = source.Transform;
             searchInstance = source.LinkInstance;
