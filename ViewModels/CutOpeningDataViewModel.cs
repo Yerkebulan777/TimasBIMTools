@@ -301,15 +301,12 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        private void GetGeneral3DView()
+        private async void GetGeneral3DView()
         {
-            task = RevitTask.RunAsync(app =>
+            view3d = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
-                }
+                return documentId.Equals(doc.ProjectInformation.UniqueId) ? RevitViewManager.Get3dView(app.ActiveUIDocument) : null;
             });
         }
 
