@@ -11,6 +11,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -33,7 +34,7 @@ namespace RevitTimasBIMTools.ViewModels
         private Task task { get; set; } = null;
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
-        private IList<Element> elements { get; set; } = null;
+        private ConcurrentQueue<Element> elements { get; set; } = null;
         private IDictionary<int, ElementId> constTypeIds { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
@@ -142,7 +143,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => docModel;
             set
             {
-                if(SetProperty(ref docModel, value))
+                if(SetProperty(ref docModel, value) && docModel != null)
                 {
                     manager.SearchDoc = docModel.Document;
                     manager.SearchTrans = docModel.Transform;
@@ -166,7 +167,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => category;
             set
             {
-                if (SetProperty(ref category, value))
+                if (SetProperty(ref category, value) && category != null)
                 {
                     Properties.Settings.Default.CategoryIntId = category.Id.IntegerValue;
                     Properties.Settings.Default.Save();

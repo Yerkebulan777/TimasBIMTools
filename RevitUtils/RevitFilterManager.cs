@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
@@ -233,7 +234,7 @@ namespace RevitTimasBIMTools.RevitUtils
         public static IDictionary<string, Material> GetConstructionCoreMaterials(Document doc, IDictionary<int, ElementId> typeIds)
         {
             CompoundStructure compound = null;
-            SortedDictionary<string, Material> result = new();
+            IDictionary<string, Material> result = new ConcurrentDictionary<string, Material>();
             if (typeIds != null && typeIds.Count > 0)
             {
                 foreach (KeyValuePair<int, ElementId> item in typeIds)
@@ -262,10 +263,10 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static IList<Element> GetInstancesByCoreMaterial(Document doc, IDictionary<int, ElementId> typeIds, string matName)
+        public static ConcurrentQueue<Element> GetInstancesByCoreMaterial(Document doc, IDictionary<int, ElementId> typeIds, string matName)
         {
             CompoundStructure compound = null;
-            List<Element> result = new(100);
+            ConcurrentQueue<Element> queue = new();
             foreach (KeyValuePair<int, ElementId> item in typeIds)
             {
                 Element elem = doc.GetElement(item.Value);
@@ -284,10 +285,13 @@ namespace RevitTimasBIMTools.RevitUtils
                 Material material = GetCompoundStructureMaterial(doc, elem, compound);
                 if (material != null && material.Name == matName)
                 {
-                    result.AddRange(GetInstancesByTypeId(doc, elem.Category.Id, elem.Id));
+                    foreach (Element inst in GetInstancesByTypeId(doc, elem.Category.Id, elem.Id))
+                    {
+                        queue.Enqueue(inst);
+                    }
                 }
             }
-            return result;
+            return queue;
         }
 
 
@@ -334,7 +338,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static IDictionary<string, Category> GetEngineerCategories(Document doc)
         {
-            IDictionary<string, Category> result = new SortedDictionary<string, Category>();
+            IDictionary<string, Category> result = new ConcurrentDictionary<string, Category>();
             IList<BuiltInCategory> builtInCats = new List<BuiltInCategory>
             {
                 BuiltInCategory.OST_Conduit,
