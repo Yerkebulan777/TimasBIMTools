@@ -319,11 +319,7 @@ namespace RevitTimasBIMTools.ViewModels
             EngineerCategories = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    return RevitFilterManager.GetEngineerCategories(doc);
-                }
-                return null;
+                return documentId.Equals(doc.ProjectInformation.UniqueId) ? RevitFilterManager.GetEngineerCategories(doc) : null;
             });
         }
 
@@ -333,11 +329,7 @@ namespace RevitTimasBIMTools.ViewModels
             StructureMaterials = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    return RevitFilterManager.GetConstructionCoreMaterials(doc, constTypeIds);
-                }
-                return null;
+                return documentId.Equals(doc.ProjectInformation.UniqueId) ? RevitFilterManager.GetConstructionCoreMaterials(doc, constTypeIds) : null;
             });
         }
 
@@ -347,52 +339,41 @@ namespace RevitTimasBIMTools.ViewModels
             FamilySymbols = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    return RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
-                }
-                return null;
+                return documentId.Equals(doc.ProjectInformation.UniqueId)
+                    ? RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel) : null;
             });
         }
 
 
-        private void SetValidLevelsToData()
+        private async void SetValidLevelsToData()
         {
-            task = RevitTask.RunAsync(app =>
+            ValidLevels = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    ValidLevels = RevitFilterManager.GetValidLevels(doc);
-                }
+                return documentId.Equals(doc.ProjectInformation.UniqueId) ? RevitFilterManager.GetValidLevels(doc) : null;
             });
         }
 
 
-        private void GetInstancesByCoreMaterialInType(string matName)
+        private async void GetInstancesByCoreMaterialInType(string matName)
         {
-            task = RevitTask.RunAsync(app =>
+            elements = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, constTypeIds, matName);
-                }
+                return documentId.Equals(doc.ProjectInformation.UniqueId)
+                    ? RevitFilterManager.GetInstancesByCoreMaterial(doc, constTypeIds, matName) : null;
             });
         }
 
 
 
-        private void SnoopIntersectionDataByLevel(Level level)
+        private async void SnoopIntersectionDataByLevel(Level level)
         {
-            task = RevitTask.RunAsync(app =>
+            ElementModelData = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                Properties.Settings.Default.Upgrade();
-                if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    ElementModelData = manager.GetCollisionByLevel(doc, level, elements).ToObservableCollection();
-                }
+                return documentId.Equals(doc.ProjectInformation.UniqueId)
+                    ? manager.GetCollisionByLevel(doc, level, elements).ToObservableCollection() : null;
             });
         }
 
@@ -490,10 +471,12 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref level, value) && value != null)
                 {
+                    Properties.Settings.Default.Upgrade();
                     SnoopIntersectionDataByLevel(level);
                 }
             }
         }
+
 
         private string filterText = string.Empty;
         public string FilterText
