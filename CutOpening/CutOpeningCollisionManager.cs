@@ -29,6 +29,7 @@ namespace RevitTimasBIMTools.CutOpening
         #region Constant Properties
 
         private const int invalIdInt = -1;
+        private const double footToMm = 304.8;
         private const double toleranceVolume = 0.005;
         private const double rightAngle = Math.PI / 2;
         private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
@@ -46,10 +47,10 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         private readonly int categoryIntId = Properties.Settings.Default.CategoryIntId;
-        private readonly double minSideSize = Properties.Settings.Default.MinSideSizeInMm;
-        private readonly double maxSideSize = Properties.Settings.Default.MaxSideSizeInMm;
-        private readonly double cutOffsetSize = Properties.Settings.Default.CutOffsetInMm;
-        
+        private readonly double minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
+        private readonly double maxSideSize = Convert.ToDouble(Properties.Settings.Default.MaxSideSizeInMm / footToMm);
+        private readonly double cutOffsetSize = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
+
         //private readonly string widthParamName = "ширина";
         //private readonly string heightParamName = "высота";
 
@@ -94,21 +95,22 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level, ConcurrentQueue<Element> elements)
+        public ConcurrentQueue<ElementModel> GetCollisionByLevel(Document doc, Level level, ConcurrentQueue<Element> elements)
         {
             Initialize(doc);
             LevelIntId = level.Id.IntegerValue;
+            ConcurrentQueue<ElementModel> output = new();
             foreach (Element host in elements)
             {
                 if (LevelIntId == host.LevelId.IntegerValue)
                 {
                     foreach (ElementModel model in GetIntersectionElementModels(doc, SearchCatId, SearchTrans, host))
                     {
-                        yield return model;
+                        output.Enqueue(model);
                     }
-
                 }
             }
+            return output;
         }
 
 

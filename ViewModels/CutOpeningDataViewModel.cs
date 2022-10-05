@@ -39,7 +39,6 @@ namespace RevitTimasBIMTools.ViewModels
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
 
-        private const double footToMm = 304.8;
         private readonly SynchronizationContext context = SynchronizationContext.Current;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
@@ -161,16 +160,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => categories;
             set
             {
-                if (SynchronizationContext.Current == context)
+                if (SetProperty(ref categories, value))
                 {
-                    if (SetProperty(ref categories, value))
-                    {
-                        Logger.Info("Right!");
-                    }
-                }
-                else
-                {
-                    context.Send(delegate { _ = SetProperty(ref categories, value); }, null);
+                    Logger.Log(nameof(EngineerCategories));
                 }
             }
         }
@@ -220,16 +212,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => familySymbols;
             set
             {
-                if (SynchronizationContext.Current == context)
+                if (SetProperty(ref familySymbols, value))
                 {
-                    if (SetProperty(ref familySymbols, value))
-                    {
-                        Logger.Info("Right!");
-                    }
-                }
-                else
-                {
-                    context.Send(delegate { _ = SetProperty(ref familySymbols, value); }, null);
+                    Logger.Log(nameof(FamilySymbols));
                 }
             }
         }
@@ -263,45 +248,45 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private double minSize = Properties.Settings.Default.MinSideSizeInMm * footToMm;
-        public double MinSideSize
+        private int minSize = Properties.Settings.Default.MinSideSizeInMm;
+        public int MinSideSize
         {
             get => minSize;
             set
             {
                 if (SetProperty(ref minSize, value))
                 {
-                    Properties.Settings.Default.MinSideSizeInMm = minSize / footToMm;
+                    Properties.Settings.Default.MinSideSizeInMm = minSize;
                     Properties.Settings.Default.Save();
                 }
             }
         }
 
 
-        private double maxSize = Properties.Settings.Default.MaxSideSizeInMm * footToMm;
-        public double MaxSideSize
+        private int maxSize = Properties.Settings.Default.MaxSideSizeInMm;
+        public int MaxSideSize
         {
             get => maxSize;
             set
             {
                 if (SetProperty(ref maxSize, value))
                 {
-                    Properties.Settings.Default.MaxSideSizeInMm = minSize / footToMm;
+                    Properties.Settings.Default.MaxSideSizeInMm = minSize;
                     Properties.Settings.Default.Save();
                 }
             }
         }
 
 
-        private double cutOffset = Properties.Settings.Default.CutOffsetInMm * footToMm;
-        public double CutOffsetSize
+        private int cutOffset = Properties.Settings.Default.CutOffsetInMm;
+        public int CutOffsetSize
         {
             get => cutOffset;
             set
             {
                 if (SetProperty(ref cutOffset, value))
                 {
-                    Properties.Settings.Default.CutOffsetInMm = minSize / footToMm;
+                    Properties.Settings.Default.CutOffsetInMm = minSize;
                     Properties.Settings.Default.Save();
                 }
             }
