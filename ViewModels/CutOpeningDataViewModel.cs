@@ -43,7 +43,7 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
-        private readonly ConcurrentExclusiveSchedulerPair taskSchedulerPair = new();
+        //private readonly ConcurrentExclusiveSchedulerPair taskSchedulerPair = new();
 
 
         public CutOpeningDataViewModel()
@@ -274,14 +274,14 @@ namespace RevitTimasBIMTools.ViewModels
         //[STAThread]
         private void GetGeneral3DView()
         {
-            _ = RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
                 }
-            });
+            }).Dispose();
         }
 
 
@@ -297,7 +297,7 @@ namespace RevitTimasBIMTools.ViewModels
                     StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constTypeIds);
                     FamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
                 }
-            }).Wait();
+            }).Dispose();
         }
 
 
@@ -311,7 +311,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     ValidLevels = RevitFilterManager.GetValidLevels(doc);
                 }
-            }).Wait();
+            }).Dispose();
         }
 
 
@@ -325,7 +325,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     elements = RevitFilterManager.GetInstancesByCoreMaterial(doc, constTypeIds, matName);
                 }
-            }).Wait();
+            }).Dispose();
         }
 
 
@@ -339,7 +339,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     ElementModelData = manager.GetCollisionByLevel(doc, level, docModel, category, elements).ToObservableCollection();
                 }
-            }).Wait();
+            }).Dispose();
         }
 
 
