@@ -28,7 +28,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Constant Properties
 
-        private const int invalIdInt = -1;
+        private const int invalidInt = -1;
         private const double footToMm = 304.8;
         private const double toleranceVolume = 0.005;
         private const double rightAngle = Math.PI / 2;
@@ -39,12 +39,11 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Input Properties
 
-        public int LevelIntId { get; internal set; } = -1;
+        public int LevelIntId { get; set; } = invalidInt;
         public Document SearchDoc { get; internal set; } = null;
         public Transform SearchTrans { get; internal set; } = null;
         public ElementId SearchCatId { get; internal set; } = null;
         public RevitLinkInstance SearchInstance { get; internal set; } = null;
-
 
         private readonly int categoryIntId = Properties.Settings.Default.CategoryIntId;
         private readonly double minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
@@ -358,7 +357,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         //private double GetLengthValueBySimilarParameterName(Element elem, string paramName)
         //{
-        //    double value = invalIdInt;
+        //    double value = invalidInt;
         //    int minimum = int.MaxValue;
         //    char[] delimiters = new[] { ' ', '_', '-' };
         //    foreach (Parameter param in elem.GetOrderedParameters())
