@@ -34,7 +34,7 @@ namespace RevitTimasBIMTools.ViewModels
         private Task task { get; set; } = null;
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
-        private ConcurrentQueue<Element> elements { get; set; } = null;
+        private ConcurrentQueue<Element> instances { get; set; } = null;
         private IDictionary<int, ElementId> constTypeIds { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
@@ -357,7 +357,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetInstancesByCoreMaterialInType(string matName)
         {
-            elements = await RevitTask.RunAsync(app =>
+            instances = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 return documentId.Equals(doc.ProjectInformation.UniqueId)
@@ -373,7 +373,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 doc = app.ActiveUIDocument.Document;
                 return documentId.Equals(doc.ProjectInformation.UniqueId)
-                    ? manager.GetCollisionByLevel(doc, level, elements).ToObservableCollection() : null;
+                    ? manager.GetCollisionByLevel(doc, level, instances).ToObservableCollection() : null;
             });
         }
 
@@ -469,7 +469,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => level;
             set
             {
-                if (SetProperty(ref level, value) && value != null)
+                if (SetProperty(ref level, value) && level != null)
                 {
                     Properties.Settings.Default.Upgrade();
                     SnoopIntersectionDataByLevel(level);
