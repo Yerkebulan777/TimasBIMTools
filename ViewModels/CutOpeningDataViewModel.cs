@@ -40,10 +40,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         private double size = 0;
         private const double footToMm = 304.8;
-        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
+
+        private readonly Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
+        private readonly SynchronizationContext context = SynchronizationContext.Current;
+        private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
-        private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
+        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
 
 
         public CutOpeningDataViewModel()
@@ -147,6 +150,7 @@ namespace RevitTimasBIMTools.ViewModels
                     manager.SearchDoc = docModel.Document;
                     manager.SearchTrans = docModel.Transform;
                     manager.SearchInstance = docModel.LinkInstance;
+                    CommandManager.InvalidateRequerySuggested();
                 }
             }
         }
@@ -158,9 +162,13 @@ namespace RevitTimasBIMTools.ViewModels
             get => categories;
             set
             {
-                if(SetProperty(ref categories, value))
+                if (SynchronizationContext.Current == context)
                 {
-                    CommandManager.InvalidateRequerySuggested();
+                    _ = SetProperty(ref categories, value);
+                }
+                else
+                {
+                    context.Send(delegate { _ = SetProperty(ref categories, value); }, null);
                 }
             }
         }
@@ -291,6 +299,13 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Methods
+
+        private void RaisePropertyChanged(object param)
+        {
+
+            OnPropertyChanged((PropertyChangedEventArgs)param);
+        }
+
 
         private void GetGeneral3DView()
         {
@@ -568,7 +583,6 @@ namespace RevitTimasBIMTools.ViewModels
                     UniqueItemNames = GetUniqueStringList(ElementModelData);
                 }
             });
-
         }
 
         #endregion
