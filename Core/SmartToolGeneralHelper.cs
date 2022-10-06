@@ -15,7 +15,6 @@ namespace RevitTimasBIMTools.Core
 {
     internal sealed class SmartToolGeneralHelper
     {
-        
         public const string ApplicationName = "Smart BIM Tools";
         public const string CutVoidToolName = "Cut Opening Manager";
         public static readonly Assembly Assembly = Assembly.GetExecutingAssembly();

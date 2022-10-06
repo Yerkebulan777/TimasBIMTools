@@ -14,8 +14,6 @@ namespace RevitTimasBIMTools.CutOpening
     internal sealed class CutOpeningShowPanelCmd : IExternalCommand, IExternalCommandAvailability
     {
         private DockablePaneId dockpid { get; set; } = null;
-
-        private readonly IServiceProvider provider = SmartToolController.Services;
         private readonly SmartToolGeneralHelper generalHelper = SmartToolController.Services.GetRequiredService<SmartToolGeneralHelper>();
         private readonly IDockablePaneProvider dockProvider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
@@ -29,13 +27,9 @@ namespace RevitTimasBIMTools.CutOpening
             dockpid = generalHelper.DockPaneId;
             if (DockablePane.PaneIsRegistered(dockpid))
             {
-
                 DockablePane dockpane = uiapp.GetDockablePane(dockpid);
                 if (dockProvider is CutOpeningDockPanelView viewpane)
                 {
-                    using IServiceScope scope = provider.CreateScope();
-                    CutOpeningStartExternalHandler dockpaneHandler = scope.ServiceProvider.GetRequiredService<CutOpeningStartExternalHandler>();
-                    ExternalEvent dockpaneExtEvent = ExternalEvent.Create(dockpaneHandler);
                     if (dockpane.IsShown())
                     {
                         try
@@ -43,35 +37,27 @@ namespace RevitTimasBIMTools.CutOpening
                             dockpane.Hide();
                             viewpane.Dispose();
                             dockpane.Dispose();
-                            dockpaneExtEvent.Dispose();
                         }
-                        catch
+                        catch (Exception ex)
                         {
+                            message = ex.Message;
                             return Result.Failed;
                         }
                     }
                     else
                     {
-                        ExternalEventRequest signal = dockpaneExtEvent.Raise();
-                        switch (signal)
+                        try
                         {
-                            case ExternalEventRequest.Accepted:
-                                try
-                                {
-                                    dockpane.Show();
-                                }
-                                catch
-                                {
-                                    return Result.Failed;
-                                }
-                                return Result.Succeeded;
-                            default:
-                                return Result.Failed;
+                            dockpane.Show();
+                        }
+                        catch (Exception ex)
+                        {
+                            message = ex.Message;
+                            return Result.Failed;
                         }
                     }
                 }
             }
-
             return Result.Succeeded;
         }
 
