@@ -7,7 +7,7 @@
     d:DataContext="{d:DesignInstance Type=vm:CutOpeningDataViewModel}"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    x:Class="RevitTimasBIMTools.Views.CutOpeningDockPanelView" 
+    x:Class="RevitTimasBIMTools.Views.CutVoidDockPanelView" 
     d:Height="Auto" d:Width="300" mc:Ignorable="d"
     Background="WhiteSmoke">
 

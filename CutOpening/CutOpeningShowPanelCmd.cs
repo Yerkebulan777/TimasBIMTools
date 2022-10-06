@@ -3,7 +3,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.Views;
 using System;
 
 
@@ -13,18 +12,14 @@ namespace RevitTimasBIMTools.CutOpening
     [Regeneration(RegenerationOption.Manual)]
     internal sealed class CutOpeningShowPanelCmd : IExternalCommand, IExternalCommandAvailability
     {
-        private DockablePaneId dockpid { get; set; } = null;
-        private ExternalEvent dockpaneExtEvent { get; set; } = null;
-        private CutOpeningStartExternalHandler dockpaneHandler { get; set; } = null;
+        private DockablePaneId dockid = null;
+        private DockablePane dockpane = null;
+        private readonly SmartToolGeneralHelper helper = SmartToolController.Services.GetRequiredService<SmartToolGeneralHelper>();
+        //private readonly IDockablePaneProvider idockpane = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
 
-        private readonly SmartToolGeneralHelper generalHelper = SmartToolController.Services.GetRequiredService<SmartToolGeneralHelper>();
-        private readonly IDockablePaneProvider dockProvider = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
-        private readonly IServiceProvider provider = SmartToolController.Services;
+
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            using IServiceScope scope = provider.CreateScope();
-            dockpaneHandler = scope.ServiceProvider.GetRequiredService<CutOpeningStartExternalHandler>();
-            dockpaneExtEvent = ExternalEvent.Create(dockpaneHandler);
             return Execute(commandData.Application, ref message);
         }
 
@@ -32,38 +27,33 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
+            dockid = helper.DockPaneId;
             Result result = Result.Succeeded;
-            dockpid = generalHelper.DockPaneId;
-            if (DockablePane.PaneIsRegistered(dockpid))
+            if (DockablePane.PaneIsRegistered(dockid))
             {
-                DockablePane dockpane = uiapp.GetDockablePane(dockpid);
-                if (dockpane.IsValidObject && dockProvider is CutOpeningDockPanelView viewpane)
+                dockpane = uiapp.GetDockablePane(dockid);
+                if (dockpane.IsShown())
                 {
-                    viewpane.DockpaneExternalEvent = dockpaneExtEvent;
-                    if (viewpane.IsLoaded)
+                    try
                     {
-                        try
-                        {
-                            dockpane.Hide();
-                            viewpane.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            message = ex.Message;
-                            result = Result.Failed;
-                        }
+                        dockpane.Hide();
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        try
-                        {
-                            dockpane.Show();
-                        }
-                        catch (Exception ex)
-                        {
-                            message = ex.Message;
-                            result = Result.Failed;
-                        }
+                        message = ex.Message;
+                        result = Result.Failed;
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        dockpane.Show();
+                    }
+                    catch (Exception ex)
+                    {
+                        message = ex.Message;
+                        result = Result.Failed;
                     }
                 }
             }
@@ -73,7 +63,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
         {
-            return generalHelper.IsActive && uiapp?.ActiveUIDocument.Document.IsFamilyDocument == false;
+            return uiapp?.ActiveUIDocument.Document.IsFamilyDocument == false;
         }
 
 

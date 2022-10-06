@@ -1,6 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
+using RevitTimasBIMTools.Core;
+using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
@@ -12,54 +15,53 @@ using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Views
 {
-    /// <summary> Логика взаимодействия для CutOpeningDockPanelView.xaml </summary>
-    public partial class CutOpeningDockPanelView : Page, IDisposable, IDockablePaneProvider
+    /// <summary> Логика взаимодействия для CutVoidDockPanelView.xaml </summary>
+    public partial class CutVoidDockPanelView : Page, IDisposable, IDockablePaneProvider
     {
         private bool disposedValue = false;
         private readonly Mutex mutex = new();
-        public ExternalEvent DockpaneExternalEvent { get; internal set; } = null;
-        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
+        private readonly ExternalEvent externalEvent;
+        private readonly CutOpeningStartExternalHandler handler;
+        private readonly IServiceProvider provider = SmartToolController.Services;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
+        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
-        
 
-        public CutOpeningDockPanelView()
+
+        public CutVoidDockPanelView()
         {
             InitializeComponent();
+            handler = provider.GetRequiredService<CutOpeningStartExternalHandler>();
+            externalEvent = ExternalEvent.Create(handler);
             Loaded += DockPanelView_Loaded;
-            Dispatcher.CurrentDispatcher.ShutdownStarted += OnShutdownStarted;
         }
 
 
         [STAThread]
         public void SetupDockablePane(DockablePaneProviderData data)
         {
-            if (DockpaneExternalEvent != null)
+            data.FrameworkElement = this;
+            data.InitialState = new DockablePaneState
             {
-                data.FrameworkElement = this;
-                data.InitialState = new DockablePaneState
-                {
-                    DockPosition = DockPosition.Tabbed,
-                    TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette
-                };
-            }
+                DockPosition = DockPosition.Tabbed,
+                TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette
+            };
         }
 
 
         [STAThread]
         private void DockPanelView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            Loaded -= DockPanelView_Loaded;
-            Dispatcher.CurrentDispatcher.Invoke(() =>
+            Dispatcher.CurrentDispatcher.ShutdownStarted += OnShutdownStarted;
+            if (ExternalEventRequest.Accepted == externalEvent.Raise())
             {
-                dataViewModel.Dispose();
-                DataContext = dataViewModel;
-                dataViewModel.DockPanelView = this;
-                if (DockpaneExternalEvent.IsPending)
+                Dispatcher.CurrentDispatcher.Invoke(() =>
                 {
-                    _ = DockpaneExternalEvent.Raise();
-                }
-            });
+                    dataViewModel.Dispose();
+                    DataContext = dataViewModel;
+                    dataViewModel.DockPanelView = this;
+                });
+            }
         }
 
 

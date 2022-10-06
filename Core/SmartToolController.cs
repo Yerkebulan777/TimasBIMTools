@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Events;
+using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using Revit.Async.Interfaces;
@@ -19,28 +19,13 @@ namespace RevitTimasBIMTools.Core
 {
     public sealed class SmartToolController : IExternalApplication
     {
+        private static IContainer Container { get; set; }
         public static IServiceProvider Services = CreateServiceProvider();
         private UIControlledApplication controller { get; set; } = null;
-        private readonly CutOpeningRegisterDockablePane dockManager = Services.GetRequiredService<CutOpeningRegisterDockablePane>();
-        private readonly SmartToolGeneralHelper generalHelper = Services.GetRequiredService<SmartToolGeneralHelper>();
+
+        private readonly CutVoidRegisterDockPane register = Services.GetRequiredService<CutVoidRegisterDockPane>();
+        private readonly SmartToolGeneralHelper helper = Services.GetRequiredService<SmartToolGeneralHelper>();
         private readonly IDockablePaneProvider provider = Services.GetRequiredService<IDockablePaneProvider>();
-
-        [STAThread]
-        public static IServiceProvider CreateServiceProvider()
-        {
-            IServiceCollection services = new ServiceCollection();
-
-            services = services.AddSingleton<IRevitTask, RevitTask>();
-            services = services.AddSingleton<SmartToolGeneralHelper>();
-            services = services.AddSingleton<CutOpeningRegisterDockablePane>();
-            services = services.AddTransient<IDockablePaneProvider, CutOpeningDockPanelView>();
-            services = services.AddTransient<CutOpeningStartExternalHandler>(); 
-            services = services.AddTransient<CutOpeningCollisionManager>();
-            services = services.AddTransient<CutOpeningDataViewModel>();
-            services = services.AddTransient<RevitPurginqManager>();
-
-            return services.BuildServiceProvider();
-        }
 
 
         [STAThread]
@@ -53,36 +38,58 @@ namespace RevitTimasBIMTools.Core
             controller = cntrapp;
 
             Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
-            cntrapp.ControlledApplication.ApplicationInitialized += DockablePaneRegisters;
-            cntrapp.Idling += new EventHandler<IdlingEventArgs>(OnIdStart);
+            cntrapp.ControlledApplication.ApplicationInitialized += OnApplicationInitialized;
 
             return Result.Succeeded;
         }
 
-
-
         [STAThread]
-        public Result OnShutdown(UIControlledApplication cntrapp)
+        private void OnApplicationInitialized(object sender, ApplicationInitializedEventArgs e)
         {
-            cntrapp.ControlledApplication.ApplicationInitialized -= DockablePaneRegisters;
-            return Result.Succeeded;
-        }
-
-
-        [STAThread]
-        private void DockablePaneRegisters(object sender, ApplicationInitializedEventArgs e)
-        {
+            register.RegisterDockablePane(controller, provider, helper.DockPaneId);
             if (RenderOptions.ProcessRenderMode.Equals(RenderMode.SoftwareOnly))
             {
                 RenderOptions.ProcessRenderMode = RenderMode.Default;
             }
-            dockManager.RegisterDockablePane(controller, provider, generalHelper.DockPaneId);
+            
+            //using (var scope = Container.BeginLifetimeScope())
+            //{
+            //    var writer = scope.Resolve<IDateWriter>();
+            //    writer.WriteDate();
+            //}
+
         }
 
-        private void OnIdStart(object sender, IdlingEventArgs e)
+        [STAThread]
+        public Result OnShutdown(UIControlledApplication cntrapp)
         {
-            controller.Idling -= OnIdStart;
-            generalHelper.IsActive = true;
+            cntrapp.ControlledApplication.ApplicationInitialized -= OnApplicationInitialized;
+            return Result.Succeeded;
+        }
+
+        public static IServiceProvider CreateServiceProvider()
+        {
+            IServiceCollection services = new ServiceCollection();
+
+            services = services.AddSingleton<IRevitTask, RevitTask>();
+            services = services.AddSingleton<SmartToolGeneralHelper>();
+            services = services.AddSingleton<CutVoidRegisterDockPane>();
+            services = services.AddScoped<IDockablePaneProvider, CutVoidDockPanelView>();
+            services = services.AddTransient<CutOpeningStartExternalHandler>();
+            services = services.AddTransient<CutOpeningCollisionManager>();
+            services = services.AddTransient<CutOpeningDataViewModel>();
+            services = services.AddTransient<RevitPurginqManager>();
+
+            return services.BuildServiceProvider();
+        }
+
+        private static IContainer Configure()
+        {
+            ContainerBuilder builder = new();
+            builder.RegisterType<RevitTask>().As<RevitTask, IRevitTask>();
+            builder.RegisterType<SmartToolGeneralHelper>().SingleInstance();
+            builder.RegisterType<CutVoidRegisterDockPane>().SingleInstance();
+            return builder.Build();
         }
 
     }
