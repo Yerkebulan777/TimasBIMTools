@@ -1,9 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
-using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
@@ -20,11 +17,11 @@ namespace RevitTimasBIMTools.Views
     {
         private bool disposedValue = false;
         private readonly Mutex mutex = new();
-        private CutOpeningStartExternalHandler dockpaneHandler = null;
-        private readonly IServiceProvider provider = SmartToolController.Services;
+        public ExternalEvent DockpaneExternalEvent { get; internal set; } = null;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
+        
 
         public CutOpeningDockPanelView()
         {
@@ -37,12 +34,15 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         public void SetupDockablePane(DockablePaneProviderData data)
         {
-            data.FrameworkElement = this;
-            data.InitialState = new DockablePaneState
+            if (DockpaneExternalEvent != null)
             {
-                DockPosition = DockPosition.Tabbed,
-                TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette
-            };
+                data.FrameworkElement = this;
+                data.InitialState = new DockablePaneState
+                {
+                    DockPosition = DockPosition.Tabbed,
+                    TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette
+                };
+            }
         }
 
 
@@ -50,15 +50,15 @@ namespace RevitTimasBIMTools.Views
         private void DockPanelView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             Loaded -= DockPanelView_Loaded;
-            using IServiceScope scope = provider.CreateScope();
-            dockpaneHandler = scope.ServiceProvider.GetRequiredService<CutOpeningStartExternalHandler>();
-            ExternalEvent dockpaneExtEvent = ExternalEvent.Create(dockpaneHandler);
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
                 dataViewModel.Dispose();
                 DataContext = dataViewModel;
                 dataViewModel.DockPanelView = this;
-                ExternalEventRequest result = dockpaneExtEvent.Raise();
+                if (DockpaneExternalEvent.IsPending)
+                {
+                    _ = DockpaneExternalEvent.Raise();
+                }
             });
         }
 
