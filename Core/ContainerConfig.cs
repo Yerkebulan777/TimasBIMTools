@@ -11,7 +11,7 @@ namespace RevitTimasBIMTools.Core
 {
     public static class ContainerConfig
     {
-        private static IContainer Configure()
+        public static IContainer Configure()
         {
             ContainerBuilder builder = new();
 
@@ -21,12 +21,14 @@ namespace RevitTimasBIMTools.Core
             builder.RegisterType<CutVoidRegisterDockPane>().As<IRegisterDockPane>().SingleInstance();
 
             builder.RegisterType<CutOpeningStartExternalHandler>().AsSelf();
-            builder.RegisterType<CutOpeningCollisionManager>().AsSelf();
-            builder.RegisterType<CutOpeningDataViewModel>().AsSelf();
+            builder.RegisterType<CutVoidCollisionManager>().AsSelf();
+            builder.RegisterType<CutVoidDataViewModel>().AsSelf();
             builder.RegisterType<RevitPurginqManager>().AsSelf();
 
             return builder.Build();
         }
+
+
 
         //Example Autofac automatic registry by assemly: 
         //Assembly dataAccess = Assembly.LoadFrom(nameof(DIContainersLibrary));

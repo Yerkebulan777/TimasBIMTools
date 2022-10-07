@@ -76,8 +76,8 @@ namespace RevitTimasBIMTools.Core
             services = services.AddSingleton<CutVoidRegisterDockPane>();
             services = services.AddScoped<IDockablePaneProvider, CutVoidDockPanelView>();
             services = services.AddTransient<CutOpeningStartExternalHandler>();
-            services = services.AddTransient<CutOpeningCollisionManager>();
-            services = services.AddTransient<CutOpeningDataViewModel>();
+            services = services.AddTransient<CutVoidCollisionManager>();
+            services = services.AddTransient<CutVoidDataViewModel>();
             services = services.AddTransient<RevitPurginqManager>();
 
             return services.BuildServiceProvider();

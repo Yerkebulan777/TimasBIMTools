@@ -82,7 +82,7 @@
     <DelaySign>false</DelaySign>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Core\MyCert.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Core\_MyCert.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -215,7 +215,7 @@
     <Compile Include="RevitModel\ElementTypeData.cs" />
     <Compile Include="RevitModel\IRevitElementModel.cs" />
     <Compile Include="RevitModel\RevitHostConstruction.cs" />
-    <Compile Include="CutOpening\CutOpeningCollisionManager.cs" />
+    <Compile Include="CutOpening\CutVoidCollisionManager.cs" />
     <Compile Include="RevitUtils\ProjectLoctionManager.cs" />
     <Compile Include="RevitUtils\RevitViewManager.cs" />
     <Compile Include="Services\AsyncObservableCollection.cs" />
@@ -257,7 +257,7 @@
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Services\Timer.cs" />
     <Compile Include="ViewConverters\ElementNameConverter.cs" />
-    <Compile Include="ViewModels\CutOpeningDataViewModel.cs" />
+    <Compile Include="ViewModels\CutVoidDataViewModel.cs" />
     <Compile Include="ViewModels\ExecutionDataflowBlockOptions.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\CutVoidDockPanelView.xaml.cs">
@@ -268,7 +268,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
-    <None Include="Core\MyCert.pfx" />
+    <None Include="Core\_MyCert.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -23,7 +23,7 @@ namespace RevitTimasBIMTools.Views
         private readonly ExternalEvent externalEvent;
         private readonly CutOpeningStartExternalHandler handler;
         private readonly IServiceProvider provider = SmartToolController.Services;
-        private readonly CutOpeningDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
+        private readonly CutVoidDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
 

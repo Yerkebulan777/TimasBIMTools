@@ -27,7 +27,7 @@ using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public sealed class CutOpeningDataViewModel : ObservableObject, IDisposable
+    public sealed class CutVoidDataViewModel : ObservableObject, IDisposable
     {
         public CutVoidDockPanelView DockPanelView { get; set; } = null;
 
@@ -40,12 +40,12 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         private readonly SynchronizationContext context = SynchronizationContext.Current;
-        private readonly CutOpeningCollisionManager manager = SmartToolController.Services.GetRequiredService<CutOpeningCollisionManager>();
+        private readonly CutVoidCollisionManager manager = SmartToolController.Services.GetRequiredService<CutVoidCollisionManager>();
         private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
 
 
-        public CutOpeningDataViewModel()
+        public CutVoidDataViewModel()
         {
             viewHandler.Completed += OnContextHandlerCompleted;
             SettingsCommand = new RelayCommand(SettingsHandelCommand);

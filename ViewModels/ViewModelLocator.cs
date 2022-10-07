@@ -7,6 +7,6 @@ namespace RevitTimasBIMTools.ViewModels
     public class ViewModelLocator
     {
         private static readonly IServiceProvider provider = SmartToolController.Services;
-        public static CutOpeningDataViewModel DataViewModel => provider.GetRequiredService<CutOpeningDataViewModel>();
+        public static CutVoidDataViewModel DataViewModel => provider.GetRequiredService<CutVoidDataViewModel>();
     }
 }

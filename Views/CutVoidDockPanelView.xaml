@@ -4,7 +4,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
-    d:DataContext="{d:DesignInstance Type=vm:CutOpeningDataViewModel}"
+    d:DataContext="{d:DesignInstance Type=vm:CutVoidDataViewModel}"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Class="RevitTimasBIMTools.Views.CutVoidDockPanelView" 

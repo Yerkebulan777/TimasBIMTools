@@ -9,7 +9,7 @@ using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.CutOpening
 {
-    internal sealed class CutOpeningCollisionManager : IDisposable
+    internal sealed class CutVoidCollisionManager : IDisposable
     {
         #region Parameter Properties
 

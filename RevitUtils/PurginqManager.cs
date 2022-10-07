@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using RevitTimasBIMTools.Services;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,27 +16,33 @@ namespace RevitTimasBIMTools.RevitUtils
                 BuiltInCategory.OST_Floors,
             };
 
-            bool flag = false;
+            FilteredElementCollector collector;
 
             ElementMulticategoryFilter multiCat = new(purgeBuiltInCats);
 
             IDictionary<int, ElementId> validTypeIds = new Dictionary<int, ElementId>(25);
+            IDictionary<int, ElementId> invalidTypeIds = new Dictionary<int, ElementId>(25);
 
-            IDictionary<int, ElementId> invalidTypeIds = new FilteredElementCollector(doc).OfClass(typeof(ElementType)).WherePasses(multiCat).ToDictionary(x => x.Id.IntegerValue, x => x.Id);
-
-            foreach (Element e in new FilteredElementCollector(doc).WherePasses(multiCat).WhereElementIsNotElementType())
+            collector = new FilteredElementCollector(doc).WhereElementIsNotElementType();
+            foreach (Element elm in collector.WherePasses(multiCat))
             {
-                ElementId typeId = e.GetTypeId();
-                int typeIdKey = typeId.IntegerValue;
-                if (!validTypeIds.ContainsKey(typeIdKey))
+                ElementId etypeId = elm.GetTypeId();
+                int typeIntId = etypeId.IntegerValue;
+                if (!validTypeIds.ContainsKey(typeIntId))
                 {
-                    validTypeIds[typeIdKey] = typeId;
+                    validTypeIds[typeIntId] = etypeId;
                 }
             }
 
-            foreach (KeyValuePair<int, ElementId> item in validTypeIds)
+            collector = new FilteredElementCollector(doc).WhereElementIsElementType();
+            foreach (Element etp in collector.WherePasses(multiCat))
             {
-                flag = invalidTypeIds.Remove(item.Key);
+                ElementId etypeId = etp.GetTypeId();
+                int typeIntId = etypeId.IntegerValue;
+                if (!validTypeIds.ContainsKey(typeIntId))
+                {
+                    invalidTypeIds[typeIntId] = etypeId;
+                }
             }
 
 
