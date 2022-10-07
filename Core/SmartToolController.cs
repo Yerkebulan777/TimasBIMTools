@@ -51,7 +51,7 @@ namespace RevitTimasBIMTools.Core
             {
                 RenderOptions.ProcessRenderMode = RenderMode.Default;
             }
-            
+
             //using (var scope = Container.BeginLifetimeScope())
             //{
             //    var writer = scope.Resolve<IDateWriter>();
@@ -83,14 +83,7 @@ namespace RevitTimasBIMTools.Core
             return services.BuildServiceProvider();
         }
 
-        private static IContainer Configure()
-        {
-            ContainerBuilder builder = new();
-            builder.RegisterType<RevitTask>().As<RevitTask, IRevitTask>();
-            builder.RegisterType<SmartToolGeneralHelper>().SingleInstance();
-            builder.RegisterType<CutVoidRegisterDockPane>().SingleInstance();
-            return builder.Build();
-        }
+
 
     }
 }

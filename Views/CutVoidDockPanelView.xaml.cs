@@ -16,7 +16,7 @@ using System.Windows.Threading;
 namespace RevitTimasBIMTools.Views
 {
     /// <summary> Логика взаимодействия для CutVoidDockPanelView.xaml </summary>
-    public partial class CutVoidDockPanelView : Page, IDisposable, IDockablePaneProvider
+    public partial class CutVoidDockPanelView : Page, IDockablePaneProvider, IDisposable
     {
         private bool disposedValue = false;
         private readonly Mutex mutex = new();
