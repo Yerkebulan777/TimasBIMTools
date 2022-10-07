@@ -1,7 +1,5 @@
 ﻿using Autodesk.Revit.UI;
 using Autofac;
-using Revit.Async;
-using Revit.Async.Interfaces;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
@@ -15,12 +13,13 @@ namespace RevitTimasBIMTools.Core
         {
             ContainerBuilder builder = new();
 
+            builder.RegisterType<SmartToolSetupUIPanel>().AsSelf().SingleInstance();
             builder.RegisterType<SmartToolGeneralHelper>().AsSelf().SingleInstance();
-            builder.RegisterType<RevitTask>().As<RevitTask, IRevitTask>().SingleInstance();
-            builder.RegisterType<CutVoidDockPanelView>().As<IDockablePaneProvider>().SingleInstance();
-            builder.RegisterType<CutVoidRegisterDockPane>().As<IRegisterDockPane>().SingleInstance();
+            builder.RegisterType<CutVoidRegisterDockPane>().AsSelf().SingleInstance();
+            builder.RegisterType<CutVoidDockPanelView>().Named<IDockablePaneProvider>("CutVoidView").SingleInstance();
 
-            builder.RegisterType<CutOpeningStartExternalHandler>().AsSelf();
+            builder.RegisterType<CutVoidStartExternalHandler>().AsSelf();
+            builder.RegisterType<CutVoidShowPanelCommand>().AsSelf();
             builder.RegisterType<CutVoidCollisionManager>().AsSelf();
             builder.RegisterType<CutVoidDataViewModel>().AsSelf();
             builder.RegisterType<RevitPurginqManager>().AsSelf();
@@ -28,10 +27,9 @@ namespace RevitTimasBIMTools.Core
             return builder.Build();
         }
 
-
-
         //Example Autofac automatic registry by assemly: 
         //Assembly dataAccess = Assembly.LoadFrom(nameof(DIContainersLibrary));
         //builder.RegisterAssemblyTypes(dataAccess).Where(t => t.Namespace.Contains("Utils")).AsSelf().AsImplementedInterfaces();
+
     }
 }

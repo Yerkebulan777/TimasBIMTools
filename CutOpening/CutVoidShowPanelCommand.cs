@@ -1,7 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Microsoft.Extensions.DependencyInjection;
+using Autofac;
 using RevitTimasBIMTools.Core;
 using System;
 
@@ -10,51 +10,39 @@ namespace RevitTimasBIMTools.CutOpening
 {
     [Transaction(TransactionMode.ReadOnly)]
     [Regeneration(RegenerationOption.Manual)]
-    internal sealed class CutOpeningShowPanelCmd : IExternalCommand, IExternalCommandAvailability
+    internal sealed class CutVoidShowPanelCommand : IExternalCommand, IExternalCommandAvailability
     {
-        private DockablePaneId dockid = null;
-        private DockablePane dockpane = null;
-        private readonly SmartToolGeneralHelper helper = SmartToolController.Services.GetRequiredService<SmartToolGeneralHelper>();
-        //private readonly IDockablePaneProvider idockpane = SmartToolController.Services.GetRequiredService<IDockablePaneProvider>();
-
-
+        private readonly SmartToolGeneralHelper helper = SmartToolController.Container.Resolve<SmartToolGeneralHelper>();
+        private readonly CutVoidStartExternalHandler handler = SmartToolController.Container.Resolve<CutVoidStartExternalHandler>();
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             return Execute(commandData.Application, ref message);
         }
 
-
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
-            dockid = helper.DockPaneId;
             Result result = Result.Succeeded;
+            DockablePaneId dockid = helper.CutVoidPaneId;
             if (DockablePane.PaneIsRegistered(dockid))
             {
-                dockpane = uiapp.GetDockablePane(dockid);
-                if (dockpane.IsShown())
+                try
                 {
-                    try
+                    ExternalEvent externalEvent = ExternalEvent.Create(handler);
+                    DockablePane dockpane = uiapp.GetDockablePane(dockid);
+                    if (dockpane.IsShown())
                     {
                         dockpane.Hide();
                     }
-                    catch (Exception ex)
-                    {
-                        message = ex.Message;
-                        result = Result.Failed;
-                    }
-                }
-                else
-                {
-                    try
+                    else
                     {
                         dockpane.Show();
                     }
-                    catch (Exception ex)
-                    {
-                        message = ex.Message;
-                        result = Result.Failed;
-                    }
+                }
+                catch (Exception ex)
+                {
+                    message = ex.Message;
+                    result = Result.Failed;
                 }
             }
             return result;
@@ -69,7 +57,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public static string GetPath()
         {
-            return typeof(CutOpeningShowPanelCmd).FullName;
+            return typeof(CutVoidShowPanelCommand).FullName;
         }
     }
 }

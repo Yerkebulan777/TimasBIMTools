@@ -13,19 +13,21 @@ using System.Windows.Media.Imaging;
 
 namespace RevitTimasBIMTools.Core
 {
-    internal sealed class SmartToolGeneralHelper
+    public sealed class SmartToolGeneralHelper
     {
-        public const string ApplicationName = "Smart BIM Tools";
-        public const string CutVoidToolName = "Cut Opening Manager";
+        public string RibbonPanelName = "Automation";
+        public string ApplicationName = "Smart BIM Tools";
+        public string CutVoidToolName = "Cut Opening Manager";
         public static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
         public static readonly string AssemblyLocation = Path.GetFullPath(Assembly.Location);
         public static readonly string AssemblyDirectory = Path.GetDirectoryName(AssemblyLocation);
         public static readonly string AssemblyName = Path.GetFileNameWithoutExtension(AssemblyLocation);
         public static readonly string DocumentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         public static readonly string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+        public static readonly string AppDirPath = Path.Combine(AppDataPath, @"Autodesk\Revit\Addins\2019\RevitTimasBIMTools");
         public static readonly string LogPath = Path.Combine(DocumentPath, "RevitAsync.log");
 
-        public DockablePaneId DockPaneId { get; } = new(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
+        public DockablePaneId CutVoidPaneId { get; } = new(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
         public bool IsActive { get; internal set; } = false;
 
         #region IconConvertToImageSource

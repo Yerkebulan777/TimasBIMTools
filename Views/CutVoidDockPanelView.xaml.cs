@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
@@ -20,9 +21,7 @@ namespace RevitTimasBIMTools.Views
     {
         private bool disposedValue = false;
         private readonly Mutex mutex = new();
-        private readonly ExternalEvent externalEvent;
-        private readonly CutOpeningStartExternalHandler handler;
-        private readonly IServiceProvider provider = SmartToolController.Services;
+        private readonly ExternalEvent externalEvent;       
         private readonly CutVoidDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
@@ -31,8 +30,6 @@ namespace RevitTimasBIMTools.Views
         public CutVoidDockPanelView()
         {
             InitializeComponent();
-            handler = provider.GetRequiredService<CutOpeningStartExternalHandler>();
-            externalEvent = ExternalEvent.Create(handler);
             Loaded += DockPanelView_Loaded;
         }
 

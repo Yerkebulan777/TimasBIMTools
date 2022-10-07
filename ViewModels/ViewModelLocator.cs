@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Autofac;
 using RevitTimasBIMTools.Core;
-using System;
 
 namespace RevitTimasBIMTools.ViewModels
 {
     public class ViewModelLocator
     {
-        private static readonly IServiceProvider provider = SmartToolController.Services;
-        public static CutVoidDataViewModel DataViewModel => provider.GetRequiredService<CutVoidDataViewModel>();
+        private static readonly IContainer provider = SmartToolController.Container;
+        public static CutVoidDataViewModel DataViewModel => provider.Resolve<CutVoidDataViewModel>();
     }
 }

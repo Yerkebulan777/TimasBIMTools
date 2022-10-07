@@ -207,7 +207,6 @@
   <ItemGroup>
     <Compile Include="Core\ContainerConfig.cs" />
     <Compile Include="Core\SmartToolController.cs" />
-    <Compile Include="Core\IRegisterDockPane.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
     <Compile Include="RevitUtils\ElementDataDictionary.cs" />
     <Compile Include="Core\SmartToolGeneralHelper.cs" />
@@ -222,8 +221,8 @@
     <Compile Include="Services\Logger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
     <Compile Include="CutOpening\CutVoidRegisterDockPane.cs" />
-    <Compile Include="CutOpening\CutOpeningStartExternalHandler.cs" />
-    <Compile Include="CutOpening\CutOpeningShowPanelCmd.cs" />
+    <Compile Include="CutOpening\CutVoidStartExternalHandler.cs" />
+    <Compile Include="CutOpening\CutVoidShowPanelCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

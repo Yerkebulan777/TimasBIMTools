@@ -1,19 +1,24 @@
 ﻿using Autodesk.Revit.UI;
+using Autofac;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Windows;
 
+
 namespace RevitTimasBIMTools.CutOpening
 {
-    internal sealed class CutVoidRegisterDockPane : IRegisterDockPane
+    internal sealed class CutVoidRegisterDockPane
     {
-        public void RegisterDockablePane(UIControlledApplication uicontrol, IDockablePaneProvider view, DockablePaneId paneId)
+        private readonly IContainer container = ContainerConfig.Configure();
+        public void RegisterDockablePane(UIControlledApplication uicontrol)
         {
-            DockablePane dockpane = null;
+            SmartToolGeneralHelper helper = container.Resolve<SmartToolGeneralHelper>();
+            IDockablePaneProvider view = container.ResolveNamed<IDockablePaneProvider>("CutVoidView");
+            DockablePaneId paneId = helper.CutVoidPaneId;
             if (!DockablePane.PaneIsRegistered(paneId))
             {
-                DockablePaneProviderData data = new DockablePaneProviderData
+                DockablePaneProviderData data = new()
                 {
                     FrameworkElement = view as FrameworkElement,
                 };
@@ -23,7 +28,7 @@ namespace RevitTimasBIMTools.CutOpening
                 data.VisibleByDefault = false;
                 try
                 {
-                    uicontrol.RegisterDockablePane(paneId, SmartToolGeneralHelper.CutVoidToolName, view);
+                    uicontrol.RegisterDockablePane(paneId, helper.CutVoidToolName, view);
                 }
                 catch (Exception exc)
                 {
@@ -31,7 +36,7 @@ namespace RevitTimasBIMTools.CutOpening
                 }
                 finally
                 {
-                    dockpane = uicontrol.GetDockablePane(paneId);
+                    DockablePane dockpane = uicontrol.GetDockablePane(paneId);
                     if (dockpane != null && dockpane.IsShown())
                     {
                         dockpane.Hide();

@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autofac;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,8 +41,8 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         private readonly SynchronizationContext context = SynchronizationContext.Current;
-        private readonly CutVoidCollisionManager manager = SmartToolController.Services.GetRequiredService<CutVoidCollisionManager>();
-        private readonly CutOpeningStartExternalHandler viewHandler = SmartToolController.Services.GetRequiredService<CutOpeningStartExternalHandler>();
+        private readonly CutVoidCollisionManager manager = SmartToolController.Container.Resolve<CutVoidCollisionManager>();
+        private readonly CutVoidStartExternalHandler viewHandler = SmartToolController.Container.Resolve<CutVoidStartExternalHandler>();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
 
 
