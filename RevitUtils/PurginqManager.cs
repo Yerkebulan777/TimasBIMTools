@@ -17,7 +17,6 @@ namespace RevitTimasBIMTools.RevitUtils
             };
 
 
-
             FilteredElementCollector collector;
 
             ElementMulticategoryFilter multiCat = new(purgeBuiltInCats);
