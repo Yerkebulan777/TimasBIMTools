@@ -39,11 +39,10 @@ namespace RevitTimasBIMTools.RevitUtils
             collector = new FilteredElementCollector(doc).WhereElementIsElementType();
             foreach (Element etp in collector.WherePasses(multiCat))
             {
-                ElementId etypeId = etp.GetTypeId();
-                int typeIntId = etypeId.IntegerValue;
+                int typeIntId = etp.Id.IntegerValue;
                 if (!validTypeIds.ContainsKey(typeIntId))
                 {
-                    invalidTypeIds[typeIntId] = etypeId;
+                    invalidTypeIds[typeIntId] = etp.Id;
                 }
             }
 
