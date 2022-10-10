@@ -4,9 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-
+using System.Collections.ObjectModel;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -49,12 +50,12 @@ namespace RevitTimasBIMTools.CutOpening
 
     public class BaseCompletedEventArgs : EventArgs
     {
-        public ICollection<DocumentModel> DocumentModels { get; }
+        public ObservableCollection<DocumentModel> DocumentModels { get; }
         public IDictionary<int, ElementId> ConstructionTypeIds { get; }
 
         public BaseCompletedEventArgs(ICollection<DocumentModel> docs, IDictionary<int, ElementId> validIds)
         {
-            DocumentModels = docs;
+            DocumentModels = docs.ToObservableCollection();
             ConstructionTypeIds = validIds;
         }
     }

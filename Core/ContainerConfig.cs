@@ -25,7 +25,7 @@ namespace RevitTimasBIMTools.Core
             services.AddSingleton<CutVoidShowPanelCommand>();
             
             services.AddSingleton<IDockablePaneProvider, CutVoidDockPanelView>();
-            services.AddSingleton<CutVoidDataViewModel>();
+            services.AddSingleton<CutVoidDataViewModel>(); //For thread safe
 
             services.AddTransient<CutVoidViewExternalHandler>();
             services.AddTransient<CutVoidCollisionManager>();
