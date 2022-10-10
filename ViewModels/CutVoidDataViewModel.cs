@@ -31,16 +31,12 @@ namespace RevitTimasBIMTools.ViewModels
     {
         public CutVoidDockPanelView DockPanelView { get; set; } = null;
 
-        private Task task { get; set; } = null;
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
+        private CutVoidCollisionManager manager { get; set; } = null;
         private ConcurrentQueue<Element> instances { get; set; } = null;
-        private IDictionary<int, ElementId> constTypeIds { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
-        private CutVoidViewExternalHandler handler { get; set; } = null;
-        private CutVoidCollisionManager manager { get; set; } = null;
-        private ExternalEvent externalEvent {get; set; } = null;
 
         private readonly IServiceProvider provider = ContainerConfig.ConfigureServices();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
@@ -49,29 +45,10 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutVoidDataViewModel()
         {
-            handler = provider.GetRequiredService<CutVoidViewExternalHandler>();
-            handler.Completed += OnContextHandlerCompleted;
-
             SettingsCommand = new RelayCommand(SettingsHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             CanselCommand = new RelayCommand(CancelCallbackLogic);
-
-            externalEvent = ExternalEvent.Create(handler);
-            if (ExternalEventRequest.Accepted == externalEvent.Raise())
-            {
-                manager = provider.GetRequiredService<CutVoidCollisionManager>();
-            }
-        }
-
-
-        [STAThread]
-        private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
-        {
-            IsStarted = true;
-            handler.Completed -= OnContextHandlerCompleted;
-            DocModelCollection = args.DocumentModels.ToObservableCollection();
-            constTypeIds = args.ConstructionTypeIds;
         }
 
 
@@ -143,9 +120,18 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref docModels, value))
                 {
+                    manager = provider.GetRequiredService<CutVoidCollisionManager>();
                     SelectedDocModel = docModels.FirstOrDefault();
                 }
             }
+        }
+
+
+        private IDictionary<int, ElementId> constructions;
+        public IDictionary<int, ElementId> ConstructionTypeIds
+        {
+            get => constructions;
+            set => SetProperty(ref constructions, value);
         }
 
 
@@ -333,7 +319,7 @@ namespace RevitTimasBIMTools.ViewModels
             StructureMaterials = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return documentId.Equals(doc.ProjectInformation.UniqueId) ? RevitFilterManager.GetConstructionCoreMaterials(doc, constTypeIds) : null;
+                return documentId.Equals(doc.ProjectInformation.UniqueId) ? RevitFilterManager.GetConstructionCoreMaterials(doc, ConstructionTypeIds) : null;
             });
         }
 
@@ -365,10 +351,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 doc = app.ActiveUIDocument.Document;
                 return documentId.Equals(doc.ProjectInformation.UniqueId)
-                    ? RevitFilterManager.GetInstancesByCoreMaterial(doc, constTypeIds, matName) : null;
+                    ? RevitFilterManager.GetInstancesByCoreMaterial(doc, constructions, matName) : null;
             });
         }
-
 
 
         private async void SnoopIntersectionDataByLevel(Level level)
@@ -611,7 +596,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (cancelToken.IsCancellationRequested)
                 {
-                    task = Task.Delay(1000).ContinueWith((action) => Logger.Warning("Task cansceled"));
+                    _ = Task.Delay(1000).ContinueWith((action) => Logger.Warning("Task cansceled"));
                 }
             }
         }

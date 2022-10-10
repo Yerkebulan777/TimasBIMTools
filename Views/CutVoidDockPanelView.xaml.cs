@@ -1,9 +1,12 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
+using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Runtime.InteropServices;
@@ -20,40 +23,53 @@ namespace RevitTimasBIMTools.Views
     {
         private bool disposedValue = false;
         private readonly Mutex mutex = new();
+        private CutVoidViewExternalHandler handler { get; set; } = null;
+        private ExternalEvent externalEvent { get; set; } = null;
+
+        private readonly IServiceProvider provider = ContainerConfig.ConfigureServices();
+        private readonly CutVoidDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
 
-
-        public CutVoidDockPanelView(CutVoidDataViewModel viewModel)
+        public CutVoidDockPanelView()
         {
             InitializeComponent();
-            DataContext = viewModel;
-            viewModel.DockPanelView = this;
-            //Loaded += DockPanelView_Loaded;
+            DataContext = dataViewModel;
+            dataViewModel.DockPanelView = this;
         }
 
-
+        
         [STAThread]
         public void SetupDockablePane(DockablePaneProviderData data)
         {
             data.FrameworkElement = this;
             data.InitialState = new DockablePaneState
             {
-                DockPosition = DockPosition.Tabbed,
+                DockPosition = DockPosition.Right,
                 TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser
             };
         }
 
 
-        //private void DockPanelView_Loaded(object sender, System.Windows.RoutedEventArgs e)
-        //{
-        //    Loaded -= DockPanelView_Loaded;
-        //    Dispatcher.CurrentDispatcher.ShutdownStarted += OnShutdownStarted;
-        //    //Dispatcher.CurrentDispatcher.Invoke(() =>
-        //    //{
+        [STAThread]
+        public void RaiseHandler()
+        {
+            handler = provider.GetRequiredService<CutVoidViewExternalHandler>();
+            handler.Completed += OnContextHandlerCompleted;
+            externalEvent = ExternalEvent.Create(handler);
 
-        //    //});
-        //}
+            if (ExternalEventRequest.Accepted != externalEvent.Raise())
+            {
+                Logger.Error("External event request not accepted!!!");
+            }
+        }
+
+
+        private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
+        {
+            dataViewModel.DocModelCollection = args.DocumentModels.ToObservableCollection();
+            dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
+        }
 
 
         private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -75,13 +91,6 @@ namespace RevitTimasBIMTools.Views
                     }
                 });
             }
-        }
-
-
-        private void OnShutdownStarted(object sender, EventArgs e)
-        {
-            Dispatcher.ShutdownStarted -= OnShutdownStarted;
-            Dispose();
         }
 
 

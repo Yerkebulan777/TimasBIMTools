@@ -11,7 +11,7 @@ using System.Text;
 
 namespace RevitTimasBIMTools.Services
 {
-    public class Logger
+    public sealed class Logger
     {
         private static ILog mainlogger;
         private const string caption = "Timas BIM Tools";

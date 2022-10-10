@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
+using RevitTimasBIMTools.Views;
 using System;
 
 
@@ -22,6 +23,7 @@ namespace RevitTimasBIMTools.CutOpening
         public Result Execute(UIApplication uiapp, ref string message)
         {
             Result result = Result.Succeeded;
+            var view = provider.GetRequiredService<CutVoidDockPanelView>();
             SmartToolHelper helper = provider.GetRequiredService<SmartToolHelper>();
             if (DockablePane.PaneIsRegistered(helper.CutVoidPaneId))
             {
@@ -32,8 +34,9 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         dockpane.Hide();
                     }
-                    else
+                    else  
                     {
+                        view.RaiseHandler();
                         dockpane.Show();
                     }
                 }
