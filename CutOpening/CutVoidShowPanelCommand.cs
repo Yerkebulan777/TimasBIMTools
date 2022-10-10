@@ -1,7 +1,6 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
 using System;
@@ -20,26 +19,27 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
             Result result = Result.Succeeded;
             SmartToolHelper helper = provider.GetRequiredService<SmartToolHelper>();
             CutVoidViewExternalHandler handler = provider.GetRequiredService<CutVoidViewExternalHandler>();
-            DockablePaneId dockid = helper.CutVoidPaneId;
-            if (DockablePane.PaneIsRegistered(dockid))
+            if (DockablePane.PaneIsRegistered(helper.CutVoidPaneId))
             {
+                DockablePane dockpane = uiapp.GetDockablePane(helper.CutVoidPaneId);
                 try
                 {
-                    ExternalEvent externalEvent = ExternalEvent.Create(handler);
-                    DockablePane dockpane = uiapp.GetDockablePane(dockid);
                     if (dockpane.IsShown())
                     {
                         dockpane.Hide();
                     }
                     else
                     {
-                        dockpane.Show();
+                        ExternalEvent externalEvent = ExternalEvent.Create(handler);
+                        if (ExternalEventRequest.Accepted == externalEvent.Raise())
+                        {
+                            dockpane.Show();
+                        }
                     }
                 }
                 catch (Exception ex)
