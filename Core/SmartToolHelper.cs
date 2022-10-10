@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 
 namespace RevitTimasBIMTools.Core
 {
-    public sealed class SmartToolGeneralHelper
+    public sealed class SmartToolHelper
     {
         public string RibbonPanelName = "Automation";
         public string ApplicationName = "Smart BIM Tools";

@@ -18,7 +18,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         [JsonExtensionData]
         private Dictionary<string, ElementTypeData> dataDict { get; set; }
-        private static readonly string fileName = Path.Combine(SmartToolGeneralHelper.DocumentPath, @"SizeTypeData.json");
+        private static readonly string fileName = Path.Combine(SmartToolHelper.DocumentPath, @"SizeTypeData.json");
         private static readonly JsonSerializerSettings options = new() { NullValueHandling = NullValueHandling.Ignore };
 
         public static ConcurrentDictionary<string, ElementTypeData> ElementTypeSizeDictionary = new();

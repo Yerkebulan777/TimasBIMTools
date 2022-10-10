@@ -143,8 +143,8 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>packages\System.Diagnostics.DiagnosticSource.4.7.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Diagnostics.DiagnosticSource.6.0.0\lib\net461\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
@@ -206,10 +206,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\ContainerConfig.cs" />
-    <Compile Include="Core\SmartToolController.cs" />
+    <Compile Include="Core\SmartToolApp.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
     <Compile Include="RevitUtils\ElementDataDictionary.cs" />
-    <Compile Include="Core\SmartToolGeneralHelper.cs" />
+    <Compile Include="Core\SmartToolHelper.cs" />
     <Compile Include="Core\SmartToolSetupUIPanel.cs" />
     <Compile Include="RevitModel\ElementTypeData.cs" />
     <Compile Include="RevitModel\IRevitElementModel.cs" />
@@ -221,7 +221,7 @@
     <Compile Include="Services\Logger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
     <Compile Include="CutOpening\CutVoidRegisterDockPane.cs" />
-    <Compile Include="CutOpening\CutVoidStartExternalHandler.cs" />
+    <Compile Include="CutOpening\CutVoidViewExternalHandler.cs" />
     <Compile Include="CutOpening\CutVoidShowPanelCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

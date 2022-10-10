@@ -2,6 +2,7 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
 using System;
 
@@ -12,17 +13,19 @@ namespace RevitTimasBIMTools.CutOpening
     [Regeneration(RegenerationOption.Manual)]
     internal sealed class CutVoidShowPanelCommand : IExternalCommand, IExternalCommandAvailability
     {
-        private readonly SmartToolGeneralHelper helper = SmartToolController.Container.Resolve<SmartToolGeneralHelper>();
-        private readonly CutVoidStartExternalHandler handler = SmartToolController.Container.Resolve<CutVoidStartExternalHandler>();
+        private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             return Execute(commandData.Application, ref message);
         }
 
+
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
             Result result = Result.Succeeded;
+            SmartToolHelper helper = provider.GetRequiredService<SmartToolHelper>();
+            CutVoidViewExternalHandler handler = provider.GetRequiredService<CutVoidViewExternalHandler>();
             DockablePaneId dockid = helper.CutVoidPaneId;
             if (DockablePane.PaneIsRegistered(dockid))
             {

@@ -103,7 +103,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
         /// <summary>
-        /// SmartToolGeneralHelper to return parameter value as string, with additional
+        /// SmartToolHelper to return parameter value as string, with additional
         /// support for instance id to display the instance type referred to.
         /// </summary>
         public static string GetParameterValue2(this Parameter param, Document doc)
@@ -184,7 +184,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
         /// <summary>
-        /// SmartToolGeneralHelper to return parameter value as string.
+        /// SmartToolHelper to return parameter value as string.
         /// One can also use param.AsValueString() to
         /// get the user interface representation.
         /// </summary>

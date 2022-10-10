@@ -1,35 +1,36 @@
 ﻿using Autodesk.Revit.UI;
-using Autofac;
+using Microsoft.Extensions.DependencyInjection;
+using Revit.Async;
+using Revit.Async.Interfaces;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
+using System;
+
 
 namespace RevitTimasBIMTools.Core
 {
     public static class ContainerConfig
     {
-        public static IContainer Configure()
+        public static IServiceProvider ConfigureServices()
         {
-            ContainerBuilder builder = new();
+            ServiceCollection services = new();
 
-            builder.RegisterType<SmartToolSetupUIPanel>().AsSelf().SingleInstance();
-            builder.RegisterType<SmartToolGeneralHelper>().AsSelf().SingleInstance();
-            builder.RegisterType<CutVoidRegisterDockPane>().AsSelf().SingleInstance();
-            builder.RegisterType<CutVoidDockPanelView>().Named<IDockablePaneProvider>("CutVoidView").SingleInstance();
+            services.AddSingleton<SmartToolHelper>();
+            services.AddSingleton<IRevitTask, RevitTask>();
+            services.AddSingleton<SmartToolSetupUIPanel>();
+            services.AddSingleton<CutVoidRegisterDockPane>();
+            services.AddSingleton<CutVoidShowPanelCommand>();
+            services.AddSingleton<CutVoidViewExternalHandler>();
 
-            builder.RegisterType<CutVoidStartExternalHandler>().AsSelf();
-            builder.RegisterType<CutVoidShowPanelCommand>().AsSelf();
-            builder.RegisterType<CutVoidCollisionManager>().AsSelf();
-            builder.RegisterType<CutVoidDataViewModel>().AsSelf();
-            builder.RegisterType<RevitPurginqManager>().AsSelf();
+            services.AddSingleton<IDockablePaneProvider, CutVoidDockPanelView>();
 
-            return builder.Build();
+            services.AddTransient<CutVoidCollisionManager>();
+            services.AddTransient<CutVoidDataViewModel>();
+            services.AddTransient<RevitPurginqManager>();
+
+            return services.BuildServiceProvider();
         }
-
-        //Example Autofac automatic registry by assemly: 
-        //Assembly dataAccess = Assembly.LoadFrom(nameof(DIContainersLibrary));
-        //builder.RegisterAssemblyTypes(dataAccess).Where(t => t.Namespace.Contains("Utils")).AsSelf().AsImplementedInterfaces();
-
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
@@ -10,9 +11,9 @@ using System.Collections.Generic;
 
 namespace RevitTimasBIMTools.CutOpening
 {
-    public sealed class CutVoidStartExternalHandler : IExternalEventHandler
+    public sealed class CutVoidViewExternalHandler : IExternalEventHandler
     {
-        private readonly RevitPurginqManager purgeManager = SmartToolController.Container.Resolve<RevitPurginqManager>();
+        private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         public event EventHandler<BaseCompletedEventArgs> Completed;
 
         [STAThread]
@@ -25,7 +26,7 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 return;
             }
-
+            RevitPurginqManager purgeManager = provider.GetRequiredService<RevitPurginqManager>();
             IDictionary<int, ElementId> validIds = purgeManager.PurgeAndGetValidConstructionTypeIds(doc);
             Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
             ICollection<DocumentModel> docModels = RevitDocumentManager.GetDocumentCollection(doc);
@@ -42,7 +43,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public string GetName()
         {
-            return nameof(CutVoidStartExternalHandler);
+            return nameof(CutVoidViewExternalHandler);
         }
     }
 

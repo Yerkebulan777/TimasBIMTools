@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.UI;
 using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.Services;
 using System;
@@ -10,11 +11,11 @@ namespace RevitTimasBIMTools.CutOpening
 {
     internal sealed class CutVoidRegisterDockPane
     {
-        private readonly IContainer container = ContainerConfig.Configure();
+        private readonly IServiceProvider provider = ContainerConfig.ConfigureServices();
         public void RegisterDockablePane(UIControlledApplication uicontrol)
         {
-            SmartToolGeneralHelper helper = container.Resolve<SmartToolGeneralHelper>();
-            IDockablePaneProvider view = container.ResolveNamed<IDockablePaneProvider>("CutVoidView");
+            SmartToolHelper helper = provider.GetRequiredService<SmartToolHelper>();
+            IDockablePaneProvider view = provider.GetRequiredService<IDockablePaneProvider>();
             DockablePaneId paneId = helper.CutVoidPaneId;
             if (!DockablePane.PaneIsRegistered(paneId))
             {

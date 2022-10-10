@@ -39,16 +39,20 @@ namespace RevitTimasBIMTools.ViewModels
         private IDictionary<int, ElementId> constTypeIds { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
+        private CutVoidViewExternalHandler handler { get; set; } = null;
+        private CutVoidCollisionManager manager { get; set; } = null;
 
-        private readonly SynchronizationContext context = SynchronizationContext.Current;
-        private readonly CutVoidCollisionManager manager = SmartToolController.Container.Resolve<CutVoidCollisionManager>();
-        private readonly CutVoidStartExternalHandler viewHandler = SmartToolController.Container.Resolve<CutVoidStartExternalHandler>();
+        private readonly IServiceProvider provider = ContainerConfig.ConfigureServices();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
+        private readonly SynchronizationContext context = SynchronizationContext.Current;
 
 
         public CutVoidDataViewModel()
         {
-            viewHandler.Completed += OnContextHandlerCompleted;
+            manager = provider.GetRequiredService<CutVoidCollisionManager>();
+            handler = provider.GetRequiredService<CutVoidViewExternalHandler>();
+            handler.Completed += OnContextHandlerCompleted;
+
             SettingsCommand = new RelayCommand(SettingsHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
@@ -60,7 +64,7 @@ namespace RevitTimasBIMTools.ViewModels
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             IsStarted = true;
-            viewHandler.Completed -= OnContextHandlerCompleted;
+            handler.Completed -= OnContextHandlerCompleted;
             DocModelCollection = args.DocumentModels.ToObservableCollection();
             constTypeIds = args.ConstructionTypeIds;
         }

@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
-using Autofac;
+using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.Services;
@@ -12,9 +12,9 @@ using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Core
 {
-    public sealed class SmartToolController : IExternalApplication
+    public sealed class SmartToolApp : IExternalApplication
     {
-        public static IContainer Container { get; set; }
+        public static IServiceProvider ServiceProvider { get; set; }
         private UIControlledApplication controller { get; set; }
 
 
@@ -22,8 +22,8 @@ namespace RevitTimasBIMTools.Core
         public Result OnStartup(UIControlledApplication cntrapp)
         {
             Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
-            Logger.InitMainLogger(typeof(SmartToolController));
-            Container = ContainerConfig.Configure();
+            ServiceProvider = ContainerConfig.ConfigureServices();
+            Logger.InitMainLogger(typeof(SmartToolApp));
             RevitTask.Initialize(cntrapp);
             controller = cntrapp;
 
@@ -41,11 +41,12 @@ namespace RevitTimasBIMTools.Core
                 RenderOptions.ProcessRenderMode = RenderMode.Default;
             }
 
-            CutVoidRegisterDockPane register = Container.Resolve<CutVoidRegisterDockPane>();
-            SmartToolGeneralHelper helper = Container.Resolve<SmartToolGeneralHelper>();
-            SmartToolSetupUIPanel uiface = Container.Resolve<SmartToolSetupUIPanel>();
+
+            CutVoidRegisterDockPane register = ServiceProvider.GetRequiredService<CutVoidRegisterDockPane>();
+
+            SmartToolSetupUIPanel uiface = ServiceProvider.GetRequiredService<SmartToolSetupUIPanel>();
             register.RegisterDockablePane(controller);
-            uiface.Initialize(controller, helper);
+            uiface.Initialize(controller);
         }
 
 
