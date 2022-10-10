@@ -20,6 +20,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
+        [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
             Result result = Result.Succeeded;
@@ -28,22 +29,26 @@ namespace RevitTimasBIMTools.CutOpening
             if (DockablePane.PaneIsRegistered(helper.CutVoidPaneId))
             {
                 DockablePane dockpane = uiapp.GetDockablePane(helper.CutVoidPaneId);
-                try
+                if (pane is CutVoidDockPanelView view)
                 {
-                    if (dockpane.IsShown())
+                    try
                     {
-                        dockpane.Hide();
+                        if (dockpane.IsShown())
+                        {
+                            view.Dispose();
+                            dockpane.Hide();
+                        }
+                        else
+                        {
+                            view.RaiseHandler();
+                            dockpane.Show();
+                        }
                     }
-                    else if (pane is CutVoidDockPanelView view)
+                    catch (Exception ex)
                     {
-                        view.RaiseHandler();
-                        dockpane.Show();
+                        message = ex.Message;
+                        result = Result.Failed;
                     }
-                }
-                catch (Exception ex)
-                {
-                    message = ex.Message;
-                    result = Result.Failed;
                 }
             }
             return result;
