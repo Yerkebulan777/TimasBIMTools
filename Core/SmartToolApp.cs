@@ -21,13 +21,11 @@ namespace RevitTimasBIMTools.Core
         [STAThread]
         public Result OnStartup(UIControlledApplication cntrapp)
         {
-            Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
             ServiceProvider = ContainerConfig.ConfigureServices();
-            Logger.InitMainLogger(typeof(SmartToolApp));
-            RevitTask.Initialize(cntrapp);
-            controller = cntrapp;
-
+            Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
             cntrapp.ControlledApplication.ApplicationInitialized += OnApplicationInitialized;
+            
+            controller = cntrapp;
 
             return Result.Succeeded;
         }
@@ -41,12 +39,13 @@ namespace RevitTimasBIMTools.Core
                 RenderOptions.ProcessRenderMode = RenderMode.Default;
             }
 
-
             CutVoidRegisterDockPane register = ServiceProvider.GetRequiredService<CutVoidRegisterDockPane>();
-
             SmartToolSetupUIPanel uiface = ServiceProvider.GetRequiredService<SmartToolSetupUIPanel>();
+            Logger.InitMainLogger(typeof(SmartToolApp));
             register.RegisterDockablePane(controller);
+            RevitTask.Initialize(controller);
             uiface.Initialize(controller);
+            
         }
 
 
