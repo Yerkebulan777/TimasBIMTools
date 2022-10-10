@@ -18,7 +18,6 @@ namespace RevitTimasBIMTools.Core
         private UIControlledApplication controller { get; set; }
 
 
-        [STAThread]
         public Result OnStartup(UIControlledApplication cntrapp)
         {
             ServiceProvider = ContainerConfig.ConfigureServices();
@@ -41,15 +40,13 @@ namespace RevitTimasBIMTools.Core
 
             CutVoidRegisterDockPane register = ServiceProvider.GetRequiredService<CutVoidRegisterDockPane>();
             SmartToolSetupUIPanel uiface = ServiceProvider.GetRequiredService<SmartToolSetupUIPanel>();
-            Logger.InitMainLogger(typeof(SmartToolApp));
-            register.RegisterDockablePane(controller);
-            RevitTask.Initialize(controller);
             uiface.Initialize(controller);
-            
+            register.RegisterDockablePane(controller);
+            Logger.InitMainLogger(typeof(SmartToolApp));
+            RevitTask.Initialize(controller);
         }
 
 
-        [STAThread]
         public Result OnShutdown(UIControlledApplication cntrapp)
         {
             cntrapp.ControlledApplication.ApplicationInitialized -= OnApplicationInitialized;
