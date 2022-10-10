@@ -20,17 +20,16 @@ namespace RevitTimasBIMTools.Views
     {
         private bool disposedValue = false;
         private readonly Mutex mutex = new();
-        private ExternalEvent externalEvent = null;
-        private readonly CutVoidDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
 
 
-        public CutVoidDockPanelView(CutVoidViewExternalHandler handler)
+        public CutVoidDockPanelView(CutVoidDataViewModel viewModel)
         {
             InitializeComponent();
-            Loaded += DockPanelView_Loaded;
-            externalEvent = ExternalEvent.Create(handler);
+            DataContext = viewModel;
+            viewModel.DockPanelView = this;
+            //Loaded += DockPanelView_Loaded;
         }
 
 
@@ -41,24 +40,20 @@ namespace RevitTimasBIMTools.Views
             data.InitialState = new DockablePaneState
             {
                 DockPosition = DockPosition.Tabbed,
-                TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette
+                TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser
             };
         }
 
 
-        private void DockPanelView_Loaded(object sender, System.Windows.RoutedEventArgs e)
-        {
-            Dispatcher.CurrentDispatcher.ShutdownStarted += OnShutdownStarted;
-            if (ExternalEventRequest.Accepted == externalEvent.Raise())
-            {
-                Dispatcher.CurrentDispatcher.Invoke(() =>
-                {
-                    dataViewModel.Dispose();
-                    DataContext = dataViewModel;
-                    dataViewModel.DockPanelView = this;
-                });
-            }
-        }
+        //private void DockPanelView_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        //{
+        //    Loaded -= DockPanelView_Loaded;
+        //    Dispatcher.CurrentDispatcher.ShutdownStarted += OnShutdownStarted;
+        //    //Dispatcher.CurrentDispatcher.Invoke(() =>
+        //    //{
+
+        //    //});
+        //}
 
 
         private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -99,7 +94,7 @@ namespace RevitTimasBIMTools.Views
                     Task task = Task.Run(Properties.Settings.Default.Reset)
                     .ContinueWith(_ =>
                     {
-                        dataViewModel?.Dispose();
+
                     }, syncContext);
                     // TODO: освободить управляемое состояние (управляемые объекты)
                 }

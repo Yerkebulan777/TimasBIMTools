@@ -22,11 +22,11 @@ namespace RevitTimasBIMTools.Core
             services.AddSingleton<SmartToolSetupUIPanel>();
             services.AddSingleton<CutVoidRegisterDockPane>();
             services.AddSingleton<CutVoidShowPanelCommand>();
-            services.AddSingleton<CutVoidViewExternalHandler>();
-
+            
             services.AddSingleton<IDockablePaneProvider, CutVoidDockPanelView>();
             services.AddSingleton<CutVoidDataViewModel>();
 
+            services.AddTransient<CutVoidViewExternalHandler>();
             services.AddTransient<CutVoidCollisionManager>();
             services.AddTransient<RevitPurginqManager>();
 

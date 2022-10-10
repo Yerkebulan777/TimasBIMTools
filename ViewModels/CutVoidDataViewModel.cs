@@ -40,15 +40,15 @@ namespace RevitTimasBIMTools.ViewModels
 
         private CutVoidViewExternalHandler handler { get; set; } = null;
         private CutVoidCollisionManager manager { get; set; } = null;
+        private ExternalEvent externalEvent {get; set; } = null;
 
         private readonly IServiceProvider provider = ContainerConfig.ConfigureServices();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
-        private readonly SynchronizationContext context = SynchronizationContext.Current;
+        //private readonly SynchronizationContext context = SynchronizationContext.Current;
 
 
         public CutVoidDataViewModel()
         {
-            manager = provider.GetRequiredService<CutVoidCollisionManager>();
             handler = provider.GetRequiredService<CutVoidViewExternalHandler>();
             handler.Completed += OnContextHandlerCompleted;
 
@@ -56,6 +56,12 @@ namespace RevitTimasBIMTools.ViewModels
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             CanselCommand = new RelayCommand(CancelCallbackLogic);
+
+            externalEvent = ExternalEvent.Create(handler);
+            if (ExternalEventRequest.Accepted == externalEvent.Raise())
+            {
+                manager = provider.GetRequiredService<CutVoidCollisionManager>();
+            }
         }
 
 
