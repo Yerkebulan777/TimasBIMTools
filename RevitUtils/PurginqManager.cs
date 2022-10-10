@@ -35,6 +35,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
 
+
             collector = new FilteredElementCollector(doc).WhereElementIsElementType();
             foreach (Element etp in collector.WherePasses(multiCat))
             {

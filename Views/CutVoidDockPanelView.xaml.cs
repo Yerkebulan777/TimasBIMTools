@@ -1,10 +1,12 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Revit.Async;
+using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -18,15 +20,17 @@ namespace RevitTimasBIMTools.Views
     {
         private bool disposedValue = false;
         private readonly Mutex mutex = new();
+        private ExternalEvent externalEvent = null;
         private readonly CutVoidDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
 
 
-        public CutVoidDockPanelView()
+        public CutVoidDockPanelView(CutVoidViewExternalHandler handler)
         {
             InitializeComponent();
             Loaded += DockPanelView_Loaded;
+            externalEvent = ExternalEvent.Create(handler);
         }
 
 
@@ -42,16 +46,18 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        [STAThread]
         private void DockPanelView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             Dispatcher.CurrentDispatcher.ShutdownStarted += OnShutdownStarted;
-            Dispatcher.CurrentDispatcher.Invoke(() =>
+            if (ExternalEventRequest.Accepted == externalEvent.Raise())
             {
-                dataViewModel.Dispose();
-                DataContext = dataViewModel;
-                dataViewModel.DockPanelView = this;
-            });
+                Dispatcher.CurrentDispatcher.Invoke(() =>
+                {
+                    dataViewModel.Dispose();
+                    DataContext = dataViewModel;
+                    dataViewModel.DockPanelView = this;
+                });
+            }
         }
 
 

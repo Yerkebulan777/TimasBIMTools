@@ -23,7 +23,6 @@ namespace RevitTimasBIMTools.CutOpening
         {
             Result result = Result.Succeeded;
             SmartToolHelper helper = provider.GetRequiredService<SmartToolHelper>();
-            CutVoidViewExternalHandler handler = provider.GetRequiredService<CutVoidViewExternalHandler>();
             if (DockablePane.PaneIsRegistered(helper.CutVoidPaneId))
             {
                 DockablePane dockpane = uiapp.GetDockablePane(helper.CutVoidPaneId);
@@ -35,11 +34,7 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                     else
                     {
-                        ExternalEvent externalEvent = ExternalEvent.Create(handler);
-                        if (ExternalEventRequest.Accepted == externalEvent.Raise())
-                        {
-                            dockpane.Show();
-                        }
+                        dockpane.Show();
                     }
                 }
                 catch (Exception ex)

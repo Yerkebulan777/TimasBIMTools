@@ -22,7 +22,7 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     FrameworkElement = view as FrameworkElement,
                 };
-                data.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.PropertiesPalette;
+                data.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.HostByLinkNavigator;
                 data.EditorInteraction = new EditorInteraction(EditorInteractionType.Dismiss);
                 data.InitialState.DockPosition = DockPosition.Tabbed;
                 data.VisibleByDefault = false;
