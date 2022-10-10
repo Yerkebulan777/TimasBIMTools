@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;

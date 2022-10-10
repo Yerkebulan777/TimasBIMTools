@@ -1,10 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Autofac;
-using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
-using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
@@ -14,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
+
 namespace RevitTimasBIMTools.Views
 {
     /// <summary> Логика взаимодействия для CutVoidDockPanelView.xaml </summary>
@@ -21,7 +18,6 @@ namespace RevitTimasBIMTools.Views
     {
         private bool disposedValue = false;
         private readonly Mutex mutex = new();
-        private readonly ExternalEvent externalEvent;       
         private readonly CutVoidDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
@@ -50,15 +46,13 @@ namespace RevitTimasBIMTools.Views
         private void DockPanelView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             Dispatcher.CurrentDispatcher.ShutdownStarted += OnShutdownStarted;
-            if (ExternalEventRequest.Accepted == externalEvent.Raise())
+            Dispatcher.CurrentDispatcher.Invoke(() =>
             {
-                Dispatcher.CurrentDispatcher.Invoke(() =>
-                {
-                    dataViewModel.Dispose();
-                    DataContext = dataViewModel;
-                    dataViewModel.DockPanelView = this;
-                });
-            }
+                dataViewModel.Dispose();
+                DataContext = dataViewModel;
+                dataViewModel.DockPanelView = this;
+            });
+
         }
 
 
