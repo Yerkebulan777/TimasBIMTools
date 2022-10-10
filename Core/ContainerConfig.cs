@@ -1,7 +1,5 @@
 ﻿using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
-using Revit.Async;
-using Revit.Async.Interfaces;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
@@ -12,7 +10,7 @@ using System;
 
 namespace RevitTimasBIMTools.Core
 {
-    public static class ContainerConfig
+    public sealed class ContainerConfig
     {
         public static IServiceProvider ConfigureServices()
         {
@@ -22,7 +20,7 @@ namespace RevitTimasBIMTools.Core
             services.AddSingleton<SmartToolSetupUIPanel>();
             services.AddSingleton<CutVoidRegisterDockPane>();
             services.AddSingleton<CutVoidShowPanelCommand>();
-            
+
             services.AddSingleton<IDockablePaneProvider, CutVoidDockPanelView>();
             services.AddSingleton<CutVoidDataViewModel>(); //For thread safe
 
