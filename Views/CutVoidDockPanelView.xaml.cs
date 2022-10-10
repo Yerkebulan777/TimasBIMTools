@@ -52,7 +52,6 @@ namespace RevitTimasBIMTools.Views
                 DataContext = dataViewModel;
                 dataViewModel.DockPanelView = this;
             });
-
         }
 
 

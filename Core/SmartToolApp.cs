@@ -23,7 +23,7 @@ namespace RevitTimasBIMTools.Core
             ServiceProvider = ContainerConfig.ConfigureServices();
             Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
             cntrapp.ControlledApplication.ApplicationInitialized += OnApplicationInitialized;
-            
+
             controller = cntrapp;
 
             return Result.Succeeded;
@@ -52,6 +52,7 @@ namespace RevitTimasBIMTools.Core
             cntrapp.ControlledApplication.ApplicationInitialized -= OnApplicationInitialized;
             return Result.Succeeded;
         }
+
 
     }
 }
