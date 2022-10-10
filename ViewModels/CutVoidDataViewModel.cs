@@ -298,8 +298,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             view3d = await RevitTask.RunAsync(app =>
             {
-                doc = app.ActiveUIDocument.Document;
-                return documentId.Equals(doc.ProjectInformation.UniqueId) ? RevitViewManager.Get3dView(app.ActiveUIDocument) : null;
+                return RevitViewManager.Get3dView(app.ActiveUIDocument);
             });
         }
 

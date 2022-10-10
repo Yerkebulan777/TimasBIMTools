@@ -19,7 +19,6 @@ namespace RevitTimasBIMTools.Core
             ServiceCollection services = new();
 
             services.AddSingleton<SmartToolHelper>();
-            services.AddSingleton<IRevitTask, RevitTask>();
             services.AddSingleton<SmartToolSetupUIPanel>();
             services.AddSingleton<CutVoidRegisterDockPane>();
             services.AddSingleton<CutVoidShowPanelCommand>();

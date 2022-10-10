@@ -67,6 +67,7 @@ namespace RevitTimasBIMTools.Views
 
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
+            dataViewModel.IsStarted = true;
             dataViewModel.DocumentModelCollection = args.DocumentModels;
             dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
         }
