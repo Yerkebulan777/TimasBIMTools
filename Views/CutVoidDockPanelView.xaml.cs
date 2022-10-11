@@ -9,12 +9,10 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Threading;
-
+using System.Windows.Input;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -38,7 +36,7 @@ namespace RevitTimasBIMTools.Views
             dataViewModel.DockPanelView = this;
         }
 
-        
+
         [STAThread]
         public void SetupDockablePane(DockablePaneProviderData data)
         {
@@ -101,10 +99,10 @@ namespace RevitTimasBIMTools.Views
             {
                 if (disposing)
                 {
-                    Task task = Task.Run(Properties.Settings.Default.Reset)
+                    Task task = Task.Run(dataViewModel.Dispose)
                     .ContinueWith(_ =>
                     {
-
+                        CommandManager.InvalidateRequerySuggested();
                     }, syncContext);
                     // TODO: освободить управляемое состояние (управляемые объекты)
                 }

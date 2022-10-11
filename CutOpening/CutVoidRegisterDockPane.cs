@@ -13,6 +13,7 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly IServiceProvider provider = ContainerConfig.ConfigureServices();
         public void RegisterDockablePane(UIControlledApplication uicontrol)
         {
+            string cutVoidToolName = SmartToolHelper.CutVoidToolName;
             SmartToolHelper helper = provider.GetRequiredService<SmartToolHelper>();
             IDockablePaneProvider view = provider.GetRequiredService<IDockablePaneProvider>();
             DockablePaneId paneId = helper.CutVoidPaneId;
@@ -22,13 +23,13 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     FrameworkElement = view as FrameworkElement,
                 };
-                data.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.HostByLinkNavigator;
+                data.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser;
                 data.EditorInteraction = new EditorInteraction(EditorInteractionType.Dismiss);
                 data.InitialState.DockPosition = DockPosition.Tabbed;
                 data.VisibleByDefault = false;
                 try
                 {
-                    uicontrol.RegisterDockablePane(paneId, helper.CutVoidToolName, view);
+                    uicontrol.RegisterDockablePane(paneId, cutVoidToolName, view);
                 }
                 catch (Exception exc)
                 {

@@ -68,18 +68,18 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool enabledOpts = false;
+        private bool enableOpt = false;
         public bool IsOptionEnabled
         {
-            get => enabledOpts;
+            get => enableOpt;
             set
             {
                 if (started)
                 {
-                    if (SetProperty(ref enabledOpts, value))
+                    if (SetProperty(ref enableOpt, value))
                     {
+                        IsDataEnabled = !enableOpt;
                         ElementModelData.Clear();
-                        IsDataEnabled = !enabledOpts;
                         SetMEPCategoriesToData();
                         SetCoreMaterialsToData();
                         SetFamilySymbolsToData();
@@ -89,17 +89,17 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool enabledData = false;
+        private bool enableData = false;
         public bool IsDataEnabled
         {
-            get => enabledData;
+            get => enableData;
             set
             {
                 if (!value || (docModel != null && category != null))
                 {
-                    if (SetProperty(ref enabledData, value))
+                    if (SetProperty(ref enableData, value))
                     {
-                        IsOptionEnabled = !enabledData;
+                        IsOptionEnabled = !enableData;
                         DataViewCollection.Refresh();
                         SetValidLevelsToData();
                     }
@@ -151,13 +151,13 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<string, FamilySymbol> familySymbols;
+        private IDictionary<string, FamilySymbol> symbols;
         public IDictionary<string, FamilySymbol> FamilySymbols
         {
-            get => familySymbols;
+            get => symbols;
             set
             {
-                if (SetProperty(ref familySymbols, value))
+                if (SetProperty(ref symbols, value))
                 {
                     Logger.Log(nameof(FamilySymbols));
                 }
@@ -608,7 +608,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             manager?.Dispose();
             ElementModelData.Clear();
-
+            DataViewCollection.Refresh();
             if (DataViewCollection is ListCollectionView list)
             {
                 foreach (object item in list)

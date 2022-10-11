@@ -15,9 +15,9 @@ namespace RevitTimasBIMTools.Core
 {
     public sealed class SmartToolHelper
     {
-        public string RibbonPanelName = "Automation";
-        public string ApplicationName = "Smart BIM Tools";
-        public string CutVoidToolName = "Cut Opening Manager";
+        public static string RibbonPanelName = "Automation";
+        public static string ApplicationName = "Smart BIM Tools";
+        public static string CutVoidToolName = "Cut Opening Manager";
         public static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
         public static readonly string AssemblyLocation = Path.GetFullPath(Assembly.Location);
         public static readonly string AssemblyDirectory = Path.GetDirectoryName(AssemblyLocation);

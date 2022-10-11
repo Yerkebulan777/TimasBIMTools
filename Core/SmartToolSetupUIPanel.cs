@@ -1,22 +1,21 @@
 ﻿using Autodesk.Revit.UI;
-using Microsoft.Extensions.DependencyInjection;
-using RevitTimasBIMTools.CutOpening;
-using System;
 
 
 namespace RevitTimasBIMTools.Core
 {
     public sealed class SmartToolSetupUIPanel
     {
-        private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
-        private readonly string cutOpeningPane = CutVoidShowPanelCommand.GetPath();
-        public void Initialize(UIControlledApplication uicontrol)
+        public static void Initialize(UIControlledApplication uicontrol)
         {
-            SmartToolHelper helper = provider.GetRequiredService<SmartToolHelper>();
+            string appName = SmartToolHelper.ApplicationName;
+            string appPath = SmartToolHelper.AssemblyLocation;
+            string panelName = SmartToolHelper.RibbonPanelName;
+            string cutVoidToolName = SmartToolHelper.CutVoidToolName;
+            string cutVoidCmdPath = SmartToolHelper.CutVoidToolName;
             // Create ribbon tab and ribbon panels
-            try { uicontrol.CreateRibbonTab(helper.ApplicationName); } catch { }
-            RibbonPanel ribbonPanel = uicontrol.CreateRibbonPanel(helper.ApplicationName, helper.RibbonPanelName);
-            PushButtonData buttonData = new("VoidManager", helper.CutVoidToolName, SmartToolHelper.AssemblyLocation, cutOpeningPane)
+            try { uicontrol.CreateRibbonTab(appName); } catch { }
+            RibbonPanel ribbonPanel = uicontrol.CreateRibbonPanel(appName, panelName);
+            PushButtonData buttonData = new("VoidManager", cutVoidToolName, appPath, cutVoidCmdPath)
             {
                 ToolTip = "Cut opening purgeMng",
                 LargeImage = SmartToolHelper.GetImageSource(),
@@ -24,7 +23,7 @@ namespace RevitTimasBIMTools.Core
             };
 
             PushButton showButton = ribbonPanel.AddItem(buttonData) as PushButton;
-            showButton.AvailabilityClassName = cutOpeningPane;
+            showButton.AvailabilityClassName = cutVoidCmdPath;
             if (showButton != null)
             {
                 ribbonPanel.AddSeparator();
