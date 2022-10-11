@@ -1,5 +1,5 @@
 ﻿using Autodesk.Revit.UI;
-
+using RevitTimasBIMTools.CutOpening;
 
 namespace RevitTimasBIMTools.Core
 {
@@ -7,23 +7,20 @@ namespace RevitTimasBIMTools.Core
     {
         public static void Initialize(UIControlledApplication uicontrol)
         {
-            string appName = SmartToolHelper.ApplicationName;
-            string appPath = SmartToolHelper.AssemblyLocation;
-            string panelName = SmartToolHelper.RibbonPanelName;
-            string cutVoidToolName = SmartToolHelper.CutVoidToolName;
-            string cutVoidCmdPath = SmartToolHelper.CutVoidToolName;
+            string cutVoidCommand = CutVoidShowPanelCommand.GetPath();
             // Create ribbon tab and ribbon panels
-            try { uicontrol.CreateRibbonTab(appName); } catch { }
-            RibbonPanel ribbonPanel = uicontrol.CreateRibbonPanel(appName, panelName);
-            PushButtonData buttonData = new("VoidManager", cutVoidToolName, appPath, cutVoidCmdPath)
+            try { uicontrol.CreateRibbonTab(SmartToolHelper.ApplicationName); } catch { }
+            RibbonPanel ribbonPanel = uicontrol.CreateRibbonPanel(SmartToolHelper.ApplicationName, SmartToolHelper.RibbonPanelName);
+            // Create Cut Opening PushButtonData 
+            PushButtonData buttonData = new(SmartToolHelper.CutVoidButtonName, SmartToolHelper.CutVoidToolName, SmartToolHelper.AssemblyLocation, cutVoidCommand)
             {
-                ToolTip = "Cut opening purgeMng",
+                ToolTip = "Подпись кнопки",
                 LargeImage = SmartToolHelper.GetImageSource(),
                 LongDescription = "Описание команды кнопки"
             };
 
             PushButton showButton = ribbonPanel.AddItem(buttonData) as PushButton;
-            showButton.AvailabilityClassName = cutVoidCmdPath;
+            showButton.AvailabilityClassName = cutVoidCommand;
             if (showButton != null)
             {
                 ribbonPanel.AddSeparator();
