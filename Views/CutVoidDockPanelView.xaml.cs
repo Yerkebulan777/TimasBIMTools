@@ -72,11 +72,11 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void DataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (sender is DataGridRow row && row.DataContext is ElementModel model)
             {
-                Task task = RevitTask.RunAsync(app =>
+                _ = RevitTask.RunAsync(app =>
                 {
                     Document doc = app.ActiveUIDocument.Document;
                     if (documentId.Equals(doc.ProjectInformation.UniqueId))
@@ -100,6 +100,7 @@ namespace RevitTimasBIMTools.Views
             {
                 if (disposing)
                 {
+
                     Task task = Task.Run(dataViewModel.Dispose)
                     .ContinueWith(_ =>
                     {
@@ -121,6 +122,7 @@ namespace RevitTimasBIMTools.Views
             //GC.WaitForPendingFinalizers();
             GC.SuppressFinalize(this);
         }
+
 
     }
 }
