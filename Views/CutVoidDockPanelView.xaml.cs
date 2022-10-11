@@ -100,8 +100,10 @@ namespace RevitTimasBIMTools.Views
             {
                 if (disposing)
                 {
-
-                    Task task = Task.Run(dataViewModel.Dispose)
+                    _ = RevitTask.RunAsync(app =>
+                    {
+                        dataViewModel.Dispose();
+                    })
                     .ContinueWith(_ =>
                     {
                         CommandManager.InvalidateRequerySuggested();
