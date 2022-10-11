@@ -5,7 +5,10 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Web.UI.WebControls;
 using Document = Autodesk.Revit.DB.Document;
+using Parameter = Autodesk.Revit.DB.Parameter;
+using UnitType = Autodesk.Revit.DB.UnitType;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -30,9 +33,8 @@ namespace RevitTimasBIMTools.CutOpening
 
         private const int invalidInt = -1;
         private const double footToMm = 304.8;
-        private const double toleranceVolume = 0.005;
         private const double rightAngle = Math.PI / 2;
-        private readonly double thresholdAngle = Math.Round(Math.Cos(45 * Math.PI / 180), 5);
+        private readonly double thresholdAngle = Math.Floor(Math.Cos(45 * Math.PI / 180));
 
         #endregion
 
@@ -49,7 +51,7 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly double minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
         private readonly double maxSideSize = Convert.ToDouble(Properties.Settings.Default.MaxSideSizeInMm / footToMm);
         private readonly double cutOffsetSize = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
-
+        private readonly double minimumVolume = 0.005;
         //private readonly string widthParamName = "ширина";
         //private readonly string heightParamName = "высота";
 
@@ -130,8 +132,9 @@ namespace RevitTimasBIMTools.CutOpening
                     if (GetElementDirection(instance, out intersectNormal) && IsParallel(hostDirection, intersectNormal))
                     {
                         intersectSolid = GetIntersectSolid(hostSolid, instance, transform);
-                        if (intersectSolid != null && intersectSolid.Volume > toleranceVolume)
+                        if (intersectSolid != null && intersectSolid.Volume > minimumVolume)
                         {
+                            
                             if (IsValidElement(instance, intersectSolid, hostDirection, out ElementTypeData sizeData))
                             {
                                 yield return new ElementModel(instance, sizeData, hostIdInt);
@@ -143,12 +146,14 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool IsValidElement(Element element, Solid intersectSolid, XYZ hostDirection, out ElementTypeData sizeData)
+        private bool IsValidElement(Element element, Solid solid, XYZ hostDirection, out ElementTypeData sizeData)
         {
             double distance;
+            centroidPoint = solid.ComputeCentroid();
             intanceBox = element.get_BoundingBox(null);
-            centroidPoint = intersectSolid.ComputeCentroid();
+            var volume = UnitUtils.ConvertFromInternalUnits(solid.Volume, DisplayUnitType.DUT_SQUARE_METERS);
             sizeData = DefineElementSize(element, intersectNormal);
+            
             foreach (KeyValuePair<XYZ, Solid> item in tempDict)
             {
                 distance = centroidPoint.DistanceTo(item.Key);
@@ -195,7 +200,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             intersectSolid = null;
             transform ??= identityTransform;
-            double tolerance = toleranceVolume;
+            double tolerance = minimumVolume;
             GeometryElement geomElement = elem.get_Geometry(options);
             BooleanOperationsType unionType = BooleanOperationsType.Union;
             BooleanOperationsType intersectType = BooleanOperationsType.Intersect;

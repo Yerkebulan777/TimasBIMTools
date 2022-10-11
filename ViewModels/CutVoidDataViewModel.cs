@@ -220,9 +220,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref rectangle, value))
                 {
+                    rectangle = ActivateFamilySimbolAsync(rectangle);
                     Properties.Settings.Default.RectangSymbol = rectangle.UniqueId;
                     Properties.Settings.Default.Save();
-                    ActivateFamilySimbol(rectangle);
                 }
             }
         }
@@ -236,9 +236,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref rounded, value))
                 {
+                    rounded = ActivateFamilySimbolAsync(rounded);
                     Properties.Settings.Default.RoundedSymbol = rounded.UniqueId;
                     Properties.Settings.Default.Save();
-                    ActivateFamilySimbol(rounded);
                 }
             }
         }
@@ -364,13 +364,25 @@ namespace RevitTimasBIMTools.ViewModels
             });
         }
 
-
-        private void ActivateFamilySimbol(FamilySymbol symbol)
+        private async void ClearElementDataAsync()
         {
-            if (symbol != null && !symbol.IsActive)
+            ElementModelData = await RevitTask.RunAsync(app =>
             {
-                symbol.Activate();
-            }
+                return new ObservableCollection<ElementModel>();
+            });
+        }
+
+
+        private FamilySymbol ActivateFamilySimbolAsync(FamilySymbol symbol)
+        {
+            return RevitTask.RunAsync(app =>
+            {
+                if (symbol != null && !symbol.IsActive)
+                {
+                    symbol.Activate();
+                }
+                return symbol;
+            }).Result;
         }
 
         #endregion
@@ -606,14 +618,10 @@ namespace RevitTimasBIMTools.ViewModels
         public void Dispose()
         {
             manager?.Dispose();
-            ElementModelData.Clear();
-            DataViewCollection.Refresh();
-            if (DataViewCollection is ListCollectionView list)
+            ClearElementDataAsync();
+            if (!DataViewCollection.IsEmpty)
             {
-                foreach (object item in list)
-                {
-                    list.Remove(item);
-                }
+                DataViewCollection.Refresh();
             }
         }
     }
