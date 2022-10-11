@@ -100,14 +100,11 @@ namespace RevitTimasBIMTools.Views
             {
                 if (disposing)
                 {
-                    _ = RevitTask.RunAsync(app =>
-                    {
-                        dataViewModel.Dispose();
-                    })
+                    Task.Run(dataViewModel.Dispose)
                     .ContinueWith(_ =>
                     {
                         CommandManager.InvalidateRequerySuggested();
-                    }, syncContext);
+                    }, syncContext).Dispose();
                     // TODO: освободить управляемое состояние (управляемые объекты)
                 }
                 // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения

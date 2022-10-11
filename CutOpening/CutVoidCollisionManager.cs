@@ -148,22 +148,19 @@ namespace RevitTimasBIMTools.CutOpening
 
         private bool IsValidElement(Element element, Solid solid, XYZ hostDirection, out ElementTypeData sizeData)
         {
-            double distance;
             centroidPoint = solid.ComputeCentroid();
             intanceBox = element.get_BoundingBox(null);
             var volume = UnitUtils.ConvertFromInternalUnits(solid.Volume, DisplayUnitType.DUT_SQUARE_METERS);
             sizeData = DefineElementSize(element, intersectNormal);
-            
             foreach (KeyValuePair<XYZ, Solid> item in tempDict)
             {
-                distance = centroidPoint.DistanceTo(item.Key);
+                var distance = centroidPoint.DistanceTo(item.Key);
                 if (distance < minimum)
                 {
                     sizeData = GetSizeByBoundingBox(intanceBox, hostDirection);
-                    return false;
                 }
             }
-            return true;
+            return sizeData.IsValidObject;
         }
 
 

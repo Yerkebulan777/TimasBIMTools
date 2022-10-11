@@ -1,40 +1,14 @@
-﻿using System;
-using System.Runtime.Serialization;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
+using System;
 
 
 namespace RevitTimasBIMTools.RevitModel
 {
     public struct ElementTypeData
     {
-        private const double footToMm = 304.8;
-        public ElementTypeData(ElementType elemtype, double height = 0, double width = 0, string description = null)
-        {
-            IsValidObject = elemtype != null && elemtype.IsValidObject;
-            Description = description == null ? string.Empty : description;
-            if (IsValidObject)
-            {
-                CategoryIdInt = elemtype.Category.Id.IntegerValue;
-                CategoryName = elemtype.Category.Name;
-                FamilyName = elemtype.FamilyName;
-                SymbolName = elemtype.Name;
-            }
-            else
-            {
-                CategoryIdInt = -1;
-                CategoryName = string.Empty;
-                FamilyName = string.Empty;
-                SymbolName = string.Empty;
-            }
+        public bool IsValidObject { get; } = false;
 
-            Height = RoundSize(height);
-            Width = RoundSize(width);
-        }
-
-
-        public bool IsValidObject { get; }
-
-        public int CategoryIdInt { get; }
+        public int CategoryIdInt { get; } = -1;
 
         public string CategoryName { get; }
 
@@ -42,11 +16,26 @@ namespace RevitTimasBIMTools.RevitModel
 
         public string SymbolName { get; }
 
-        public double Height { get; set; }
+        public double Height { get; }
 
-        public double Width { get; set; }
+        public double Width { get; }
 
-        public string Description { get; set; }
+        private const double footToMm = 304.8;
+
+
+        public ElementTypeData(ElementType elemtype, double height = 0, double width = 0)
+        {
+            IsValidObject = elemtype != null && elemtype.IsValidObject;
+            if (IsValidObject)
+            {
+                CategoryIdInt = elemtype.Category.Id.IntegerValue;
+                CategoryName = elemtype.Category.Name;
+                FamilyName = elemtype.FamilyName;
+                SymbolName = elemtype.Name;
+                Height = RoundSize(height);
+                Width = RoundSize(width);
+            }
+        }
 
 
         private double RoundSize(double value, int digit = 5)
