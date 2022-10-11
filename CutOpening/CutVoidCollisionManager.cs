@@ -5,8 +5,8 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Web.UI.WebControls;
 using Document = Autodesk.Revit.DB.Document;
+using Line = Autodesk.Revit.DB.Line;
 using Parameter = Autodesk.Revit.DB.Parameter;
 using UnitType = Autodesk.Revit.DB.UnitType;
 
@@ -24,6 +24,7 @@ namespace RevitTimasBIMTools.CutOpening
             IncludeNonVisibleObjects = false,
             DetailLevel = ViewDetailLevel.Medium
         };
+        private readonly SolidCurveIntersectionOptions intersectOptions = new();
 
         private readonly Transform identityTransform = Transform.Identity;
         #endregion
@@ -41,6 +42,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Input Properties
 
+        private double minDistance { get; set; } = 0;
         public int LevelIntId { get; set; } = invalidInt;
         public Document SearchDoc { get; internal set; } = null;
         public Transform SearchTrans { get; internal set; } = null;
@@ -51,7 +53,7 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly double minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
         private readonly double maxSideSize = Convert.ToDouble(Properties.Settings.Default.MaxSideSizeInMm / footToMm);
         private readonly double cutOffsetSize = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
-        private readonly double minimumVolume = 0.005;
+
         //private readonly string widthParamName = "ширина";
         //private readonly string heightParamName = "высота";
 
@@ -62,9 +64,9 @@ namespace RevitTimasBIMTools.CutOpening
 
         private ElementDataDictionary dataBase;
         private XYZ centroidPoint = XYZ.Zero;
-        private XYZ intersectNormal = XYZ.BasisZ;
+        private readonly XYZ intersectNormal = XYZ.BasisZ;
         private XYZ hostDirection = XYZ.BasisZ;
-
+        private Line intersectline = null;
         private Solid hostSolid = null;
         private Solid intersectSolid = null;
         private string unique = string.Empty;
@@ -76,7 +78,7 @@ namespace RevitTimasBIMTools.CutOpening
         private IDictionary<XYZ, Solid> tempDict { get; set; } = null;
         private ConcurrentDictionary<string, ElementTypeData> dictDatabase { get; set; } = ElementDataDictionary.ElementTypeSizeDictionary;
 
-        private readonly double minimum = 0;
+
         private double angleRadians = 0;
         private double angleHorisontDegrees = 0;
         private double angleVerticalDegrees = 0;
@@ -87,24 +89,26 @@ namespace RevitTimasBIMTools.CutOpening
         #endregion
 
 
-        private void Initialize(Document doc)
+        private void InitializeUnits(Document doc)
         {
             dataBase = new();
             revitUnits = doc.GetUnits();
             SearchCatId = new ElementId(categoryIntId);
+            minDistance = cutOffsetSize + ((minSideSize + maxSideSize) * 0.25);
             angleUnit = revitUnits.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
 
 
         public ConcurrentQueue<ElementModel> GetCollisionByLevel(Document doc, Level level, ConcurrentQueue<Element> elements)
         {
-            Initialize(doc);
+            InitializeUnits(doc);
             LevelIntId = level.Id.IntegerValue;
             ConcurrentQueue<ElementModel> output = new();
             foreach (Element host in elements)
             {
                 if (LevelIntId == host.LevelId.IntegerValue)
                 {
+
                     foreach (ElementModel model in GetIntersectionElementModels(doc, SearchCatId, SearchTrans, host))
                     {
                         output.Enqueue(model);
@@ -127,18 +131,15 @@ namespace RevitTimasBIMTools.CutOpening
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(catId);
             foreach (Element instance in collector)
             {
-                if (hostSolid != null && VerifyElementByLenght(instance))
+                if (IsNotParallel(hostDirection, intersectNormal))
                 {
-                    if (GetElementDirection(instance, out intersectNormal) && IsParallel(hostDirection, intersectNormal))
+                    intersectSolid = GetIntersectSolid(hostSolid, instance, transform);
+                    if (intersectSolid != null && intersectSolid.Volume > 0)
                     {
-                        intersectSolid = GetIntersectSolid(hostSolid, instance, transform);
-                        if (intersectSolid != null && intersectSolid.Volume > minimumVolume)
+                        //GetElementDirection(instance, intersectSolid, out intersectNormal);
+                        if (IsValidElement(instance, intersectSolid, hostDirection, out ElementTypeData sizeData))
                         {
-                            
-                            if (IsValidElement(instance, intersectSolid, hostDirection, out ElementTypeData sizeData))
-                            {
-                                yield return new ElementModel(instance, sizeData, hostIdInt);
-                            }
+                            yield return new ElementModel(instance, sizeData, hostIdInt);
                         }
                     }
                 }
@@ -148,19 +149,50 @@ namespace RevitTimasBIMTools.CutOpening
 
         private bool IsValidElement(Element element, Solid solid, XYZ hostDirection, out ElementTypeData sizeData)
         {
-            centroidPoint = solid.ComputeCentroid();
+
             intanceBox = element.get_BoundingBox(null);
-            var volume = UnitUtils.ConvertFromInternalUnits(solid.Volume, DisplayUnitType.DUT_SQUARE_METERS);
+
+            _ = UnitUtils.ConvertFromInternalUnits(solid.Volume, DisplayUnitType.DUT_SQUARE_METERS);
             sizeData = DefineElementSize(element, intersectNormal);
             foreach (KeyValuePair<XYZ, Solid> item in tempDict)
             {
-                var distance = centroidPoint.DistanceTo(item.Key);
-                if (distance < minimum)
+                double distance = centroidPoint.DistanceTo(item.Key);
+                if (distance < minDistance)
                 {
                     sizeData = GetSizeByBoundingBox(intanceBox, hostDirection);
                 }
             }
             return sizeData.IsValidObject;
+        }
+
+
+        private bool IsVerifyInstanceBySolid(Element elem, Solid solid, out XYZ direction)
+        {
+            direction = XYZ.Zero;
+            centroidPoint = solid.ComputeCentroid();
+            if (elem is FamilyInstance instance)
+            {
+                transform = instance.GetTransform();
+                direction = transform.BasisX.Normalize();
+                XYZ strPnt = centroidPoint - (direction * maxSideSize);
+                XYZ endPnt = centroidPoint + (direction * maxSideSize);
+                intersectline = Line.CreateBound(strPnt, endPnt);
+            }
+            else if (elem.Location is LocationCurve curve)
+            {
+                intersectline = curve.Curve as Line;
+                direction = intersectline.Direction.Normalize();
+            }
+            try
+            {
+                intersectline = solid.IntersectWithCurve(intersectline, intersectOptions).GetCurveSegment(0) as Line;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex.Message);
+                return false;
+            }
+            return direction.IsAlmostEqualTo(XYZ.Zero) == false;
         }
 
 
@@ -170,34 +202,9 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool VerifyElementByLenght(Element elem)
-        {
-            return elem.Location is not LocationCurve || elem.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() > minimum;
-        }
-
-
-        private bool GetElementDirection(Element elem, out XYZ direction)
-        {
-            direction = XYZ.Zero;
-            if (elem is FamilyInstance instance)
-            {
-                transform = instance.GetTransform();
-                direction = transform.BasisX.Normalize();
-            }
-            else if (elem.Location is LocationCurve curve)
-            {
-                Line line = curve.Curve as Line;
-                direction = line.Direction.Normalize();
-            }
-            return direction.IsAlmostEqualTo(XYZ.Zero) == false;
-        }
-
-
-        private Solid GetIntersectSolid(Solid source, Element elem, Transform transform = null)
+        private Solid GetIntersectSolid(Solid source, Element elem, Transform transform, double tolerance = 0)
         {
             intersectSolid = null;
-            transform ??= identityTransform;
-            double tolerance = minimumVolume;
             GeometryElement geomElement = elem.get_Geometry(options);
             BooleanOperationsType unionType = BooleanOperationsType.Union;
             BooleanOperationsType intersectType = BooleanOperationsType.Intersect;
@@ -318,7 +325,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool IsParallel(XYZ normal, XYZ direction)
+        private bool IsNotParallel(XYZ normal, XYZ direction)
         {
             return !direction.IsAlmostEqualTo(XYZ.Zero) && Math.Abs(normal.DotProduct(direction)) > thresholdAngle;
         }
@@ -360,7 +367,7 @@ namespace RevitTimasBIMTools.CutOpening
         //private double GetLengthValueBySimilarParameterName(Element elem, string paramName)
         //{
         //    double value = invalidInt;
-        //    int minimum = int.MaxValue;
+        //    int minDistance = int.MaxValue;
         //    char[] delimiters = new[] { ' ', '_', '-' };
         //    foreach (Parameter param in elem.GetOrderedParameters())
         //    {
@@ -372,9 +379,9 @@ namespace RevitTimasBIMTools.CutOpening
         //            if (strArray.Contains(paramName, StringComparer.CurrentCultureIgnoreCase))
         //            {
         //                int tmp = param.IsShared ? name.Length : name.Length + strArray.Length;
-        //                if (minimum > tmp && UnitFormatUtils.TryParse(revitUnits, UnitType.UT_Length, param.AsValueString(), out value))
+        //                if (minDistance > tmp && UnitFormatUtils.TryParse(revitUnits, UnitType.UT_Length, param.AsValueString(), out value))
         //                {
-        //                    minimum = tmp;
+        //                    minDistance = tmp;
         //                }
         //            }
         //        }
