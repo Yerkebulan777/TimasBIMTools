@@ -3,6 +3,7 @@ using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
@@ -32,15 +33,14 @@ namespace RevitTimasBIMTools.ViewModels
         public CutVoidDockPanelView DockPanelView { get; set; } = null;
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
-        private CutVoidCollisionManager manager { get; set; } = null;
         private ConcurrentQueue<Element> instances { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
+        private IServiceProvider provider { get; } = SmartToolApp.ServiceProvider;
+        private CutVoidCollisionManager manager { get; set; } = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
 
-
-        private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
-        //private readonly SynchronizationContext context = SynchronizationContext.Current;
 
+        //private readonly SynchronizationContext context = SynchronizationContext.Current;
 
         public CutVoidDataViewModel()
         {
@@ -77,7 +77,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (SetProperty(ref enableOpt, value))
                     {
-                        Properties.Settings.Default.Reset();
+                        manager = provider.GetRequiredService<CutVoidCollisionManager>();
                         IsDataEnabled = !enableOpt;
                         ElementModelData.Clear();
                         SetMEPCategoriesToData();
@@ -99,7 +99,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (SetProperty(ref enableData, value))
                     {
-                        Properties.Settings.Default.Reload();
                         IsOptionEnabled = !enableData;
                         DataViewCollection.Refresh();
                         SetValidLevelsToData();
@@ -121,7 +120,6 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref docModels, value))
                 {
-                    manager = provider.GetRequiredService<CutVoidCollisionManager>();
                     SelectedDocModel = docModels.FirstOrDefault();
                 }
             }
@@ -177,7 +175,6 @@ namespace RevitTimasBIMTools.ViewModels
                     manager.SearchDoc = docModel.Document;
                     manager.SearchGlobal = docModel.Transform;
                     manager.SearchInstance = docModel.LinkInstance;
-                    CommandManager.InvalidateRequerySuggested();
                 }
             }
         }
@@ -206,8 +203,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref material, value) && material != null)
                 {
                     GetInstancesByCoreMaterialInType(material.Name);
-                    Properties.Settings.Default.CoreMaterialName = material.Name;
-                    Properties.Settings.Default.Save();
                 }
             }
         }

@@ -74,18 +74,6 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string CoreMaterialName {
-            get {
-                return ((string)(this["CoreMaterialName"]));
-            }
-            set {
-                this["CoreMaterialName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string RectangSymbol {
             get {
                 return ((string)(this["RectangSymbol"]));
