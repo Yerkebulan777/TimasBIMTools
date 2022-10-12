@@ -24,10 +24,10 @@ namespace RevitTimasBIMTools.CutOpening
         public Result Execute(UIApplication uiapp, ref string message)
         {
             Result result = Result.Succeeded;
-            IDockablePaneProvider pane = provider.GetRequiredService<IDockablePaneProvider>();
             SmartToolHelper helper = provider.GetRequiredService<SmartToolHelper>();
             if (DockablePane.PaneIsRegistered(helper.CutVoidPaneId))
             {
+                IDockablePaneProvider pane = provider.GetRequiredService<IDockablePaneProvider>();
                 DockablePane dockpane = uiapp.GetDockablePane(helper.CutVoidPaneId);
                 if (pane is CutVoidDockPanelView view)
                 {
@@ -35,11 +35,15 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         if (dockpane.IsShown())
                         {
-                            view.Dispose();
                             dockpane.Hide();
+                            if (!view.Disposed)
+                            {
+                                view.Dispose();
+                            }
                         }
                         else
                         {
+                            view.Disposed = false;
                             view.RaiseHandler();
                             dockpane.Show();
                         }

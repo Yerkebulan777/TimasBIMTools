@@ -20,11 +20,11 @@ namespace RevitTimasBIMTools.Views
     /// <summary> Логика взаимодействия для CutVoidDockPanelView.xaml </summary>
     public partial class CutVoidDockPanelView : Page, IDockablePaneProvider, IDisposable
     {
-        private bool disposedValue = false;
         private readonly Mutex mutex = new();
-        private CutVoidViewExternalHandler handler { get; set; } = null;
+        public bool Disposed { get; internal set; } = false;
         private ExternalEvent externalEvent { get; set; } = null;
-
+        private CutVoidViewExternalHandler handler { get; set; } = null;
+        
         private readonly IServiceProvider provider = ContainerConfig.ConfigureServices();
         private readonly CutVoidDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
@@ -96,7 +96,7 @@ namespace RevitTimasBIMTools.Views
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!Disposed)
             {
                 if (disposing)
                 {
@@ -109,7 +109,7 @@ namespace RevitTimasBIMTools.Views
                 }
                 // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения
                 // TODO: установить значение NULL для больших полей
-                disposedValue = true;
+                Disposed = true;
             }
         }
 
