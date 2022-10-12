@@ -166,18 +166,15 @@ namespace RevitTimasBIMTools.CutOpening
             }
             try
             {
-                line = solid.IntersectWithCurve(line, intersectOptions)?.GetCurveSegment(0) as Line;
+                SolidCurveIntersection curves = solid.IntersectWithCurve(line, intersectOptions);
+                if (curves != null && 0 < curves.SegmentCount)
+                {
+                    length = curves.GetCurveSegment(0).Length;
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error(elem.Name + ex.ToString());
-            }
-            finally
-            {
-                if (line != null)
-                {
-                    length = line.Length;
-                }
             }
             return length > tolerance;
         }
@@ -189,7 +186,7 @@ namespace RevitTimasBIMTools.CutOpening
             ElementTypeData structData = new(null);
             if (doc.GetElement(elem.GetTypeId()) is ElementType etype)
             {
-                unique = etype.UniqueId.Normalize();
+                unique = (etype.UniqueId + elem.Name).Normalize();
                 if (!dictDatabase.TryGetValue(unique, out structData))
                 {
                     structData = GetSectionSize(elem, etype, direction);
