@@ -167,7 +167,7 @@ namespace RevitTimasBIMTools.CutOpening
             try
             {
                 SolidCurveIntersection curves = solid.IntersectWithCurve(line, intersectOptions);
-                if (curves != null && 0 < curves.SegmentCount)
+                if (curves != null && 0 <= curves.SegmentCount)
                 {
                     length = curves.GetCurveSegment(0).Length;
                 }
