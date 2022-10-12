@@ -14,19 +14,20 @@ namespace RevitTimasBIMTools.CutOpening
 {
     public sealed class CutVoidCollisionManager : IDisposable
     {
-        #region Parameter Properties
+        #region Default Properties
 
-        private Units revitUnits = null;
-        private DisplayUnitType angleUnit;
-        private readonly Options options = new()
+        private Units revitUnits { get; set; } = null;
+        private DisplayUnitType angleUnit { get; set; }
+        private Options options { get; } = new()
         {
             ComputeReferences = true,
             IncludeNonVisibleObjects = false,
             DetailLevel = ViewDetailLevel.Medium
         };
-        private readonly SolidCurveIntersectionOptions intersectOptions = new();
 
-        private readonly Transform identityTransform = Transform.Identity;
+        private Transform identityTransform { get; } = Transform.Identity;
+        private SolidCurveIntersectionOptions intersectOptions { get; } = new();
+
         #endregion
 
 
@@ -45,8 +46,8 @@ namespace RevitTimasBIMTools.CutOpening
         private double minDistance { get; set; } = 0;
         public int LevelIntId { get; set; } = invalidInt;
         public Document SearchDoc { get; internal set; } = null;
-        public Transform SearchTrans { get; internal set; } = null;
         public ElementId SearchCatId { get; internal set; } = null;
+        public Transform SearchGlobal { get; internal set; } = null;
         public RevitLinkInstance SearchInstance { get; internal set; } = null;
 
         private readonly int categoryIntId = Properties.Settings.Default.CategoryIntId;
@@ -62,18 +63,17 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Templory Properties
 
-
-        private XYZ instNormal = XYZ.BasisZ;
-        private XYZ hostNormal = XYZ.BasisZ;
-        private XYZ centroid = XYZ.Zero;
         private Line line = null;
+        private XYZ centroid = null;
         private Solid hostSolid = null;
         private Solid intersection = null;
+        private XYZ instNormal = XYZ.BasisZ;
+        private XYZ hostNormal = XYZ.BasisZ;
         private string unique = string.Empty;
+        private BoundingBoxXYZ instBbox = null;
+        private BoundingBoxXYZ hostBbox = null;
         private Transform transform = Transform.Identity;
         private FilteredElementCollector collector = null;
-        private BoundingBoxXYZ intanceBox = new();
-        private readonly BoundingBoxXYZ hostBbox = new();
 
 
         private IDictionary<XYZ, Solid> localSolidsDict { get; set; } = null;
@@ -108,7 +108,7 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 if (LevelIntId == host.LevelId.IntegerValue)
                 {
-                    foreach (ElementModel model in GetIntersectionModelByHost(doc, SearchCatId, SearchTrans, host))
+                    foreach (ElementModel model in GetIntersectionModelByHost(doc, SearchGlobal, host, SearchCatId))
                     {
                         output.Enqueue(model);
                     }
@@ -118,9 +118,10 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private IEnumerable<ElementModel> GetIntersectionModelByHost(Document doc, ElementId catId, Transform transform, Element host)
+        private IEnumerable<ElementModel> GetIntersectionModelByHost(Document doc, Transform global, Element host, ElementId catId)
         {
             int hostIdInt = host.Id.IntegerValue;
+            hostBbox = host.get_BoundingBox(null);
             hostSolid = host.GetSolidByVolume(identityTransform, options);
             hostNormal = host is Wall wall ? wall.Orientation : XYZ.BasisZ;
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
@@ -128,12 +129,12 @@ namespace RevitTimasBIMTools.CutOpening
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(catId);
             foreach (Element instance in collector)
             {
-                centroid = instance.GetMiddlePointByBoundingBox(ref intanceBox);
+                centroid = instance.GetMiddlePointByBoundingBox(ref instBbox);
                 if (IsValidIntersection(instance, hostSolid, centroid, minSideSize, out instNormal))
                 {
                     if (IsNotParallelDirections(hostNormal, instNormal))
                     {
-                        intersection = instance.GetIntersectionSolid(hostSolid, transform, options);
+                        intersection = instance.GetIntersectionSolid(global, hostSolid, options);
                         if (intersection != null)
                         {
                             centroid = intersection.ComputeCentroid();
@@ -258,11 +259,11 @@ namespace RevitTimasBIMTools.CutOpening
             Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngle(angleVerticalDegrees), centroid);
             intersection = angleHorisontDegrees == 0 ? intersection : SolidUtils.CreateTransformed(intersection, horizont);
             intersection = angleVerticalDegrees == 0 ? intersection : SolidUtils.CreateTransformed(intersection, vertical);
-            intanceBox = intersection?.GetBoundingBox();
-            if (intanceBox != null)
+            instBbox = intersection?.GetBoundingBox();
+            if (instBbox != null)
             {
-                widht = Math.Abs(intanceBox.Max.X - intanceBox.Min.X);
-                hight = Math.Abs(intanceBox.Max.Z - intanceBox.Min.Z);
+                widht = Math.Abs(instBbox.Max.X - instBbox.Min.X);
+                hight = Math.Abs(instBbox.Max.Z - instBbox.Min.Z);
                 result = new ElementTypeData(etype, hight, widht);
             }
             return result;
@@ -388,11 +389,11 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        //private double GetRotationAngleFromTransform(Transform transform)
+        //private double GetRotationAngleFromTransform(Transform global)
         //{
-        //    double x = transform.BasisX.X;
-        //    double y = transform.BasisY.Y;
-        //    double z = transform.BasisZ.Z;
+        //    double x = global.BasisX.X;
+        //    double y = global.BasisY.Y;
+        //    double z = global.BasisZ.Z;
         //    double trace = x + y + z;
         //    return Math.Acos((trace - 1) / 2.0);
         //}
@@ -444,7 +445,7 @@ namespace RevitTimasBIMTools.CutOpening
             SearchDoc?.Dispose();
             intersection?.Dispose();
             SearchInstance?.Dispose();
-            SearchTrans?.Dispose();
+            SearchGlobal?.Dispose();
 
             Logger.Log(dictDatabase.Values.Count.ToString());
         }

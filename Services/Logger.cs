@@ -17,7 +17,7 @@ namespace RevitTimasBIMTools.Services
         private const string caption = "Timas BIM Tools";
         private static readonly string documentPath = Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.Personal));
         private static readonly string logFilePath = Path.Combine(documentPath, "TimasBIMToolLog", "Revit.log");
-        public void InitMainLogger(Type type)
+        public static void InitMainLogger(Type type)
         {
             string name = type.ToString();
             log4net.Repository.ILoggerRepository repository = log4net.LogManager.CreateRepository(name);

@@ -173,7 +173,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref docModel, value) && docModel != null)
                 {
                     manager.SearchDoc = docModel.Document;
-                    manager.SearchTrans = docModel.Transform;
+                    manager.SearchGlobal = docModel.Transform;
                     manager.SearchInstance = docModel.LinkInstance;
                     CommandManager.InvalidateRequerySuggested();
                 }
