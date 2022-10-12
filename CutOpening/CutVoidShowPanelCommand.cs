@@ -43,7 +43,6 @@ namespace RevitTimasBIMTools.CutOpening
                         }
                         else
                         {
-                            view.Disposed = false;
                             view.RaiseHandler();
                             dockpane.Show();
                         }

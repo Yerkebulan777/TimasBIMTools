@@ -56,6 +56,7 @@ namespace RevitTimasBIMTools.Views
             handler = provider.GetRequiredService<CutVoidViewExternalHandler>();
             handler.Completed += OnContextHandlerCompleted;
             externalEvent = ExternalEvent.Create(handler);
+            Disposed = false;
 
             if (ExternalEventRequest.Accepted != externalEvent.Raise())
             {
