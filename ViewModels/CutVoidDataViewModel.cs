@@ -3,7 +3,6 @@ using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
@@ -37,13 +36,13 @@ namespace RevitTimasBIMTools.ViewModels
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
         private IServiceProvider provider { get; } = SmartToolApp.ServiceProvider;
         private CutVoidCollisionManager manager { get; set; } = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
+        private TaskScheduler context { get; } = CustomSynchronizationContext.GetSynchronizationContext();
+        private string documentId { get; } = Properties.Settings.Default.ActiveDocumentUniqueId;
 
-        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
-
-        //private readonly SynchronizationContext context = SynchronizationContext.Current;
 
         public CutVoidDataViewModel()
         {
+
             SettingsCommand = new RelayCommand(SettingsHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
