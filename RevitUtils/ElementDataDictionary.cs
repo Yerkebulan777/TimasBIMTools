@@ -17,25 +17,22 @@ namespace RevitTimasBIMTools.RevitUtils
     {
 
         [JsonExtensionData]
-        private Dictionary<string, ElementTypeData> dataDict { get; set; }
+
         private static readonly string fileName = Path.Combine(SmartToolHelper.DocumentPath, @"SizeTypeData.json");
         private static readonly JsonSerializerSettings options = new() { NullValueHandling = NullValueHandling.Ignore };
-
         public static ConcurrentDictionary<string, ElementTypeData> ElementTypeSizeDictionary = new();
 
         [STAThread]
-        public void SerializeData(ConcurrentDictionary<string, ElementTypeData> sourceDict)
+        public static void SerializeData(ConcurrentDictionary<string, ElementTypeData> sourceDict)
         {
-
-            dataDict = sourceDict.ToDictionary(k => k.Key, v => v.Value);
-            if (dataDict.Count > 0)
+            if (sourceDict.Count > 0)
             {
                 try
                 {
                     using MemoryStream stream = new(capacity: 10);
                     using StreamWriter writer = new(stream, Encoding.UTF8);
                     using JsonTextWriter jsonWriter = new(writer);
-                    JsonSerializer.CreateDefault(options).Serialize(jsonWriter, dataDict);
+                    JsonSerializer.CreateDefault(options).Serialize(jsonWriter, sourceDict);
                     jsonWriter.Flush();
                     stream.Position = 0;
                     File.WriteAllBytes(fileName, stream.ToArray());

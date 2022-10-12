@@ -7,9 +7,6 @@ namespace RevitTimasBIMTools.RevitModel
 {
     public sealed class ElementModel : ObservableObject, IRevitElementModel
     {
-        public readonly int IdInt;
-        public readonly int LevelId;
-        
 
         private readonly ElementTypeData elemTypeData;
         public ElementModel(Element instance, ElementTypeData data, int hostIdInt = 0, string description = null)
@@ -31,6 +28,9 @@ namespace RevitTimasBIMTools.RevitModel
             }
         }
 
+
+        public int IdInt { get; }
+        public int LevelId { get; }
         public int HostIdInt {get; internal set; }
         public string SymbolName { get; private set; }
         public string FamilyName { get; private set; }

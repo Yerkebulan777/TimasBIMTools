@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
 using System;
@@ -26,7 +25,6 @@ namespace RevitTimasBIMTools.Core
             _ = services.AddTransient<CutVoidViewExternalHandler>();
             _ = services.AddTransient<CutVoidCollisionManager>();
             _ = services.AddTransient<RevitPurginqManager>();
-            _ = services.AddTransient<Logger>();
 
             return services.BuildServiceProvider();
         }

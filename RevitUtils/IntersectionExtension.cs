@@ -1,17 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using RevitTimasBIMTools.Services;
+using System;
+using System.Collections.Generic;
+using Options = Autodesk.Revit.DB.Options;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
     internal static class IntersectionExtension
     {
+        private static Solid result { get; set; } = null;
+
         public static Outline GetOutLine(this BoundingBoxXYZ bbox)
         {
             Transform transform = bbox.Transform;
             return new Outline(transform.OfPoint(bbox.Min), transform.OfPoint(bbox.Max));
         }
+
 
         public static XYZ GetMiddlePointByBoundingBox(this Element element, ref BoundingBoxXYZ bbox)
         {
@@ -19,42 +23,49 @@ namespace RevitTimasBIMTools.RevitUtils
             return (bbox.Min + bbox.Max) * 0.5;
         }
 
-        public static Solid GetElementSolidByCenter(this Element element, Options geoOptions, Transform global, XYZ centre, double tolerance = 0.5)
+
+        public static Solid GetSolidByVolume(this Element element, Transform global, Options options, double tolerance = 0.5)
         {
-            Solid result = null;
-            double maxDistance = double.MaxValue;
-            GeometryElement geomElem = element.get_Geometry(geoOptions);
-            foreach (GeometryObject geomObj in geomElem.GetTransformed(global))
+            result = null;
+            GeometryElement geomElem = element.get_Geometry(options);
+            foreach (GeometryObject obj in geomElem.GetTransformed(global))
             {
-                if (geomObj is Solid)
+                if (obj is Solid solid && solid != null)
                 {
-                    Solid solid = geomObj as Solid;
-                    if (solid.Faces.Size > 0 && solid.Volume > tolerance)
+                    double volume = solid.Volume;
+                    if (volume > tolerance)
                     {
-                        double minDistance = Math.Abs(centre.DistanceTo(solid.ComputeCentroid()));
-                        if (maxDistance > minDistance)
-                        {
-                            maxDistance = minDistance;
-                            result = solid;
-                        }
+                        tolerance = volume;
+                        result = solid;
                     }
                 }
-                else if (geomObj is GeometryInstance geomInst)
+            }
+            return result;
+        }
+
+
+        public static Solid GetUnionSolidByVolume(this Element elem, Transform global, Options options, double tolerance = 0.5)
+        {
+            result = null;
+            GeometryElement geomElement = elem.get_Geometry(options);
+            BooleanOperationsType unionType = BooleanOperationsType.Union;
+            foreach (GeometryObject obj in geomElement.GetTransformed(global))
+            {
+                if (obj is Solid solid && solid != null && solid.Faces.Size > 0)
                 {
-                    GeometryElement instGeomElem = geomInst.GetInstanceGeometry();
-                    foreach (GeometryObject instGeomObj in instGeomElem)
+                    if (solid.Volume > tolerance)
                     {
-                        if (instGeomObj is Solid solid)
+                        if (null == result)
                         {
-                            if (solid.Faces.Size > 0 && solid.Volume > tolerance)
-                            {
-                                double minDistance = Math.Abs(centre.DistanceTo(solid.ComputeCentroid()));
-                                if (maxDistance > minDistance)
-                                {
-                                    maxDistance = minDistance;
-                                    result = solid;
-                                }
-                            }
+                            result = solid;
+                        }
+                        try
+                        {
+                            result = BooleanOperationsUtils.ExecuteBooleanOperation(result, solid, unionType);
+                        }
+                        catch
+                        {
+                            continue;
                         }
                     }
                 }
@@ -62,14 +73,48 @@ namespace RevitTimasBIMTools.RevitUtils
             return result;
         }
 
-        public static Solid CreateSolidFromBoundingBox(this BoundingBoxXYZ boundBox, Transform transform, SolidOptions solidOptions = null)
+
+        public static Solid GetIntersectionSolid(this Element elem, Solid source, Transform global, Options options, double tolerance = 0)
         {
-            // Check that the bounding box is valid.
+            result = null;
+            GeometryElement geomElement = elem.get_Geometry(options);
+            BooleanOperationsType unionType = BooleanOperationsType.Union;
+            BooleanOperationsType interType = BooleanOperationsType.Intersect;
+            foreach (GeometryObject obj in geomElement.GetTransformed(global))
+            {
+                if (obj is Solid solid && solid != null && solid.Faces.Size > 0)
+                {
+                    try
+                    {
+                        solid = BooleanOperationsUtils.ExecuteBooleanOperation(source, solid, interType);
+                        if (result != null && solid != null && solid.Faces.Size > 0)
+                        {
+                            solid = BooleanOperationsUtils.ExecuteBooleanOperation(result, solid, unionType);
+                        }
+                    }
+                    finally
+                    {
+                        double volume = solid.Volume;
+                        if (volume > tolerance)
+                        {
+                            tolerance = volume;
+                            result = solid;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+
+        public static Solid CreateSolidFromBoundingBox(this BoundingBoxXYZ boundBox, Transform transform, SolidOptions options)
+        {
+            result = null;
             if (boundBox != null && boundBox.Enabled)
             {
                 try
                 {
-                    // Create a transform based on the incoming transform coordinate system and the bounding box coordinate system.
+                    // Create a global based on the incoming global coordinate system and the bounding box coordinate system.
                     Transform bboxTransform = (transform == null) ? boundBox.Transform : transform.Multiply(boundBox.Transform);
 
                     XYZ[] profilePts = new XYZ[4];
@@ -90,7 +135,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     double extrusionDistance = extrusionVector.GetLength();
                     XYZ extrusionDirection = extrusionVector.Normalize();
 
-                    CurveLoop baseLoop = new CurveLoop();
+                    CurveLoop baseLoop = new();
 
                     for (int i = 0; i < 4; i++)
                     {
@@ -99,18 +144,14 @@ namespace RevitTimasBIMTools.RevitUtils
 
                     IList<CurveLoop> baseLoops = new List<CurveLoop> { baseLoop };
 
-                    return solidOptions == null
-                        ? GeometryCreationUtilities.CreateExtrusionGeometry(baseLoops, extrusionDirection, extrusionDistance)
-                        : GeometryCreationUtilities.CreateExtrusionGeometry(baseLoops, extrusionDirection, extrusionDistance, solidOptions);
+                    result = GeometryCreationUtilities.CreateExtrusionGeometry(baseLoops, extrusionDirection, extrusionDistance, options);
                 }
                 catch (Exception exc)
                 {
                     Logger.Error(exc.Message);
-                    return null;
                 }
             }
-            return null;
+            return result;
         }
-
     }
 }
