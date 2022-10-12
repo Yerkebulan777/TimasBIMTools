@@ -166,7 +166,11 @@ namespace RevitTimasBIMTools.CutOpening
             }
             try
             {
-                line = solid.IntersectWithCurve(line, intersectOptions).GetCurveSegment(0) as Line;
+                line = solid.IntersectWithCurve(line, intersectOptions)?.GetCurveSegment(0) as Line;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(elem.Name + ex.ToString());
             }
             finally
             {
