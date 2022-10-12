@@ -17,8 +17,6 @@ namespace RevitTimasBIMTools.Core
         public static IServiceProvider ServiceProvider { get; set; }
         private UIControlledApplication controller { get; set; }
 
-
-        [STAThread]
         public Result OnStartup(UIControlledApplication controlledApp)
         {
             RevitTask.Initialize(controlledApp);
