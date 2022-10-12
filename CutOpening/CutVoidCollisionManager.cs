@@ -50,7 +50,6 @@ namespace RevitTimasBIMTools.CutOpening
         public Transform SearchGlobal { get; internal set; } = null;
         public RevitLinkInstance SearchInstance { get; internal set; } = null;
 
-        private readonly int categoryIntId = Properties.Settings.Default.CategoryIntId;
         private readonly double minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
         private readonly double maxSideSize = Convert.ToDouble(Properties.Settings.Default.MaxSideSizeInMm / footToMm);
         private readonly double cutOffsetSize = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
@@ -93,7 +92,7 @@ namespace RevitTimasBIMTools.CutOpening
         private void InitializeUnits(Document doc)
         {
             revitUnits = doc.GetUnits();
-            SearchCatId = new ElementId(categoryIntId);
+            
             minDistance = cutOffsetSize + ((minSideSize + maxSideSize) * 0.25);
             angleUnit = revitUnits.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }

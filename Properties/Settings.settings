@@ -14,9 +14,6 @@
     <Setting Name="CutOffsetInMm" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50</Value>
     </Setting>
-    <Setting Name="CategoryIntId" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">-1</Value>
-    </Setting>
     <Setting Name="CoreMaterialName" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>

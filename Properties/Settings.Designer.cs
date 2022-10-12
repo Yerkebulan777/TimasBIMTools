@@ -73,18 +73,6 @@ namespace RevitTimasBIMTools.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
-        public int CategoryIntId {
-            get {
-                return ((int)(this["CategoryIntId"]));
-            }
-            set {
-                this["CategoryIntId"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string CoreMaterialName {
             get {

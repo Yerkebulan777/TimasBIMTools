@@ -77,6 +77,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (SetProperty(ref enableOpt, value))
                     {
+                        Properties.Settings.Default.Reset();
                         IsDataEnabled = !enableOpt;
                         ElementModelData.Clear();
                         SetMEPCategoriesToData();
@@ -94,10 +95,11 @@ namespace RevitTimasBIMTools.ViewModels
             get => enableData;
             set
             {
-                if (!value || (docModel != null && category != null))
+                if (docModel != null && category != null)
                 {
                     if (SetProperty(ref enableData, value))
                     {
+                        Properties.Settings.Default.Reload();
                         IsOptionEnabled = !enableData;
                         DataViewCollection.Refresh();
                         SetValidLevelsToData();
@@ -189,8 +191,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref category, value) && category != null)
                 {
-                    Properties.Settings.Default.CategoryIntId = category.Id.IntegerValue;
-                    Properties.Settings.Default.Save();
+                    manager.SearchCatId = category.Id;
                 }
             }
         }
