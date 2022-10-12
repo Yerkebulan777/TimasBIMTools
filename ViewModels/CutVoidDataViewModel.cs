@@ -37,7 +37,7 @@ namespace RevitTimasBIMTools.ViewModels
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
 
-        private readonly IServiceProvider provider = ContainerConfig.ConfigureServices();
+        private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         //private readonly SynchronizationContext context = SynchronizationContext.Current;
 

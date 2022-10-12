@@ -25,7 +25,7 @@ namespace RevitTimasBIMTools.Views
         private ExternalEvent externalEvent { get; set; } = null;
         private CutVoidViewExternalHandler handler { get; set; } = null;
         
-        private readonly IServiceProvider provider = ContainerConfig.ConfigureServices();
+        private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         private readonly CutVoidDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();

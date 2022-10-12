@@ -10,12 +10,12 @@ using Line = Autodesk.Revit.DB.Line;
 using Parameter = Autodesk.Revit.DB.Parameter;
 using UnitType = Autodesk.Revit.DB.UnitType;
 
+
 namespace RevitTimasBIMTools.CutOpening
 {
     public sealed class CutVoidCollisionManager : IDisposable
     {
         #region Default Properties
-
         private Units revitUnits { get; set; } = null;
         private DisplayUnitType angleUnit { get; set; }
         private Options options { get; } = new()

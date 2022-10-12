@@ -14,19 +14,17 @@ namespace RevitTimasBIMTools.Core
 {
     public sealed class SmartToolApp : IExternalApplication
     {
-        public static IServiceProvider ServiceProvider { get; set; }
         private UIControlledApplication controller { get; set; }
-
+        public static IServiceProvider ServiceProvider { get; private set; }
         public Result OnStartup(UIControlledApplication controlledApp)
         {
+            controller = controlledApp;
             RevitTask.Initialize(controlledApp);
             Logger.InitMainLogger(typeof(SmartToolApp));
             SmartToolSetupUIPanel.Initialize(controlledApp);
             ServiceProvider = ContainerConfig.ConfigureServices();
             Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
             controlledApp.ControlledApplication.ApplicationInitialized += OnApplicationInitialized;
-
-            controller = controlledApp;
 
             return Result.Succeeded;
         }
@@ -41,7 +39,7 @@ namespace RevitTimasBIMTools.Core
             }
 
             CutVoidRegisterDockPane register = ServiceProvider.GetRequiredService<CutVoidRegisterDockPane>();
-            register = register ?? throw new ArgumentNullException(nameof(register));           
+            register = register ?? throw new ArgumentNullException(nameof(register));
             register.RegisterDockablePane(controller);
 
         }
