@@ -174,7 +174,7 @@ namespace RevitTimasBIMTools.CutOpening
             }
             catch (Exception ex)
             {
-                Logger.Error(elem.Name + ex.ToString());
+                Logger.Error(elem.Id.IntegerValue, ex.Message);
             }
             return length > tolerance;
         }

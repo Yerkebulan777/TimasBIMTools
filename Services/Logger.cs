@@ -22,7 +22,7 @@ namespace RevitTimasBIMTools.Services
             string name = type.ToString();
             log4net.Repository.ILoggerRepository repository = log4net.LogManager.CreateRepository(name);
             mainlogger = log4net.LogManager.GetLogger(name, type);
-            RollingFileAppender LogFile = new RollingFileAppender
+            RollingFileAppender LogFile = new()
             {
                 File = logFilePath,
                 MaxSizeRollBackups = 10,
@@ -41,7 +41,7 @@ namespace RevitTimasBIMTools.Services
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static string GetCurrentMethod()
         {
-            StackTrace st = new StackTrace();
+            StackTrace st = new();
             StackFrame sf = st.GetFrame(1);
             return sf.GetMethod().Name;
         }
@@ -69,7 +69,7 @@ namespace RevitTimasBIMTools.Services
             mainlogger?.Error(text);
             string intro = "Error: ";
             Debug.WriteLine($"\n{intro}\t{text}");
-            TaskDialog dlg = new TaskDialog(caption)
+            TaskDialog dlg = new(caption)
             {
                 MainContent = text,
                 MainInstruction = intro,
@@ -77,7 +77,30 @@ namespace RevitTimasBIMTools.Services
             };
             try
             {
-                dlg.Show();
+                _ = dlg.Show();
+            }
+            catch (Exception exc)
+            {
+                Debug.WriteLine(exc.Message);
+            }
+        }
+
+
+        public static void Error(int intId, string text)
+        {
+            mainlogger?.Error(text);
+            string intro = "Error: ";
+            Debug.WriteLine($"\n{intro}\t{text}");
+            System.Windows.Clipboard.SetText(intId.ToString());
+            TaskDialog dlg = new(caption)
+            {
+                MainContent = text,
+                MainInstruction = intro,
+                MainIcon = TaskDialogIcon.TaskDialogIconInformation
+            };
+            try
+            {
+                _ = dlg.Show();
             }
             catch (Exception exc)
             {
@@ -91,7 +114,7 @@ namespace RevitTimasBIMTools.Services
             mainlogger?.Warn(text);
             string intro = "Warning: ";
             Debug.WriteLine($"\n{intro}\t{text}");
-            TaskDialog dlg = new TaskDialog(caption)
+            TaskDialog dlg = new(caption)
             {
                 MainContent = text,
                 MainInstruction = intro,
@@ -99,7 +122,7 @@ namespace RevitTimasBIMTools.Services
             };
             try
             {
-                dlg.Show();
+                _ = dlg.Show();
             }
             catch (Exception exc)
             {
@@ -113,7 +136,7 @@ namespace RevitTimasBIMTools.Services
             mainlogger?.Info(text);
             string intro = "Information: ";
             Debug.WriteLine($"\n{intro}\t{text}");
-            TaskDialog dlg = new TaskDialog(caption)
+            TaskDialog dlg = new(caption)
             {
                 MainContent = text,
                 MainInstruction = intro,
@@ -121,7 +144,7 @@ namespace RevitTimasBIMTools.Services
             };
             try
             {
-                dlg.Show();
+                _ = dlg.Show();
             }
             catch (Exception exc)
             {
