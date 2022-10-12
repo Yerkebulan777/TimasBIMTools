@@ -164,17 +164,10 @@ namespace RevitTimasBIMTools.CutOpening
                 line = curve.Curve as Line;
                 normal = line.Direction.Normalize();
             }
-            try
+            SolidCurveIntersection curves = solid.IntersectWithCurve(line, intersectOptions);
+            if (curves != null && 0 < curves.SegmentCount)
             {
-                SolidCurveIntersection curves = solid.IntersectWithCurve(line, intersectOptions);
-                if (curves != null && 0 <= curves.SegmentCount)
-                {
-                    length = curves.GetCurveSegment(0).Length;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(elem.Id.IntegerValue, ex.Message);
+                length = curves.GetCurveSegment(0).Length;
             }
             return length > tolerance;
         }
