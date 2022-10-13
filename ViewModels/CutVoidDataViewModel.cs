@@ -329,7 +329,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void ClearElementDataAsync()
         {
-            if (IsOptionEnabled)
+            if (IsOptionEnabled || IsDataEnabled)
             {
                 Properties.Settings.Default.Reset();
                 await Task.Delay(1000).ContinueWith(_ =>
