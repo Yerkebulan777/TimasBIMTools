@@ -92,7 +92,6 @@ namespace RevitTimasBIMTools.CutOpening
         private void InitializeUnits(Document doc)
         {
             revitUnits = doc.GetUnits();
-            
             minDistance = cutOffsetSize + ((minSideSize + maxSideSize) * 0.25);
             angleUnit = revitUnits.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }

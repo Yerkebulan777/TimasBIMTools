@@ -65,6 +65,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref started, value))
                 {
                     ClearElementDataAsync();
+
                     GetGeneral3DView();
                 }
             }
