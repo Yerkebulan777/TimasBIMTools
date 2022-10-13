@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,8 +65,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref started, value))
                 {
                     ClearElementDataAsync();
-
-                    GetGeneral3DView();
+                    GetGeneral3DViewAsync();
                 }
             }
         }
@@ -160,7 +160,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref symbols, value))
                 {
-                    Logger.Log(nameof(FamilySymbols));
+                    Logger.ThreadLog(nameof(FamilySymbols));
                 }
             }
         }
@@ -300,7 +300,17 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (SynchronizationContext.Current != syncContext)
             {
-                await Task.Yield();
+                try
+                {
+                    await Task.Yield();
+                }
+                finally
+                {
+                    if (SynchronizationContext.Current != syncContext)
+                    {
+                        Debug.WriteLine("Thread: " + Thread.CurrentThread.Name);
+                    }
+                }
             }
         }
 
@@ -309,28 +319,23 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (IsStarted)
             {
+                Properties.Settings.Default.Reset();
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
-                    IsStarted = false;
-                    Properties.Settings.Default.Reset();
                     manager = provider.GetRequiredService<CutVoidCollisionManager>();
                     ElementModelData = new ObservableCollection<ElementModel>();
-
                 }, taskContext);
             }
         }
 
 
-        private void GetGeneral3DView()
+        private async void GetGeneral3DViewAsync()
         {
-            View3D view = null;
-            _ = RevitTask.RunAsync(app =>
+            GetCurrentContextAsync();
+            view3d = await RevitTask.RunAsync(app =>
             {
-                view = RevitViewManager.Get3dView(app.ActiveUIDocument);
-            }).ContinueWith(task =>
-            {
-                view3d = view;
-            }, taskContext);
+                return RevitViewManager.Get3dView(app.ActiveUIDocument);
+            });
         }
 
 

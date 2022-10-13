@@ -27,7 +27,7 @@ namespace RevitTimasBIMTools.Services
             }
             catch (AbandonedMutexException)
             {
-                // Log the fact that the mutex was abandoned in another process,
+                // ThreadLog the fact that the mutex was abandoned in another process,
                 // it will still get acquired
                 hasHandle = true;
             }

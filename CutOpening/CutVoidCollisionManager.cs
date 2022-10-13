@@ -439,7 +439,7 @@ namespace RevitTimasBIMTools.CutOpening
             SearchInstance?.Dispose();
             SearchGlobal?.Dispose();
 
-            Logger.Log(dictDatabase.Values.Count.ToString());
+            Logger.ThreadLog(dictDatabase.Values.Count.ToString());
         }
     }
 }
