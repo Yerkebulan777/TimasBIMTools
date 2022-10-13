@@ -126,7 +126,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<int, ElementId> constructions;
+        private IDictionary<int, ElementId> constructions = null;
         public IDictionary<int, ElementId> ConstructionTypeIds
         {
             get => constructions;
@@ -140,7 +140,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<string, Category> categories;
+        private IDictionary<string, Category> categories = null;
         public IDictionary<string, Category> EngineerCategories
         {
             get => categories;
@@ -154,7 +154,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<string, Material> structMats;
+        private IDictionary<string, Material> structMats = null;
         public IDictionary<string, Material> StructureMaterials
         {
             get => structMats;
@@ -168,7 +168,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<string, FamilySymbol> symbols;
+        private IDictionary<string, FamilySymbol> symbols = null;
         public IDictionary<string, FamilySymbol> FamilySymbols
         {
             get => symbols;
@@ -212,7 +212,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private Material material;
+        private Material material = null;
         public Material SelectedMaterial
         {
             get => material;
@@ -226,7 +226,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private FamilySymbol rectang;
+        private FamilySymbol rectang = null;
         public FamilySymbol RectangSymbol
         {
             get => rectang;
@@ -242,7 +242,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private FamilySymbol rounded;
+        private FamilySymbol rounded = null;
         public FamilySymbol RoundedSymbol
         {
             get => rounded;
