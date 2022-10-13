@@ -82,7 +82,6 @@ namespace RevitTimasBIMTools.ViewModels
                         SetMEPCategoriesToData();
                         SetCoreMaterialsToData();
                         SetFamilySymbolsToData();
-                        IsDataEnabled = !enableOpt;
                     }
                 }
             }
@@ -327,17 +326,18 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void ClearElementDataAsync()
+        public async void ClearElementDataAsync()
         {
             if (IsOptionEnabled || IsDataEnabled)
             {
                 Properties.Settings.Default.Reset();
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
-                    if (0 < ElementModelData.Count)
-                    {
-                        ElementModelData = new ObservableCollection<ElementModel>();
-                    }
+                    ElementModelData = new ObservableCollection<ElementModel>();
+                    EngineerCategories = new Dictionary<string, Category>();
+                    StructureMaterials = new Dictionary<string, Material>();
+                    FamilySymbols = new Dictionary<string, FamilySymbol>();
+
                 }, taskContext);
             }
         }
