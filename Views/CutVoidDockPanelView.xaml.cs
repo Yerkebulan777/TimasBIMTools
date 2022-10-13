@@ -9,6 +9,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -66,9 +67,18 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
-            dataViewModel.IsStarted = true;
-            dataViewModel.DocumentModelCollection = args.DocumentModels;
-            dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                dataViewModel.IsStarted = true;
+                dataViewModel.IsDataEnabled = false;
+                dataViewModel.IsOptionEnabled = false;
+                dataViewModel.DocumentModelCollection = args.DocumentModels;
+                dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
+                dataViewModel.EngineerCategories.Clear();
+                dataViewModel.StructureMaterials.Clear();
+                dataViewModel.FamilySymbols.Clear();
+            }, DispatcherPriority.Background);
+            CommandManager.InvalidateRequerySuggested();
         }
 
 
