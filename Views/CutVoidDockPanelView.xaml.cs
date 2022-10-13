@@ -64,7 +64,6 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        [STAThread]
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             Dispatcher.CurrentDispatcher.Invoke(() =>
@@ -74,9 +73,9 @@ namespace RevitTimasBIMTools.Views
                 dataViewModel.IsOptionEnabled = false;
                 dataViewModel.DocumentModelCollection = args.DocumentModels;
                 dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
-                dataViewModel.EngineerCategories.Clear();
-                dataViewModel.StructureMaterials.Clear();
-                dataViewModel.FamilySymbols.Clear();
+                dataViewModel.EngineerCategories?.Clear();
+                dataViewModel.StructureMaterials?.Clear();
+                dataViewModel.FamilySymbols?.Clear();
             }, DispatcherPriority.Background);
             CommandManager.InvalidateRequerySuggested();
         }
