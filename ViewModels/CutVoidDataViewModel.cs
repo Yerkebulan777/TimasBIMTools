@@ -320,7 +320,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void SetMEPCategoriesToData()
+        private async Task SetMEPCategoriesToData()
         {
             await Task.Yield();
             EngineerCategories = await RevitTask.RunAsync(app =>
