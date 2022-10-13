@@ -60,7 +60,12 @@ namespace RevitTimasBIMTools.CutOpening
 
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
         {
-            return uiapp?.ActiveUIDocument.Document.IsFamilyDocument == false;
+            if (uiapp.ActiveUIDocument.IsValidObject)
+            {
+                return uiapp.ActiveUIDocument.Document.IsFamilyDocument == false;
+            }
+            return false;
+
         }
 
 
