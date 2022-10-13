@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
-
+using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -28,7 +28,6 @@ namespace RevitTimasBIMTools.Views
         private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         private readonly CutVoidDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
-        private readonly TaskScheduler syncContext = TaskScheduler.FromCurrentSynchronizationContext();
 
         public CutVoidDockPanelView()
         {
@@ -102,11 +101,11 @@ namespace RevitTimasBIMTools.Views
             {
                 if (disposing)
                 {
-                    Task.Run(dataViewModel.Dispose)
-                    .ContinueWith(_ =>
+                    Dispatcher.CurrentDispatcher.Invoke(() =>
                     {
+                        dataViewModel.Dispose();
                         CommandManager.InvalidateRequerySuggested();
-                    }, syncContext).Dispose();
+                    }, DispatcherPriority.Background);
                     // TODO: освободить управляемое состояние (управляемые объекты)
                 }
                 // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения
