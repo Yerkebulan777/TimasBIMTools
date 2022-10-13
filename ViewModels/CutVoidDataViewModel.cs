@@ -300,7 +300,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void ClearElementDataAsync()
         {
-            Properties.Settings.Default.Reload();
+            Properties.Settings.Default.Reset();
             await Task.Delay(1000).ContinueWith(_ =>
             {
                 manager = provider.GetRequiredService<CutVoidCollisionManager>();
