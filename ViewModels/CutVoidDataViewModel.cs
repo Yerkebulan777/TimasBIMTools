@@ -311,13 +311,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         private void ResetCurrentContext()
         {
-            Logger.ThreadProcessLog(nameof(ResetCurrentContext));
+            Logger.ThreadProcessLog("Start" + nameof(ResetCurrentContext));
             if (SynchronizationContext.Current != SyncContext)
             {
                 try
                 {
                     SynchronizationContext.SetSynchronizationContext(SyncContext);
-                    Logger.ThreadProcessLog(nameof(ResetCurrentContext));
+                    Logger.ThreadProcessLog("Finaly" + nameof(ResetCurrentContext));
                 }
                 catch (Exception ex)
                 {

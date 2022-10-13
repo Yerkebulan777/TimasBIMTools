@@ -35,6 +35,7 @@ namespace RevitTimasBIMTools.Views
             InitializeComponent();
             DataContext = dataViewModel;
             dataViewModel.DockPanelView = this;
+            Logger.ThreadProcessLog("Process => " + nameof(CutVoidDockPanelView));
         }
 
 
@@ -53,6 +54,7 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         public void RaiseHandler()
         {
+            Logger.ThreadProcessLog("Process => " + nameof(RaiseHandler));
             handler = provider.GetRequiredService<CutVoidViewExternalHandler>();
             handler.Completed += OnContextHandlerCompleted;
             externalEvent = ExternalEvent.Create(handler);
@@ -74,6 +76,7 @@ namespace RevitTimasBIMTools.Views
                 dataViewModel.IsOptionEnabled = false;
                 dataViewModel.DocumentModelCollection = args.DocumentModels;
                 dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
+                Logger.ThreadProcessLog("Process => " + nameof(OnContextHandlerCompleted));
                 SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
                 dataViewModel.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                 dataViewModel.SyncContext = SynchronizationContext.Current;
