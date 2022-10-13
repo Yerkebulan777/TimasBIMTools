@@ -115,6 +115,7 @@ namespace RevitTimasBIMTools.Views
                         CommandManager.InvalidateRequerySuggested();
                         Properties.Settings.Default.Reset();
                     }, DispatcherPriority.Background);
+                    Dispatcher.CurrentDispatcher.InvokeShutdown();
                     // TODO: освободить управляемое состояние (управляемые объекты)
                 }
                 // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения
