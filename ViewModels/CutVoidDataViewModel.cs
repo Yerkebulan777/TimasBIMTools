@@ -36,7 +36,6 @@ namespace RevitTimasBIMTools.ViewModels
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private ConcurrentQueue<Element> instances { get; set; } = null;
-        private IServiceProvider provider { get; } = SmartToolApp.ServiceProvider;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
         private string documentId { get; } = Properties.Settings.Default.ActiveDocumentUniqueId;
         private CutVoidCollisionManager manager { get; set; } = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
@@ -82,6 +81,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (SetProperty(ref enableOpt, value))
                     {
+                        IsStarted = true;
                         IsDataEnabled = !enableOpt;
                         SetMEPCategoriesToData();
                         SetCoreMaterialsToData();
@@ -102,6 +102,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (SetProperty(ref enableData, value))
                     {
+                        IsStarted = true;
                         IsOptionEnabled = !enableData;
                         DataViewCollection?.Refresh();
                         SetValidLevelsToData();
@@ -337,7 +338,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     IsDataEnabled = false;
                     Properties.Settings.Default.Reset();
-                    manager = provider.GetRequiredService<CutVoidCollisionManager>();
+                    //manager = provider.GetRequiredService<CutVoidCollisionManager>();
                     ElementModelData = new ObservableCollection<ElementModel>();
                 }, taskContext);
             }
