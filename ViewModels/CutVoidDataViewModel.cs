@@ -326,7 +326,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        public async void ClearElementDataAsync()
+        private async void ClearElementDataAsync()
         {
             if (IsOptionEnabled || IsDataEnabled)
             {
