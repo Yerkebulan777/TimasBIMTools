@@ -36,10 +36,6 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
 
-            int count01 = new FilteredElementCollector(doc).WhereElementIsElementType().Count();
-            int count02 = new FilteredElementCollector(doc).OfClass(typeof(ElementType)).Count();
-
-            Logger.Log($"Counts = {count01} in {count02}");
 
             collector = new FilteredElementCollector(doc).OfClass(typeof(ElementType));
             foreach (Element etp in collector.WherePasses(multiCat))
