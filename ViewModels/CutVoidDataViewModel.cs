@@ -18,6 +18,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -296,20 +297,17 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        private async void GetCurrentContextAsync()
+        private void GetCurrentContextAsync()
         {
             if (SynchronizationContext.Current != syncContext)
             {
                 try
                 {
-                    await Task.Yield();
+                    SynchronizationContext.SetSynchronizationContext(syncContext);
                 }
-                finally
+                catch (Exception ex)
                 {
-                    if (SynchronizationContext.Current != syncContext)
-                    {
-                        Debug.WriteLine("Thread: " + Thread.CurrentThread.Name);
-                    }
+                    Logger.Error(ex.Message);
                 }
             }
         }
