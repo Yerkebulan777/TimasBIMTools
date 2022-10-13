@@ -24,7 +24,7 @@ namespace RevitTimasBIMTools.Views
         public bool Disposed { get; internal set; } = false;
         private ExternalEvent externalEvent { get; set; } = null;
         private CutVoidViewExternalHandler handler { get; set; } = null;
-        
+
         private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         private readonly CutVoidDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
@@ -65,6 +65,7 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        [STAThread]
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
             dataViewModel.IsStarted = true;
@@ -77,7 +78,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (sender is DataGridRow row && row.DataContext is ElementModel model)
             {
-                _ = RevitTask.RunAsync(app =>
+                RevitTask.RunAsync(app =>
                 {
                     Document doc = app.ActiveUIDocument.Document;
                     if (documentId.Equals(doc.ProjectInformation.UniqueId))
@@ -90,7 +91,7 @@ namespace RevitTimasBIMTools.Views
                             mutex.ReleaseMutex();
                         }
                     }
-                });
+                }).Dispose();
             }
         }
 

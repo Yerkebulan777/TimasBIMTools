@@ -318,7 +318,7 @@ namespace RevitTimasBIMTools.ViewModels
             }).ContinueWith(task =>
             {
                 view3d = view;
-            }, context).Dispose();
+            }, context);
         }
 
 
