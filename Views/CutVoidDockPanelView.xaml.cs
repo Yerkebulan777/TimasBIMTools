@@ -74,7 +74,7 @@ namespace RevitTimasBIMTools.Views
                 dataViewModel.DocumentModelCollection = args.DocumentModels;
                 dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
                 CommandManager.InvalidateRequerySuggested();
-            }, DispatcherPriority.Background);
+            });
         }
 
 
@@ -110,8 +110,10 @@ namespace RevitTimasBIMTools.Views
                     {
                         dataViewModel.Dispose();
                         dataViewModel.IsStarted = false;
-                        Properties.Settings.Default.Reset();
+                        dataViewModel.IsDataEnabled = false;
+                        dataViewModel.IsOptionEnabled = false;
                         CommandManager.InvalidateRequerySuggested();
+                        Properties.Settings.Default.Reset();
                     }, DispatcherPriority.Background);
                     // TODO: освободить управляемое состояние (управляемые объекты)
                 }

@@ -35,11 +35,8 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         if (dockpane.IsShown())
                         {
+                            view.Dispose();
                             dockpane.Hide();
-                            if (!view.Disposed)
-                            {
-                                view.Dispose();
-                            }
                         }
                         else
                         {
@@ -60,12 +57,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
         {
-            if (uiapp.ActiveUIDocument.IsValidObject)
-            {
-                return uiapp.ActiveUIDocument.Document.IsFamilyDocument == false;
-            }
-            return false;
-
+            return uiapp.ActiveUIDocument.IsValidObject && uiapp.ActiveUIDocument.Document.IsFamilyDocument == false;
         }
 
 

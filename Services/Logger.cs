@@ -8,6 +8,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
+using System.Xml.Linq;
 
 namespace RevitTimasBIMTools.Services
 {
@@ -44,6 +46,13 @@ namespace RevitTimasBIMTools.Services
             StackTrace st = new();
             StackFrame sf = st.GetFrame(1);
             return sf.GetMethod().Name;
+        }
+
+
+        public static void ThreadProcessLog(string name)
+        {
+            Thread th = Thread.CurrentThread;
+            Debug.WriteLine($"Task Thread ID: {th.ManagedThreadId}, Thread Name: {th.Name}, Process Name: {name}");
         }
 
 
