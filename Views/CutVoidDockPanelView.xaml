@@ -32,8 +32,8 @@
 
             
             <!--Header -->
-            <!--Visibility="{Binding Path=IsStarted, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToViz}}"-->
-            <Border  Grid.Row="0" Background="{DynamicResource FloralGradientBrush}" >
+            <Border  Grid.Row="0" Background="{DynamicResource FloralGradientBrush}" 
+                     Visibility="{Binding Path=IsStarted, Converter={StaticResource BoolToViz}}">
                 <Grid Grid.Row="0" VerticalAlignment="Center" >
                     <Label Name="ActiveDocTitle" TextElement.FontSize="13" VerticalAlignment="Center"
                            Content="{Binding Path=SelectedDocModel, Mode=OneWay, UpdateSourceTrigger=Explicit}">
@@ -44,7 +44,8 @@
                     <ToggleButton Name="settingsBtn" Height="40" Width="60"
                                   HorizontalAlignment="Right" VerticalAlignment="Center"
                                   Background="Transparent" BorderBrush="Transparent"
-                                  Command="{Binding Path=SettingsCommand, Mode=Default}"
+                                  IsChecked="{Binding Path=IsOptionEnabled, Mode=TwoWay}"
+                                  Command="{Binding Path=SettingsCommand, Mode=OneTime}"
                                   CommandParameter="{Binding Path=IsStarted}">
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
@@ -243,7 +244,7 @@
 
 
             <!-- ButtonPanel -->
-            <Border Grid.Row="4" Background="Silver" >
+            <Border Grid.Row="4" Background="Silver" Visibility="{Binding Path=IsStarted, Converter={StaticResource BoolToViz}}">
                 <DockPanel Grid.Row="3" LastChildFill="True" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
                     <Button Name="SnoopCmd" Height="30" Width="75" Margin="5" 
                         Command="{Binding SnoopCommand, Mode=OneTime}">

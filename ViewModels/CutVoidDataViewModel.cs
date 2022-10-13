@@ -330,7 +330,6 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (IsOptionEnabled || IsDataEnabled)
             {
-                Properties.Settings.Default.Reset();
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
                     ElementModelData = new ObservableCollection<ElementModel>();
