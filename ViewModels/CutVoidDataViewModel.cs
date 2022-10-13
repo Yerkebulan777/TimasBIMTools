@@ -300,7 +300,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void ClearElementDataAsync()
         {
-            await Task.Yield();
             Properties.Settings.Default.Reload();
             await Task.Delay(1000).ContinueWith(_ =>
             {
@@ -325,7 +324,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetMEPCategoriesToData()
         {
-            await Task.Yield();
             EngineerCategories = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -336,7 +334,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetCoreMaterialsToData()
         {
-            await Task.Yield();
             StructureMaterials = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -347,7 +344,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetFamilySymbolsToData()
         {
-            await Task.Yield();
             FamilySymbols = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -359,7 +355,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetValidLevelsToData()
         {
-            await Task.Yield();
             ValidLevels = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -370,7 +365,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetInstancesByCoreMaterialInType(string matName)
         {
-            await Task.Yield();
             instances = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -382,7 +376,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SnoopIntersectionDataByLevel(Level level)
         {
-            await Task.Yield();
             ElementModelData = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -394,7 +387,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void ActivateFamilySimbolAsync(FamilySymbol symbol)
         {
-            await Task.Yield();
             await RevitTask.RunAsync(app =>
             {
                 if (symbol != null && !symbol.IsActive)
