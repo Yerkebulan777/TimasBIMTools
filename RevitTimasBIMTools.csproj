@@ -214,7 +214,6 @@
     <Compile Include="CutOpening\CutVoidCollisionManager.cs" />
     <Compile Include="RevitUtils\ProjectLoctionManager.cs" />
     <Compile Include="RevitUtils\RevitViewManager.cs" />
-    <Compile Include="Services\AsyncObservableCollection.cs" />
     <Compile Include="Services\CustomSynchronizationContext.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
