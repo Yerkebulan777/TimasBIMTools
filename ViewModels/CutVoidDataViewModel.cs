@@ -310,13 +310,16 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void GetGeneral3DView()
+        private void GetGeneral3DView()
         {
-            await Task.Yield();
-            view3d = await RevitTask.RunAsync(app =>
+            View3D view = null;
+            RevitTask.RunAsync(app =>
             {
-                return RevitViewManager.Get3dView(app.ActiveUIDocument);
-            });
+                view = RevitViewManager.Get3dView(app.ActiveUIDocument);
+            }).ContinueWith(task =>
+            {
+                view3d = view;
+            }, context).Dispose();
         }
 
 
