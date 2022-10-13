@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -34,11 +35,14 @@ namespace RevitTimasBIMTools.ViewModels
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private ConcurrentQueue<Element> instances { get; set; } = null;
-        private CancellationToken cancelToken { get; set; } = CancellationToken.None;
         private IServiceProvider provider { get; } = SmartToolApp.ServiceProvider;
-        private CutVoidCollisionManager manager { get; set; } = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
-        private TaskScheduler context { get; } = CustomSynchronizationContext.GetSynchronizationContext();
+        private CancellationToken cancelToken { get; set; } = CancellationToken.None;
         private string documentId { get; } = Properties.Settings.Default.ActiveDocumentUniqueId;
+        private CutVoidCollisionManager manager { get; set; } = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
+        
+
+        private readonly TaskScheduler taskContext = CustomSynchronizationContext.GetSynchronizationContext();
+        private readonly SynchronizationContext syncContext = SynchronizationContext.Current;
 
 
         public CutVoidDataViewModel()
@@ -294,18 +298,24 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetCurrentContextAsync()
         {
-            await Task.Yield();
+            if (SynchronizationContext.Current != syncContext)
+            {
+                await Task.Yield();
+            }                
         }
 
 
         private async void ClearElementDataAsync()
         {
-            Properties.Settings.Default.Reset();
-            await Task.Delay(1000).ContinueWith(_ =>
+            if (started)
             {
-                manager = provider.GetRequiredService<CutVoidCollisionManager>();
-                ElementModelData = new ObservableCollection<ElementModel>();
-            }, context);
+                Properties.Settings.Default.Reset();
+                await Task.Delay(1000).ContinueWith(_ =>
+                {
+                    manager = provider.GetRequiredService<CutVoidCollisionManager>();
+                    ElementModelData = new ObservableCollection<ElementModel>();
+                }, taskContext);
+            }
         }
 
 
@@ -318,12 +328,13 @@ namespace RevitTimasBIMTools.ViewModels
             }).ContinueWith(task =>
             {
                 view3d = view;
-            }, context);
+            }, taskContext);
         }
 
 
         private async void SetMEPCategoriesToData()
         {
+            GetCurrentContextAsync();
             EngineerCategories = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -334,6 +345,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetCoreMaterialsToData()
         {
+            GetCurrentContextAsync();
             StructureMaterials = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -344,6 +356,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetFamilySymbolsToData()
         {
+            GetCurrentContextAsync();
             FamilySymbols = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -355,6 +368,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetValidLevelsToData()
         {
+            GetCurrentContextAsync();
             ValidLevels = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -365,6 +379,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetInstancesByCoreMaterialInType(string matName)
         {
+            GetCurrentContextAsync();
             instances = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -376,6 +391,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SnoopIntersectionDataByLevel(Level level)
         {
+            GetCurrentContextAsync();
             ElementModelData = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -387,6 +403,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void ActivateFamilySimbolAsync(FamilySymbol symbol)
         {
+            GetCurrentContextAsync();
             await RevitTask.RunAsync(app =>
             {
                 if (symbol != null && !symbol.IsActive)
@@ -439,7 +456,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private ICollectionView dataView = new ListCollectionView(new List<ElementModel>());
+        private ICollectionView dataView = null;
         public ICollectionView DataViewCollection
         {
             get => dataView;
