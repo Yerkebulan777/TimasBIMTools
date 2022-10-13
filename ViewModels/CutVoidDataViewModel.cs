@@ -39,8 +39,8 @@ namespace RevitTimasBIMTools.ViewModels
         private CutVoidCollisionManager manager { get; set; } = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
 
 
-        private readonly TaskScheduler taskContext = CustomSynchronizationContext.GetSynchronizationContext();
-        private readonly SynchronizationContext syncContext = SynchronizationContext.Current;
+        public TaskScheduler TaskContext { get; internal set; } = CustomSynchronizationContext.GetSynchronizationContext();
+        public SynchronizationContext SyncContext { get; internal set; } = SynchronizationContext.Current;
 
 
         public CutVoidDataViewModel()
@@ -312,11 +312,11 @@ namespace RevitTimasBIMTools.ViewModels
         private void ResetCurrentContext()
         {
             Logger.ThreadProcessLog(nameof(ResetCurrentContext));
-            if (SynchronizationContext.Current != syncContext)
+            if (SynchronizationContext.Current != SyncContext)
             {
                 try
                 {
-                    SynchronizationContext.SetSynchronizationContext(syncContext);
+                    SynchronizationContext.SetSynchronizationContext(SyncContext);
                     Logger.ThreadProcessLog(nameof(ResetCurrentContext));
                 }
                 catch (Exception ex)
@@ -338,7 +338,7 @@ namespace RevitTimasBIMTools.ViewModels
                     StructureMaterials = new Dictionary<string, Material>();
                     FamilySymbols = new Dictionary<string, FamilySymbol>();
 
-                }, taskContext);
+                }, TaskContext);
             }
         }
 
