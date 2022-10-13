@@ -73,6 +73,7 @@ namespace RevitTimasBIMTools.Views
                 dataViewModel.IsOptionEnabled = false;
                 dataViewModel.DocumentModelCollection = args.DocumentModels;
                 dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
+                dataViewModel.ClearElementDataAsync();
 
             }, DispatcherPriority.Background);
             CommandManager.InvalidateRequerySuggested();
