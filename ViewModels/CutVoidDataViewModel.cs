@@ -42,7 +42,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutVoidDataViewModel()
         {
-
             SettingsCommand = new RelayCommand(SettingsHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
