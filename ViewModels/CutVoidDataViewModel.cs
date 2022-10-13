@@ -485,13 +485,16 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref dataView, value))
                 {
                     IsAllSelectChecked = false;
-                    using (dataView.DeferRefresh())
+                    if (dataView != null && !dataView.IsEmpty)
                     {
-                        dataView.SortDescriptions.Clear();
-                        dataView.GroupDescriptions.Clear();
-                        dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
-                        dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
-                        dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
+                        using (dataView.DeferRefresh())
+                        {
+                            dataView.SortDescriptions.Clear();
+                            dataView.GroupDescriptions.Clear();
+                            dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
+                            dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                            dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
+                        }
                     }
                 }
             }
