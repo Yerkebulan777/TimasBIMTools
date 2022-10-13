@@ -334,10 +334,10 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (IsDataEnabled)
             {
+                Properties.Settings.Default.Reset();
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
                     IsDataEnabled = false;
-                    Properties.Settings.Default.Reset();
                     //manager = provider.GetRequiredService<CutVoidCollisionManager>();
                     ElementModelData = new ObservableCollection<ElementModel>();
                 }, taskContext);
