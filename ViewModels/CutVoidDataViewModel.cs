@@ -133,7 +133,13 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<int, ElementId> ConstructionTypeIds
         {
             get => constructions;
-            set => SetProperty(ref constructions, value);
+            set
+            {
+                if (value != null && SetProperty(ref constructions, value))
+                {
+                    Logger.Log(constructions.Count.ToString());
+                }
+            }
         }
 
 
@@ -185,7 +191,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => docModel;
             set
             {
-                if (SetProperty(ref docModel, value) && docModel != null)
+                if (value != null && SetProperty(ref docModel, value))
                 {
                     manager.SearchDoc = docModel.Document;
                     manager.SearchGlobal = docModel.Transform;
@@ -201,7 +207,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => category;
             set
             {
-                if (SetProperty(ref category, value) && category != null)
+                if (value != null && SetProperty(ref category, value))
                 {
                     manager.SearchCatId = category.Id;
                 }
@@ -215,7 +221,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => material;
             set
             {
-                if (SetProperty(ref material, value) && material != null)
+                if (value != null && SetProperty(ref material, value))
                 {
                     GetInstancesByCoreMaterialInType(material.Name);
                 }
