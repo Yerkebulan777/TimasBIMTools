@@ -10,7 +10,6 @@ using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;

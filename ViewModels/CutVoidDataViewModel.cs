@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -39,7 +38,7 @@ namespace RevitTimasBIMTools.ViewModels
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
         private string documentId { get; } = Properties.Settings.Default.ActiveDocumentUniqueId;
         private CutVoidCollisionManager manager { get; set; } = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
-        
+
 
         private readonly TaskScheduler taskContext = CustomSynchronizationContext.GetSynchronizationContext();
         private readonly SynchronizationContext syncContext = SynchronizationContext.Current;
@@ -302,19 +301,21 @@ namespace RevitTimasBIMTools.ViewModels
             if (SynchronizationContext.Current != syncContext)
             {
                 await Task.Yield();
-            }                
+            }
         }
 
 
         private async void ClearElementDataAsync()
         {
-            if (started)
+            if (IsStarted)
             {
-                Properties.Settings.Default.Reset();
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
+                    IsStarted = false;
+                    Properties.Settings.Default.Reset();
                     manager = provider.GetRequiredService<CutVoidCollisionManager>();
                     ElementModelData = new ObservableCollection<ElementModel>();
+
                 }, taskContext);
             }
         }
@@ -323,7 +324,7 @@ namespace RevitTimasBIMTools.ViewModels
         private void GetGeneral3DView()
         {
             View3D view = null;
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(app =>
             {
                 view = RevitViewManager.Get3dView(app.ActiveUIDocument);
             }).ContinueWith(task =>
