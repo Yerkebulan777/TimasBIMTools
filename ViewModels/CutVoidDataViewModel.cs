@@ -482,9 +482,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => dataView;
             set
             {
+                IsAllSelectChecked = false;
                 if (SetProperty(ref dataView, value))
                 {
-                    IsAllSelectChecked = false;
                     if (dataView != null && !dataView.IsEmpty)
                     {
                         using (dataView.DeferRefresh())
