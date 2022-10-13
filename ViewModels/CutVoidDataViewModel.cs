@@ -29,6 +29,7 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutVoidDataViewModel : ObservableObject, IDisposable
     {
+
         public CutVoidDockPanelView DockPanelView { get; set; } = null;
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
@@ -59,6 +60,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref started, value))
                 {
+                    ClearElementDataAsync();
                     GetGeneral3DView();
                 }
             }
@@ -75,9 +77,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (SetProperty(ref enableOpt, value))
                     {
-                        manager = provider.GetRequiredService<CutVoidCollisionManager>();
                         IsDataEnabled = !enableOpt;
-                        ElementModelData.Clear();
                         SetMEPCategoriesToData();
                         SetCoreMaterialsToData();
                         SetFamilySymbolsToData();
@@ -214,9 +214,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref rectangle, value))
                 {
-                    rectangle = ActivateFamilySimbolAsync(rectangle);
+                    ActivateFamilySimbolAsync(rectangle);
                     Properties.Settings.Default.RectangSymbol = rectangle.UniqueId;
                     Properties.Settings.Default.Save();
+                    GetCurrentContextAsync();
                 }
             }
         }
@@ -230,9 +231,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref rounded, value))
                 {
-                    rounded = ActivateFamilySimbolAsync(rounded);
+                    ActivateFamilySimbolAsync(rounded);
                     Properties.Settings.Default.RoundedSymbol = rounded.UniqueId;
                     Properties.Settings.Default.Save();
+                    GetCurrentContextAsync();
                 }
             }
         }
@@ -248,6 +250,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     Properties.Settings.Default.MinSideSizeInMm = minSize;
                     Properties.Settings.Default.Save();
+                    GetCurrentContextAsync();
                 }
             }
         }
@@ -263,6 +266,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     Properties.Settings.Default.MaxSideSizeInMm = minSize;
                     Properties.Settings.Default.Save();
+                    GetCurrentContextAsync();
                 }
             }
         }
@@ -278,6 +282,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     Properties.Settings.Default.CutOffsetInMm = minSize;
                     Properties.Settings.Default.Save();
+                    GetCurrentContextAsync();
                 }
             }
         }
@@ -287,8 +292,27 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
+        private async void GetCurrentContextAsync()
+        {
+            await Task.Yield();
+        }
+
+
+        private async void ClearElementDataAsync()
+        {
+            await Task.Yield();
+            Properties.Settings.Default.Reload();
+            await Task.Delay(1000).ContinueWith(_ =>
+            {
+                manager = provider.GetRequiredService<CutVoidCollisionManager>();
+                ElementModelData = new ObservableCollection<ElementModel>();
+            }, context);
+        }
+
+
         private async void GetGeneral3DView()
         {
+            await Task.Yield();
             view3d = await RevitTask.RunAsync(app =>
             {
                 return RevitViewManager.Get3dView(app.ActiveUIDocument);
@@ -298,6 +322,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetMEPCategoriesToData()
         {
+            await Task.Yield();
             EngineerCategories = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -308,6 +333,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetCoreMaterialsToData()
         {
+            await Task.Yield();
             StructureMaterials = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -318,6 +344,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetFamilySymbolsToData()
         {
+            await Task.Yield();
             FamilySymbols = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -329,6 +356,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetValidLevelsToData()
         {
+            await Task.Yield();
             ValidLevels = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -339,6 +367,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetInstancesByCoreMaterialInType(string matName)
         {
+            await Task.Yield();
             instances = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -350,6 +379,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SnoopIntersectionDataByLevel(Level level)
         {
+            await Task.Yield();
             ElementModelData = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -358,25 +388,17 @@ namespace RevitTimasBIMTools.ViewModels
             });
         }
 
-        private async void ClearElementDataAsync()
-        {
-            ElementModelData = await RevitTask.RunAsync(app =>
-            {
-                return new ObservableCollection<ElementModel>();
-            });
-        }
 
-
-        private FamilySymbol ActivateFamilySimbolAsync(FamilySymbol symbol)
+        private async void ActivateFamilySimbolAsync(FamilySymbol symbol)
         {
-            return RevitTask.RunAsync(app =>
+            await Task.Yield();
+            await RevitTask.RunAsync(app =>
             {
                 if (symbol != null && !symbol.IsActive)
                 {
                     symbol.Activate();
                 }
-                return symbol;
-            }).Result;
+            });
         }
 
         #endregion
@@ -613,10 +635,6 @@ namespace RevitTimasBIMTools.ViewModels
         {
             manager?.Dispose();
             ClearElementDataAsync();
-            if (!DataViewCollection.IsEmpty)
-            {
-                DataViewCollection.Refresh();
-            }
         }
     }
 }
