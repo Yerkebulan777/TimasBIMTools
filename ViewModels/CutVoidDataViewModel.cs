@@ -16,9 +16,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -31,8 +29,8 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutVoidDataViewModel : ObservableObject, IDisposable
     {
-
         public CutVoidDockPanelView DockPanelView { get; set; } = null;
+
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private ConcurrentQueue<Element> instances { get; set; } = null;
@@ -64,7 +62,6 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref started, value))
                 {
-                    ClearElementDataAsync();
                     GetGeneral3DViewAsync();
                 }
             }
@@ -77,15 +74,15 @@ namespace RevitTimasBIMTools.ViewModels
             get => enableOpt;
             set
             {
-                if (started)
+                if (!string.IsNullOrEmpty(documentId))
                 {
                     if (SetProperty(ref enableOpt, value))
                     {
-                        IsStarted = true;
-                        IsDataEnabled = !enableOpt;
+                        ClearElementDataAsync();
                         SetMEPCategoriesToData();
                         SetCoreMaterialsToData();
                         SetFamilySymbolsToData();
+                        IsDataEnabled = !enableOpt;
                     }
                 }
             }
@@ -102,7 +99,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (SetProperty(ref enableData, value))
                     {
-                        IsStarted = true;
                         IsOptionEnabled = !enableData;
                         DataViewCollection?.Refresh();
                         SetValidLevelsToData();
@@ -320,6 +316,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 try
                 {
+                    Logger.Log(nameof(ResetCurrentContext));
                     SynchronizationContext.SetSynchronizationContext(syncContext);
                 }
                 catch (Exception ex)
@@ -332,14 +329,15 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void ClearElementDataAsync()
         {
-            if (IsDataEnabled)
+            if (IsOptionEnabled)
             {
                 Properties.Settings.Default.Reset();
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
-                    IsDataEnabled = false;
-                    //manager = provider.GetRequiredService<CutVoidCollisionManager>();
-                    ElementModelData = new ObservableCollection<ElementModel>();
+                    if (0 < ElementModelData.Count)
+                    {
+                        ElementModelData = new ObservableCollection<ElementModel>();
+                    }
                 }, taskContext);
             }
         }
