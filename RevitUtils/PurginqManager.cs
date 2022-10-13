@@ -35,8 +35,8 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
 
-
-            collector = new FilteredElementCollector(doc).WhereElementIsElementType();
+            collector = new FilteredElementCollector(doc).WhereElementIsElementType();  
+            collector = new FilteredElementCollector(doc).OfClass(typeof(ElementType));
             foreach (Element etp in collector.WherePasses(multiCat))
             {
                 int typeIntId = etp.Id.IntegerValue;

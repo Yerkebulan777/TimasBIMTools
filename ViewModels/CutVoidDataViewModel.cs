@@ -103,7 +103,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (SetProperty(ref enableData, value))
                     {
                         IsOptionEnabled = !enableData;
-                        DataViewCollection.Refresh();
+                        DataViewCollection?.Refresh();
                         SetValidLevelsToData();
                     }
                 }
@@ -121,7 +121,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => docModels;
             set
             {
-                if (SetProperty(ref docModels, value))
+                if (value != null && SetProperty(ref docModels, value))
                 {
                     SelectedDocModel = docModels.FirstOrDefault();
                 }
@@ -141,7 +141,13 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<string, Category> EngineerCategories
         {
             get => categories;
-            set => SetProperty(ref categories, value);
+            set
+            {
+                if (value != null && SetProperty(ref categories, value))
+                {
+                    Logger.Log(categories.Count.ToString());
+                }
+            }
         }
 
 
@@ -149,7 +155,13 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<string, Material> StructureMaterials
         {
             get => structMats;
-            set => SetProperty(ref structMats, value);
+            set
+            {
+                if (value != null && SetProperty(ref structMats, value))
+                {
+                    Logger.Log(structMats.Count.ToString());
+                }
+            }
         }
 
 
@@ -159,9 +171,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => symbols;
             set
             {
-                if (SetProperty(ref symbols, value))
+                if (value != null && SetProperty(ref symbols, value))
                 {
-                    Logger.ThreadLog(nameof(FamilySymbols));
+                    Logger.Log(nameof(FamilySymbols));
                 }
             }
         }

@@ -47,22 +47,22 @@ namespace RevitTimasBIMTools.Services
         }
 
 
-        public static void ThreadLog(Exception ex)
+        public static void Log(Exception ex)
         {
             mainlogger?.Error("Error", ex);
             Debug.WriteLine($"\n{ex.Message}");
         }
 
-        public static void ThreadLog(string text, Exception ex)
-        {
-            mainlogger?.Error(text, ex);
-            Debug.WriteLine($"\n{text}\n{ex.Message}");
-        }
-
-        public static void ThreadLog(string text)
+        public static void Log(string text)
         {
             Debug.WriteLine(text);
             mainlogger?.Info(text);
+        }
+
+        public static void Log(string text, Exception ex)
+        {
+            mainlogger?.Error(text, ex);
+            Debug.WriteLine($"\n{text}\n{ex.Message}");
         }
 
         public static void Error(string text)
