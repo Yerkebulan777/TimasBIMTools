@@ -22,20 +22,19 @@ namespace RevitTimasBIMTools.Views
         private readonly Mutex mutex = new();
         public bool Disposed { get; internal set; } = false;
         private ExternalEvent externalEvent { get; set; } = null;
-        private readonly CutVoidDataViewModel DataContextHandler = null;
+        private readonly CutVoidDataViewModel DataContextHandler;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
 
 
-        public CutVoidDockPaneView(IExternalEventHandler handler)
+        public CutVoidDockPaneView(CutVoidDataViewModel handler)
         {
             handler = handler ?? throw new ArgumentNullException(nameof(handler));
             Logger.ThreadProcessLog("Process => " + nameof(CutVoidDockPaneView));
-            if (handler is CutVoidDataViewModel viewModel)
-            {
-                InitializeComponent();
-                DataContext = DataContextHandler = viewModel;
-                viewModel.DockPanelView = this;
-            }            
+
+            InitializeComponent();
+            handler.DockPanelView = this;
+            DataContext = DataContextHandler = handler;
+                      
         }
 
 

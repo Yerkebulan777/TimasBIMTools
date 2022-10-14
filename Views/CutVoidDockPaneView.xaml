@@ -2,9 +2,9 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="viewPage" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     d:DataContext="{d:DesignInstance Type=vm:CutVoidDataViewModel}"
+    xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Class="RevitTimasBIMTools.Views.CutVoidDockPaneView" 
@@ -19,9 +19,10 @@
         </ResourceDictionary>
     </Page.Resources>
 
+    
     <!-- GridMain -->
     <Border BorderThickness="2.5" BorderBrush="Gray">
-        <Grid Name="PageMainGrid">
+        <Grid Name="PageMainGrid" >
  
             <Grid.RowDefinitions>
                 <RowDefinition Height="45"/>

@@ -27,7 +27,7 @@ using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public sealed class CutVoidDataViewModel : ObservableObject, IExternalEventHandler, IDisposable
+    public class CutVoidDataViewModel : ObservableObject, IExternalEventHandler, IDisposable
     {
         public event EventHandler<BaseCompletedEventArgs> Completed;
         public CutVoidDockPaneView DockPanelView { get; set; } = null;
@@ -53,7 +53,6 @@ namespace RevitTimasBIMTools.ViewModels
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             constructManager = provider.GetRequiredService<RevitPurginqManager>();
             collisionManager = provider.GetRequiredService<CutVoidCollisionManager>();
-            Logger.ThreadProcessLog("Process => " + nameof(CutVoidDataViewModel));
         }
 
 
@@ -82,6 +81,7 @@ namespace RevitTimasBIMTools.ViewModels
             Completed?.Invoke(this, e);
             Properties.Settings.Default.Save();
             Properties.Settings.Default.Reload();
+            Logger.ThreadProcessLog("Process => " + nameof(OnCompleted));
         }
 
 

@@ -1,20 +1,20 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-    xmlns:Converters ="clr-namespace:RevitTimasBIMTools.ViewConverters" >
+    xmlns:Converters ="clr-namespace:RevitTimasBIMTools.ViewConverters" 
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" >
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Animation.xaml"/>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Colors.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
-    <Converters:ElementNameConverter x:Key="ElementNameConverter"/>
     <BooleanToVisibilityConverter x:Key="BoolToViz"/>
 
     <!--DropShadowEffect-->
     <DropShadowEffect x:Key="ShadowBlur" />
     <!--HeaderTextBox-->
-    <Style x:Key="Header" TargetType="Label" >
+    <Style x:Key="Header" TargetType="{x:Type Label}" >
         <Setter Property="Margin" Value="10,0"/>
         <Setter Property="FontSize" Value="11"/>
         <Setter Property="MinWidth" Value="150"/>
@@ -24,7 +24,7 @@
         <Setter Property="Foreground" Value="DarkOliveGreen"/>
     </Style>
     <!--TextBox-->
-    <Style TargetType="TextBox">
+    <Style TargetType="{x:Type TextBox}">
         <Setter Property="IsUndoEnabled" Value="False"/>
         <Setter Property="TextWrapping" Value="NoWrap"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -34,14 +34,12 @@
                     <Condition Property="IsKeyboardFocused" Value="True" />
                     <Condition Property="IsMouseOver" Value="True" />
                 </MultiTrigger.Conditions>
-                <MultiTrigger.Setters>
-                    <Setter Property="Background" Value="LightGreen" />
-                </MultiTrigger.Setters>
+                <Setter Property="Background" Value="LightGreen" />
             </MultiTrigger>
         </Style.Triggers>
     </Style>
     <!--ScrollViewer-->
-    <Style TargetType="ScrollViewer">
+    <Style TargetType="{x:Type ScrollViewer}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
@@ -49,7 +47,7 @@
         <Setter Property="CanContentScroll" Value="True"/>
     </Style>
     <!--ComboBox-->
-    <Style TargetType="ComboBox">
+    <Style TargetType="{x:Type ComboBox}">
         <Setter Property="Margin" Value="50,0"/>
         <Setter Property="IsReadOnly" Value="True"/>
         <Setter Property="SelectedIndex" Value="0"/>
@@ -62,7 +60,7 @@
         <Setter Property="Height" Value="23" />
     </Style>
     <!--CenterHeaderTextBlock-->
-    <Style TargetType="TextBlock" x:Key="CenterHeaderTextBlock">
+    <Style TargetType="{x:Type TextBlock}" x:Key="CenterHeaderTextBlock">
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="TextAlignment" Value="Center"/>
@@ -100,7 +98,7 @@
         </Style.Triggers>
     </Style>
     <!--DataGridCell-->
-    <Style TargetType="DataGridCell">
+    <Style TargetType="{x:Type DataGridCell}">
         <Setter Property="TextBlock.TextAlignment" Value="Left" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
@@ -125,13 +123,13 @@
         </Style.Triggers>
     </Style>
     <!--GroupBoxBorderStyle-->
-    <Style x:Key="GroupBoxBorderStyle"  TargetType="Border" >
+    <Style x:Key="GroupBoxBorderStyle"  TargetType="{x:Type Border}" >
         <Setter Property="BorderBrush" Value="Silver"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="2.5"/>
         <Setter Property="Padding" Value="2.5"/>
         <Setter Property="Margin" Value="2.5"/>
     </Style>
-   
+
 
 </ResourceDictionary>
