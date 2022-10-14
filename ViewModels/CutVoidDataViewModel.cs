@@ -29,23 +29,20 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutVoidDataViewModel : ObservableObject, IExternalEventHandler, IDisposable
     {
+        public event EventHandler<BaseCompletedEventArgs> Completed;
         public CutVoidDockPaneView DockPanelView { get; set; } = null;
         public SynchronizationContext SyncContext { get; set; } = SynchronizationContext.Current;
         public TaskScheduler TaskContext { get; set; } = TaskScheduler.FromCurrentSynchronizationContext();
-
 
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private ConcurrentQueue<Element> instances { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
-
-        private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
+        private readonly RevitPurginqManager constructManager;
+        private readonly CutVoidCollisionManager collisionManager;
+        private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
-        private readonly RevitPurginqManager purgeManager = provider.GetRequiredService<RevitPurginqManager>();
-        private readonly CutVoidCollisionManager collisionManager = provider.GetRequiredService<CutVoidCollisionManager>();
-
-        public event EventHandler<BaseCompletedEventArgs> Completed;
 
 
         public CutVoidDataViewModel()
@@ -54,6 +51,8 @@ namespace RevitTimasBIMTools.ViewModels
             SettingsCommand = new RelayCommand(SettingsHandelCommand);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
+            constructManager = provider.GetRequiredService<RevitPurginqManager>();
+            collisionManager = provider.GetRequiredService<CutVoidCollisionManager>();
             Logger.ThreadProcessLog("Process => " + nameof(CutVoidDataViewModel));
         }
 
@@ -66,7 +65,7 @@ namespace RevitTimasBIMTools.ViewModels
             doc = uiapp.ActiveUIDocument.Document;
             SyncContext = SynchronizationContext.Current;
             TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
-            ConstructionTypeIds = purgeManager.PurgeAndGetValidConstructionTypeIds(doc);
+            ConstructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
             DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
             Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
             OnCompleted(new BaseCompletedEventArgs(SyncContext, TaskContext));
