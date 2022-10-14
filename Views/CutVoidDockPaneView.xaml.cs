@@ -72,7 +72,7 @@ namespace RevitTimasBIMTools.Views
                 CommandManager.InvalidateRequerySuggested();
                 DataContextHandler.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                 DataContextHandler.SyncContext = SynchronizationContext.Current;
-                if (SynchronizationContext.Current != args.SyncContext)
+                if (SynchronizationContext.Current == args.SyncContext)
                 {
                     Logger.ThreadProcessLog("Process => " + nameof(OnContextHandlerCompleted));
                 }

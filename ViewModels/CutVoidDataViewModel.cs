@@ -65,9 +65,6 @@ namespace RevitTimasBIMTools.ViewModels
 
             // Get Revit API Context
             doc = uiapp.ActiveUIDocument.Document;
-            SyncContext = SynchronizationContext.Current;
-            TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
-
             ConstructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
             DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
             Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
@@ -79,7 +76,7 @@ namespace RevitTimasBIMTools.ViewModels
         private void OnCompleted(BaseCompletedEventArgs e)
         {
             Completed?.Invoke(this, e);
-            DockPanelView.Dispatcher.Invoke(Properties.Settings.Default.Reload);
+            //DockPanelView.Dispatcher.Invoke(Properties.Settings.Default.Reload);
             Logger.ThreadProcessLog("Process => " + nameof(OnCompleted));
         }
 
@@ -164,7 +161,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         public ListCollectionView ConstructionResults { get; set; }
-        private readonly IDictionary<int, ElementId> constructions = null;
+        private IDictionary<int, ElementId> constructions = null;
         public IDictionary<int, ElementId> ConstructionTypeIds
         {
             get => constructions;
@@ -173,10 +170,11 @@ namespace RevitTimasBIMTools.ViewModels
                 if (value != null)
                 {
                     Logger.Log(value.Count.ToString());
-                    DockPanelView.Dispatcher.Invoke(delegate
+                    DockPanelView.ActiveDocTitle.Dispatcher.Invoke(delegate
                     {
                         ConstructionResults = CollectionViewSource.GetDefaultView(value) as ListCollectionView;
                         OnPropertyChanged(nameof(ConstructionResults));
+                        constructions = value;
                     }, DispatcherPriority.Background);
                 }
             }
