@@ -47,6 +47,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         public event EventHandler<BaseCompletedEventArgs> Completed;
 
+
         public CutVoidDataViewModel()
         {
             CanselCommand = new RelayCommand(CancelCallbackLogic);

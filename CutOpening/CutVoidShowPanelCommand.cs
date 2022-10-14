@@ -16,48 +16,43 @@ namespace RevitTimasBIMTools.CutOpening
         private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         private SmartToolHelper toolHelper { get; set; } = provider.GetRequiredService<SmartToolHelper>();
         private IDockablePaneProvider paneProvider { get; set; } = provider.GetRequiredService<IDockablePaneProvider>();
-        private CutVoidRegisterDockPane paneRegister { get; set; } = provider.GetRequiredService<CutVoidRegisterDockPane>();
 
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            var uiapp = commandData.Application;
             toolHelper = toolHelper ?? throw new ArgumentNullException(nameof(toolHelper));
             paneProvider = paneProvider ?? throw new ArgumentNullException(nameof(paneProvider));
-            paneRegister = paneRegister ?? throw new ArgumentNullException(nameof(paneRegister));
-            return Execute(commandData.Application, ref message);
+            return Execute(uiapp, ref message);
         }
 
 
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
-            DockablePaneId paneId = toolHelper.CutVoidPaneId;
-            if (paneRegister.RegisterDockablePane(uiapp, paneId, paneProvider))
+            DockablePane dockPane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);
+            if (dockPane != null && dockPane.IsValidObject)
             {
-                DockablePane dockPane = uiapp.GetDockablePane(paneId);
-                if (dockPane != null && dockPane.IsValidObject)
+                try
                 {
-                    try
+                    if (paneProvider is CutVoidDockPaneView paneView)
                     {
-                        if (paneProvider is CutVoidDockPaneView paneView)
+                        if (dockPane.IsShown())
                         {
-                            if (dockPane.IsShown())
-                            {
-                                dockPane.Hide();
-                                paneView.Dispose();
-                            }
-                            else
-                            {
-                                dockPane.Show();
-                                paneView.RaiseHandler();
-                            }
+                            dockPane.Hide();
+                            paneView.Dispose();
+                        }
+                        else
+                        {
+                            dockPane.Show();
+                            paneView.RaiseHandler();
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        message = ex.Message;
-                        return Result.Failed;
-                    }
+                }
+                catch (Exception ex)
+                {
+                    message = ex.ToString();
+                    return Result.Failed;
                 }
             }
             return Result.Succeeded;

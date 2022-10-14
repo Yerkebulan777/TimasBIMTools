@@ -2,7 +2,6 @@
 using Autodesk.Revit.UI;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
@@ -23,10 +22,9 @@ namespace RevitTimasBIMTools.Views
         private readonly Mutex mutex = new();
         public bool Disposed { get; internal set; } = false;
         private ExternalEvent externalEvent { get; set; } = null;
-
-
         private readonly CutVoidDataViewModel DataContextHandler = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
+
 
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {

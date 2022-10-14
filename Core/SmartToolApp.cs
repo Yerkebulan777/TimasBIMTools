@@ -1,6 +1,8 @@
 ﻿using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
+using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
+using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Windows.Interop;
@@ -34,6 +36,16 @@ namespace RevitTimasBIMTools.Core
             if (RenderOptions.ProcessRenderMode.Equals(RenderMode.SoftwareOnly))
             {
                 RenderOptions.ProcessRenderMode = RenderMode.Default;
+            }
+            SmartToolHelper toolHelper = ServiceProvider.GetRequiredService<SmartToolHelper>();
+            IDockablePaneProvider paneProvider = ServiceProvider.GetRequiredService<IDockablePaneProvider>();
+            CutVoidRegisterDockPane paneRegister = ServiceProvider.GetRequiredService<CutVoidRegisterDockPane>();
+            toolHelper = toolHelper ?? throw new ArgumentNullException(nameof(toolHelper));
+            paneProvider = paneProvider ?? throw new ArgumentNullException(nameof(paneProvider));
+            paneRegister = paneRegister ?? throw new ArgumentNullException(nameof(paneRegister));
+            if (paneRegister.RegisterDockablePane(controller, toolHelper.CutVoidPaneId, paneProvider))
+            {
+
             }
         }
 
