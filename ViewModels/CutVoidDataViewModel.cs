@@ -165,21 +165,18 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         public ListCollectionView ConstructionResults { get; set; }
-        private IDictionary<int, ElementId> constructions = null;
+        private readonly IDictionary<int, ElementId> constructions = null;
         public IDictionary<int, ElementId> ConstructionTypeIds
         {
             get => constructions;
             set
             {
                 Logger.Log(constructions.Count.ToString());
-                if (value != null && SetProperty(ref constructions, value))
+                if (value != null)
                 {
                     ConstructionResults.Dispatcher.Invoke(delegate
                     {
-                        foreach (KeyValuePair<int, ElementId> item in constructions)
-                        {
-                            ConstructionResults.AddNewItem(item.Value);
-                        }
+                        ConstructionResults = CollectionViewSource.GetDefaultView(constructions) as ListCollectionView;
                         OnPropertyChanged(nameof(ConstructionResults));
                     }, DispatcherPriority.Background);
                 }
@@ -520,10 +517,6 @@ namespace RevitTimasBIMTools.ViewModels
                         DataViewCollection = CollectionViewSource.GetDefaultView(dataModels) as ListCollectionView;
                         UniqueItemNames = GetUniqueStringList(dataModels);
                         DataViewCollection.Refresh();
-                    }
-                    else
-                    {
-                        DataViewCollection?.DetachFromSourceCollection();
                     }
                 }
             }
