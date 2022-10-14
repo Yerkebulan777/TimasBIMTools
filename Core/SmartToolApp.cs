@@ -1,8 +1,6 @@
 ﻿using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
-using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
-using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Windows.Interop;
@@ -22,7 +20,7 @@ namespace RevitTimasBIMTools.Core
             RevitTask.Initialize(controlledApp);
             Logger.InitMainLogger(typeof(SmartToolApp));
             SmartToolSetupUIPanel.Initialize(controlledApp);
-            ServiceProvider = ContainerConfig.ConfigureServices();
+            ServiceProvider = BaseContainerConfig.ConfigureServices();
             Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
             controlledApp.ControlledApplication.ApplicationInitialized += OnApplicationInitialized;
 
