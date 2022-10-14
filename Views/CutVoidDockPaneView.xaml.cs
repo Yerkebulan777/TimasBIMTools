@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
@@ -20,22 +21,25 @@ namespace RevitTimasBIMTools.Views
     public partial class CutVoidDockPaneView : Page, IDockablePaneProvider, IDisposable
     {
         private readonly Mutex mutex = new();
-        public bool Disposed { get; internal set; } = false;
+        public bool Disposed { get; set; } = false;
         private ExternalEvent externalEvent { get; set; } = null;
-        private readonly CutVoidDataViewModel DataContextHandler;
-        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
+        private CutVoidDataViewModel DataContextHandler { get; set; } = null;
+        private string documentId { get; set; } = Properties.Settings.Default.ActiveDocumentUniqueId;
 
-
-        public CutVoidDockPaneView(CutVoidDataViewModel handler)
+        private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
+        public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {
-            handler = handler ?? throw new ArgumentNullException(nameof(handler));
+            viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
             Logger.ThreadProcessLog("Process => " + nameof(CutVoidDockPaneView));
 
             InitializeComponent();
-            handler.DockPanelView = this;
-            DataContext = DataContextHandler = handler;
-                      
+            Loaded += CutVoidDockPaneView_Loaded;
+            DataContextHandler.DockPanelView = this;
+            DataContext = DataContextHandler = viewModel;
+            DataContextHandler.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
+            DataContextHandler.SyncContext = SynchronizationContext.Current;
         }
+
 
 
         [STAThread]
@@ -51,32 +55,18 @@ namespace RevitTimasBIMTools.Views
 
 
         [STAThread]
-        public void RaiseHandler()
+        private void CutVoidDockPaneView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            DataContextHandler.Completed += OnContextHandlerCompleted;
-            externalEvent = ExternalEvent.Create(DataContextHandler);
-            if (ExternalEventRequest.Accepted != externalEvent.Raise())
+            Disposed = false;
+            RevitTask.RunAsync(app =>
             {
-                Logger.Warning("External event request not accepted!!!");
-                Logger.ThreadProcessLog("Process => " + nameof(RaiseHandler));
-            }
-        }
-
-
-        [STAThread]
-        private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
-        {
-            Dispatcher.CurrentDispatcher.Invoke(() =>
-            {
-                Disposed = false;
+                Document doc = app.ActiveUIDocument.Document;
+                RevitPurginqManager constructManager = provider.GetRequiredService<RevitPurginqManager>();
+                DataContextHandler.ConstructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
+                DataContextHandler.DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
+                Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
                 CommandManager.InvalidateRequerySuggested();
-                DataContextHandler.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
-                DataContextHandler.SyncContext = SynchronizationContext.Current;
-                if (SynchronizationContext.Current == args.SyncContext)
-                {
-                    Logger.ThreadProcessLog("Process => " + nameof(OnContextHandlerCompleted));
-                }
-            }, DispatcherPriority.Background);
+            }).Dispose();
         }
 
 
@@ -101,38 +91,22 @@ namespace RevitTimasBIMTools.Views
             }
         }
 
-
-        protected virtual void Dispose(bool disposing)
+        public void Dispose()
         {
             if (!Disposed)
             {
-                if (disposing)
-                {
-                    Dispatcher.CurrentDispatcher.Invoke(() =>
-                    {
-                        DataContextHandler.Dispose();
-                        Properties.Settings.Default.Reset();
-                        DataContextHandler.IsStarted = false;
-                        DataContextHandler.IsDataEnabled = false;
-                        DataContextHandler.IsOptionEnabled = false;
-                    }, DispatcherPriority.Background);
-                    Dispatcher.CurrentDispatcher.InvokeShutdown();
-                    // TODO: освободить управляемое состояние (управляемые объекты)
-                }
-                // TODO: освободить неуправляемые ресурсы (неуправляемые объекты) и переопределить метод завершения
-                // TODO: установить значение NULL для больших полей
                 Disposed = true;
+                Dispatcher.CurrentDispatcher.Invoke(() =>
+                {
+                    DataContextHandler.Dispose();
+                    Properties.Settings.Default.Reset();
+                    DataContextHandler.IsStarted = false;
+                    DataContextHandler.IsDataEnabled = false;
+                    DataContextHandler.IsOptionEnabled = false;
+                }, DispatcherPriority.Background);
+                Dispatcher.CurrentDispatcher.InvokeShutdown();
+                // TODO: освободить управляемое состояние (управляемые объекты)
             }
         }
-
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            //GC.SuppressFinalize(this);
-        }
-
     }
 }

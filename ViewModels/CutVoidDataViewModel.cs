@@ -27,7 +27,7 @@ using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public class CutVoidDataViewModel : ObservableObject, IExternalEventHandler, IDisposable
+    public class CutVoidDataViewModel : ObservableObject, IDisposable
     {
         public event EventHandler<BaseCompletedEventArgs> Completed;
         public CutVoidDockPaneView DockPanelView { get; set; } = null;
@@ -39,11 +39,11 @@ namespace RevitTimasBIMTools.ViewModels
         private ConcurrentQueue<Element> instances { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
-        private readonly RevitPurginqManager constructManager;
-        private readonly CutVoidCollisionManager collisionManager;
-        private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
-        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
 
+        private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
+        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
+        private readonly CutVoidCollisionManager collisionManager = provider.GetRequiredService<CutVoidCollisionManager>();
+        
 
         public CutVoidDataViewModel()
         {
@@ -51,23 +51,15 @@ namespace RevitTimasBIMTools.ViewModels
             SettingsCommand = new RelayCommand(SettingsHandelCommand);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
-            constructManager = provider.GetRequiredService<RevitPurginqManager>();
-            collisionManager = provider.GetRequiredService<CutVoidCollisionManager>();
         }
 
 
         [STAThread]
-        public void Execute(UIApplication uiapp)
+        public void Execute()
         {
             IsStarted = true;
             IsDataEnabled = false;
             IsOptionEnabled = false;
-
-            // Get Revit API Context
-            doc = uiapp.ActiveUIDocument.Document;
-            ConstructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
-            DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
-            Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
 
             OnCompleted(new BaseCompletedEventArgs(SyncContext, TaskContext));
         }
@@ -77,7 +69,6 @@ namespace RevitTimasBIMTools.ViewModels
         {
             Completed?.Invoke(this, e);
             //DockPanelView.Dispatcher.Invoke(Properties.Settings.Default.Reload);
-            Logger.ThreadProcessLog("Process => " + nameof(OnCompleted));
         }
 
 

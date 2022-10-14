@@ -15,12 +15,10 @@ namespace RevitTimasBIMTools.Core
             ServiceCollection services = new();
 
             _ = services.AddSingleton<SmartToolHelper>();
+            _ = services.AddSingleton<CutVoidDataViewModel>();
             _ = services.AddSingleton<CutVoidRegisterDockPane>();
             _ = services.AddSingleton<CutVoidShowPanelCommand>();
-
-            _ = services.AddSingleton<CutVoidDataViewModel>();
             _ = services.AddSingleton<IDockablePaneProvider, CutVoidDockPaneView>();
-            _ = services.AddSingleton<IExternalEventHandler, CutVoidDataViewModel>();
 
             _ = services.AddTransient<CutVoidCollisionManager>();
             _ = services.AddTransient<RevitPurginqManager>();
