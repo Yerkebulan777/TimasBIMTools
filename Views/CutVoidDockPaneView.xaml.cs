@@ -66,16 +66,16 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
-            if (SynchronizationContext.Current != args.SyncContext)
-            {
-                Logger.ThreadProcessLog("Process => " + nameof(OnContextHandlerCompleted));
-            }
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
                 Disposed = false;
+                CommandManager.InvalidateRequerySuggested();
                 DataContextHandler.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                 DataContextHandler.SyncContext = SynchronizationContext.Current;
-                CommandManager.InvalidateRequerySuggested();
+                if (SynchronizationContext.Current != args.SyncContext)
+                {
+                    Logger.ThreadProcessLog("Process => " + nameof(OnContextHandlerCompleted));
+                }
             }, DispatcherPriority.Background);
         }
 
