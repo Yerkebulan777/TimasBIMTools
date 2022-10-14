@@ -466,11 +466,11 @@ namespace RevitTimasBIMTools.ViewModels
             get => dataModels;
             set
             {
-                if (SetProperty(ref dataModels, value))
+                if (SetProperty(ref dataModels, value) && value != null)
                 {
                     DataViewCollection = CollectionViewSource.GetDefaultView(value);
                     UniqueItemNames = GetUniqueStringList(value);
-                    DataViewCollection.Refresh();
+                    DataViewCollection?.Refresh();
                 }
             }
         }
