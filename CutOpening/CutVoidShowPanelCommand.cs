@@ -36,7 +36,6 @@ namespace RevitTimasBIMTools.CutOpening
                         if (dockPane.IsShown())
                         {
                             dockPane.Hide();
-                            paneView.Dispose();
                         }
                         else
                         {

@@ -79,8 +79,8 @@ namespace RevitTimasBIMTools.ViewModels
         private void OnCompleted(BaseCompletedEventArgs e)
         {
             Completed?.Invoke(this, e);
-            Properties.Settings.Default.Save();
-            Properties.Settings.Default.Reload();
+            //Properties.Settings.Default.Save();
+            //Properties.Settings.Default.Reload();
             Logger.ThreadProcessLog("Process => " + nameof(OnCompleted));
         }
 
@@ -506,15 +506,15 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref dataModels, value))
                 {
-                    if (value != null && dataModels.Count > 0)
+                    if (dataModels != null && dataModels.Count > 0)
                     {
                         DataViewCollection = CollectionViewSource.GetDefaultView(dataModels) as ListCollectionView;
-                        UniqueItemNames = GetUniqueStringList(value);
+                        UniqueItemNames = GetUniqueStringList(dataModels);
                         DataViewCollection?.Refresh();
                     }
                     else
                     {
-                        DataViewCollection.DetachFromSourceCollection();
+                        DataViewCollection?.DetachFromSourceCollection();
                     }
                 }
             }
