@@ -57,26 +57,31 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         public void Execute(UIApplication uiapp)
         {
             IsStarted = true;
             IsDataEnabled = false;
             IsOptionEnabled = false;
+
+            // Get Revit API Context
             doc = uiapp.ActiveUIDocument.Document;
             SyncContext = SynchronizationContext.Current;
             TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
+
             ConstructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
             DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
             Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
+
             OnCompleted(new BaseCompletedEventArgs(SyncContext, TaskContext));
-            Properties.Settings.Default.Save();
         }
 
 
-        [STAThread]
         private void OnCompleted(BaseCompletedEventArgs e)
         {
             Completed?.Invoke(this, e);
+            Properties.Settings.Default.Save();
+            Properties.Settings.Default.Reload();
         }
 
 
