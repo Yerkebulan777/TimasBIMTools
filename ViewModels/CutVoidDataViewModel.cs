@@ -3,6 +3,7 @@ using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
@@ -38,17 +39,20 @@ namespace RevitTimasBIMTools.ViewModels
         private string documentId { get; } = Properties.Settings.Default.ActiveDocumentUniqueId;
         private CutVoidCollisionManager manager { get; set; } = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
 
-
         public TaskScheduler TaskContext { get; internal set; } = CustomSynchronizationContext.GetSynchronizationContext();
         public SynchronizationContext SyncContext { get; internal set; } = SynchronizationContext.Current;
 
 
-        public CutVoidDataViewModel()
+        private readonly CutVoidViewExternalHandler ViewHandler  = null;
+        public CutVoidDataViewModel(CutVoidViewExternalHandler handler)
         {
-            SettingsCommand = new RelayCommand(SettingsHandelCommand);
-            ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
-            SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
+            ViewHandler = handler;
             CanselCommand = new RelayCommand(CancelCallbackLogic);
+            SettingsCommand = new RelayCommand(SettingsHandelCommand);
+            SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
+            ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
+            Logger.ThreadProcessLog("Process => " + nameof(CutVoidDataViewModel));
+            handler = handler ?? throw new ArgumentNullException(nameof(handler));
         }
 
 

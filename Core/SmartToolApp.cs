@@ -37,11 +37,6 @@ namespace RevitTimasBIMTools.Core
             {
                 RenderOptions.ProcessRenderMode = RenderMode.Default;
             }
-
-            CutVoidRegisterDockPane register = ServiceProvider.GetRequiredService<CutVoidRegisterDockPane>();
-            register = register ?? throw new ArgumentNullException(nameof(register));
-            register.RegisterDockablePane(controller);
-
         }
 
 

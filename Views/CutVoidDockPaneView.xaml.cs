@@ -27,16 +27,17 @@ namespace RevitTimasBIMTools.Views
         private CutVoidViewExternalHandler handler { get; set; } = null;
 
         private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
-        private readonly CutVoidDataViewModel dataViewModel = ViewModelLocator.DataViewModel;
+        private readonly CutVoidDataViewModel DataViewModel = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
 
 
-        public CutVoidDockPaneView()
+        public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {
             InitializeComponent();
-            DataContext = dataViewModel;
-            dataViewModel.DockPanelView = this;
+            viewModel.DockPanelView = this;
+            DataContext = DataViewModel = viewModel;
             Logger.ThreadProcessLog("Process => " + nameof(CutVoidDockPaneView));
+            viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         }
 
 
@@ -72,15 +73,15 @@ namespace RevitTimasBIMTools.Views
         {
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
-                dataViewModel.IsStarted = true;
-                dataViewModel.IsDataEnabled = false;
-                dataViewModel.IsOptionEnabled = false;
-                dataViewModel.DocumentModelCollection = args.DocumentModels;
-                dataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
+                DataViewModel.IsStarted = true;
+                DataViewModel.IsDataEnabled = false;
+                DataViewModel.IsOptionEnabled = false;
+                DataViewModel.DocumentModelCollection = args.DocumentModels;
+                DataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
                 Logger.ThreadProcessLog("Process => " + nameof(OnContextHandlerCompleted));
                 SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
-                dataViewModel.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
-                dataViewModel.SyncContext = SynchronizationContext.Current;
+                DataViewModel.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
+                DataViewModel.SyncContext = SynchronizationContext.Current;
                 CommandManager.InvalidateRequerySuggested();
             }, DispatcherPriority.DataBind);
         }
@@ -116,10 +117,10 @@ namespace RevitTimasBIMTools.Views
                 {
                     Dispatcher.CurrentDispatcher.Invoke(() =>
                     {
-                        dataViewModel.Dispose();
-                        dataViewModel.IsStarted = false;
-                        dataViewModel.IsDataEnabled = false;
-                        dataViewModel.IsOptionEnabled = false;
+                        DataViewModel.Dispose();
+                        DataViewModel.IsStarted = false;
+                        DataViewModel.IsDataEnabled = false;
+                        DataViewModel.IsOptionEnabled = false;
                         CommandManager.InvalidateRequerySuggested();
                         Properties.Settings.Default.Reset();
                     }, DispatcherPriority.Background);

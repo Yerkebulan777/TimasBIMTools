@@ -13,7 +13,13 @@ namespace RevitTimasBIMTools.CutOpening
     [Regeneration(RegenerationOption.Manual)]
     internal sealed class CutVoidShowPanelCommand : IExternalCommand, IExternalCommandAvailability
     {
-        private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
+
+        private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
+        private SmartToolHelper toolHelper { get; set; } = provider.GetRequiredService<SmartToolHelper>();
+        private IDockablePaneProvider paneProvider { get; set; } = provider.GetRequiredService<IDockablePaneProvider>();
+        private CutVoidRegisterDockPane paneRegister { get; set; } = provider.GetRequiredService<CutVoidRegisterDockPane>();
+
+
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             return Execute(commandData.Application, ref message);
@@ -23,35 +29,39 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
-            Result result = Result.Succeeded;
-            SmartToolHelper helper = provider.GetRequiredService<SmartToolHelper>();
-            if (DockablePane.PaneIsRegistered(helper.CutVoidPaneId))
+            DockablePaneId paneId = toolHelper.CutVoidPaneId;
+            paneRegister = paneRegister ?? throw new ArgumentNullException(nameof(paneRegister));
+            if (paneRegister.RegisterDockablePane(uiapp, paneId, paneProvider))
             {
-                IDockablePaneProvider pane = provider.GetRequiredService<IDockablePaneProvider>();
-                DockablePane dockpane = uiapp.GetDockablePane(helper.CutVoidPaneId);
-                if (dockpane.IsValidObject && pane is CutVoidDockPaneView view)
+                DockablePane dockPane = uiapp.GetDockablePane(paneId);
+                if (dockPane != null && dockPane.IsValidObject)
                 {
                     try
                     {
-                        if (dockpane.IsShown())
+                        if (dockPane.IsShown() && paneProvider is CutVoidDockPaneView oldView)
                         {
-                            dockpane.Hide();
-                            view.Dispose();
+                            dockPane.Hide();
+                            oldView.Dispose();
                         }
                         else
                         {
-                            view.RaiseHandler();
-                            dockpane.Show();
+                            using IServiceScope scope = provider.CreateScope();
+                            paneProvider = scope.ServiceProvider.GetRequiredService<IDockablePaneProvider>();
+                            if (paneProvider is CutVoidDockPaneView newView)
+                            {
+                                dockPane.Show();
+                                newView.RaiseHandler();
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
                         message = ex.Message;
-                        result = Result.Failed;
+                        return Result.Failed;
                     }
                 }
             }
-            return result;
+            return Result.Succeeded;
         }
 
 

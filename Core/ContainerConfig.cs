@@ -19,12 +19,12 @@ namespace RevitTimasBIMTools.Core
             services.AddSingleton<CutVoidRegisterDockPane>();
             services.AddSingleton<CutVoidShowPanelCommand>();
 
+            services.AddScoped<CutVoidViewExternalHandler>();
             services.AddScoped<IDockablePaneProvider, CutVoidDockPaneView>();
             services.AddScoped<INotifyPropertyChanged, CutVoidDataViewModel>();
-
-            services.AddScoped<CutVoidViewExternalHandler>();
-            services.AddScoped<CutVoidCollisionManager>();
-            services.AddScoped<RevitPurginqManager>();
+            
+            services.AddTransient<CutVoidCollisionManager>();
+            services.AddTransient<RevitPurginqManager>();
 
             return services.BuildServiceProvider();
         }
