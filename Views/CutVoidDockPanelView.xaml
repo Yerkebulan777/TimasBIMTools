@@ -32,8 +32,7 @@
 
             
             <!--Header -->
-            <Border  Grid.Row="0" Background="{DynamicResource FloralGradientBrush}" 
-                     Visibility="{Binding Path=IsStarted, Converter={StaticResource BoolToViz}}">
+            <Border  Grid.Row="0" Background="{DynamicResource FloralGradientBrush}" >
                 <Grid Grid.Row="0" VerticalAlignment="Center" >
                     <Label Name="ActiveDocTitle" TextElement.FontSize="13" VerticalAlignment="Center"
                            Content="{Binding Path=SelectedDocModel, Mode=OneWay, UpdateSourceTrigger=Explicit}">
@@ -130,14 +129,14 @@
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Minimum size: " Width="125"/>
-                                <xctk:IntegerUpDown Name="MinSideSize" Minimum="0" Maximum="100" Height="23" Width="65" TextAlignment="Center" 
-                                                    Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Name="MinSideSize" Minimum="0" Maximum="100" Height="23" Width="65" 
+                                        Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Maximum size: " Width="125"/>
-                                <xctk:IntegerUpDown Name="MaxSideSize" Minimum="100" Maximum="1000" Height="23" Width="65" TextAlignment="Center" 
-                                                    Value="{Binding Path=MaxSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Name="MaxSideSize" Minimum="100" Maximum="1000" Height="23" Width="65" 
+                                        Value="{Binding Path=MaxSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             </WrapPanel>
 
                         </StackPanel>
@@ -148,8 +147,8 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                             <Label Content="Cut offset: " Width="125"/>
-                            <xctk:IntegerUpDown Name="CutOffset" Minimum="0" Maximum="100" Height="23" Width="65" TextAlignment="Center" 
-                                                Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Slider Name="CutOffset" Minimum="0" Maximum="100" Height="23" Width="65" 
+                                    Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </WrapPanel>
                     </Border>
                 </ListViewItem>
@@ -244,7 +243,7 @@
 
 
             <!-- ButtonPanel -->
-            <Border Grid.Row="4" Background="Silver" Visibility="{Binding Path=IsStarted, Converter={StaticResource BoolToViz}}">
+            <Border Grid.Row="4" Background="Silver">
                 <DockPanel Grid.Row="3" LastChildFill="True" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
                     <Button Name="SnoopCmd" Height="30" Width="75" Margin="5" 
                         Command="{Binding SnoopCommand, Mode=OneTime}">
