@@ -29,7 +29,7 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutVoidDataViewModel : ObservableObject, IDisposable
     {
-        public CutVoidDockPanelView DockPanelView { get; set; } = null;
+        public CutVoidDockPaneView DockPanelView { get; set; } = null;
 
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;

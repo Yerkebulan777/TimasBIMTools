@@ -17,8 +17,8 @@ using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Views
 {
-    /// <summary> Логика взаимодействия для CutVoidDockPanelView.xaml </summary>
-    public partial class CutVoidDockPanelView : Page, IDockablePaneProvider, IDisposable
+    /// <summary> Логика взаимодействия для CutVoidDockPaneView.xaml </summary>
+    public partial class CutVoidDockPaneView : Page, IDockablePaneProvider, IDisposable
     {
         private readonly Mutex mutex = new();
         public bool Disposed { get; internal set; } = false;
@@ -30,12 +30,12 @@ namespace RevitTimasBIMTools.Views
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
 
 
-        public CutVoidDockPanelView()
+        public CutVoidDockPaneView()
         {
             InitializeComponent();
             DataContext = dataViewModel;
             dataViewModel.DockPanelView = this;
-            Logger.ThreadProcessLog("Process => " + nameof(CutVoidDockPanelView));
+            Logger.ThreadProcessLog("Process => " + nameof(CutVoidDockPaneView));
         }
 
 

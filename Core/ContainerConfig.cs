@@ -5,7 +5,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
 using System;
-
+using System.ComponentModel;
 
 namespace RevitTimasBIMTools.Core
 {
@@ -16,11 +16,13 @@ namespace RevitTimasBIMTools.Core
             ServiceCollection services = new();
 
             services.AddSingleton<SmartToolHelper>();
-            services.AddSingleton<CutVoidDataViewModel>();
+            
             services.AddSingleton<CutVoidRegisterDockPane>();
             services.AddSingleton<CutVoidShowPanelCommand>();
-            services.AddSingleton<IDockablePaneProvider, CutVoidDockPanelView>();
-            
+
+            services.AddScoped<IDockablePaneProvider, CutVoidDockPaneView>();
+            services.AddScoped<INotifyPropertyChanged, CutVoidDataViewModel>();
+
             services.AddTransient<CutVoidViewExternalHandler>();
             services.AddTransient<CutVoidCollisionManager>();
             services.AddTransient<RevitPurginqManager>();

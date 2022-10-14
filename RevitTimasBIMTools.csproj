@@ -256,8 +256,8 @@
     <Compile Include="ViewConverters\ElementNameConverter.cs" />
     <Compile Include="ViewModels\CutVoidDataViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
-    <Compile Include="Views\CutVoidDockPanelView.xaml.cs">
-      <DependentUpon>CutVoidDockPanelView.xaml</DependentUpon>
+    <Compile Include="Views\CutVoidDockPaneView.xaml.cs">
+      <DependentUpon>CutVoidDockPaneView.xaml</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -284,7 +284,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\CutVoidDockPanelView.xaml">
+    <Page Include="Views\CutVoidDockPaneView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

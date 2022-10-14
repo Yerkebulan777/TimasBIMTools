@@ -29,14 +29,14 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 IDockablePaneProvider pane = provider.GetRequiredService<IDockablePaneProvider>();
                 DockablePane dockpane = uiapp.GetDockablePane(helper.CutVoidPaneId);
-                if (pane is CutVoidDockPanelView view)
+                if (dockpane.IsValidObject && pane is CutVoidDockPaneView view)
                 {
                     try
                     {
                         if (dockpane.IsShown())
                         {
-                            view.Dispose();
                             dockpane.Hide();
+                            view.Dispose();
                         }
                         else
                         {
