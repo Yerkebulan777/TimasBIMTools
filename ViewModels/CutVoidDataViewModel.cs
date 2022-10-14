@@ -99,7 +99,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => started;
             set
             {
-                if (SetProperty(ref started, value))
+                if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref started, value)))
                 {
                     GetGeneral3DViewAsync();
                 }
@@ -115,7 +115,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (!string.IsNullOrEmpty(documentId))
                 {
-                    if (SetProperty(ref enableOpt, value))
+                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref enableOpt, value)))
                     {
                         ClearElementDataAsync();
                         SetMEPCategoriesToData();
@@ -135,7 +135,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (docModel != null && category != null)
                 {
-                    if (SetProperty(ref enableData, value))
+                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref enableData, value)))
                     {
                         IsOptionEnabled = !enableData;
                         DataViewCollection?.Refresh();
@@ -312,7 +312,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     Properties.Settings.Default.MinSideSizeInMm = minSize;
                     Properties.Settings.Default.Save();
-                    ResetCurrentContext();
                 }
             }
         }
@@ -328,7 +327,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     Properties.Settings.Default.MaxSideSizeInMm = minSize;
                     Properties.Settings.Default.Save();
-                    ResetCurrentContext();
                 }
             }
         }
@@ -344,7 +342,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     Properties.Settings.Default.CutOffsetInMm = minSize;
                     Properties.Settings.Default.Save();
-                    ResetCurrentContext();
                 }
             }
         }
@@ -353,23 +350,6 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Methods
-
-        private void ResetCurrentContext()
-        {
-            Logger.ThreadProcessLog("Start" + nameof(ResetCurrentContext));
-            if (SynchronizationContext.Current != SyncContext)
-            {
-                try
-                {
-                    SynchronizationContext.SetSynchronizationContext(SyncContext);
-                    Logger.ThreadProcessLog("Finaly" + nameof(SynchronizationContext));
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex.Message);
-                }
-            }
-        }
 
 
         private async void ClearElementDataAsync()
@@ -389,7 +369,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetGeneral3DViewAsync()
         {
-            ResetCurrentContext();
             view3d = await RevitTask.RunAsync(app =>
             {
                 return RevitViewManager.Get3dView(app.ActiveUIDocument);
@@ -399,7 +378,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetMEPCategoriesToData()
         {
-            ResetCurrentContext();
             EngineerCategories = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -410,7 +388,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetCoreMaterialsToData()
         {
-            ResetCurrentContext();
             StructureMaterials = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -421,7 +398,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetFamilySymbolsToData()
         {
-            ResetCurrentContext();
             FamilySymbols = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -433,7 +409,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetValidLevelsToData()
         {
-            ResetCurrentContext();
             ValidLevels = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -444,7 +419,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetInstancesByCoreMaterialInType(string matName)
         {
-            ResetCurrentContext();
             instances = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
@@ -456,7 +430,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SnoopIntersectionDataByLevel(Level level)
         {
-            ResetCurrentContext();
             ElementModelData = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
