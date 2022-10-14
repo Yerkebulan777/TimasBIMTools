@@ -79,8 +79,7 @@ namespace RevitTimasBIMTools.ViewModels
         private void OnCompleted(BaseCompletedEventArgs e)
         {
             Completed?.Invoke(this, e);
-            //Properties.Settings.Default.Save();
-            //Properties.Settings.Default.Reload();
+            DockPanelView.Dispatcher.Invoke(Properties.Settings.Default.Reload);
             Logger.ThreadProcessLog("Process => " + nameof(OnCompleted));
         }
 
