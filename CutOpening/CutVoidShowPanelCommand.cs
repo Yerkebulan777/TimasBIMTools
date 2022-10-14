@@ -20,8 +20,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            toolHelper = toolHelper ?? throw new ArgumentNullException(nameof(toolHelper));
-            paneProvider = paneProvider ?? throw new ArgumentNullException(nameof(paneProvider));
+            message = "Error: " + nameof(CutVoidShowPanelCommand);
             return Execute(commandData.Application, ref message);
         }
 
@@ -29,6 +28,8 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
+            toolHelper = toolHelper ?? throw new ArgumentNullException(nameof(toolHelper));
+            paneProvider = paneProvider ?? throw new ArgumentNullException(nameof(paneProvider));
             DockablePane dockPane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);
             if (dockPane != null && dockPane.IsValidObject)
             {
@@ -53,8 +54,9 @@ namespace RevitTimasBIMTools.CutOpening
                     message = ex.ToString();
                     return Result.Failed;
                 }
+                return Result.Succeeded;
             }
-            return Result.Succeeded;
+            return Result.Failed;
         }
 
 

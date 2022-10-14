@@ -220,7 +220,6 @@
     <Compile Include="Services\Logger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
     <Compile Include="CutOpening\CutVoidRegisterDockPane.cs" />
-    <Compile Include="CutOpening\CutVoidViewExternalHandler.cs" />
     <Compile Include="CutOpening\CutVoidShowPanelCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

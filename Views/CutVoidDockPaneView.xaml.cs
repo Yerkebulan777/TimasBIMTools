@@ -22,7 +22,7 @@ namespace RevitTimasBIMTools.Views
         private readonly Mutex mutex = new();
         public bool Disposed { get; internal set; } = false;
         private ExternalEvent externalEvent { get; set; } = null;
-        private readonly CutVoidDataViewModel DataContextHandler = ViewModelLocator.DataViewModel;
+        private readonly CutVoidDataViewModel DataContextHandler = null;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
 
 
