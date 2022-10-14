@@ -33,10 +33,6 @@ namespace RevitTimasBIMTools.Core
         [STAThread]
         private void OnApplicationInitialized(object sender, ApplicationInitializedEventArgs e)
         {
-            if (RenderOptions.ProcessRenderMode.Equals(RenderMode.SoftwareOnly))
-            {
-                RenderOptions.ProcessRenderMode = RenderMode.Default;
-            }
             SmartToolHelper toolHelper = ServiceProvider.GetRequiredService<SmartToolHelper>();
             IDockablePaneProvider paneProvider = ServiceProvider.GetRequiredService<IDockablePaneProvider>();
             CutVoidRegisterDockPane paneRegister = ServiceProvider.GetRequiredService<CutVoidRegisterDockPane>();
@@ -45,7 +41,10 @@ namespace RevitTimasBIMTools.Core
             paneRegister = paneRegister ?? throw new ArgumentNullException(nameof(paneRegister));
             if (paneRegister.RegisterDockablePane(controller, toolHelper.CutVoidPaneId, paneProvider))
             {
-
+                if (RenderOptions.ProcessRenderMode.Equals(RenderMode.SoftwareOnly))
+                {
+                    RenderOptions.ProcessRenderMode = RenderMode.Default;
+                }
             }
         }
 
