@@ -20,10 +20,9 @@ namespace RevitTimasBIMTools.CutOpening
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            var uiapp = commandData.Application;
             toolHelper = toolHelper ?? throw new ArgumentNullException(nameof(toolHelper));
             paneProvider = paneProvider ?? throw new ArgumentNullException(nameof(paneProvider));
-            return Execute(uiapp, ref message);
+            return Execute(commandData.Application, ref message);
         }
 
 
