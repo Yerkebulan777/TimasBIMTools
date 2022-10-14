@@ -60,7 +60,6 @@ namespace RevitTimasBIMTools.ViewModels
             IsStarted = true;
             IsDataEnabled = false;
             IsOptionEnabled = false;
-
             OnCompleted(new BaseCompletedEventArgs(SyncContext, TaskContext));
         }
 
@@ -100,7 +99,6 @@ namespace RevitTimasBIMTools.ViewModels
             get => enableOpt;
             set
             {
-
                 if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref enableOpt, value)))
                 {
                     ClearElementDataAsync();
@@ -179,6 +177,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
+                    //SetProperty(ref categories, value);
                     if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref categories, value)))
                     {
                         Logger.Log(value.Count.ToString());
@@ -196,6 +195,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
+                    SetProperty(ref structMats, value);
                     if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref structMats, value)))
                     {
                         Logger.Log(value.Count.ToString());
@@ -399,8 +399,9 @@ namespace RevitTimasBIMTools.ViewModels
             EngineerCategories = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return documentId.Equals(doc.ProjectInformation.UniqueId) ? RevitFilterManager.GetEngineerCategories(doc) : null;
+                return RevitFilterManager.GetEngineerCategories(doc);
             });
+            //Logger.Info(EngineerCategories.Count.ToString());
         }
 
 
@@ -409,8 +410,9 @@ namespace RevitTimasBIMTools.ViewModels
             StructureMaterials = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return documentId.Equals(doc.ProjectInformation.UniqueId) ? RevitFilterManager.GetConstructionCoreMaterials(doc, ConstructionTypeIds) : null;
+                return RevitFilterManager.GetConstructionCoreMaterials(doc, ConstructionTypeIds);
             });
+            //Logger.Info(StructureMaterials.Count.ToString());
         }
 
 
@@ -419,9 +421,9 @@ namespace RevitTimasBIMTools.ViewModels
             FamilySymbols = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return documentId.Equals(doc.ProjectInformation.UniqueId)
-                    ? RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel) : null;
+                return RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
             });
+            //Logger.Info(FamilySymbols.Count.ToString());
         }
 
 
@@ -430,7 +432,7 @@ namespace RevitTimasBIMTools.ViewModels
             ValidLevels = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return documentId.Equals(doc.ProjectInformation.UniqueId) ? RevitFilterManager.GetValidLevels(doc) : null;
+                return RevitFilterManager.GetValidLevels(doc);
             });
         }
 
@@ -440,8 +442,7 @@ namespace RevitTimasBIMTools.ViewModels
             instances = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return documentId.Equals(doc.ProjectInformation.UniqueId)
-                    ? RevitFilterManager.GetInstancesByCoreMaterial(doc, constructions, matName) : null;
+                return RevitFilterManager.GetInstancesByCoreMaterial(doc, constructions, matName);
             });
         }
 
@@ -451,8 +452,7 @@ namespace RevitTimasBIMTools.ViewModels
             ElementModelData = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return documentId.Equals(doc.ProjectInformation.UniqueId)
-                    ? collisionManager.GetCollisionByLevel(doc, level, instances).ToObservableCollection() : null;
+                return collisionManager.GetCollisionByLevel(doc, level, instances).ToObservableCollection();
             });
         }
 
