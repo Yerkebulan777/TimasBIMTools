@@ -26,13 +26,16 @@ namespace RevitTimasBIMTools.Views
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
 
 
-        public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
+        public CutVoidDockPaneView(IExternalEventHandler handler)
         {
-            InitializeComponent();
-            viewModel.DockPanelView = this;
-            DataContext = DataContextHandler = viewModel;
+            handler = handler ?? throw new ArgumentNullException(nameof(handler));
             Logger.ThreadProcessLog("Process => " + nameof(CutVoidDockPaneView));
-            viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
+            if (handler is CutVoidDataViewModel viewModel)
+            {
+                InitializeComponent();
+                DataContext = DataContextHandler = viewModel;
+                viewModel.DockPanelView = this;
+            }            
         }
 
 
