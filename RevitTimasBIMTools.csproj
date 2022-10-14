@@ -205,6 +205,7 @@
     <Compile Include="Core\ContainerConfig.cs" />
     <Compile Include="Core\RevitEventWrapper.cs" />
     <Compile Include="Core\SmartToolApp.cs" />
+    <Compile Include="Core\BaseCompletedEventArgs.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
     <Compile Include="RevitUtils\ElementDataDictionary.cs" />
     <Compile Include="Core\SmartToolHelper.cs" />

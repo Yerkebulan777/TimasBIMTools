@@ -3,7 +3,6 @@ using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
@@ -28,31 +27,59 @@ using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public sealed class CutVoidDataViewModel : ObservableObject, IDisposable
+    public sealed class CutVoidDataViewModel : ObservableObject, IExternalEventHandler, IDisposable
     {
         public CutVoidDockPaneView DockPanelView { get; set; } = null;
+        public SynchronizationContext SyncContext { get; set; } = SynchronizationContext.Current;
+        public TaskScheduler TaskContext { get; set; } = TaskScheduler.FromCurrentSynchronizationContext();
+
 
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private ConcurrentQueue<Element> instances { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
-        private string documentId { get; } = Properties.Settings.Default.ActiveDocumentUniqueId;
-        private CutVoidCollisionManager manager { get; set; } = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
-
-        public TaskScheduler TaskContext { get; internal set; } = CustomSynchronizationContext.GetSynchronizationContext();
-        public SynchronizationContext SyncContext { get; internal set; } = SynchronizationContext.Current;
 
 
-        private readonly CutVoidViewExternalHandler ViewHandler  = null;
-        public CutVoidDataViewModel(CutVoidViewExternalHandler handler)
+        private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
+        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
+        private readonly RevitPurginqManager purgeManager = provider.GetRequiredService<RevitPurginqManager>();
+        private readonly CutVoidCollisionManager collisionManager = provider.GetRequiredService<CutVoidCollisionManager>();
+
+        public event EventHandler<BaseCompletedEventArgs> Completed;
+
+        public CutVoidDataViewModel()
         {
-            ViewHandler = handler;
             CanselCommand = new RelayCommand(CancelCallbackLogic);
             SettingsCommand = new RelayCommand(SettingsHandelCommand);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             Logger.ThreadProcessLog("Process => " + nameof(CutVoidDataViewModel));
-            handler = handler ?? throw new ArgumentNullException(nameof(handler));
+        }
+
+
+        public void Execute(UIApplication uiapp)
+        {
+            doc = uiapp.ActiveUIDocument.Document;
+            SyncContext = SynchronizationContext.Current;
+            TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
+            ConstructionTypeIds = purgeManager.PurgeAndGetValidConstructionTypeIds(doc);
+            DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
+            Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
+            OnCompleted(new BaseCompletedEventArgs(SyncContext, TaskContext));
+            Properties.Settings.Default.Save();
+        }
+
+
+        [STAThread]
+        private void OnCompleted(BaseCompletedEventArgs e)
+        {
+            Completed?.Invoke(this, e);
+        }
+
+
+        public string GetName()
+        {
+            return nameof(CutVoidDataViewModel);
         }
 
 
@@ -193,9 +220,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref docModel, value))
                 {
-                    manager.SearchDoc = docModel.Document;
-                    manager.SearchGlobal = docModel.Transform;
-                    manager.SearchInstance = docModel.LinkInstance;
+                    collisionManager.SearchDoc = docModel.Document;
+                    collisionManager.SearchGlobal = docModel.Transform;
+                    collisionManager.SearchInstance = docModel.LinkInstance;
                 }
             }
         }
@@ -209,7 +236,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref category, value))
                 {
-                    manager.SearchCatId = category.Id;
+                    collisionManager.SearchCatId = category.Id;
                 }
             }
         }
@@ -341,7 +368,6 @@ namespace RevitTimasBIMTools.ViewModels
                     EngineerCategories = new Dictionary<string, Category>();
                     StructureMaterials = new Dictionary<string, Material>();
                     FamilySymbols = new Dictionary<string, FamilySymbol>();
-
                 }, TaskContext);
             }
         }
@@ -421,7 +447,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 doc = app.ActiveUIDocument.Document;
                 return documentId.Equals(doc.ProjectInformation.UniqueId)
-                    ? manager.GetCollisionByLevel(doc, level, instances).ToObservableCollection() : null;
+                    ? collisionManager.GetCollisionByLevel(doc, level, instances).ToObservableCollection() : null;
             });
         }
 
@@ -470,18 +496,25 @@ namespace RevitTimasBIMTools.ViewModels
             get => dataModels;
             set
             {
-                if (SetProperty(ref dataModels, value) && value != null)
+                if (SetProperty(ref dataModels, value))
                 {
-                    DataViewCollection = CollectionViewSource.GetDefaultView(value);
-                    UniqueItemNames = GetUniqueStringList(value);
-                    DataViewCollection?.Refresh();
+                    if (value != null && dataModels.Count > 0)
+                    {
+                        DataViewCollection = CollectionViewSource.GetDefaultView(dataModels) as ListCollectionView;
+                        UniqueItemNames = GetUniqueStringList(value);
+                        DataViewCollection?.Refresh();
+                    }
+                    else
+                    {
+                        DataViewCollection.DetachFromSourceCollection();
+                    }
                 }
             }
         }
 
 
-        private ICollectionView dataView = null;
-        public ICollectionView DataViewCollection
+        private ListCollectionView dataView = null;
+        public ListCollectionView DataViewCollection
         {
             get => dataView;
             set
@@ -671,8 +704,9 @@ namespace RevitTimasBIMTools.ViewModels
 
         public void Dispose()
         {
-            manager?.Dispose();
+            collisionManager?.Dispose();
             ClearElementDataAsync();
         }
+
     }
 }
