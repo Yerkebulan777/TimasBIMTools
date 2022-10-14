@@ -510,7 +510,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         DataViewCollection = CollectionViewSource.GetDefaultView(dataModels) as ListCollectionView;
                         UniqueItemNames = GetUniqueStringList(dataModels);
-                        DataViewCollection?.Refresh();
+                        DataViewCollection.Refresh();
                     }
                     else
                     {
