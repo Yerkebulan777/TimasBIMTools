@@ -29,17 +29,12 @@ namespace RevitTimasBIMTools.Views
         private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {
-            viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
-            Logger.ThreadProcessLog("Process => " + nameof(CutVoidDockPaneView));
-
             InitializeComponent();
             Loaded += CutVoidDockPaneView_Loaded;
-            DataContextHandler.DockPanelView = this;
             DataContext = DataContextHandler = viewModel;
-            DataContextHandler.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
-            DataContextHandler.SyncContext = SynchronizationContext.Current;
+            viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
+            Logger.ThreadProcessLog("Process => " + nameof(CutVoidDockPaneView));
         }
-
 
 
         [STAThread]
@@ -58,6 +53,9 @@ namespace RevitTimasBIMTools.Views
         private void CutVoidDockPaneView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             Disposed = false;
+            DataContextHandler.DockPanelView = this;
+            DataContextHandler.SyncContext = SynchronizationContext.Current;
+            DataContextHandler.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
             RevitTask.RunAsync(app =>
             {
                 Document doc = app.ActiveUIDocument.Document;
@@ -66,7 +64,7 @@ namespace RevitTimasBIMTools.Views
                 DataContextHandler.DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
                 Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
                 CommandManager.InvalidateRequerySuggested();
-            }).Dispose();
+            });
         }
 
 

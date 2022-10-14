@@ -43,7 +43,7 @@ namespace RevitTimasBIMTools.ViewModels
         private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutVoidCollisionManager collisionManager = provider.GetRequiredService<CutVoidCollisionManager>();
-        
+
 
         public CutVoidDataViewModel()
         {
@@ -100,16 +100,15 @@ namespace RevitTimasBIMTools.ViewModels
             get => enableOpt;
             set
             {
-                if (!string.IsNullOrEmpty(documentId))
+
+                if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref enableOpt, value)))
                 {
-                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref enableOpt, value)))
-                    {
-                        ClearElementDataAsync();
-                        SetMEPCategoriesToData();
-                        SetCoreMaterialsToData();
-                        SetFamilySymbolsToData();
-                    }
+                    ClearElementDataAsync();
+                    SetMEPCategoriesToData();
+                    SetCoreMaterialsToData();
+                    SetFamilySymbolsToData();
                 }
+
             }
         }
 
@@ -273,8 +272,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    _ = DockPanelView.Dispatcher.Invoke(() => SetProperty(ref material, value));
-                    GetInstancesByCoreMaterialInType(material.Name);
+                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref material, value)))
+                    {
+                        GetInstancesByCoreMaterialInType(material.Name);
+                    }
                 }
             }
         }
@@ -288,10 +289,12 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    _ = DockPanelView.Dispatcher.Invoke(() => SetProperty(ref rectang, value));
-                    Properties.Settings.Default.RectangSymbol = rectang.UniqueId;
-                    Properties.Settings.Default.Save();
-                    ActivateFamilySimbolAsync(rectang);
+                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref rectang, value)))
+                    {
+                        Properties.Settings.Default.RectangSymbol = rectang.UniqueId;
+                        Properties.Settings.Default.Save();
+                        ActivateFamilySimbolAsync(rectang);
+                    }
                 }
             }
         }
@@ -305,10 +308,12 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    _ = DockPanelView.Dispatcher.Invoke(() => SetProperty(ref rounded, value));
-                    Properties.Settings.Default.RoundedSymbol = rounded.UniqueId;
-                    Properties.Settings.Default.Save();
-                    ActivateFamilySimbolAsync(rounded);
+                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref rounded, value)))
+                    {
+                        Properties.Settings.Default.RoundedSymbol = rounded.UniqueId;
+                        Properties.Settings.Default.Save();
+                        ActivateFamilySimbolAsync(rounded);
+                    }
                 }
             }
         }
