@@ -164,15 +164,25 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        public ListCollectionView ConstructionResults { get; set; }
         private IDictionary<int, ElementId> constructions = null;
         public IDictionary<int, ElementId> ConstructionTypeIds
         {
             get => constructions;
             set
             {
+                Logger.Log(constructions.Count.ToString());
                 if (value != null && SetProperty(ref constructions, value))
                 {
-                    Logger.Log(constructions.Count.ToString());
+                    ConstructionResults.Dispatcher.Invoke(delegate
+                    {
+                        foreach (KeyValuePair<int, ElementId> item in constructions)
+                        {
+                            ConstructionResults.AddNewItem(item.Value);
+                        }
+                        OnPropertyChanged(nameof(ConstructionResults));
+                    }, DispatcherPriority.Background);
+
                 }
             }
         }
