@@ -182,7 +182,6 @@ namespace RevitTimasBIMTools.ViewModels
                         }
                         OnPropertyChanged(nameof(ConstructionResults));
                     }, DispatcherPriority.Background);
-
                 }
             }
         }
