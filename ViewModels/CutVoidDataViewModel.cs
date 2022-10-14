@@ -59,6 +59,9 @@ namespace RevitTimasBIMTools.ViewModels
 
         public void Execute(UIApplication uiapp)
         {
+            IsStarted = true;
+            IsDataEnabled = false;
+            IsOptionEnabled = false;
             doc = uiapp.ActiveUIDocument.Document;
             SyncContext = SynchronizationContext.Current;
             TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
@@ -348,7 +351,7 @@ namespace RevitTimasBIMTools.ViewModels
                 try
                 {
                     SynchronizationContext.SetSynchronizationContext(SyncContext);
-                    Logger.ThreadProcessLog("Finaly" + nameof(ResetCurrentContext));
+                    Logger.ThreadProcessLog("Finaly" + nameof(SynchronizationContext));
                 }
                 catch (Exception ex)
                 {

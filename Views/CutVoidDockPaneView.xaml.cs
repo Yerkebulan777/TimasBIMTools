@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.CutOpening;
@@ -24,18 +23,16 @@ namespace RevitTimasBIMTools.Views
         private readonly Mutex mutex = new();
         public bool Disposed { get; internal set; } = false;
         private ExternalEvent externalEvent { get; set; } = null;
-        private CutVoidViewExternalHandler handler { get; set; } = null;
 
-        private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
-        private readonly CutVoidDataViewModel DataViewModel = ViewModelLocator.DataViewModel;
+
+        private readonly CutVoidDataViewModel DataContextHandler = ViewModelLocator.DataViewModel;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
-
 
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {
             InitializeComponent();
             viewModel.DockPanelView = this;
-            DataContext = DataViewModel = viewModel;
+            DataContext = DataContextHandler = viewModel;
             Logger.ThreadProcessLog("Process => " + nameof(CutVoidDockPaneView));
             viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         }
@@ -56,34 +53,28 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         public void RaiseHandler()
         {
-            Logger.ThreadProcessLog("Process => " + nameof(RaiseHandler));
-            handler = provider.GetRequiredService<CutVoidViewExternalHandler>();
-            handler.Completed += OnContextHandlerCompleted;
-            externalEvent = ExternalEvent.Create(handler);
-            Disposed = false;
-
+            DataContextHandler.Completed += OnContextHandlerCompleted;
+            externalEvent = ExternalEvent.Create(DataContextHandler);
             if (ExternalEventRequest.Accepted != externalEvent.Raise())
             {
                 Logger.Warning("External event request not accepted!!!");
+                Logger.ThreadProcessLog("Process => " + nameof(RaiseHandler));
             }
         }
 
 
+        [STAThread]
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
+            SynchronizationContext.SetSynchronizationContext(args.SyncContext);
+            Logger.ThreadProcessLog("Process => " + nameof(OnContextHandlerCompleted));
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
-                DataViewModel.IsStarted = true;
-                DataViewModel.IsDataEnabled = false;
-                DataViewModel.IsOptionEnabled = false;
-                DataViewModel.DocumentModelCollection = args.DocumentModels;
-                DataViewModel.ConstructionTypeIds = args.ConstructionTypeIds;
-                Logger.ThreadProcessLog("Process => " + nameof(OnContextHandlerCompleted));
-                SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
-                DataViewModel.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
-                DataViewModel.SyncContext = SynchronizationContext.Current;
+                Disposed = false;
+                DataContextHandler.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
+                DataContextHandler.SyncContext = SynchronizationContext.Current;
                 CommandManager.InvalidateRequerySuggested();
-            }, DispatcherPriority.DataBind);
+            }, DispatcherPriority.Background);
         }
 
 
@@ -117,12 +108,11 @@ namespace RevitTimasBIMTools.Views
                 {
                     Dispatcher.CurrentDispatcher.Invoke(() =>
                     {
-                        DataViewModel.Dispose();
-                        DataViewModel.IsStarted = false;
-                        DataViewModel.IsDataEnabled = false;
-                        DataViewModel.IsOptionEnabled = false;
-                        CommandManager.InvalidateRequerySuggested();
+                        DataContextHandler.Dispose();
                         Properties.Settings.Default.Reset();
+                        DataContextHandler.IsStarted = false;
+                        DataContextHandler.IsDataEnabled = false;
+                        DataContextHandler.IsOptionEnabled = false;
                     }, DispatcherPriority.Background);
                     Dispatcher.CurrentDispatcher.InvokeShutdown();
                     // TODO: освободить управляемое состояние (управляемые объекты)
