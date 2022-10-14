@@ -66,8 +66,10 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         private void OnContextHandlerCompleted(object sender, BaseCompletedEventArgs args)
         {
-            SynchronizationContext.SetSynchronizationContext(args.SyncContext);
-            Logger.ThreadProcessLog("Process => " + nameof(OnContextHandlerCompleted));
+            if (SynchronizationContext.Current != args.SyncContext)
+            {
+                Logger.ThreadProcessLog("Process => " + nameof(OnContextHandlerCompleted));
+            }
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
                 Disposed = false;
