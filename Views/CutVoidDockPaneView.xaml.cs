@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
@@ -22,7 +23,6 @@ namespace RevitTimasBIMTools.Views
     {
         private readonly Mutex mutex = new();
         public bool Disposed { get; set; } = false;
-        private ExternalEvent externalEvent { get; set; } = null;
         private CutVoidDataViewModel DataContextHandler { get; set; } = null;
         private string documentId { get; set; } = Properties.Settings.Default.ActiveDocumentUniqueId;
 
@@ -53,18 +53,8 @@ namespace RevitTimasBIMTools.Views
         private void CutVoidDockPaneView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             Disposed = false;
+            DataContextHandler.IsStarted = true;
             DataContextHandler.DockPanelView = this;
-            DataContextHandler.SyncContext = SynchronizationContext.Current;
-            DataContextHandler.TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
-            RevitTask.RunAsync(app =>
-            {
-                Document doc = app.ActiveUIDocument.Document;
-                RevitPurginqManager constructManager = provider.GetRequiredService<RevitPurginqManager>();
-                DataContextHandler.ConstructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
-                DataContextHandler.DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
-                Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
-                CommandManager.InvalidateRequerySuggested();
-            });
         }
 
 
@@ -93,14 +83,14 @@ namespace RevitTimasBIMTools.Views
         {
             if (!Disposed)
             {
-                Disposed = true;
                 Dispatcher.CurrentDispatcher.Invoke(() =>
                 {
+                    Disposed = true;
                     DataContextHandler.Dispose();
-                    Properties.Settings.Default.Reset();
                     DataContextHandler.IsStarted = false;
                     DataContextHandler.IsDataEnabled = false;
                     DataContextHandler.IsOptionEnabled = false;
+                    Properties.Settings.Default.Reset();
                 }, DispatcherPriority.Background);
                 Dispatcher.CurrentDispatcher.InvokeShutdown();
                 // TODO: освободить управляемое состояние (управляемые объекты)

@@ -36,14 +36,15 @@ namespace RevitTimasBIMTools.ViewModels
 
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
+        
         private ConcurrentQueue<Element> instances { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
-
+        public IDictionary<int, ElementId> ConstructionTypeIds { get; internal set; } = null;
+        
 
         private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutVoidCollisionManager collisionManager = provider.GetRequiredService<CutVoidCollisionManager>();
-
 
         public CutVoidDataViewModel()
         {
@@ -54,14 +55,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
-        public void Execute()
-        {
-            IsStarted = true;
-            IsDataEnabled = false;
-            IsOptionEnabled = false;
-            OnCompleted(new BaseCompletedEventArgs(SyncContext, TaskContext));
-        }
+
 
 
         private void OnCompleted(BaseCompletedEventArgs e)
@@ -134,6 +128,9 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Settings
 
+        
+
+
         private ObservableCollection<DocumentModel> docModels = null;
         public ObservableCollection<DocumentModel> DocumentModelCollection
         {
@@ -147,28 +144,7 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-
-        public ListCollectionView ConstructionResults { get; set; }
-        private IDictionary<int, ElementId> constructions = null;
-        public IDictionary<int, ElementId> ConstructionTypeIds
-        {
-            get => constructions;
-            set
-            {
-                if (value != null)
-                {
-                    Logger.Log(value.Count.ToString());
-                    DockPanelView.ActiveDocTitle.Dispatcher.Invoke(delegate
-                    {
-                        ConstructionResults = CollectionViewSource.GetDefaultView(value) as ListCollectionView;
-                        OnPropertyChanged(nameof(ConstructionResults));
-                        constructions = value;
-                    }, DispatcherPriority.Background);
-                }
-            }
-        }
-
-
+        
         private IDictionary<string, Category> categories = null;
         public IDictionary<string, Category> EngineerCategories
         {
@@ -368,6 +344,26 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
+        public void StartExecuteHandler()
+        {
+            RevitTask.RunAsync(async app =>
+            {
+                IsStarted = true;
+                IsDataEnabled = false;
+                IsOptionEnabled = false;
+                doc = app.ActiveUIDocument.Document;
+                SyncContext = SynchronizationContext.Current;
+                TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
+                Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
+                DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
+                RevitPurginqManager constructManager = provider.GetRequiredService<RevitPurginqManager>();
+                ConstructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
+                CommandManager.InvalidateRequerySuggested();
+                Properties.Settings.Default.Save();
+                await Task.Yield();
+            });
+        }
+
 
         private async void ClearElementDataAsync()
         {
@@ -385,11 +381,11 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void GetGeneral3DViewAsync()
+        private void GetGeneral3DViewAsync()
         {
-            view3d = await RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
-                return RevitViewManager.Get3dView(app.ActiveUIDocument);
+                view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
             });
         }
 
@@ -442,7 +438,7 @@ namespace RevitTimasBIMTools.ViewModels
             instances = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetInstancesByCoreMaterial(doc, constructions, matName);
+                return RevitFilterManager.GetInstancesByCoreMaterial(doc, ConstructionTypeIds , matName);
             });
         }
 
