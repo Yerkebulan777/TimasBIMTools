@@ -11,7 +11,6 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -29,22 +28,21 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public class CutVoidDataViewModel : ObservableObject, IDisposable
     {
-        public event EventHandler<BaseCompletedEventArgs> Completed;
         public CutVoidDockPaneView DockPanelView { get; set; } = null;
         public SynchronizationContext SyncContext { get; set; } = SynchronizationContext.Current;
         public TaskScheduler TaskContext { get; set; } = TaskScheduler.FromCurrentSynchronizationContext();
 
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
-        
-        private ConcurrentQueue<Element> instances { get; set; } = null;
+        private IEnumerable<Element> constructionInstances { get; set; } = null;
+        private IDictionary<int, ElementId> constructionTypeIds { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
-        public IDictionary<int, ElementId> ConstructionTypeIds { get; internal set; } = null;
-        
 
         private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly CutVoidCollisionManager collisionManager = provider.GetRequiredService<CutVoidCollisionManager>();
+        private readonly RevitPurginqManager constructManager = provider.GetRequiredService<RevitPurginqManager>();
+
 
         public CutVoidDataViewModel()
         {
@@ -56,21 +54,6 @@ namespace RevitTimasBIMTools.ViewModels
 
 
 
-
-
-        private void OnCompleted(BaseCompletedEventArgs e)
-        {
-            Completed?.Invoke(this, e);
-            //DockPanelView.Dispatcher.Invoke(Properties.Settings.Default.Reload);
-        }
-
-
-        public string GetName()
-        {
-            return nameof(CutVoidDataViewModel);
-        }
-
-
         #region Visibility
 
         private bool started = false;
@@ -79,7 +62,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => started;
             set
             {
-                if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref started, value)))
+                if (SetProperty(ref started, value))
                 {
                     GetGeneral3DViewAsync();
                 }
@@ -93,7 +76,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => enableOpt;
             set
             {
-                if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref enableOpt, value)))
+                if (SetProperty(ref enableOpt, value))
                 {
                     ClearElementDataAsync();
                     SetMEPCategoriesToData();
@@ -113,9 +96,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (docModel != null && category != null)
                 {
-                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref enableData, value)))
+                    if (SetProperty(ref enableData, value))
                     {
-                        IsOptionEnabled = !enableData;
                         DataViewCollection?.Refresh();
                         SetValidLevelsToData();
                     }
@@ -127,9 +109,6 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Settings
-
-        
-
 
         private ObservableCollection<DocumentModel> docModels = null;
         public ObservableCollection<DocumentModel> DocumentModelCollection
@@ -144,7 +123,7 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-        
+
         private IDictionary<string, Category> categories = null;
         public IDictionary<string, Category> EngineerCategories
         {
@@ -153,8 +132,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    //SetProperty(ref categories, value);
-                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref categories, value)))
+                    if (SetProperty(ref categories, value))
                     {
                         Logger.Log(value.Count.ToString());
                     }
@@ -171,8 +149,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    SetProperty(ref structMats, value);
-                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref structMats, value)))
+                    _ = SetProperty(ref structMats, value);
+                    if (SetProperty(ref structMats, value))
                     {
                         Logger.Log(value.Count.ToString());
                     }
@@ -356,12 +334,12 @@ namespace RevitTimasBIMTools.ViewModels
                 TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                 Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
                 DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
-                RevitPurginqManager constructManager = provider.GetRequiredService<RevitPurginqManager>();
-                ConstructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
+                constructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
                 CommandManager.InvalidateRequerySuggested();
+                Properties.Settings.Default.Reload();
                 Properties.Settings.Default.Save();
                 await Task.Yield();
-            });
+            }).Dispose();
         }
 
 
@@ -386,82 +364,79 @@ namespace RevitTimasBIMTools.ViewModels
             RevitTask.RunAsync(app =>
             {
                 view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
-            });
+            }).Dispose();
         }
 
 
-        private async void SetMEPCategoriesToData()
+        private void SetMEPCategoriesToData()
         {
-            EngineerCategories = await RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetEngineerCategories(doc);
-            });
-            //Logger.Info(EngineerCategories.Count.ToString());
+                EngineerCategories = RevitFilterManager.GetEngineerCategories(doc);
+            }).Dispose();
         }
 
 
-        private async void SetCoreMaterialsToData()
+        private void SetCoreMaterialsToData()
         {
-            StructureMaterials = await RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetConstructionCoreMaterials(doc, ConstructionTypeIds);
-            });
-            //Logger.Info(StructureMaterials.Count.ToString());
+                StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constructionTypeIds);
+            }).Dispose();
         }
 
 
-        private async void SetFamilySymbolsToData()
+        private void SetFamilySymbolsToData()
         {
-            FamilySymbols = await RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
-            });
-            //Logger.Info(FamilySymbols.Count.ToString());
+                FamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+            }).Dispose();
         }
 
 
-        private async void SetValidLevelsToData()
+        private void SetValidLevelsToData()
         {
-            ValidLevels = await RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetValidLevels(doc);
-            });
+                ValidLevels = RevitFilterManager.GetValidLevels(doc);
+            }).Dispose();
         }
 
 
-        private async void GetInstancesByCoreMaterialInType(string matName)
+        private void GetInstancesByCoreMaterialInType(string matName)
         {
-            instances = await RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetInstancesByCoreMaterial(doc, ConstructionTypeIds , matName);
-            });
+                constructionInstances = RevitFilterManager.GetInstancesByCoreMaterial(doc, constructionTypeIds, matName);
+            }).Dispose();
         }
 
 
-        private async void SnoopIntersectionDataByLevel(Level level)
+        private void SnoopIntersectionDataByLevel(Level level)
         {
-            ElementModelData = await RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return collisionManager.GetCollisionByLevel(doc, level, instances).ToObservableCollection();
-            });
+                ElementModelData = collisionManager.GetCollisionByLevel(doc, level, constructionInstances).ToObservableCollection();
+            }).Dispose();
         }
 
 
-        private async void ActivateFamilySimbolAsync(FamilySymbol symbol)
+        private void ActivateFamilySimbolAsync(FamilySymbol symbol)
         {
-            await RevitTask.RunAsync(app =>
-            {
-                if (symbol != null && !symbol.IsActive)
-                {
-                    symbol.Activate();
-                }
-            });
+            RevitTask.RunAsync(app =>
+           {
+               if (symbol != null && !symbol.IsActive)
+               {
+                   symbol.Activate();
+               }
+           }).Dispose();
         }
 
         #endregion

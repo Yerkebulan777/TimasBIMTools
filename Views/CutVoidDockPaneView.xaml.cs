@@ -1,7 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
@@ -10,7 +8,6 @@ using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -53,8 +50,11 @@ namespace RevitTimasBIMTools.Views
         private void CutVoidDockPaneView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             Disposed = false;
-            DataContextHandler.IsStarted = true;
-            DataContextHandler.DockPanelView = this;
+            if (DataContextHandler != null)
+            {
+                DataContextHandler.IsStarted = true;
+                DataContextHandler.DockPanelView = this;
+            }
         }
 
 

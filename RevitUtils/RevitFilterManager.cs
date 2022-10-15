@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -263,10 +264,9 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static ConcurrentQueue<Element> GetInstancesByCoreMaterial(Document doc, IDictionary<int, ElementId> typeIds, string matName)
+        public static IEnumerable<Element> GetInstancesByCoreMaterial(Document doc, IDictionary<int, ElementId> typeIds, string matName)
         {
             CompoundStructure compound = null;
-            ConcurrentQueue<Element> queue = new();
             foreach (KeyValuePair<int, ElementId> item in typeIds)
             {
                 Element elem = doc.GetElement(item.Value);
@@ -287,11 +287,10 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     foreach (Element inst in GetInstancesByTypeId(doc, elem.Category.Id, elem.Id))
                     {
-                        queue.Enqueue(inst);
+                        yield return inst;
                     }
                 }
             }
-            return queue;
         }
 
 
