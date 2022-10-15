@@ -2,6 +2,7 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
+using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.Views;
 using System;
@@ -13,9 +14,12 @@ namespace RevitTimasBIMTools.CutOpening
     [Regeneration(RegenerationOption.Manual)]
     internal sealed class CutVoidShowPanelCommand : IExternalCommand, IExternalCommandAvailability
     {
-        private readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
+        private readonly SmartToolHelper toolHelper = SmartToolApp.ServiceProvider?.GetRequiredService<SmartToolHelper>();
+        private readonly IDockablePaneProvider paneProvider = SmartToolApp.ServiceProvider?.GetRequiredService<IDockablePaneProvider>();
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            toolHelper.IsActiveStart = true;
+            RevitTask.RegisterGlobal(new SyncContextHandler());
             message = "Error: " + nameof(CutVoidShowPanelCommand);
             return Execute(commandData.Application, ref message);
         }
@@ -24,8 +28,6 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
-            SmartToolHelper toolHelper = provider.GetRequiredService<SmartToolHelper>();
-            IDockablePaneProvider paneProvider = provider.GetRequiredService<IDockablePaneProvider>();
             DockablePane dockPane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);
             if (dockPane != null && dockPane.IsValidObject)
             {

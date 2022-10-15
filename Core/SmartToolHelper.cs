@@ -29,7 +29,7 @@ namespace RevitTimasBIMTools.Core
         public static readonly string LogPath = Path.Combine(DocumentPath, "RevitAsync.log");
 
         public DockablePaneId CutVoidPaneId { get; } = new(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
-        public bool IsActive { get; internal set; } = false;
+        public bool IsActiveStart { get; set; } = false;
 
         #region IconConvertToImageSource
         [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]

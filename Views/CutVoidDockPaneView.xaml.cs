@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
@@ -11,7 +12,7 @@ using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-
+using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -20,10 +21,10 @@ namespace RevitTimasBIMTools.Views
     {
         private readonly Mutex mutex = new();
         public bool Disposed { get; set; } = false;
-        private CutVoidDataViewModel DataContextHandler { get; set; } = null;
         private string documentId { get; set; } = Properties.Settings.Default.ActiveDocumentUniqueId;
 
-        private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
+        private readonly CutVoidDataViewModel DataContextHandler = null;
+        private readonly SmartToolHelper helper = SmartToolApp.ServiceProvider.GetRequiredService<SmartToolHelper>();
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {
             InitializeComponent();
@@ -38,6 +39,7 @@ namespace RevitTimasBIMTools.Views
         public void SetupDockablePane(DockablePaneProviderData data)
         {
             data.FrameworkElement = this;
+            data.VisibleByDefault = false;
             data.InitialState = new DockablePaneState
             {
                 DockPosition = DockPosition.Right,
@@ -54,6 +56,7 @@ namespace RevitTimasBIMTools.Views
             {
                 DataContextHandler.IsStarted = true;
                 DataContextHandler.DockPanelView = this;
+                documentId = RevitTask.RaiseGlobalNew<SyncContextHandler, bool, string>(true).Result;
             }
         }
 
