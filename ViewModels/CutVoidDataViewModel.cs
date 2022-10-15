@@ -324,7 +324,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         public void StartExecuteHandler()
         {
-            RevitTask.RunAsync(async app =>
+            _ = RevitTask.RunAsync(async app =>
             {
                 IsStarted = true;
                 IsDataEnabled = false;
@@ -339,7 +339,7 @@ namespace RevitTimasBIMTools.ViewModels
                 CommandManager.InvalidateRequerySuggested();
                 Properties.Settings.Default.Save();
                 await Task.Yield();
-            }).Dispose();
+            });
         }
 
 
@@ -361,82 +361,89 @@ namespace RevitTimasBIMTools.ViewModels
 
         private void GetGeneral3DViewAsync()
         {
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(async app =>
             {
                 view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
-            }).Dispose();
+                await Task.Yield();
+            });
         }
 
 
         private void SetMEPCategoriesToData()
         {
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(async app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 EngineerCategories = RevitFilterManager.GetEngineerCategories(doc);
-            }).Dispose();
+                await Task.Yield();
+            });
         }
 
 
         private void SetCoreMaterialsToData()
         {
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(async app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constructionTypeIds);
-            }).Dispose();
+                await Task.Yield();
+            });
         }
 
 
         private void SetFamilySymbolsToData()
         {
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(async app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 FamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
-            }).Dispose();
+                await Task.Yield();
+            });
         }
 
 
         private void SetValidLevelsToData()
         {
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(async app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 ValidLevels = RevitFilterManager.GetValidLevels(doc);
-            }).Dispose();
+                await Task.Yield();
+            });
         }
 
 
         private void GetInstancesByCoreMaterialInType(string matName)
         {
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(async app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 constructionInstances = RevitFilterManager.GetInstancesByCoreMaterial(doc, constructionTypeIds, matName);
-            }).Dispose();
+                await Task.Yield();
+            });
         }
 
 
         private void SnoopIntersectionDataByLevel(Level level)
         {
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(async app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 ElementModelData = collisionManager.GetCollisionByLevel(doc, level, constructionInstances).ToObservableCollection();
-            }).Dispose();
+                await Task.Yield();
+            });
         }
 
 
         private void ActivateFamilySimbolAsync(FamilySymbol symbol)
         {
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(app =>
             {
                 if (symbol != null && !symbol.IsActive)
                 {
                     symbol.Activate();
                 }
-            }).Dispose();
+            });
         }
 
         #endregion
