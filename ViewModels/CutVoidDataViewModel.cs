@@ -64,6 +64,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref started, value))
                 {
+                    StartExecuteHandler();
                     GetGeneral3DViewAsync();
                 }
             }
@@ -324,21 +325,11 @@ namespace RevitTimasBIMTools.ViewModels
 
         public void StartExecuteHandler()
         {
-            _ = RevitTask.RunAsync(async app =>
+            _ = RevitTask.RunAsync(app =>
             {
-                IsStarted = true;
-                IsDataEnabled = false;
-                IsOptionEnabled = false;
                 doc = app.ActiveUIDocument.Document;
-                Properties.Settings.Default.Reload();
-                SyncContext = SynchronizationContext.Current;
-                TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
-                Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
                 DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
                 constructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
-                CommandManager.InvalidateRequerySuggested();
-                Properties.Settings.Default.Save();
-                await Task.Yield();
             });
         }
 

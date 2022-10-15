@@ -19,7 +19,6 @@ namespace RevitTimasBIMTools.CutOpening
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             toolHelper.IsActiveStart = true;
-            RevitTask.RegisterGlobal(new SyncContextHandler());
             message = "Error: " + nameof(CutVoidShowPanelCommand);
             return Execute(commandData.Application, ref message);
         }

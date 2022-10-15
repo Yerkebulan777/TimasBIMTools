@@ -54,9 +54,15 @@ namespace RevitTimasBIMTools.Views
             Disposed = false;
             if (DataContextHandler != null)
             {
-                DataContextHandler.IsStarted = true;
-                DataContextHandler.DockPanelView = this;
-                documentId = RevitTask.RaiseGlobalNew<SyncContextHandler, bool, string>(true).Result;
+                Dispatcher.CurrentDispatcher.Invoke(() =>
+                {
+                    DataContextHandler.IsStarted = true;
+                    DataContextHandler.DockPanelView = this;
+                    //RevitTask.RunAsync(app =>
+                    //{
+
+                    //});
+                });
             }
         }
 
