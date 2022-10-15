@@ -431,12 +431,12 @@ namespace RevitTimasBIMTools.ViewModels
         private void ActivateFamilySimbolAsync(FamilySymbol symbol)
         {
             RevitTask.RunAsync(app =>
-           {
-               if (symbol != null && !symbol.IsActive)
-               {
-                   symbol.Activate();
-               }
-           }).Dispose();
+            {
+                if (symbol != null && !symbol.IsActive)
+                {
+                    symbol.Activate();
+                }
+            }).Dispose();
         }
 
         #endregion
