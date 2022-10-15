@@ -330,13 +330,13 @@ namespace RevitTimasBIMTools.ViewModels
                 IsDataEnabled = false;
                 IsOptionEnabled = false;
                 doc = app.ActiveUIDocument.Document;
+                Properties.Settings.Default.Reload();
                 SyncContext = SynchronizationContext.Current;
                 TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                 Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
                 DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
                 constructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
                 CommandManager.InvalidateRequerySuggested();
-                Properties.Settings.Default.Reload();
                 Properties.Settings.Default.Save();
                 await Task.Yield();
             }).Dispose();

@@ -1,7 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
