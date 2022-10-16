@@ -51,18 +51,13 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         private void CutVoidDockPaneView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            Disposed = false;
             if (DataContextHandler != null)
             {
-                Dispatcher.CurrentDispatcher.Invoke(async () =>
+                Dispatcher.CurrentDispatcher.Invoke(() =>
                 {
-                    documentId = await RevitTask.RunAsync(app =>
-                    {
-                        DataContextHandler.IsStarted = true;
-                        DataContextHandler.DockPanelView = this;
-                        return RevitTask.RaiseGlobalNew<SyncContextHandler, bool, string>(Disposed);
-                    });
-                }).Wait();
+                    DataContextHandler.IsStarted = true;
+                    DataContextHandler.DockPanelView = this;
+                });
             }
         }
 

@@ -32,17 +32,11 @@ namespace RevitTimasBIMTools.ViewModels
         public SynchronizationContext SyncContext { get; set; } = SynchronizationContext.Current;
         public TaskScheduler TaskContext { get; set; } = TaskScheduler.FromCurrentSynchronizationContext();
 
-        private Document doc { get; set; } = null;
-        private View3D view3d { get; set; } = null;
-        private IEnumerable<Element> constructionInstances { get; set; } = null;
-        private IDictionary<int, ElementId> constructionTypeIds { get; set; } = null;
         private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
-        private static readonly IServiceProvider provider = SmartToolApp.ServiceProvider;
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
-        private readonly CutVoidCollisionManager collisionManager = provider.GetRequiredService<CutVoidCollisionManager>();
-        private readonly RevitPurginqManager constructManager = provider.GetRequiredService<RevitPurginqManager>();
-
+        private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
+        private readonly CutVoidCollisionManager collisionManager = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
 
         public CutVoidDataViewModel()
         {
@@ -51,7 +45,6 @@ namespace RevitTimasBIMTools.ViewModels
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
         }
-
 
 
         #region Visibility
@@ -80,7 +73,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref enableOpt, value))
                 {
                     ClearElementDataAsync();
-                    SetMEPCategoriesToData();
+                    SetMEPCategoriesToDataAsync();
                     SetCoreMaterialsToData();
                     SetFamilySymbolsToData();
                 }
@@ -109,7 +102,39 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
+        #region Temporary
+
+        private Document doc { get; set; } = null;
+        private View3D view3d { get; set; } = null;
+        private IDictionary<int, ElementId> constructTypeIds { get; set; } = null;
+        private IEnumerable<Element> constructInstances { get; set; } = null;
+
+        #endregion
+
+
         #region Settings
+
+        private DocumentModel docModel = null;
+        public DocumentModel SelectedDocModel
+        {
+            get => docModel;
+            set
+            {
+                if (value != null)
+                {
+                    DockPanelView.Dispatcher.Invoke(delegate
+                    {
+                        if (SetProperty(ref docModel, value))
+                        {
+                            collisionManager.SearchDoc = docModel.Document;
+                            collisionManager.SearchGlobal = docModel.Transform;
+                            collisionManager.SearchInstance = docModel.LinkInstance;
+                        }
+                    });
+                }
+            }
+        }
+
 
         private ObservableCollection<DocumentModel> docModels = null;
         public ObservableCollection<DocumentModel> DocumentModelCollection
@@ -135,7 +160,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (SetProperty(ref categories, value))
                     {
-                        Logger.Log(value.Count.ToString());
+                        Logger.Log(nameof(EngineerCategories) + "\tcount:\t" + value.Count.ToString());
                     }
                 }
             }
@@ -150,10 +175,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    _ = SetProperty(ref structMats, value);
                     if (SetProperty(ref structMats, value))
                     {
-                        Logger.Log(value.Count.ToString());
+                        Logger.Log(nameof(StructureMaterials) + "\tcount:\t" + value.Count.ToString());
                     }
                 }
             }
@@ -170,30 +194,8 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref symbols, value)))
                     {
-                        Logger.Log(value.Count.ToString());
+                        Logger.Log(nameof(FamilySymbols) + "\tcount:\t" + value.Count.ToString());
                     }
-                }
-            }
-        }
-
-
-        private DocumentModel docModel = null;
-        public DocumentModel SelectedDocModel
-        {
-            get => docModel;
-            set
-            {
-                if (value != null)
-                {
-                    DockPanelView.Dispatcher.Invoke(delegate
-                    {
-                        if (SetProperty(ref docModel, value))
-                        {
-                            collisionManager.SearchDoc = docModel.Document;
-                            collisionManager.SearchGlobal = docModel.Transform;
-                            collisionManager.SearchInstance = docModel.LinkInstance;
-                        }
-                    });
                 }
             }
         }
@@ -323,13 +325,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        public void StartExecuteHandler()
+        public async void StartExecuteHandler()
         {
-            _ = RevitTask.RunAsync(app =>
+            DocumentModelCollection = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                DocumentModelCollection = RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
-                constructionTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
+                constructTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
+                return RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
             });
         }
 
@@ -350,85 +352,78 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void GetGeneral3DViewAsync()
+        private async void GetGeneral3DViewAsync()
         {
-            _ = RevitTask.RunAsync(async app =>
+            view3d = await RevitTask.RunAsync(app =>
             {
-                view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
-                await Task.Yield();
+                return RevitViewManager.Get3dView(app.ActiveUIDocument);
             });
         }
 
 
-        private void SetMEPCategoriesToData()
+        private async void SetMEPCategoriesToDataAsync()
         {
-            _ = RevitTask.RunAsync(async app =>
-            {
-                doc = app.ActiveUIDocument.Document;
-                EngineerCategories = RevitFilterManager.GetEngineerCategories(doc);
-                await Task.Yield();
-            });
-        }
-
-
-        private void SetCoreMaterialsToData()
-        {
-            _ = RevitTask.RunAsync(async app =>
+            EngineerCategories = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                StructureMaterials = RevitFilterManager.GetConstructionCoreMaterials(doc, constructionTypeIds);
-                await Task.Yield();
+                return RevitFilterManager.GetEngineerCategories(doc);
             });
         }
 
 
-        private void SetFamilySymbolsToData()
+        private async void SetCoreMaterialsToData()
         {
-            _ = RevitTask.RunAsync(async app =>
+            StructureMaterials = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                FamilySymbols = RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
-                await Task.Yield();
+                return RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds);
             });
         }
 
 
-        private void SetValidLevelsToData()
+        private async void SetFamilySymbolsToData()
         {
-            _ = RevitTask.RunAsync(async app =>
+            FamilySymbols = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                ValidLevels = RevitFilterManager.GetValidLevels(doc);
-                await Task.Yield();
+                return RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
             });
         }
 
 
-        private void GetInstancesByCoreMaterialInType(string matName)
+        private async void SetValidLevelsToData()
         {
-            _ = RevitTask.RunAsync(async app =>
+            ValidLevels = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                constructionInstances = RevitFilterManager.GetInstancesByCoreMaterial(doc, constructionTypeIds, matName);
-                await Task.Yield();
+                return RevitFilterManager.GetValidLevels(doc);
             });
         }
 
 
-        private void SnoopIntersectionDataByLevel(Level level)
+        private async void GetInstancesByCoreMaterialInType(string matName)
         {
-            _ = RevitTask.RunAsync(async app =>
+            constructInstances = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                ElementModelData = collisionManager.GetCollisionByLevel(doc, level, constructionInstances).ToObservableCollection();
-                await Task.Yield();
+                return RevitFilterManager.GetInstancesByCoreMaterial(doc, constructTypeIds, matName);
             });
         }
 
 
-        private void ActivateFamilySimbolAsync(FamilySymbol symbol)
+        private async void SnoopIntersectionDataByLevel(Level level)
         {
-            _ = RevitTask.RunAsync(app =>
+            ElementModelData = await RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+                return collisionManager.GetCollisionByLevel(doc, level, constructInstances).ToObservableCollection();
+            });
+        }
+
+
+        private async void ActivateFamilySimbolAsync(FamilySymbol symbol)
+        {
+            await RevitTask.RunAsync(app =>
             {
                 if (symbol != null && !symbol.IsActive)
                 {
@@ -670,6 +665,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         #endregion
+
 
 
         public void Dispose()
