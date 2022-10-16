@@ -8,7 +8,7 @@ using System;
 
 namespace RevitTimasBIMTools.Core
 {
-    public sealed class BaseContainerConfig
+    public sealed class ContainerConfig
     {
         public static IServiceProvider ConfigureServices()
         {
@@ -18,6 +18,7 @@ namespace RevitTimasBIMTools.Core
             _ = services.AddSingleton<CutVoidDataViewModel>();
             _ = services.AddSingleton<CutVoidRegisterDockPane>();
             _ = services.AddSingleton<CutVoidShowPanelCommand>();
+            _ = services.AddSingleton<APIEventHandler>();
             _ = services.AddSingleton<IDockablePaneProvider, CutVoidDockPaneView>();
 
             _ = services.AddTransient<CutVoidCollisionManager>();

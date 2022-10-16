@@ -14,8 +14,8 @@ namespace RevitTimasBIMTools.CutOpening
     [Regeneration(RegenerationOption.Manual)]
     internal sealed class CutVoidShowPanelCommand : IExternalCommand, IExternalCommandAvailability
     {
-        private readonly SmartToolHelper toolHelper = SmartToolApp.ServiceProvider?.GetRequiredService<SmartToolHelper>();
-        private readonly IDockablePaneProvider paneProvider = SmartToolApp.ServiceProvider?.GetRequiredService<IDockablePaneProvider>();
+        private readonly SmartToolHelper toolHelper = SmartToolApp.ServiceProvider.GetRequiredService<SmartToolHelper>();
+        private readonly IDockablePaneProvider paneProvider = SmartToolApp.ServiceProvider.GetRequiredService<IDockablePaneProvider>();
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             message = "Error: " + nameof(CutVoidShowPanelCommand);
@@ -42,6 +42,7 @@ namespace RevitTimasBIMTools.CutOpening
                         else
                         {
                             dockPane.Show();
+                            paneView.Raise();
                         }
                     }
                 }

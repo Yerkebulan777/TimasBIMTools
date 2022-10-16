@@ -20,7 +20,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Threading;
 using Document = Autodesk.Revit.DB.Document;
 
 
@@ -28,18 +27,22 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public class CutVoidDataViewModel : ObservableObject, IDisposable
     {
+        public TaskScheduler TaskContext { get; set; }
+        public SynchronizationContext SyncContext { get; set; }
+        public ExternalEvent externalEvent { get; set; } = null;
         public CutVoidDockPaneView DockPanelView { get; set; } = null;
-        public SynchronizationContext SyncContext { get; set; } = SynchronizationContext.Current;
-        public TaskScheduler TaskContext { get; set; } = TaskScheduler.FromCurrentSynchronizationContext();
+        public CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
-        private CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
+        private readonly APIEventHandler eventHandler = SmartToolApp.ServiceProvider.GetRequiredService<APIEventHandler>();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
         private readonly CutVoidCollisionManager collisionManager = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
 
+
         public CutVoidDataViewModel()
         {
+            externalEvent = ExternalEvent.Create(eventHandler);
             CanselCommand = new RelayCommand(CancelCallbackLogic);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
@@ -56,7 +59,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref started, value))
                 {
-                    StartExecuteHandler();
+                    StartHandlerExecute();
                     GetGeneral3DViewAsync();
                 }
             }
@@ -299,14 +302,19 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        public async void StartExecuteHandler()
+        public async void StartHandlerExecute()
         {
-            DocumentModelCollection = await RevitTask.RunAsync(app =>
+            if (ExternalEventRequest.Accepted == externalEvent.Raise())
             {
-                doc = app.ActiveUIDocument.Document;
-                constructTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
-                return RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
-            });
+                SyncContext = SynchronizationContext.Current;
+                TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
+                DocumentModelCollection = await RevitTask.RunAsync(app =>
+                {
+                    doc = app.ActiveUIDocument.Document;
+                    constructTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
+                    return RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
+                });
+            }
         }
 
 
@@ -317,11 +325,11 @@ namespace RevitTimasBIMTools.ViewModels
                 // Is Work
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
+                    Properties.Settings.Default.Reset();
                     ElementModelData = new ObservableCollection<ElementModel>();
                     EngineerCategories = new Dictionary<string, Category>();
                     StructureMaterials = new Dictionary<string, Material>();
                     FamilySymbols = new Dictionary<string, FamilySymbol>();
-                    Properties.Settings.Default.Reset();
                 }, TaskContext);
             }
         }

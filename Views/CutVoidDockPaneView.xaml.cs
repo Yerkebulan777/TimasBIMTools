@@ -23,16 +23,12 @@ namespace RevitTimasBIMTools.Views
         public bool Disposed { get; set; } = false;
         private string documentId { get; set; } = Properties.Settings.Default.ActiveDocumentUniqueId;
 
-        private readonly ExternalEvent externalEvent;
         private readonly CutVoidDataViewModel DataContextHandler = null;
-        private readonly APIExternalEventHandler eventHandler = new();
-        private readonly SmartToolHelper helper = SmartToolApp.ServiceProvider.GetRequiredService<SmartToolHelper>();
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {
             InitializeComponent();
             DataContext = DataContextHandler = viewModel;
-            externalEvent = ExternalEvent.Create(eventHandler);
-            viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
+            DataContextHandler = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         }
 
 
@@ -52,14 +48,12 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         public void Raise()
         {
-            if (ExternalEventRequest.Accepted == externalEvent.Raise())
+            Dispatcher.CurrentDispatcher.Invoke(() =>
             {
-                Dispatcher.CurrentDispatcher.Invoke(() =>
-                {
-                    DataContextHandler.IsStarted = true;
-                    DataContextHandler.DockPanelView = this;
-                });
-            }
+                Disposed = false;
+                DataContextHandler.IsStarted = true;
+                DataContextHandler.DockPanelView = this;
+            });
         }
 
 

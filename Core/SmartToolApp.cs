@@ -21,7 +21,7 @@ namespace RevitTimasBIMTools.Core
             controller = controlledApp;
             Logger.InitMainLogger(typeof(SmartToolApp));
             SmartToolSetupUIPanel.Initialize(controlledApp);
-            ServiceProvider = BaseContainerConfig.ConfigureServices();
+            ServiceProvider = ContainerConfig.ConfigureServices();
             Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
             controlledApp.ControlledApplication.ApplicationInitialized += OnApplicationInitialized;
 
