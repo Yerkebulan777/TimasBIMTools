@@ -120,17 +120,11 @@ namespace RevitTimasBIMTools.ViewModels
             get => docModel;
             set
             {
-                if (value != null)
+                if (value != null && SetProperty(ref docModel, value))
                 {
-                    DockPanelView.Dispatcher.Invoke(delegate
-                    {
-                        if (SetProperty(ref docModel, value))
-                        {
-                            collisionManager.SearchDoc = docModel.Document;
-                            collisionManager.SearchGlobal = docModel.Transform;
-                            collisionManager.SearchInstance = docModel.LinkInstance;
-                        }
-                    });
+                    collisionManager.SearchDoc = docModel.Document;
+                    collisionManager.SearchGlobal = docModel.Transform;
+                    collisionManager.SearchInstance = docModel.LinkInstance;
                 }
             }
         }
@@ -156,12 +150,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => categories;
             set
             {
-                if (value != null)
+                if (value != null && SetProperty(ref categories, value))
                 {
-                    if (SetProperty(ref categories, value))
-                    {
-                        Logger.Log(nameof(EngineerCategories) + "\tcount:\t" + value.Count.ToString());
-                    }
+                    Logger.Log(nameof(EngineerCategories) + "\tcount:\t" + value.Count.ToString());
                 }
             }
         }
@@ -175,7 +166,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    if (SetProperty(ref structMats, value))
+                    if (value != null && SetProperty(ref structMats, value))
                     {
                         Logger.Log(nameof(StructureMaterials) + "\tcount:\t" + value.Count.ToString());
                     }
@@ -190,12 +181,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => symbols;
             set
             {
-                if (value != null)
+                if (value != null && SetProperty(ref symbols, value))
                 {
-                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref symbols, value)))
-                    {
-                        Logger.Log(nameof(FamilySymbols) + "\tcount:\t" + value.Count.ToString());
-                    }
+                    Logger.Log(nameof(FamilySymbols) + "\tcount:\t" + value.Count.ToString());
                 }
             }
         }
@@ -207,15 +195,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => category;
             set
             {
-                if (value != null)
+                if (value != null && SetProperty(ref category, value))
                 {
-                    DockPanelView.Dispatcher.Invoke(delegate
-                    {
-                        if (SetProperty(ref category, value))
-                        {
-                            collisionManager.SearchCatId = category.Id;
-                        }
-                    });
+                    collisionManager.SearchCatId = category.Id;
                 }
             }
         }
@@ -227,12 +209,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => material;
             set
             {
-                if (value != null)
+                if (value != null && SetProperty(ref material, value))
                 {
-                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref material, value)))
-                    {
-                        GetInstancesByCoreMaterialInType(material.Name);
-                    }
+                    GetInstancesByCoreMaterialInType(material.Name);
                 }
             }
         }
@@ -244,14 +223,11 @@ namespace RevitTimasBIMTools.ViewModels
             get => rectang;
             set
             {
-                if (value != null)
+                if (value != null && SetProperty(ref rectang, value))
                 {
-                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref rectang, value)))
-                    {
-                        Properties.Settings.Default.RectangSymbol = rectang.UniqueId;
-                        Properties.Settings.Default.Save();
-                        ActivateFamilySimbolAsync(rectang);
-                    }
+                    Properties.Settings.Default.RectangSymbol = rectang.UniqueId;
+                    Properties.Settings.Default.Save();
+                    ActivateFamilySimbolAsync(rectang);
                 }
             }
         }
@@ -263,14 +239,11 @@ namespace RevitTimasBIMTools.ViewModels
             get => rounded;
             set
             {
-                if (value != null)
+                if (value != null && SetProperty(ref rounded, value))
                 {
-                    if (DockPanelView.Dispatcher.Invoke(() => SetProperty(ref rounded, value)))
-                    {
-                        Properties.Settings.Default.RoundedSymbol = rounded.UniqueId;
-                        Properties.Settings.Default.Save();
-                        ActivateFamilySimbolAsync(rounded);
-                    }
+                    Properties.Settings.Default.RoundedSymbol = rounded.UniqueId;
+                    Properties.Settings.Default.Save();
+                    ActivateFamilySimbolAsync(rounded);
                 }
             }
         }
