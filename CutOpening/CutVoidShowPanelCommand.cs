@@ -18,7 +18,6 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly IDockablePaneProvider paneProvider = SmartToolApp.ServiceProvider?.GetRequiredService<IDockablePaneProvider>();
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            toolHelper.IsActiveStart = true;
             message = "Error: " + nameof(CutVoidShowPanelCommand);
             return Execute(commandData.Application, ref message);
         }
@@ -27,6 +26,8 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
+            RevitTask.Initialize(uiapp);
+            toolHelper.IsActiveStart = true;
             DockablePane dockPane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);
             if (dockPane != null && dockPane.IsValidObject)
             {
