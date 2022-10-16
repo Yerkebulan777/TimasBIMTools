@@ -1,25 +1,17 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using Microsoft.Extensions.DependencyInjection;
-using Revit.Async;
-using RevitTimasBIMTools.Core;
+﻿using Autodesk.Revit.UI;
 using RevitTimasBIMTools.RevitModel;
-using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
-using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.Views
 {
     /// <summary> Логика взаимодействия для CutVoidDockPaneView.xaml </summary>
     public partial class CutVoidDockPaneView : Page, IDockablePaneProvider, IDisposable
     {
-        
+
         public bool Disposed { get; set; } = false;
         private string documentId { get; set; } = Properties.Settings.Default.ActiveDocumentUniqueId;
 
