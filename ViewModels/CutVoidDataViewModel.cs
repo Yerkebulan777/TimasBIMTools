@@ -60,6 +60,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref started, value))
                 {
                     StartHandlerExecute();
+                    ClearElementDataAsync();
                 }
             }
         }
@@ -73,7 +74,6 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref enableOpt, value))
                 {
-                    ClearElementDataAsync();
                     SetMEPCategoriesToData();
                     SetCoreMaterialsToData();
                     SetFamilySymbolsToData();
@@ -322,7 +322,6 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (IsOptionEnabled || IsDataEnabled)
             {
-                // Is Work
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
                     Properties.Settings.Default.Reset();
