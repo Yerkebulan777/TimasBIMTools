@@ -41,7 +41,6 @@ namespace RevitTimasBIMTools.ViewModels
         public CutVoidDataViewModel()
         {
             CanselCommand = new RelayCommand(CancelCallbackLogic);
-            SettingsCommand = new RelayCommand(SettingsHandelCommand);
             SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
         }
@@ -92,6 +91,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (SetProperty(ref enableData, value))
                     {
+                        IsOptionEnabled = !enableData;
                         DataViewCollection?.Refresh();
                         SetValidLevelsToData();
                     }
@@ -138,6 +138,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref docModels, value))
                 {
+                    Logger.Log(nameof(DocumentModelCollection) + "\tcount:\t" + value.Count.ToString());
                     SelectedDocModel = docModels.FirstOrDefault();
                 }
             }
@@ -313,6 +314,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (IsOptionEnabled || IsDataEnabled)
             {
+                // Is Work
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
                     ElementModelData = new ObservableCollection<ElementModel>();
@@ -536,29 +538,6 @@ namespace RevitTimasBIMTools.ViewModels
             || obj is not ElementModel model || model.SymbolName.Contains(FilterText)
             || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
             || model.SymbolName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
-        }
-
-        #endregion
-
-
-        #region SettingsCommand
-
-        public ICommand SettingsCommand { get; private set; }
-
-        [STAThread]
-        private void SettingsHandelCommand()
-        {
-            Dispatcher.CurrentDispatcher.Invoke(() =>
-            {
-                if (!IsOptionEnabled)
-                {
-                    IsOptionEnabled = true;
-                }
-                else
-                {
-                    IsDataEnabled = true;
-                }
-            });
         }
 
         #endregion

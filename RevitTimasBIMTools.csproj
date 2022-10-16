@@ -210,11 +210,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\APIExternalEventHandler.cs" />
     <Compile Include="Core\BaseContainerConfig.cs" />
     <Compile Include="Core\RevitEventWrapper.cs" />
     <Compile Include="Core\SmartToolApp.cs" />
     <Compile Include="Core\BaseCompletedEventArgs.cs" />
-    <Compile Include="Core\SyncContextHandler.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
     <Compile Include="RevitUtils\ElementDataDictionary.cs" />
     <Compile Include="Core\SmartToolHelper.cs" />

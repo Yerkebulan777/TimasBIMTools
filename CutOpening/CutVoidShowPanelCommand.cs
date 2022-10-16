@@ -10,7 +10,7 @@ using System;
 
 namespace RevitTimasBIMTools.CutOpening
 {
-    [Transaction(TransactionMode.ReadOnly)]
+    [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     internal sealed class CutVoidShowPanelCommand : IExternalCommand, IExternalCommandAvailability
     {
