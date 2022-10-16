@@ -9,13 +9,12 @@ using System.Windows.Threading;
 namespace RevitTimasBIMTools.Views
 {
     /// <summary> Логика взаимодействия для CutVoidDockPaneView.xaml </summary>
-    public partial class CutVoidDockPaneView : Page, IDockablePaneProvider, IDisposable
+    public partial class CutVoidDockPaneView : Page, IDockablePaneProvider
     {
-
         public bool Disposed { get; set; } = false;
-        private string documentId { get; set; } = Properties.Settings.Default.ActiveDocumentUniqueId;
 
-        private readonly CutVoidDataViewModel DataContextHandler = null;
+        private readonly CutVoidDataViewModel DataContextHandler;
+
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {
             InitializeComponent();
@@ -65,7 +64,7 @@ namespace RevitTimasBIMTools.Views
                 Dispatcher.CurrentDispatcher.Invoke(() =>
                 {
                     Disposed = true;
-                    DataContextHandler.Dispose();
+                    DataContextHandler?.Dispose();
                     DataContextHandler.IsStarted = false;
                     DataContextHandler.IsDataEnabled = false;
                     DataContextHandler.IsOptionEnabled = false;

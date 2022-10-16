@@ -25,7 +25,7 @@ using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public class CutVoidDataViewModel : ObservableObject, IDisposable
+    public class CutVoidDataViewModel : ObservableObject
     {
         public TaskScheduler TaskContext { get; set; }
         public SynchronizationContext SyncContext { get; set; }
