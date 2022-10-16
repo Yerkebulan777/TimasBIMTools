@@ -34,6 +34,7 @@ namespace RevitTimasBIMTools.ViewModels
         public CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
 
+        private readonly Mutex mutex = new();
         private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly APIEventHandler eventHandler = SmartToolApp.ServiceProvider.GetRequiredService<APIEventHandler>();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
@@ -413,6 +414,26 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             });
         }
+
+
+        internal async void GetModelInView(ElementModel model)
+        {
+            await RevitTask.RunAsync(app =>
+            {
+                Document doc = app.ActiveUIDocument.Document;
+                if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    if (mutex.WaitOne())
+                    {
+                        System.Windows.Clipboard.SetText(model.IdInt.ToString());
+                        Element elem = doc.GetElement(new ElementId(model.IdInt));
+                        RevitViewManager.ShowElement(app.ActiveUIDocument, elem);
+                        mutex.ReleaseMutex();
+                    }
+                }
+            });
+        }
+
 
         #endregion
 

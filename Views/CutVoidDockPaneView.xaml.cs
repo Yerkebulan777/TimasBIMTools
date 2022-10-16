@@ -19,7 +19,7 @@ namespace RevitTimasBIMTools.Views
     /// <summary> Логика взаимодействия для CutVoidDockPaneView.xaml </summary>
     public partial class CutVoidDockPaneView : Page, IDockablePaneProvider, IDisposable
     {
-        private readonly Mutex mutex = new();
+        
         public bool Disposed { get; set; } = false;
         private string documentId { get; set; } = Properties.Settings.Default.ActiveDocumentUniqueId;
 
@@ -61,20 +61,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (sender is DataGridRow row && row.DataContext is ElementModel model)
             {
-                RevitTask.RunAsync(app =>
-                {
-                    Document doc = app.ActiveUIDocument.Document;
-                    if (documentId.Equals(doc.ProjectInformation.UniqueId))
-                    {
-                        if (mutex.WaitOne())
-                        {
-                            System.Windows.Clipboard.SetText(model.IdInt.ToString());
-                            Element elem = doc.GetElement(new ElementId(model.IdInt));
-                            RevitViewManager.ShowElement(app.ActiveUIDocument, elem);
-                            mutex.ReleaseMutex();
-                        }
-                    }
-                }).Dispose();
+
             }
         }
 
