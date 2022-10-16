@@ -62,7 +62,7 @@ namespace RevitTimasBIMTools.Views
                         DataContextHandler.DockPanelView = this;
                         return RevitTask.RaiseGlobalNew<SyncContextHandler, bool, string>(Disposed);
                     });
-                }).Start();
+                }).Wait();
             }
         }
 
