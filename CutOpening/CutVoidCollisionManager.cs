@@ -65,7 +65,8 @@ namespace RevitTimasBIMTools.CutOpening
         private Line line = null;
         private XYZ centroid = null;
         private Solid hostSolid = null;
-        private Solid intersection = null;
+        private Solid interSolid = null;
+        private ElementType instType = null;
         private XYZ instNormal = XYZ.BasisZ;
         private XYZ hostNormal = XYZ.BasisZ;
         private string unique = string.Empty;
@@ -76,8 +77,7 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         private IDictionary<XYZ, Solid> localSolidsDict { get; set; } = null;
-        private ConcurrentDictionary<string, ElementTypeData> dictDatabase { get; set; } = ElementDataDictionary.ElementTypeSizeDictionary;
-
+        private ConcurrentDictionary<string, ElementTypeData> dictTypeData { get; set; } = ElementDataDictionary.ElementTypeSizeDictionary;
 
         private double angleRadians = 0;
         private double angleHorisontDegrees = 0;
@@ -132,11 +132,12 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     if (IsNotParallelDirections(hostNormal, instNormal))
                     {
-                        intersection = instance.GetIntersectionSolid(global, hostSolid, options);
-                        if (intersection != null)
+                        interSolid = instance.GetIntersectionSolid(global, hostSolid, options);
+                        if (interSolid != null)
                         {
-                            centroid = intersection.ComputeCentroid();
-                            ElementTypeData sizeData = DefineElementSize(instance, instNormal);
+                            centroid = interSolid.ComputeCentroid();
+                            instType = instance.Document.GetElement(instance.GetTypeId()) as ElementType;
+                            ElementTypeData sizeData = GetSectionSize(instance, instType, instNormal);
                             yield return new ElementModel(instance, sizeData, hostIdInt);
                         }
                     }
@@ -171,28 +172,9 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private ElementTypeData DefineElementSize(Element elem, XYZ direction)
-        {
-            Document doc = elem.Document;
-            ElementTypeData structData = new(null);
-            if (doc.GetElement(elem.GetTypeId()) is ElementType etype)
-            {
-                unique = (etype.UniqueId + elem.Name).Normalize();
-                if (!dictDatabase.TryGetValue(unique, out structData))
-                {
-                    structData = GetSectionSize(elem, etype, direction);
-                    if (dictDatabase.TryAdd(unique, structData))
-                    {
-                        ElementDataDictionary.SerializeData(dictDatabase);
-                    }
-                }
-            }
-            return structData;
-        }
-
-
         private ElementTypeData GetSectionSize(Element elem, ElementType etype, XYZ direction)
         {
+            ElementTypeData structData = new(null);
             int catIdInt = elem.Category.Id.IntegerValue;
             if (Enum.IsDefined(typeof(BuiltInCategory), catIdInt))
             {
@@ -232,11 +214,20 @@ namespace RevitTimasBIMTools.CutOpening
                         }
                     default:
                         {
-                            return GetSizeByGeometry(etype, direction);
+                            unique = etype.UniqueId.Normalize();
+                            if (!dictTypeData.TryGetValue(unique, out structData))
+                            {
+                                structData = GetSizeByGeometry(etype, direction);
+                                if (dictTypeData.TryAdd(unique, structData))
+                                {
+                                    ElementDataDictionary.SerializeData(dictTypeData);
+                                }
+                            }
+                            return structData;
                         }
                 }
             }
-            return new ElementTypeData(null);
+            return structData;
         }
 
 
@@ -249,9 +240,9 @@ namespace RevitTimasBIMTools.CutOpening
             angleVerticalDegrees = ConvertRadiansToDegrees(GetVerticalAngleRadiansByNormal(direction));
             Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngle(angleHorisontDegrees), centroid);
             Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngle(angleVerticalDegrees), centroid);
-            intersection = angleHorisontDegrees == 0 ? intersection : SolidUtils.CreateTransformed(intersection, horizont);
-            intersection = angleVerticalDegrees == 0 ? intersection : SolidUtils.CreateTransformed(intersection, vertical);
-            instBbox = intersection?.GetBoundingBox();
+            interSolid = angleHorisontDegrees == 0 ? interSolid : SolidUtils.CreateTransformed(interSolid, horizont);
+            interSolid = angleVerticalDegrees == 0 ? interSolid : SolidUtils.CreateTransformed(interSolid, vertical);
+            instBbox = interSolid?.GetBoundingBox();
             if (instBbox != null)
             {
                 widht = Math.Abs(instBbox.Max.X - instBbox.Min.X);
@@ -432,14 +423,14 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public void Dispose()
         {
-            dictDatabase.Clear();
+            dictTypeData.Clear();
             transform?.Dispose();
             SearchDoc?.Dispose();
-            intersection?.Dispose();
-            SearchInstance?.Dispose();
+            interSolid?.Dispose();
             SearchGlobal?.Dispose();
+            SearchInstance?.Dispose();
 
-            Logger.Log(dictDatabase.Values.Count.ToString());
+            Logger.Log(dictTypeData.Values.Count.ToString());
         }
     }
 }
