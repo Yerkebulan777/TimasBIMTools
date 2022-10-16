@@ -9,7 +9,11 @@ namespace RevitTimasBIMTools.Core
         {
             try
             {
+                Properties.Settings.Default.Reset();
+                Properties.Settings.Default.Reload();
                 Document doc = app.ActiveUIDocument.Document;
+                Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
+                Properties.Settings.Default.Save();
             }
             catch
             {

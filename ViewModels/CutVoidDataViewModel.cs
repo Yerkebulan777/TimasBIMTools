@@ -134,8 +134,8 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private ObservableCollection<DocumentModel> docModels = null;
-        public ObservableCollection<DocumentModel> DocumentModelCollection
+        private ICollection<DocumentModel> docModels = null;
+        public ICollection<DocumentModel> DocumentModelCollection
         {
             get => docModels;
             set
@@ -230,7 +230,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref rectang, value))
                 {
-                    Properties.Settings.Default.RectangSymbol = rectang.UniqueId;
+                    Properties.Settings.Default.RectangSymbolUniqueId = rectang.UniqueId;
                     Properties.Settings.Default.Save();
                     ActivateFamilySimbolAsync(rectang);
                 }
@@ -246,7 +246,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref rounded, value))
                 {
-                    Properties.Settings.Default.RoundedSymbol = rounded.UniqueId;
+                    Properties.Settings.Default.RoundedSymbolUniqueId = rounded.UniqueId;
                     Properties.Settings.Default.Save();
                     ActivateFamilySimbolAsync(rounded);
                 }
@@ -313,7 +313,7 @@ namespace RevitTimasBIMTools.ViewModels
                     SyncContext = SynchronizationContext.Current;
                     TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                     constructTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
-                    return RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
+                    return RevitDocumentManager.GetDocumentCollection(doc);
                 });
             }
         }
@@ -325,7 +325,6 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
-                    Properties.Settings.Default.Reset();
                     ElementModelData = new ObservableCollection<ElementModel>();
                     EngineerCategories = new Dictionary<string, Category>();
                     StructureMaterials = new Dictionary<string, Material>();
@@ -416,7 +415,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal async void GetModelInView(ElementModel model)
+        internal async void GetElementInView(ElementModel model)
         {
             await RevitTask.RunAsync(app =>
             {

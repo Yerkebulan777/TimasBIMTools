@@ -61,7 +61,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (sender is DataGridRow row && row.DataContext is ElementModel model)
             {
-
+                DataContextHandler.GetElementInView(model);
             }
         }
 
@@ -77,7 +77,6 @@ namespace RevitTimasBIMTools.Views
                     DataContextHandler.IsStarted = false;
                     DataContextHandler.IsDataEnabled = false;
                     DataContextHandler.IsOptionEnabled = false;
-                    Properties.Settings.Default.Reset();
                 }, DispatcherPriority.Background);
                 Dispatcher.CurrentDispatcher.InvokeShutdown();
                 // TODO: освободить управляемое состояние (управляемые объекты)

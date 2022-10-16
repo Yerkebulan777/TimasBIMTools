@@ -14,10 +14,10 @@
     <Setting Name="CutOffsetInMm" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50</Value>
     </Setting>
-    <Setting Name="RectangSymbol" Type="System.String" Scope="User">
+    <Setting Name="RectangSymbolUniqueId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="RoundedSymbol" Type="System.String" Scope="User">
+    <Setting Name="RoundedSymbolUniqueId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
