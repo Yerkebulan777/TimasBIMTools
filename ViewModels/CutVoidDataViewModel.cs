@@ -60,7 +60,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref started, value))
                 {
                     StartHandlerExecute();
-                    GetGeneral3DViewAsync();
                 }
             }
         }
@@ -75,7 +74,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref enableOpt, value))
                 {
                     ClearElementDataAsync();
-                    SetMEPCategoriesToDataAsync();
+                    SetMEPCategoriesToData();
                     SetCoreMaterialsToData();
                     SetFamilySymbolsToData();
                 }
@@ -90,13 +89,14 @@ namespace RevitTimasBIMTools.ViewModels
             get => enableData;
             set
             {
-                if (docModel != null && category != null)
+                if (SetProperty(ref enableData, value))
                 {
-                    if (SetProperty(ref enableData, value))
+                    if (docModel != null && category != null)
                     {
                         IsOptionEnabled = !enableData;
                         DataViewCollection?.Refresh();
-                        SetValidLevelsToData();
+                        GetValidLevelsToData();
+                        GetGeneral3DView();
                     }
                 }
             }
@@ -306,11 +306,11 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (ExternalEventRequest.Accepted == externalEvent.Raise())
             {
-                SyncContext = SynchronizationContext.Current;
-                TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                 DocumentModelCollection = await RevitTask.RunAsync(app =>
                 {
                     doc = app.ActiveUIDocument.Document;
+                    SyncContext = SynchronizationContext.Current;
+                    TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                     constructTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
                     return RevitDocumentManager.GetDocumentCollection(doc).ToObservableCollection();
                 });
@@ -335,7 +335,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void GetGeneral3DViewAsync()
+        private async void GetGeneral3DView()
         {
             view3d = await RevitTask.RunAsync(app =>
             {
@@ -344,7 +344,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void SetMEPCategoriesToDataAsync()
+        private async void SetMEPCategoriesToData()
         {
             EngineerCategories = await RevitTask.RunAsync(app =>
             {
@@ -374,7 +374,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void SetValidLevelsToData()
+        private async void GetValidLevelsToData()
         {
             ValidLevels = await RevitTask.RunAsync(app =>
             {
