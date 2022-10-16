@@ -46,7 +46,7 @@ namespace RevitTimasBIMTools.Views
 
 
         [STAThread]
-        public void Raise()
+        public void RaiseEvent()
         {
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {

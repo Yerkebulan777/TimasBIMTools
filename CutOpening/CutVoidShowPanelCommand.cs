@@ -38,11 +38,12 @@ namespace RevitTimasBIMTools.CutOpening
                         if (dockPane.IsShown())
                         {
                             dockPane.Hide();
+                            paneView.Dispose();
                         }
                         else
                         {
                             dockPane.Show();
-                            paneView.Raise();
+                            paneView.RaiseEvent();
                         }
                     }
                 }
