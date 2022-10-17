@@ -97,22 +97,20 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        public ConcurrentQueue<ElementModel> GetCollisionByLevel(Document doc, Level level, IEnumerable<Element> elements)
+        public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level, IEnumerable<Element> elements)
         {
             InitializeUnits(doc);
             LevelIntId = level.Id.IntegerValue;
-            ConcurrentQueue<ElementModel> output = new();
             foreach (Element host in elements)
             {
                 if (LevelIntId == host.LevelId.IntegerValue)
                 {
                     foreach (ElementModel model in GetIntersectionModelByHost(doc, host, SearchGlobal, SearchCatId))
                     {
-                        output.Enqueue(model);
+                        yield return model;
                     }
                 }
             }
-            return output;
         }
 
 
