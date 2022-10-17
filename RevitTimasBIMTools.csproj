@@ -248,7 +248,6 @@
     <Compile Include="Services\Timer.cs" />
     <Compile Include="ViewConverters\ElementNameConverter.cs" />
     <Compile Include="ViewModels\CutVoidDataViewModel.cs" />
-    <Compile Include="ViewModels\ViewModelLocator.cs" />
     <Compile Include="Views\CutVoidDockPaneView.xaml.cs">
       <DependentUpon>CutVoidDockPaneView.xaml</DependentUpon>
     </Compile>

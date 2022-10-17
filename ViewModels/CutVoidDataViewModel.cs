@@ -646,12 +646,10 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-
         public void Dispose()
         {
             collisionManager?.Dispose();
             ClearElementDataAsync();
         }
-
     }
 }
