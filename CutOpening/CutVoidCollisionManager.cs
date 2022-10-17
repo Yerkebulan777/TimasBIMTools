@@ -318,7 +318,7 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        //private void CreateDirectShape(Document doc, Element elem, Solid solid)
+        //private void CreateDirectShape(Document doc, Element elem, Centroid solid)
         //{
         //    using Transaction trans = new(doc, "Create DirectShape");
         //    try
@@ -326,7 +326,7 @@ namespace RevitTimasBIMTools.CutOpening
         //        _ = trans.Start();
         //        DirectShape ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_GenericModel));
         //        ds.ApplicationDataId = elem.UniqueId;
-        //        ds.Name = "Intersection by " + elem.Name;
+        //        ds.Name = "Centroid by " + elem.Name;
         //        ds.SetShape(new GeometryObject[] { solid });
         //        _ = trans.Commit();
         //    }
@@ -382,7 +382,7 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        //private static IEnumerable<CurveLoop> GetCountours(Solid solid, Element elem)
+        //private static IEnumerable<CurveLoop> GetCountours(Centroid solid, Element elem)
         //{
         //    try
         //    {

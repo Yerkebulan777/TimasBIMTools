@@ -5,33 +5,11 @@ using System;
 
 namespace RevitTimasBIMTools.RevitModel
 {
-    public sealed class ElementModel : ObservableObject, IRevitElementModel
+    public sealed class ElementModel : ObservableObject, IElementModel
     {
-
-        private readonly ElementTypeData elemTypeData;
-        public ElementModel(Element instance, ElementTypeData data, int hostIdInt = 0, string description = null)
-        {
-            if (instance.IsValidObject)
-            {
-                elemTypeData = data;
-                HostIdInt = hostIdInt;
-                IdInt = instance.Id.IntegerValue;
-                LevelId = instance.LevelId.IntegerValue;
-                CategoryName = instance.Category.Name;
-                SymbolName = elemTypeData.SymbolName;
-                FamilyName = elemTypeData.FamilyName;
-                Description = GetSizeDataToString();
-                if (!string.IsNullOrEmpty(description))
-                {
-                    Description += description;
-                }
-            }
-        }
-
-
-        public int IdInt { get; }
-        public int LevelId { get; }
-        public int HostIdInt {get; internal set; }
+        public int IntId { get; }
+        public int LevelIntId { get; }
+        public int HostIntId { get; internal set; }
         public string SymbolName { get; private set; }
         public string FamilyName { get; private set; }
         public string CategoryName { get; private set; }
@@ -44,6 +22,28 @@ namespace RevitTimasBIMTools.RevitModel
             set => SetProperty(ref selected, value);
         }
 
+        private readonly BoundingBoxXYZ BoundingBox;
+        private readonly ElementTypeData SizeTypeData;
+        public ElementModel(Element instance, ElementTypeData data, int hostIdInt, BoundingBoxXYZ bbox = null, string description = null)
+        {
+            if (instance.IsValidObject)
+            {
+                BoundingBox = bbox;
+                SizeTypeData = data;
+                HostIntId = hostIdInt;
+                IntId = instance.Id.IntegerValue;
+                LevelIntId = instance.LevelId.IntegerValue;
+                CategoryName = instance.Category.Name;
+                SymbolName = SizeTypeData.SymbolName;
+                FamilyName = SizeTypeData.FamilyName;
+                Description = GetSizeDataToString();
+                if (!string.IsNullOrEmpty(description))
+                {
+                    Description += description;
+                }
+            }
+        }
+
 
         public override string ToString()
         {
@@ -53,10 +53,10 @@ namespace RevitTimasBIMTools.RevitModel
 
         private string GetSizeDataToString()
         {
-            if (elemTypeData.IsValidObject)
+            if (SizeTypeData.IsValidObject)
             {
-                int h = (int)Math.Round(elemTypeData.Height * 304.8);
-                int w = (int)Math.Round(elemTypeData.Width * 304.8);
+                int h = (int)Math.Round(SizeTypeData.Height * 304.8);
+                int w = (int)Math.Round(SizeTypeData.Width * 304.8);
                 return $"{w}x{h}(h)".Normalize();
             }
             return string.Empty;

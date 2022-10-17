@@ -1,6 +1,6 @@
 ﻿namespace RevitTimasBIMTools.RevitModel
 {
-    public interface IRevitElementModel
+    public interface IElementModel
     {
         string SymbolName { get; }
         string Description { get; set; }

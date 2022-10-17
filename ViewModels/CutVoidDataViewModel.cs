@@ -106,7 +106,6 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-
         #region Temporary
 
         private Document doc { get; set; } = null;
@@ -416,17 +415,17 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal async void GetElementInView(ElementModel model)
+        internal async void GetElementInViewByIntId(int intId)
         {
             await RevitTask.RunAsync(app =>
             {
                 Document doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    if (mutex.WaitOne())
+                    if (intId != -1 && mutex.WaitOne())
                     {
-                        System.Windows.Clipboard.SetText(model.IdInt.ToString());
-                        Element elem = doc.GetElement(new ElementId(model.IdInt));
+                        System.Windows.Clipboard.SetText(intId.ToString());
+                        Element elem = doc.GetElement(new ElementId(intId));
                         RevitViewManager.ShowElement(app.ActiveUIDocument, elem);
                         mutex.ReleaseMutex();
                     }
@@ -599,7 +598,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (model.IsSelected && ElementModelData.Remove(model))
                         {
-                            Element elem = doc.GetElement(new ElementId(model.IdInt));
+                            Element elem = doc.GetElement(new ElementId(model.IntId));
                             try
                             {
                                 // Set Openning Logic with doc regenerate and transaction RollBack                                   

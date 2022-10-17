@@ -1,7 +1,8 @@
 ﻿using Autodesk.Revit.DB;
-using RevitTimasBIMTools.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -82,11 +83,70 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
             {
-                // if there are any failures, rollback the transaction
+                // if there are any failures, rollback the t
                 return failuresAccessor.GetFailureMessages().Count > 0
                     ? FailureProcessingResult.ProceedWithRollBack
                     : FailureProcessingResult.Continue;
             }
         }
+
+
+        public static void Purge(Document doc)
+        {
+            //The internal GUID of the Performance Adviser Rule 
+            const string PurgeGuid = "e8c63650-70b7-435a-9010-ec97660c1bda";
+
+            List<PerformanceAdviserRuleId> performanceAdviserRuleIds = new();
+
+            //Iterating through all PerformanceAdviser rules looking to find that which matches PURGE_GUID
+            foreach (PerformanceAdviserRuleId performanceAdviserRuleId in PerformanceAdviser.GetPerformanceAdviser().GetAllRuleIds())
+            {
+                if (performanceAdviserRuleId.Guid.ToString() == PurgeGuid)
+                {
+                    performanceAdviserRuleIds.Add(performanceAdviserRuleId);
+                    break;
+                }
+            }
+
+            //Attempting to recover all purgeable elements and delete them from the document
+            List<ElementId> purgeableIds = GetPurgeableElements(doc, performanceAdviserRuleIds);
+            if (purgeableIds != null)
+            {
+                using Transaction t = new(doc, "Purge");
+                if (t.Start() == TransactionStatus.Started)
+                {
+                    try
+                    {
+                        _ = doc.Delete(purgeableIds);
+                        _ = t.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        if (!t.HasEnded())
+                        {
+                            _ = t.RollBack();
+                        }
+                    }
+                }
+            }
+        }
+
+
+        internal static List<ElementId> GetPurgeableElements(Document doc, List<PerformanceAdviserRuleId> performanceAdviserRuleIds)
+        {
+            List<FailureMessage> failureMessages = PerformanceAdviser.GetPerformanceAdviser().ExecuteRules(doc, performanceAdviserRuleIds).ToList();
+            if (failureMessages.Count > 0)
+            {
+                List<ElementId> purgeableElementIds = failureMessages[0].GetFailingElements().ToList();
+                return purgeableElementIds;
+            }
+            return null;
+        }
+
+
     }
 }
+
+
+
+

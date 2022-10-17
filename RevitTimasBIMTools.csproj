@@ -204,7 +204,7 @@
     <Compile Include="Core\SmartToolHelper.cs" />
     <Compile Include="Core\SmartToolSetupUIPanel.cs" />
     <Compile Include="RevitModel\ElementTypeData.cs" />
-    <Compile Include="RevitModel\IRevitElementModel.cs" />
+    <Compile Include="RevitModel\IElementModel.cs" />
     <Compile Include="RevitModel\RevitHostConstruction.cs" />
     <Compile Include="CutOpening\CutVoidCollisionManager.cs" />
     <Compile Include="RevitUtils\ProjectLoctionManager.cs" />
