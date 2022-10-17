@@ -360,9 +360,6 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
-
-
-
         #region LevelFilter
 
         public static IDictionary<double, Level> GetValidLevels(Document doc)
