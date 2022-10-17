@@ -3,7 +3,7 @@ using System;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
-    public static class RevitTransactionManager
+    public static class TransactionManager
     {
         /// <summary> The method used to create a single sub-transaction </summary>
         public static void CreateSubTransaction(Document document, Action action)

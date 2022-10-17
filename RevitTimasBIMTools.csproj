@@ -234,12 +234,10 @@
     <Compile Include="RevitUtils\IntersectionExtension.cs" />
     <Compile Include="RevitModel\DocumentModel.cs" />
     <Compile Include="RevitModel\ElementModel.cs" />
-    <Compile Include="RevitUtils\RevitDocumentManager.cs" />
     <Compile Include="RevitUtils\ParameterUtils.cs" />
     <Compile Include="RevitUtils\PurginqManager.cs" />
     <Compile Include="RevitUtils\RevitFilterManager.cs" />
-    <Compile Include="RevitUtils\RevitSelectManager.cs" />
-    <Compile Include="RevitUtils\RevitTransactionManager.cs" />
+    <Compile Include="RevitUtils\TransactionManager.cs" />
     <Compile Include="RevitUtils\RevitWPFViewer.cs" />
     <Compile Include="RevitUtils\ViewModelExtension.cs" />
     <Compile Include="Services\FiIeIOServise.cs" />

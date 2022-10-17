@@ -106,7 +106,7 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 if (LevelIntId == host.LevelId.IntegerValue)
                 {
-                    foreach (ElementModel model in GetIntersectionModelByHost(doc, SearchGlobal, host, SearchCatId))
+                    foreach (ElementModel model in GetIntersectionModelByHost(doc, host, SearchGlobal, SearchCatId))
                     {
                         output.Enqueue(model);
                     }
@@ -116,7 +116,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private IEnumerable<ElementModel> GetIntersectionModelByHost(Document doc, Transform global, Element host, ElementId catId)
+        private IEnumerable<ElementModel> GetIntersectionModelByHost(Document doc, Element host, Transform global, ElementId catId)
         {
             int hostIdInt = host.Id.IntegerValue;
             hostBbox = host.get_BoundingBox(null);

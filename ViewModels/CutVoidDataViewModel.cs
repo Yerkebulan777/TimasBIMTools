@@ -313,7 +313,7 @@ namespace RevitTimasBIMTools.ViewModels
                     SyncContext = SynchronizationContext.Current;
                     TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                     constructTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
-                    return RevitDocumentManager.GetDocumentCollection(doc);
+                    return RevitFilterManager.GetDocumentCollection(doc);
                 });
             }
         }

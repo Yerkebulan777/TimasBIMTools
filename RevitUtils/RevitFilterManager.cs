@@ -1,4 +1,6 @@
 ﻿using Autodesk.Revit.DB;
+using log4net;
+using RevitTimasBIMTools.RevitModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,31 @@ namespace RevitTimasBIMTools.RevitUtils
     {
 
         public static List<Element> ElementTypeList = new(50);
+
+
+        #region Document Collector
+
+        public static FilteredElementCollector GetRevitLinkInstanceCollector(Document doc)
+        {
+            return GetElementsOfCategory(doc, typeof(RevitLinkInstance), BuiltInCategory.OST_RvtLinks, true);
+        }
+
+
+        public static IList<DocumentModel> GetDocumentCollection(Document doc)
+        {
+            IList<DocumentModel> result = new List<DocumentModel> { new DocumentModel(doc) };
+            foreach (RevitLinkInstance link in GetRevitLinkInstanceCollector(doc))
+            {
+                Document linkDoc = link.GetLinkDocument();
+                if (linkDoc != null && linkDoc.IsValidObject)
+                {
+                    result.Add(new DocumentModel(linkDoc, link));
+                }
+            }
+            return result;
+        }
+
+        #endregion
 
 
         #region Standert Filtered Element Collector

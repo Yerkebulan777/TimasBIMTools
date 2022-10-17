@@ -133,12 +133,14 @@
                                 <Label Content="Minimum size: " Width="125"/>
                                 <Slider Name="MinSideSize" Minimum="0" Maximum="100" Height="23" Width="65" 
                                         Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Text="{Binding ElementName=MinSideSize, Path=Value}" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Maximum size: " Width="125"/>
                                 <Slider Name="MaxSideSize" Minimum="100" Maximum="1000" Height="23" Width="65" 
                                         Value="{Binding Path=MaxSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Text="{Binding ElementName=MaxSideSize, Path=Value}" />
                             </WrapPanel>
 
                         </StackPanel>
@@ -151,6 +153,7 @@
                             <Label Content="Cut offset: " Width="125"/>
                             <Slider Name="CutOffset" Minimum="0" Maximum="100" Height="23" Width="65" 
                                     Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Text="{Binding ElementName=CutOffset, Path=Value}" />
                         </WrapPanel>
                     </Border>
                 </ListViewItem>
