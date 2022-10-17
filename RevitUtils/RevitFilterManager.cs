@@ -10,7 +10,7 @@ namespace RevitTimasBIMTools.RevitUtils
     internal sealed class RevitFilterManager
     {
 
-        public static List<Element> ElementTypeList = new(100);
+        public static List<Element> ElementTypeList = new(50);
 
 
         #region Standert Filtered Element Collector
