@@ -4,7 +4,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Windows.Media.Media3D;
+using System.Diagnostics;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 using Parameter = Autodesk.Revit.DB.Parameter;
@@ -15,6 +15,7 @@ namespace RevitTimasBIMTools.CutOpening
 {
     public sealed class CutVoidCollisionManager : IDisposable
     {
+
         #region Default Properties
         private Units revitUnits { get; set; } = null;
         private DisplayUnitType angleUnit { get; set; }
@@ -63,8 +64,8 @@ namespace RevitTimasBIMTools.CutOpening
         #region Templory Properties
 
         private Line line = null;
-        private ElementId id = null;
-        private XYZ offsetVector = null;
+        private ElementId instanceId = null;
+        private XYZ offset = null;
         private XYZ centroid = null;
         private Solid hostSolid = null;
         private Solid interSolid = null;
@@ -100,7 +101,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             revitUnits = doc.GetUnits();
             modelTempData = new ElementModel[100];
-            offsetVector = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
+            offset = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
             minDistance = cutOffsetSize + ((minSideSize + maxSideSize) * 0.25);
             angleUnit = revitUnits.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
@@ -138,21 +139,29 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     if (IsNotParallelDirections(hostNormal, instNormal))
                     {
+                        Plane plane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
                         interSolid = elem.GetIntersectionSolid(global, hostSolid, options);
-                        sizeData = GetSectionSize(elem, interSolid, instNormal);
-                        if (sizeData.IsValidObject)
+                        //sizeData = GetSectionSize(elem, interSolid, instNormal);
+                        instBbox = interSolid?.GetBoundingBox();
+                        if (instBbox != null && instBbox.Enabled)
                         {
-                            id = elem.Id;
-                            idsExclude.Add(id);
-                            ElementModel model = new(id, sizeData)
+                            instanceId = elem.Id;
+                            idsExclude.Add(instanceId);
+
+                            XYZ minPnt = ProjectOnto(plane, instBbox.Min -= offset);
+                            XYZ maxPnt = ProjectOnto(plane, instBbox.Max += offset);
+                            
+                            ElementModel model = new(instanceId, sizeData)
                             {
-                                Normal = instNormal,
+                                Origin = centroid,
+                                HostNormal = hostNormal,
+                                ModelNormal = instNormal,
                                 LevelIntId = levelIntId,
+                                Outline = new(minPnt, maxPnt),
                                 HostIntId = host.Id.IntegerValue,
                                 SymbolName = sizeData.SymbolName,
                                 FamilyName = sizeData.FamilyName,
-                                Outline = new(instBbox.Min -= offsetVector, instBbox.Max += offsetVector),
-                                Description = GetSizeDescriptionToString(sizeData),
+                                Description = GetSizeDescription(sizeData)
                             };
                             yield return model;
                         }
@@ -163,20 +172,49 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool CreateOpening(Document doc, ElementModel model)
-        {
+        //public UV ProjectInto(Plane plane, XYZ pnt)
+        //{
+        //    XYZ point = ProjectOnto(plane, pnt);
+        //    XYZ origin = plane.Origin;
+        //    XYZ result = point - origin;
+        //    double u = result.DotProduct(plane.XVec);
+        //    double v = result.DotProduct(plane.YVec);
+        //    return new UV(u, v);
+        //}
 
-            return true;
+
+        private XYZ ProjectOnto(Plane plane, XYZ pnt)
+        {
+            double distance = SignedDistanceTo(plane, pnt);
+            XYZ result = pnt - distance * plane.Normal;
+            return result;
+        }
+
+
+        private double SignedDistanceTo(Plane plane, XYZ pnt)
+        {
+            XYZ vector = pnt - plane.Origin;
+            return plane.Normal.DotProduct(vector);
+        }
+
+        private Outline CreateOpening(Document doc, ElementModel model)
+        {
+            
+
+            return null;
         }
 
 
         private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ normal, View view)
         {
-            Outline outline = new(bbox.Min -= offsetVector, bbox.Max += offsetVector);
+            Outline outline = new(bbox.Min -= offset, bbox.Max += offset);
             collector = new FilteredElementCollector(doc, view.Id).Excluding(idsExclude);
-            id = collector.WherePasses(new BoundingBoxIntersectsFilter(outline)).FirstElementId();
-
-            return true;
+            instanceId = collector.WherePasses(new BoundingBoxIntersectsFilter(outline)).FirstElementId();
+            if (instanceId == null)
+            {
+                return true;
+            }
+            return false;
         }
 
 
@@ -285,7 +323,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private string GetSizeDescriptionToString(ElementTypeData typeData)
+        private string GetSizeDescription(ElementTypeData typeData)
         {
             if (typeData.IsValidObject)
             {
@@ -332,6 +370,8 @@ namespace RevitTimasBIMTools.CutOpening
         {
             return Math.Round(180 / Math.PI * radians, digit);
         }
+
+
 
 
         #region Other methods

@@ -104,7 +104,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         /// <summary>
         /// SmartToolHelper to return parameter value as string, with additional
-        /// support for instance id to display the instance type referred to.
+        /// support for instance instanceId to display the instance type referred to.
         /// </summary>
         public static string GetParameterValue2(this Parameter param, Document doc)
         {
@@ -150,7 +150,7 @@ namespace RevitTimasBIMTools.RevitUtils
             _min_bic = values.Cast<int>().Min();
         }
         /// <summary>
-        /// Return a description string including instance id for a given instance.
+        /// Return a description string including instance instanceId for a given instance.
         /// </summary>
         public static string ElementDescription(Element element, bool includeId)
         {
