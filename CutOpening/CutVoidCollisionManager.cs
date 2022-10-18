@@ -163,9 +163,9 @@ namespace RevitTimasBIMTools.CutOpening
                                 FamilyName = sizeData.FamilyName,
                                 Description = GetSizeDescription(sizeData)
                             };
+
                             yield return model;
                         }
-
                     }
                 }
             }
