@@ -4,6 +4,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Windows.Media.Media3D;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 using Parameter = Autodesk.Revit.DB.Parameter;
@@ -145,6 +146,7 @@ namespace RevitTimasBIMTools.CutOpening
                             idsExclude.Add(id);
                             ElementModel model = new(id, sizeData)
                             {
+                                Normal = instNormal,
                                 LevelIntId = levelIntId,
                                 HostIntId = host.Id.IntegerValue,
                                 SymbolName = sizeData.SymbolName,
@@ -172,7 +174,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             Outline outline = new(bbox.Min -= offsetVector, bbox.Max += offsetVector);
             collector = new FilteredElementCollector(doc, view.Id).Excluding(idsExclude);
-            _ = collector.WherePasses(new BoundingBoxIntersectsFilter(outline)).FirstElementId();
+            id = collector.WherePasses(new BoundingBoxIntersectsFilter(outline)).FirstElementId();
 
             return true;
         }

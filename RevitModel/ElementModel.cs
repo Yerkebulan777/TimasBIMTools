@@ -15,12 +15,12 @@ namespace RevitTimasBIMTools.RevitModel
             TypeData = typeData;
         }
 
-
+        public XYZ Normal { get; internal set; }
+        public Outline Outline { get; internal set; }
         public int HostIntId { get; internal set; }
         public int LevelIntId { get; internal set; }
         public string SymbolName { get; internal set; }
         public string FamilyName { get; internal set; }
-        public Outline Outline { get; internal set; }
         public string Description { get; internal set; }
 
 
