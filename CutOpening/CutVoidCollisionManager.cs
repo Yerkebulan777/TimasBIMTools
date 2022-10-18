@@ -171,7 +171,10 @@ namespace RevitTimasBIMTools.CutOpening
                             IList<CurveLoop> curveloops = new List<CurveLoop> { baseLoop };
 
 
-                            Solid createdCylinder = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, XYZ.BasisZ, maxSideSize);
+                            Solid solid = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, XYZ.BasisZ, maxSideSize);
+
+
+                            /// Use Dynamo
 
 
                             ElementModel model = new(instanceId, sizeData)
