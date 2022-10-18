@@ -8,29 +8,27 @@ namespace RevitTimasBIMTools.RevitModel
     {
         public ElementId Id { get; }
         public ElementTypeData TypeData { get; }
-        public int HostIntId { get; private set; }
-        public int LevelIntId { get; private set; }
-        public string SymbolName { get; private set; }
-        public string FamilyName { get; private set; }
-        public string Description { get; set; } = string.Empty;
+
+        public ElementModel(ElementId elementId, ElementTypeData typeData)
+        {
+            Id = elementId;
+            TypeData = typeData;
+        }
+
+
+        public int HostIntId { get; internal set; }
+        public int LevelIntId { get; internal set; }
+        public string SymbolName { get; internal set; }
+        public string FamilyName { get; internal set; }
+        public Outline Outline { get; internal set; }
+        public string Description { get; internal set; }
+
 
         private bool selected = false;
         public bool IsSelected
         {
             get => selected;
             set => SetProperty(ref selected, value);
-        }
-
-
-        public ElementModel(ElementId elementId, ElementTypeData typeData, int hostIntId, int levelIntId, string description)
-        {
-            Id = elementId;
-            TypeData = typeData;
-            HostIntId = hostIntId;
-            LevelIntId = levelIntId;
-            SymbolName = typeData.SymbolName;
-            FamilyName = typeData.FamilyName;
-            Description = description;
         }
 
 

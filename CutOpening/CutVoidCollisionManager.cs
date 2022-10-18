@@ -62,20 +62,19 @@ namespace RevitTimasBIMTools.CutOpening
         #region Templory Properties
 
         private Line line = null;
-        private XYZ offset = null;
+        private ElementId id = null;
+        private XYZ offsetVector = null;
         private XYZ centroid = null;
         private Solid hostSolid = null;
         private Solid interSolid = null;
-        private readonly ElementType instType = null;
         private XYZ instNormal = XYZ.BasisZ;
         private XYZ hostNormal = XYZ.BasisZ;
-        private string unique = string.Empty;
         private BoundingBoxXYZ instBbox = null;
         private BoundingBoxXYZ hostBbox = null;
-        private string description = string.Empty;
         private Transform transform = Transform.Identity;
-
         private FilteredElementCollector collector = null;
+        private string unique = string.Empty;
+        private ElementTypeData sizeData;
 
         private double angleRadians = 0;
         private double angleHorisontDegrees = 0;
@@ -100,7 +99,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             revitUnits = doc.GetUnits();
             modelTempData = new ElementModel[100];
-            offset = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
+            offsetVector = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
             minDistance = cutOffsetSize + ((minSideSize + maxSideSize) * 0.25);
             angleUnit = revitUnits.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
@@ -114,7 +113,7 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 if (levelIntId == host.LevelId.IntegerValue)
                 {
-                    foreach (ElementModel model in GetIntersectionModelByHost(doc, host, SearchGlobal, SearchCatId))
+                    foreach (ElementModel model in GetIntersectionByElement(doc, host, SearchGlobal, SearchCatId))
                     {
                         yield return model;
                     }
@@ -123,9 +122,8 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private IEnumerable<ElementModel> GetIntersectionModelByHost(Document doc, Element host, Transform global, ElementId catId)
+        private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Element host, Transform global, ElementId catId)
         {
-            int hostIdInt = host.Id.IntegerValue;
             hostBbox = host.get_BoundingBox(null);
             hostSolid = host.GetSolidByVolume(identityTransform, options);
             hostNormal = host is Wall wall ? wall.Orientation : XYZ.BasisZ;
@@ -139,14 +137,22 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     if (IsNotParallelDirections(hostNormal, instNormal))
                     {
-                        ElementId id = elem.Id;
                         interSolid = elem.GetIntersectionSolid(global, hostSolid, options);
-                        ElementTypeData sizeData = GetSectionSize(elem, interSolid, instNormal);
+                        sizeData = GetSectionSize(elem, interSolid, instNormal);
                         if (sizeData.IsValidObject)
                         {
+                            id = elem.Id;
                             idsExclude.Add(id);
-                            description = GetSizeDescriptionToString(sizeData);
-                            yield return new ElementModel(id, sizeData, hostIdInt, levelIntId, description);
+                            ElementModel model = new(id, sizeData)
+                            {
+                                LevelIntId = levelIntId,
+                                HostIntId = host.Id.IntegerValue,
+                                SymbolName = sizeData.SymbolName,
+                                FamilyName = sizeData.FamilyName,
+                                Outline = new(instBbox.Min -= offsetVector, instBbox.Max += offsetVector),
+                                Description = GetSizeDescriptionToString(sizeData),
+                            };
+                            yield return model;
                         }
 
                     }
@@ -155,18 +161,18 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool CreateOpening(ElementModel model)
+        private bool CreateOpening(Document doc, ElementModel model)
         {
+
             return true;
         }
 
 
-        private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox)
+        private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ normal, View view)
         {
-            Outline outline = new(bbox.Min -= offset, bbox.Max += offset);
-            BoundingBoxIntersectsFilter bbfilter = new(outline);
-            collector = new FilteredElementCollector(doc, doc.ActiveView.Id);
-            _ = collector.Excluding(idsExclude).WherePasses(bbfilter);
+            Outline outline = new(bbox.Min -= offsetVector, bbox.Max += offsetVector);
+            collector = new FilteredElementCollector(doc, view.Id).Excluding(idsExclude);
+            _ = collector.WherePasses(new BoundingBoxIntersectsFilter(outline)).FirstElementId();
 
             return true;
         }

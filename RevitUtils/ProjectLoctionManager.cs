@@ -26,9 +26,9 @@ namespace RevitTimasBIMTools.RevitUtils
             String prompt = "Current project location information:\n";
             prompt += "\n\t" + "Origin point position:";
             prompt += "\n\t\t" + "Angle: " + position.Angle;
-            prompt += "\n\t\t" + "East to West offset: " + position.EastWest;
+            prompt += "\n\t\t" + "East to West offsetVector: " + position.EastWest;
             prompt += "\n\t\t" + "Elevation: " + position.Elevation;
-            prompt += "\n\t\t" + "North to South offset: " + position.NorthSouth;
+            prompt += "\n\t\t" + "North to South offsetVector: " + position.NorthSouth;
 
             // Angles are in radians when coming from Revit API, so we 
             // convert to degrees for display
