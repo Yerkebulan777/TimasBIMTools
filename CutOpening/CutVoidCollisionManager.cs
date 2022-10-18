@@ -3,7 +3,6 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
@@ -63,6 +62,7 @@ namespace RevitTimasBIMTools.CutOpening
         #region Templory Properties
 
         private Line line = null;
+        private XYZ offset = null;
         private XYZ centroid = null;
         private Solid hostSolid = null;
         private Solid interSolid = null;
@@ -73,11 +73,8 @@ namespace RevitTimasBIMTools.CutOpening
         private BoundingBoxXYZ instBbox = null;
         private BoundingBoxXYZ hostBbox = null;
         private Transform transform = Transform.Identity;
+
         private FilteredElementCollector collector = null;
-
-
-        private IDictionary<XYZ, Solid> localSolidsDict { get; set; } = null;
-        private ConcurrentDictionary<string, ElementTypeData> dictTypeData { get; set; } = ElementDataDictionary.ElementTypeSizeDictionary;
 
         private double angleRadians = 0;
         private double angleHorisontDegrees = 0;
@@ -89,9 +86,20 @@ namespace RevitTimasBIMTools.CutOpening
         #endregion
 
 
-        private void InitializeUnits(Document doc)
+        #region Cache
+
+        private ICollection<ElementId> idsExclude = new List<ElementId>();
+        private ElementModel[] modelTempData { get; set; } = new ElementModel[0];
+        private IDictionary<string, ElementTypeData> sizeTempData { get; set; } = CacheDataRepository.SizeTypeData;
+
+        #endregion
+
+
+        private void InitializeCache(Document doc)
         {
             revitUnits = doc.GetUnits();
+            modelTempData = new ElementModel[100];
+            offset = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
             minDistance = cutOffsetSize + ((minSideSize + maxSideSize) * 0.25);
             angleUnit = revitUnits.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
@@ -99,7 +107,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level, IEnumerable<Element> elements)
         {
-            InitializeUnits(doc);
+            InitializeCache(doc);
             LevelIntId = level.Id.IntegerValue;
             foreach (Element host in elements)
             {
@@ -136,11 +144,25 @@ namespace RevitTimasBIMTools.CutOpening
                             centroid = interSolid.ComputeCentroid();
                             instType = instance.Document.GetElement(instance.GetTypeId()) as ElementType;
                             ElementTypeData sizeData = GetSectionSize(instance, instType, instNormal);
-                            yield return new ElementModel(instance, sizeData, hostIdInt);
+                            yield return new ElementModel(instance, sizeData, hostIdInt, instBbox);
                         }
                     }
                 }
             }
+        }
+
+
+        private bool CreateOpening(ElementModel model)
+        {
+            return true;
+        }
+
+
+        private bool CheckSizeOpenning(BoundingBoxXYZ bbox)
+        {
+            Outline outline = new(bbox.Min -= offset, bbox.Max += offset);
+            BoundingBoxIntersectsFilter bbfilter = new BoundingBoxIntersectsFilter(outline);
+            return true;
         }
 
 
@@ -168,6 +190,7 @@ namespace RevitTimasBIMTools.CutOpening
             }
             return length > tolerance;
         }
+
 
 
         private ElementTypeData GetSectionSize(Element elem, ElementType etype, XYZ direction)
@@ -213,13 +236,10 @@ namespace RevitTimasBIMTools.CutOpening
                     default:
                         {
                             unique = etype.UniqueId.Normalize();
-                            if (!dictTypeData.TryGetValue(unique, out structData))
+                            if (!sizeTempData.TryGetValue(unique, out structData))
                             {
                                 structData = GetSizeByGeometry(etype, direction);
-                                if (dictTypeData.TryAdd(unique, structData))
-                                {
-                                    ElementDataDictionary.SerializeData(dictTypeData);
-                                }
+                                sizeTempData.Add(unique, structData);
                             }
                             return structData;
                         }
@@ -398,6 +418,8 @@ namespace RevitTimasBIMTools.CutOpening
         #endregion
 
 
+
+
         /// Алгоритм проверки семейств отверстия
         /*
         * Проверить семейство что это реальное отверстие
@@ -421,14 +443,14 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public void Dispose()
         {
-            dictTypeData.Clear();
+            sizeTempData.Clear();
             transform?.Dispose();
             SearchDoc?.Dispose();
             interSolid?.Dispose();
             SearchGlobal?.Dispose();
             SearchInstance?.Dispose();
 
-            Logger.Log(dictTypeData.Values.Count.ToString());
+            Logger.Log(sizeTempData.Values.Count.ToString());
         }
     }
 }

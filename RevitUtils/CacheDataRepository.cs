@@ -3,27 +3,26 @@ using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Path = System.IO.Path;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
-    internal sealed class ElementDataDictionary
+    internal static class CacheDataRepository
     {
 
         [JsonExtensionData]
 
         private static readonly string fileName = Path.Combine(SmartToolHelper.DocumentPath, @"SizeTypeData.json");
         private static readonly JsonSerializerSettings options = new() { NullValueHandling = NullValueHandling.Ignore };
-        public static ConcurrentDictionary<string, ElementTypeData> ElementTypeSizeDictionary = new();
+        public static IDictionary<string, ElementTypeData> SizeTypeData { get; set; } = new Dictionary<string, ElementTypeData>(25);
+
 
         [STAThread]
-        public static void SerializeData(ConcurrentDictionary<string, ElementTypeData> sourceDict)
+        public static void SerializeData(IDictionary<string, ElementTypeData> sourceDict)
         {
             if (sourceDict.Count > 0)
             {
@@ -45,7 +44,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public void DeserialiseSizeData()
+        public static void DeserialiseSizeData()
         {
             if (File.Exists(fileName))
             {

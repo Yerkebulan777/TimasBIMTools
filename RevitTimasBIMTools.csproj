@@ -200,7 +200,7 @@
     <Compile Include="Core\RevitEventWrapper.cs" />
     <Compile Include="Core\SmartToolApp.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
-    <Compile Include="RevitUtils\ElementDataDictionary.cs" />
+    <Compile Include="RevitUtils\CacheDataRepository.cs" />
     <Compile Include="Core\SmartToolHelper.cs" />
     <Compile Include="Core\SmartToolSetupUIPanel.cs" />
     <Compile Include="RevitModel\ElementTypeData.cs" />
