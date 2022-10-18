@@ -153,6 +153,7 @@ namespace RevitTimasBIMTools.CutOpening
 
                             XYZ[] profilePts = new XYZ[4];
 
+                            // подправить offset by vector или Transform
                             XYZ minPnt = ProjectOnto(plane, instBbox.Min -= offset);
                             XYZ maxPnt = ProjectOnto(plane, instBbox.Max += offset);
 
@@ -170,12 +171,13 @@ namespace RevitTimasBIMTools.CutOpening
 
                             IList<CurveLoop> curveloops = new List<CurveLoop> { baseLoop };
 
+                            curveloops = ExporterIFCUtils.ValidateCurveLoops(curveloops, XYZ.BasisZ);
 
                             Solid solid = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, XYZ.BasisZ, maxSideSize);
 
+                            ExtrusionAnalyzer extrusionAnalyzer = ExtrusionAnalyzer.Create(solid, plane, XYZ.BasisZ);
 
                             /// Use Dynamo
-
 
                             ElementModel model = new(instanceId, sizeData)
                             {
