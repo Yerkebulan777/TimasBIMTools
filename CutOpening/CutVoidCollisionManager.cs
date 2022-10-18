@@ -4,7 +4,6 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 using Parameter = Autodesk.Revit.DB.Parameter;
@@ -44,6 +43,8 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Input Properties
 
+        ExporterIFCUtils
+
         private double minDistance { get; set; } = 0;
         public int levelIntId { get; set; } = invalidInt;
         public Document SearchDoc { get; internal set; } = null;
@@ -76,7 +77,7 @@ namespace RevitTimasBIMTools.CutOpening
         private Transform transform = Transform.Identity;
         private FilteredElementCollector collector = null;
         private string unique = string.Empty;
-        private ElementTypeData sizeData;
+        private readonly ElementTypeData sizeData;
 
         private double angleRadians = 0;
         private double angleHorisontDegrees = 0;
@@ -150,7 +151,7 @@ namespace RevitTimasBIMTools.CutOpening
 
                             XYZ minPnt = ProjectOnto(plane, instBbox.Min -= offset);
                             XYZ maxPnt = ProjectOnto(plane, instBbox.Max += offset);
-                            
+
                             ElementModel model = new(instanceId, sizeData)
                             {
                                 Origin = centroid,
@@ -186,7 +187,7 @@ namespace RevitTimasBIMTools.CutOpening
         private XYZ ProjectOnto(Plane plane, XYZ pnt)
         {
             double distance = SignedDistanceTo(plane, pnt);
-            XYZ result = pnt - distance * plane.Normal;
+            XYZ result = pnt - (distance * plane.Normal);
             return result;
         }
 
@@ -199,9 +200,36 @@ namespace RevitTimasBIMTools.CutOpening
 
         private Outline CreateOpening(Document doc, ElementModel model)
         {
-            
+
 
             return null;
+        }
+
+
+        private Solid CreateCylindricalVolume(Document doc, XYZ point, double height, double radius)
+        {
+            // build cylindrical shape around endpoint
+            List<CurveLoop> curveloops = new List<CurveLoop>();
+            CurveLoop circle = new CurveLoop();
+
+            //IList<CurveLoop> loopsIfcOut = ExporterIFCUtils.ValidateCurveLoops(loopsIfc, XYZ.BasisZ);
+            //// For solid geometry creation, two curves are necessary, even for closed
+            //// cyclic shapes like circles
+            //circle.Append(doc.Create.(point, radius, 0, Math.PI, XYZ.BasisX, XYZ.BasisY));
+            //circle.Append(doc.Create.NewArc(point, radius, Math.PI, 2 * Math.PI, XYZ.BasisX, XYZ.BasisY));
+            //curveloops.Add(circle);
+
+
+            Solid createdCylinder = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, XYZ.BasisZ, height);
+
+            return createdCylinder;
+        }
+
+
+        private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)
+        {
+            Solid intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
+            return intersection.Volume > 0;
         }
 
 
@@ -210,11 +238,7 @@ namespace RevitTimasBIMTools.CutOpening
             Outline outline = new(bbox.Min -= offset, bbox.Max += offset);
             collector = new FilteredElementCollector(doc, view.Id).Excluding(idsExclude);
             instanceId = collector.WherePasses(new BoundingBoxIntersectsFilter(outline)).FirstElementId();
-            if (instanceId == null)
-            {
-                return true;
-            }
-            return false;
+            return instanceId == null;
         }
 
 

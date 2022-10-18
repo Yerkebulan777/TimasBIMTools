@@ -124,6 +124,10 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
+    <Reference Include="RevitAPIIFC">
+      <HintPath>C:\Program Files\Autodesk\Revit 2019\RevitAPIIFC.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="RevitAPIUI, Version=19.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>packages\Revit_All_Main_Versions_API_x64.2019.0.1\lib\net47\RevitAPIUI.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
