@@ -415,17 +415,17 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal async void GetElementInViewByIntId(int intId)
+        internal async void GetElementInViewByIntId(ElementId id)
         {
             await RevitTask.RunAsync(app =>
             {
                 Document doc = app.ActiveUIDocument.Document;
                 if (documentId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    if (intId != -1 && mutex.WaitOne())
+                    if (mutex.WaitOne())
                     {
-                        System.Windows.Clipboard.SetText(intId.ToString());
-                        Element elem = doc.GetElement(new ElementId(intId));
+                        Element elem = doc.GetElement(id);
+                        System.Windows.Clipboard.SetText(id.ToString());
                         RevitViewManager.ShowElement(app.ActiveUIDocument, elem);
                         mutex.ReleaseMutex();
                     }
@@ -495,9 +495,9 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             dataView.SortDescriptions.Clear();
                             dataView.GroupDescriptions.Clear();
-                            dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.CategoryName)));
+                            dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.Description)));
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
-                            dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.Description), ListSortDirection.Ascending));
+                            dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.FamilyName), ListSortDirection.Ascending));
                         }
                     }
                 }
@@ -598,7 +598,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (model.IsSelected && ElementModelData.Remove(model))
                         {
-                            Element elem = doc.GetElement(new ElementId(model.IntId));
+                            Element elem = doc.GetElement(model.Id);
                             try
                             {
                                 // Set Openning Logic with doc regenerate and transaction RollBack                                   

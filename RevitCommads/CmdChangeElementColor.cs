@@ -46,7 +46,7 @@ namespace TimasRevitBIMTools
             var ogs = new OverrideGraphicSettings();
             ogs.SetProjectionLineColor(color);
 
-            using (Transaction transaction = new Transaction(doc, "Change Element Color"))
+            using (Transaction transaction = new Transaction(doc, "Change Instance Color"))
             {
                 if (transaction.Start() == TransactionStatus.Started)
                 {
@@ -78,7 +78,7 @@ namespace TimasRevitBIMTools
 
                 using (var tx = new Transaction(doc))
                 {
-                    tx.Start("Change Element Material");
+                    tx.Start("Change Instance Material");
                     e.Category.Material = materials[i];
                     tx.Commit();
                 }

@@ -53,7 +53,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (sender is DataGridRow row && row.DataContext is ElementModel model)
             {
-                DataContextHandler.GetElementInViewByIntId(model.IntId);
+                DataContextHandler.GetElementInViewByIntId(model.Id);
             }
         }
 

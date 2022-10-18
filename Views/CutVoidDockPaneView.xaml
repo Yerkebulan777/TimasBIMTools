@@ -216,6 +216,7 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
+                        
                         <DataGridTextColumn Width="150" Header="Symbol Name" Binding="{Binding SymbolName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
@@ -223,6 +224,7 @@
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
+                        
                         <DataGridTextColumn Width="150" Header="Family Name" Binding="{Binding FamilyName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
@@ -230,13 +232,7 @@
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Width="100" Header="Category" Binding="{Binding CategoryName, Mode=OneWay}">
-                            <DataGridTextColumn.EditingElementStyle>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="IsReadOnly" Value="true"/>
-                                </Style>
-                            </DataGridTextColumn.EditingElementStyle>
-                        </DataGridTextColumn>
+
                         <DataGridTextColumn Width="100" Header="Description" Binding="{Binding Description, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">

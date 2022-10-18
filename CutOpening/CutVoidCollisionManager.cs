@@ -43,7 +43,7 @@ namespace RevitTimasBIMTools.CutOpening
         #region Input Properties
 
         private double minDistance { get; set; } = 0;
-        public int LevelIntId { get; set; } = invalidInt;
+        public int levelIntId { get; set; } = invalidInt;
         public Document SearchDoc { get; internal set; } = null;
         public ElementId SearchCatId { get; internal set; } = null;
         public Transform SearchGlobal { get; internal set; } = null;
@@ -66,12 +66,13 @@ namespace RevitTimasBIMTools.CutOpening
         private XYZ centroid = null;
         private Solid hostSolid = null;
         private Solid interSolid = null;
-        private ElementType instType = null;
+        private readonly ElementType instType = null;
         private XYZ instNormal = XYZ.BasisZ;
         private XYZ hostNormal = XYZ.BasisZ;
         private string unique = string.Empty;
         private BoundingBoxXYZ instBbox = null;
         private BoundingBoxXYZ hostBbox = null;
+        private string description = string.Empty;
         private Transform transform = Transform.Identity;
 
         private FilteredElementCollector collector = null;
@@ -88,7 +89,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Cache
 
-        private ICollection<ElementId> idsExclude = new List<ElementId>();
+        private readonly ICollection<ElementId> idsExclude = new List<ElementId>();
         private ElementModel[] modelTempData { get; set; } = new ElementModel[0];
         private IDictionary<string, ElementTypeData> sizeTempData { get; set; } = CacheDataRepository.SizeTypeData;
 
@@ -108,10 +109,10 @@ namespace RevitTimasBIMTools.CutOpening
         public IEnumerable<ElementModel> GetCollisionByLevel(Document doc, Level level, IEnumerable<Element> elements)
         {
             InitializeCache(doc);
-            LevelIntId = level.Id.IntegerValue;
+            levelIntId = level.Id.IntegerValue;
             foreach (Element host in elements)
             {
-                if (LevelIntId == host.LevelId.IntegerValue)
+                if (levelIntId == host.LevelId.IntegerValue)
                 {
                     foreach (ElementModel model in GetIntersectionModelByHost(doc, host, SearchGlobal, SearchCatId))
                     {
@@ -131,21 +132,23 @@ namespace RevitTimasBIMTools.CutOpening
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(catId);
-            foreach (Element instance in collector)
+            foreach (Element elem in collector)
             {
-                centroid = instance.GetMiddlePointByBoundingBox(ref instBbox);
-                if (IsValidIntersection(instance, hostSolid, centroid, minSideSize, out instNormal))
+                centroid = elem.GetMiddlePointByBoundingBox(ref instBbox);
+                if (IsValidIntersection(elem, hostSolid, centroid, minSideSize, out instNormal))
                 {
                     if (IsNotParallelDirections(hostNormal, instNormal))
                     {
-                        interSolid = instance.GetIntersectionSolid(global, hostSolid, options);
-                        if (interSolid != null)
+                        ElementId id = elem.Id;
+                        interSolid = elem.GetIntersectionSolid(global, hostSolid, options);
+                        ElementTypeData sizeData = GetSectionSize(elem, interSolid, instNormal);
+                        if (sizeData.IsValidObject)
                         {
-                            centroid = interSolid.ComputeCentroid();
-                            instType = instance.Document.GetElement(instance.GetTypeId()) as ElementType;
-                            ElementTypeData sizeData = GetSectionSize(instance, instType, instNormal);
-                            yield return new ElementModel(instance, sizeData, hostIdInt, instBbox);
+                            idsExclude.Add(id);
+                            description = GetSizeDescriptionToString(sizeData);
+                            yield return new ElementModel(id, sizeData, hostIdInt, levelIntId, description);
                         }
+
                     }
                 }
             }
@@ -158,10 +161,13 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool CheckSizeOpenning(BoundingBoxXYZ bbox)
+        private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox)
         {
             Outline outline = new(bbox.Min -= offset, bbox.Max += offset);
-            BoundingBoxIntersectsFilter bbfilter = new BoundingBoxIntersectsFilter(outline);
+            BoundingBoxIntersectsFilter bbfilter = new(outline);
+            collector = new FilteredElementCollector(doc, doc.ActiveView.Id);
+            _ = collector.Excluding(idsExclude).WherePasses(bbfilter);
+
             return true;
         }
 
@@ -193,11 +199,11 @@ namespace RevitTimasBIMTools.CutOpening
 
 
 
-        private ElementTypeData GetSectionSize(Element elem, ElementType etype, XYZ direction)
+        private ElementTypeData GetSectionSize(Element elem, Solid solid, XYZ direction)
         {
             ElementTypeData structData = new(null);
             int catIdInt = elem.Category.Id.IntegerValue;
-            if (Enum.IsDefined(typeof(BuiltInCategory), catIdInt))
+            if (elem.Document.GetElement(elem.GetTypeId()) is ElementType etype)
             {
                 BuiltInCategory builtInCategory = (BuiltInCategory)catIdInt;
                 switch (builtInCategory)
@@ -238,7 +244,7 @@ namespace RevitTimasBIMTools.CutOpening
                             unique = etype.UniqueId.Normalize();
                             if (!sizeTempData.TryGetValue(unique, out structData))
                             {
-                                structData = GetSizeByGeometry(etype, direction);
+                                structData = GetSizeByGeometry(solid, etype, direction);
                                 sizeTempData.Add(unique, structData);
                             }
                             return structData;
@@ -249,18 +255,18 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private ElementTypeData GetSizeByGeometry(ElementType etype, XYZ direction)
+        private ElementTypeData GetSizeByGeometry(Solid solid, ElementType etype, XYZ direction)
         {
-            transform = identityTransform;
             ElementTypeData result = new(null);
+            centroid = solid.ComputeCentroid();
             direction = ResetDirectionToPositive(direction);
             angleHorisontDegrees = ConvertRadiansToDegrees(GetHorizontAngleRadiansByNormal(direction));
             angleVerticalDegrees = ConvertRadiansToDegrees(GetVerticalAngleRadiansByNormal(direction));
             Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngle(angleHorisontDegrees), centroid);
             Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngle(angleVerticalDegrees), centroid);
-            interSolid = angleHorisontDegrees == 0 ? interSolid : SolidUtils.CreateTransformed(interSolid, horizont);
-            interSolid = angleVerticalDegrees == 0 ? interSolid : SolidUtils.CreateTransformed(interSolid, vertical);
-            instBbox = interSolid?.GetBoundingBox();
+            solid = angleHorisontDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, horizont);
+            solid = angleVerticalDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, vertical);
+            instBbox = solid?.GetBoundingBox();
             if (instBbox != null)
             {
                 widht = Math.Abs(instBbox.Max.X - instBbox.Min.X);
@@ -268,6 +274,18 @@ namespace RevitTimasBIMTools.CutOpening
                 result = new ElementTypeData(etype, hight, widht);
             }
             return result;
+        }
+
+
+        private string GetSizeDescriptionToString(ElementTypeData typeData)
+        {
+            if (typeData.IsValidObject)
+            {
+                int h = (int)Math.Round(typeData.Height * 304.8);
+                int w = (int)Math.Round(typeData.Width * 304.8);
+                return $"{w}x{h}(h)".Normalize();
+            }
+            return string.Empty;
         }
 
 
@@ -310,7 +328,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Other methods
 
-        //private double GetLengthValueBySimilarParameterName(Element elem, string paramName)
+        //private double GetLengthValueBySimilarParameterName(Instance elem, string paramName)
         //{
         //    double value = invalidInt;
         //    int minDistance = int.MaxValue;
@@ -336,7 +354,7 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        //private void CreateDirectShape(Document doc, Element elem, Centroid solid)
+        //private void CreateDirectShape(Document doc, Instance elem, Centroid solid)
         //{
         //    using Transaction trans = new(doc, "Create DirectShape");
         //    try
@@ -400,7 +418,7 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        //private static IEnumerable<CurveLoop> GetCountours(Centroid solid, Element elem)
+        //private static IEnumerable<CurveLoop> GetCountours(Centroid solid, Instance elem)
         //{
         //    try
         //    {
