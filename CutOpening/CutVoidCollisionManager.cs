@@ -137,7 +137,7 @@ namespace RevitTimasBIMTools.CutOpening
                 centroid = elem.GetMiddlePointByBoundingBox(ref instBbox);
                 if (IsValidIntersection(elem, hostSolid, centroid, minSideSize, out instNormal))
                 {
-                    if (IsNotParallelDirections(hostNormal, instNormal))
+                    if (IsNotParallel(hostNormal, instNormal))
                     {
                         Plane plane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
                         interSolid = elem.GetIntersectionSolid(global, hostSolid, options);
@@ -335,7 +335,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool IsNotParallelDirections(XYZ hostNormal, XYZ direction)
+        private bool IsNotParallel(XYZ hostNormal, XYZ direction)
         {
             return !direction.IsAlmostEqualTo(XYZ.Zero) && Math.Abs(hostNormal.DotProduct(direction)) > thresholdAngle;
         }
