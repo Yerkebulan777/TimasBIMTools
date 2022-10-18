@@ -6,7 +6,7 @@ using Options = Autodesk.Revit.DB.Options;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
-    internal static class IntersectionExtension
+    internal static class SolidExtension
     {
         private static Solid result { get; set; } = null;
 

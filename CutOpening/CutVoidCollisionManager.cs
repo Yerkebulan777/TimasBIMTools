@@ -1,9 +1,11 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.IFC;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Windows.Media.Media3D;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 using Parameter = Autodesk.Revit.DB.Parameter;
@@ -43,7 +45,6 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Input Properties
 
-        ExporterIFCUtils
 
         private double minDistance { get; set; } = 0;
         public int levelIntId { get; set; } = invalidInt;
@@ -147,10 +148,31 @@ namespace RevitTimasBIMTools.CutOpening
                         if (instBbox != null && instBbox.Enabled)
                         {
                             instanceId = elem.Id;
+
                             idsExclude.Add(instanceId);
+
+                            XYZ[] profilePts = new XYZ[4];
 
                             XYZ minPnt = ProjectOnto(plane, instBbox.Min -= offset);
                             XYZ maxPnt = ProjectOnto(plane, instBbox.Max += offset);
+
+                            profilePts[0] = identityTransform.OfPoint(minPnt);
+                            profilePts[1] = identityTransform.OfPoint(new XYZ(minPnt.X, minPnt.Y, maxPnt.Z));
+                            profilePts[2] = identityTransform.OfPoint(new XYZ(maxPnt.X, maxPnt.Y, minPnt.Z));
+                            profilePts[3] = identityTransform.OfPoint(maxPnt);
+
+                            CurveLoop baseLoop = new();
+
+                            for (int i = 0; i < profilePts.Length; i++)
+                            {
+                                baseLoop.Append(Line.CreateBound(profilePts[i], profilePts[(i + 1) % profilePts.Length]));
+                            }
+
+                            IList<CurveLoop> curveloops = new List<CurveLoop> { baseLoop };
+
+
+                            Solid createdCylinder = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, XYZ.BasisZ, maxSideSize);
+
 
                             ElementModel model = new(instanceId, sizeData)
                             {
@@ -171,6 +193,29 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
         }
+
+
+
+        //private Solid CreateCylindricalVolume(Document doc, XYZ point, double height, double radius)
+        //{
+        //    // build cylindrical shape around endpoint
+
+
+
+        //    //IList<CurveLoop> loopsIfcOut = ExporterIFCUtils.ValidateCurveLoops(loopsIfc, XYZ.BasisZ);
+        //    // For solid geometry creation, two curves are necessary, even for closed
+        //    // cyclic shapes like circles
+        //    //circle.Append(doc.Create. (point, radius, 0, Math.PI, XYZ.BasisX, XYZ.BasisY));
+        //    //circle.Append(doc.Create.NewArc(point, radius, Math.PI, 2 * Math.PI, XYZ.BasisX, XYZ.BasisY));
+        //    //curveloops.Add(circle);
+
+        //    //curveloop = CurveLoop.Create(revitCurves)
+
+        //    Solid createdCylinder = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, XYZ.BasisZ, height);
+
+        //    return createdCylinder;
+        //}
+
 
 
         //public UV ProjectInto(Plane plane, XYZ pnt)
@@ -203,26 +248,6 @@ namespace RevitTimasBIMTools.CutOpening
 
 
             return null;
-        }
-
-
-        private Solid CreateCylindricalVolume(Document doc, XYZ point, double height, double radius)
-        {
-            // build cylindrical shape around endpoint
-            List<CurveLoop> curveloops = new List<CurveLoop>();
-            CurveLoop circle = new CurveLoop();
-
-            //IList<CurveLoop> loopsIfcOut = ExporterIFCUtils.ValidateCurveLoops(loopsIfc, XYZ.BasisZ);
-            //// For solid geometry creation, two curves are necessary, even for closed
-            //// cyclic shapes like circles
-            //circle.Append(doc.Create.(point, radius, 0, Math.PI, XYZ.BasisX, XYZ.BasisY));
-            //circle.Append(doc.Create.NewArc(point, radius, Math.PI, 2 * Math.PI, XYZ.BasisX, XYZ.BasisY));
-            //curveloops.Add(circle);
-
-
-            Solid createdCylinder = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, XYZ.BasisZ, height);
-
-            return createdCylinder;
         }
 
 
