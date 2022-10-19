@@ -191,7 +191,7 @@ namespace RevitTimasBIMTools.CutOpening
         private IList<CurveLoop> GetCountours(Document doc, Solid solid, XYZ basePnt, XYZ direction, double offset)
         {
             IList<CurveLoop> curveloops = new List<CurveLoop>();
-            using (SubTransaction transaction = new(doc))
+            using (Transaction transaction = new(doc))
             {
                 status = transaction.Start();
                 try
