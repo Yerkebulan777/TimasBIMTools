@@ -77,9 +77,9 @@ namespace RevitTimasBIMTools.CutOpening
         private XYZ centroid = null;
         private Solid hostSolid = null;
         private Solid interSolid = null;
-        private XYZ instNormal = XYZ.BasisZ;
+        private XYZ interNormal = XYZ.BasisZ;
         private XYZ hostNormal = XYZ.BasisZ;
-        private BoundingBoxXYZ instBbox = null;
+        private BoundingBoxXYZ interBbox = null;
         private BoundingBoxXYZ hostBbox = null;
         private Transform transform = Transform.Identity;
 
@@ -146,33 +146,33 @@ namespace RevitTimasBIMTools.CutOpening
 
             foreach (Element elem in collector)
             {
-                centroid = elem.GetMiddlePointByBoundingBox(ref instBbox);
-                if (IsValidIntersection(elem, hostSolid, centroid, minSideSize, out instNormal))
+                centroid = elem.GetMiddlePointByBoundingBox(ref interBbox);
+                if (IsValidIntersection(elem, hostSolid, centroid, minSideSize, out interNormal))
                 {
-                    if (IsNotParallel(hostNormal, instNormal))
+                    if (IsNotParallel(hostNormal, interNormal))
                     {
                         Plane sectionPlane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
                         interSolid = elem.GetIntersectionSolid(global, hostSolid, options);
-                        instBbox = interSolid?.GetBoundingBox();
-                        if (instBbox != null && instBbox.Enabled)
+                        interBbox = interSolid?.GetBoundingBox();
+                        if (interBbox != null && interBbox.Enabled)
                         {
                             instanceId = elem.Id;
 
                             idsExclude.Add(instanceId);
 
-                            XYZ minPnt = ProjectOnto(sectionPlane, instBbox.Min -= cutOffsetSize * XYZ.BasisZ);
-                            XYZ maxPnt = ProjectOnto(sectionPlane, instBbox.Max += cutOffsetSize * XYZ.BasisZ);
+                            XYZ minPnt = ProjectOnto(sectionPlane, interBbox.Min -= cutOffsetSize * XYZ.BasisZ);
+                            XYZ maxPnt = ProjectOnto(sectionPlane, interBbox.Max += cutOffsetSize * XYZ.BasisZ);
 
                             IList<CurveLoop> curveloops = GetCountours(doc, interSolid, minPnt, XYZ.BasisZ, cutOffsetSize);
 
                             _ = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, XYZ.BasisZ, Math.Abs(maxPnt.Z - minPnt.Z));
 
-                            sizeData = GetSectionSize(elem, interSolid, instNormal);
+                            sizeData = GetSectionSize(elem, interSolid, interNormal);
                             ElementModel model = new(instanceId, sizeData)
                             {
                                 Origin = centroid,
                                 HostNormal = hostNormal,
-                                ModelNormal = instNormal,
+                                ModelNormal = interNormal,
                                 LevelIntId = levelIntId,
                                 HostIntId = host.Id.IntegerValue,
                                 SymbolName = sizeData.SymbolName,
@@ -211,6 +211,7 @@ namespace RevitTimasBIMTools.CutOpening
                         CurveArray array = CurveLoop.CreateViaThicken(loop, offset, direction).GetEnumerator() as CurveArray;
                         _ = doc.Create.NewModelCurveArray(array, sketchPlane);
                     }
+
                     status = transaction.Commit();
                 }
                 catch (Exception ex)
@@ -359,11 +360,11 @@ namespace RevitTimasBIMTools.CutOpening
             Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngle(angleVerticalDegrees), centroid);
             solid = angleHorisontDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, horizont);
             solid = angleVerticalDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, vertical);
-            instBbox = solid?.GetBoundingBox();
-            if (instBbox != null)
+            interBbox = solid?.GetBoundingBox();
+            if (interBbox != null)
             {
-                widht = Math.Abs(instBbox.Max.X - instBbox.Min.X);
-                hight = Math.Abs(instBbox.Max.Z - instBbox.Min.Z);
+                widht = Math.Abs(interBbox.Max.X - interBbox.Min.X);
+                hight = Math.Abs(interBbox.Max.Z - interBbox.Min.Z);
                 result = new ElementTypeData(etype, hight, widht);
             }
             return result;
