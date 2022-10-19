@@ -5,7 +5,6 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Windows.Media.Media3D;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 using Parameter = Autodesk.Revit.DB.Parameter;
@@ -23,7 +22,7 @@ namespace RevitTimasBIMTools.CutOpening
         private Options options { get; } = new()
         {
             ComputeReferences = true,
-            IncludeNonVisibleObjects = false,
+            IncludeNonVisibleObjects = true,
             DetailLevel = ViewDetailLevel.Medium
         };
 
@@ -45,7 +44,6 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Input Properties
 
-
         private double minDistance { get; set; } = 0;
         public int levelIntId { get; set; } = invalidInt;
         public Document SearchDoc { get; internal set; } = null;
@@ -63,6 +61,14 @@ namespace RevitTimasBIMTools.CutOpening
         #endregion
 
 
+        #region Output Properties
+
+        private ElementTypeData sizeData;
+        private FilteredElementCollector collector;
+
+        #endregion
+
+
         #region Templory Properties
 
         private Line line = null;
@@ -76,9 +82,8 @@ namespace RevitTimasBIMTools.CutOpening
         private BoundingBoxXYZ instBbox = null;
         private BoundingBoxXYZ hostBbox = null;
         private Transform transform = Transform.Identity;
-        private FilteredElementCollector collector = null;
+
         private string unique = string.Empty;
-        private readonly ElementTypeData sizeData;
 
         private double angleRadians = 0;
         private double angleHorisontDegrees = 0;
@@ -141,9 +146,8 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     if (IsNotParallel(hostNormal, instNormal))
                     {
-                        Plane plane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
+                        Plane sectionPlane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
                         interSolid = elem.GetIntersectionSolid(global, hostSolid, options);
-                        //sizeData = GetSectionSize(elem, interSolid, instNormal);
                         instBbox = interSolid?.GetBoundingBox();
                         if (instBbox != null && instBbox.Enabled)
                         {
@@ -151,41 +155,20 @@ namespace RevitTimasBIMTools.CutOpening
 
                             idsExclude.Add(instanceId);
 
-                            XYZ[] profilePts = new XYZ[4];
+                            XYZ minPnt = ProjectOnto(sectionPlane, instBbox.Min -= cutOffsetSize * XYZ.BasisZ);
+                            XYZ maxPnt = ProjectOnto(sectionPlane, instBbox.Max += cutOffsetSize * XYZ.BasisZ);
 
-                            // подправить offset by vector или Transform
-                            XYZ minPnt = ProjectOnto(plane, instBbox.Min -= offset);
-                            XYZ maxPnt = ProjectOnto(plane, instBbox.Max += offset);
+                            IList<CurveLoop> curveloops = GetCountours(doc, interSolid, minPnt, XYZ.BasisZ, cutOffsetSize);
 
-                            profilePts[0] = identityTransform.OfPoint(minPnt);
-                            profilePts[1] = identityTransform.OfPoint(new XYZ(minPnt.X, minPnt.Y, maxPnt.Z));
-                            profilePts[2] = identityTransform.OfPoint(new XYZ(maxPnt.X, maxPnt.Y, minPnt.Z));
-                            profilePts[3] = identityTransform.OfPoint(maxPnt);
+                            _ = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, XYZ.BasisZ, Math.Abs(maxPnt.Z - minPnt.Z));
 
-                            CurveLoop baseLoop = new();
-
-                            for (int i = 0; i < profilePts.Length; i++)
-                            {
-                                baseLoop.Append(Line.CreateBound(profilePts[i], profilePts[(i + 1) % profilePts.Length]));
-                            }
-
-                            IList<CurveLoop> curveloops = new List<CurveLoop> { baseLoop };
-
-                            curveloops = ExporterIFCUtils.ValidateCurveLoops(curveloops, XYZ.BasisZ);
-
-                            Solid solid = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, XYZ.BasisZ, maxSideSize);
-
-                            ExtrusionAnalyzer extrusionAnalyzer = ExtrusionAnalyzer.Create(solid, plane, XYZ.BasisZ);
-
-                            /// Use Dynamo
-
+                            sizeData = GetSectionSize(elem, interSolid, instNormal);
                             ElementModel model = new(instanceId, sizeData)
                             {
                                 Origin = centroid,
                                 HostNormal = hostNormal,
                                 ModelNormal = instNormal,
                                 LevelIntId = levelIntId,
-                                Outline = new(minPnt, maxPnt),
                                 HostIntId = host.Id.IntegerValue,
                                 SymbolName = sizeData.SymbolName,
                                 FamilyName = sizeData.FamilyName,
@@ -200,38 +183,33 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
+        private IList<CurveLoop> GetCountours(Document doc, Solid solid, XYZ basePnt, XYZ direction, double offset)
+        {
+            IList<CurveLoop> curveloops = new List<CurveLoop>();
+            try
+            {
+                Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, basePnt);
 
-        //private Solid CreateCylindricalVolume(Document doc, XYZ point, double height, double radius)
-        //{
-        //    // build cylindrical shape around endpoint
+                Face result = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
 
+                curveloops = ExporterIFCUtils.ValidateCurveLoops(result.GetEdgesAsCurveLoops(), direction);
 
+                SketchPlane sketchPlane = SketchPlane.Create(doc, plane);
 
-        //    //IList<CurveLoop> loopsIfcOut = ExporterIFCUtils.ValidateCurveLoops(loopsIfc, XYZ.BasisZ);
-        //    // For solid geometry creation, two curves are necessary, even for closed
-        //    // cyclic shapes like circles
-        //    //circle.Append(doc.Create. (point, radius, 0, Math.PI, XYZ.BasisX, XYZ.BasisY));
-        //    //circle.Append(doc.Create.NewArc(point, radius, Math.PI, 2 * Math.PI, XYZ.BasisX, XYZ.BasisY));
-        //    //curveloops.Add(circle);
+                doc.Regenerate();
 
-        //    //curveloop = CurveLoop.Create(revitCurves)
-
-        //    Solid createdCylinder = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, XYZ.BasisZ, height);
-
-        //    return createdCylinder;
-        //}
-
-
-
-        //public UV ProjectInto(Plane plane, XYZ pnt)
-        //{
-        //    XYZ point = ProjectOnto(plane, pnt);
-        //    XYZ origin = plane.Origin;
-        //    XYZ result = point - origin;
-        //    double u = result.DotProduct(plane.XVec);
-        //    double v = result.DotProduct(plane.YVec);
-        //    return new UV(u, v);
-        //}
+                foreach (CurveLoop loop in curveloops)
+                {
+                    CurveArray array = CurveLoop.CreateViaThicken(loop, offset, direction).GetEnumerator() as CurveArray;
+                    _ = doc.Create.NewModelCurveArray(array, sketchPlane);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex.Message);
+            }
+            return curveloops;
+        }
 
 
         private XYZ ProjectOnto(Plane plane, XYZ pnt)
@@ -248,28 +226,28 @@ namespace RevitTimasBIMTools.CutOpening
             return plane.Normal.DotProduct(vector);
         }
 
-        private Outline CreateOpening(Document doc, ElementModel model)
-        {
+        //private Outline CreateOpening(Document doc, ElementModel model)
+        //{
 
 
-            return null;
-        }
+        //    return null;
+        //}
 
 
-        private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)
-        {
-            Solid intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
-            return intersection.Volume > 0;
-        }
+        //private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)
+        //{
+        //    Solid intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
+        //    return intersection.Volume > 0;
+        //}
 
 
-        private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ normal, View view)
-        {
-            Outline outline = new(bbox.Min -= offset, bbox.Max += offset);
-            collector = new FilteredElementCollector(doc, view.Id).Excluding(idsExclude);
-            instanceId = collector.WherePasses(new BoundingBoxIntersectsFilter(outline)).FirstElementId();
-            return instanceId == null;
-        }
+        //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ normal, View view)
+        //{
+        //    Outline outline = new(bbox.Min -= offset, bbox.Max += offset);
+        //    collector = new FilteredElementCollector(doc, view.Id).Excluding(idsExclude);
+        //    instanceId = collector.WherePasses(new BoundingBoxIntersectsFilter(outline)).FirstElementId();
+        //    return instanceId == null;
+        //}
 
 
         private bool IsValidIntersection(Element elem, Solid solid, XYZ centroid, double tolerance, out XYZ normal)
@@ -524,8 +502,8 @@ namespace RevitTimasBIMTools.CutOpening
         //{
         //    try
         //    {
-        //        Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, elem.get_BoundingBox(null).Min);
-        //        ExtrusionAnalyzer analyzer = ExtrusionAnalyzer.Create(solid, plane, XYZ.BasisZ);
+        //        Plane sectionPlane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, elem.get_BoundingBox(null).Min);
+        //        ExtrusionAnalyzer analyzer = ExtrusionAnalyzer.Create(solid, sectionPlane, XYZ.BasisZ);
         //        Face face = analyzer.GetExtrusionBase();
         //        return face.GetEdgesAsCurveLoops();
         //    }

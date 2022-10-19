@@ -18,7 +18,6 @@ namespace RevitTimasBIMTools.RevitModel
         public XYZ Origin { get; internal set; }
         public XYZ HostNormal { get; internal set; }
         public XYZ ModelNormal { get; internal set; }
-        public Outline Outline { get; internal set; }
         public int HostIntId { get; internal set; }
         public int LevelIntId { get; internal set; }
         public string SymbolName { get; internal set; }
