@@ -91,6 +91,7 @@ namespace RevitTimasBIMTools.CutOpening
         private double diameter = 0;
         private double hight = 0;
         private double widht = 0;
+        private TransactionStatus status;
 
         #endregion
 
@@ -118,6 +119,8 @@ namespace RevitTimasBIMTools.CutOpening
         {
             InitializeCache(doc);
             levelIntId = level.Id.IntegerValue;
+            using TransactionGroup transGroup = new(doc);
+            status = transGroup.Start("GetCollision");
             foreach (Element host in elements)
             {
                 if (levelIntId == host.LevelId.IntegerValue)
@@ -128,6 +131,7 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                 }
             }
+            status = transGroup.Assimilate();
         }
 
 
@@ -139,6 +143,7 @@ namespace RevitTimasBIMTools.CutOpening
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(catId);
+
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(ref instBbox);
@@ -186,27 +191,37 @@ namespace RevitTimasBIMTools.CutOpening
         private IList<CurveLoop> GetCountours(Document doc, Solid solid, XYZ basePnt, XYZ direction, double offset)
         {
             IList<CurveLoop> curveloops = new List<CurveLoop>();
-            try
+            using (SubTransaction transaction = new(doc))
             {
-                Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, basePnt);
-
-                Face result = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
-
-                curveloops = ExporterIFCUtils.ValidateCurveLoops(result.GetEdgesAsCurveLoops(), direction);
-
-                SketchPlane sketchPlane = SketchPlane.Create(doc, plane);
-
-                doc.Regenerate();
-
-                foreach (CurveLoop loop in curveloops)
+                status = transaction.Start();
+                try
                 {
-                    CurveArray array = CurveLoop.CreateViaThicken(loop, offset, direction).GetEnumerator() as CurveArray;
-                    _ = doc.Create.NewModelCurveArray(array, sketchPlane);
+                    Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, basePnt);
+
+                    Face result = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
+
+                    curveloops = ExporterIFCUtils.ValidateCurveLoops(result.GetEdgesAsCurveLoops(), direction);
+
+                    SketchPlane sketchPlane = SketchPlane.Create(doc, plane);
+
+                    doc.Regenerate();
+
+                    foreach (CurveLoop loop in curveloops)
+                    {
+                        CurveArray array = CurveLoop.CreateViaThicken(loop, offset, direction).GetEnumerator() as CurveArray;
+                        _ = doc.Create.NewModelCurveArray(array, sketchPlane);
+                    }
+                    status = transaction.Commit();
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex.Message);
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                    if (!transaction.HasEnded())
+                    {
+                        status = transaction.RollBack();
+                        Logger.Log(status.ToString());
+                    }
+                }
             }
             return curveloops;
         }
