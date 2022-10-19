@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
+using log4net.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
@@ -68,7 +69,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private ElementTypeData sizeData;
         private FilteredElementCollector collector;
-
+        SketchPlane levelSketchPlane;
         #endregion
 
 
@@ -127,16 +128,20 @@ namespace RevitTimasBIMTools.CutOpening
             IList<ElementModel> output = new List<ElementModel>(50);
             using TransactionGroup transGroup = new(doc);
             status = transGroup.Start("GetCollision");
+            
             foreach (Element host in elements)
             {
+                levelSketchPlane = SketchPlane.Create(doc, level.Id);
                 if (levelIntId == host.LevelId.IntegerValue)
                 {
+                    doc.Regenerate();
                     foreach (ElementModel model in GetIntersectionByElement(doc, host, SearchGlobal, SearchCatId))
                     {
                         output.Add(model);
                     }
                 }
             }
+
             status = transGroup.Assimilate();
             Logger.Info("Result count: " + count);
             return output;
@@ -162,7 +167,7 @@ namespace RevitTimasBIMTools.CutOpening
                         Plane sectionPlane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
                         interSolid = elem.GetIntersectionSolid(global, hostSolid, options);
                         interBbox = interSolid?.GetBoundingBox();
-                        if (interBbox != null && interBbox.Enabled)
+                        if (interBbox != null)
                         {
                             instanceId = elem.Id;
 
@@ -176,6 +181,7 @@ namespace RevitTimasBIMTools.CutOpening
                             _ = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, basisNormal, height);
 
                             sizeData = GetSectionSize(elem, interSolid, interNormal);
+
                             ElementModel model = new(instanceId, sizeData)
                             {
                                 Origin = centroid,
@@ -196,7 +202,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private IList<CurveLoop> GetCountours(Document doc, Solid solid, XYZ basePnt, XYZ direction, double offset)
+        private IList<CurveLoop> GetCountours(Document doc, ElementId levelId,  Solid solid, XYZ bottom, XYZ direction, double offset)
         {
             IList<CurveLoop> curveloops = new List<CurveLoop>();
             using (Transaction transaction = new(doc))
@@ -204,22 +210,20 @@ namespace RevitTimasBIMTools.CutOpening
                 status = transaction.Start("GetCountours");
                 try
                 {
-                    Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, basePnt);
+                    Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, bottom);
 
                     Face result = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
 
                     curveloops = ExporterIFCUtils.ValidateCurveLoops(result.GetEdgesAsCurveLoops(), direction);
 
-                    SketchPlane sketchPlane = SketchPlane.Create(doc, plane);
-
-                    doc.Regenerate();
-
                     foreach (CurveLoop loop in curveloops)
                     {
                         plane = loop.GetPlane();
-                        CurveLoop crvloop = CurveLoop.CreateViaOffset(loop, offset, plane.Normal);
-                        CurveArray array = crvloop.GetEnumerator() as CurveArray;
-                        _ = doc.Create.NewModelCurveArray(array, sketchPlane);
+                        CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, plane.Normal));
+                        if (!array.IsEmpty)
+                        {
+                            _ = doc.Create.NewModelCurveArray(array, levelSketchPlane);
+                        }
                     }
 
                     status = transaction.Commit();
@@ -235,6 +239,17 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
             return curveloops;
+        }
+
+
+        CurveArray ConvertLoopToArray(CurveLoop loop)
+        {
+            CurveArray a = new CurveArray();
+            foreach (Curve c in loop)
+            {
+                a.Append(c);
+            }
+            return a;
         }
 
 
