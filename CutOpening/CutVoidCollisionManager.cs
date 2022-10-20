@@ -201,18 +201,23 @@ namespace RevitTimasBIMTools.CutOpening
                             double horzAngle = XYZ.BasisX.AngleTo(hostNormal).GetInternalAngleByRadians();
                             Transform vertical = Transform.CreateRotationAtPoint(XYZ.BasisZ, vertAngle, centroid);
                             Transform horizont = Transform.CreateRotationAtPoint(XYZ.BasisX, horzAngle, centroid);
-                            Transform trans = vertical.Multiply(horizont);
+                            Transform transfm = vertical.Multiply(horizont);
 
-                            hight = 0; widht = 0; 
+                            hight = 0; widht = 0;
                             List<XYZ> pointList = pointSet.ToList();
                             for (int i = 0; i < pointList.Count; i++)
                             {
-                                XYZ cur = pointList[i];
-                                XYZ seq = pointList[(i + 1) % pointList.Count];
-                                cur = trans.OfPoint(ProjectOnto(section, cur));
-                                seq = trans.OfPoint(ProjectOnto(section, seq));
-                                hight = Math.Max(hight, Math.Abs(seq.Z - cur.Z));
-                                widht = Math.Max(widht, Math.Abs(seq.X - cur.X));
+                                XYZ curr = pointList[i];
+                                XYZ next = pointList[(i + 1) % pointList.Count];
+
+
+                                //curr = transfm.OfPoint(ProjectOnto(section, curr));
+                                //next = transfm.OfPoint(ProjectOnto(section, next));
+                                curr = transfm.OfPoint(curr);
+                                next = transfm.OfPoint(next);
+
+                                hight = Math.Max(hight, Math.Abs(next.Z - curr.Z));
+                                widht = Math.Max(widht, Math.Abs(next.X - curr.X));
                             }
 
                             _ = interSolid.GetCountours(doc, levelPlane, levelSketch, cutOffsetSize);
