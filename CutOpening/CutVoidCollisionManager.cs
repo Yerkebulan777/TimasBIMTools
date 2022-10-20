@@ -196,14 +196,14 @@ namespace RevitTimasBIMTools.CutOpening
                             _ = pointSet.Add(new XYZ(max.X, max.Y, min.Z));
 
                             hostNormal = hostNormal.ResetDirectionToPositive();
-                            double vertRad = XYZ.BasisZ.AngleTo(hostNormal.Normalize());
-                            double horzRad = XYZ.BasisX.AngleTo(hostNormal.Normalize());
                             Plane section = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
-                            Transform horizont = Transform.CreateRotationAtPoint(XYZ.BasisX, horzRad, centroid);
-                            Transform vertical = Transform.CreateRotationAtPoint(XYZ.BasisZ, vertRad, centroid);
+                            double vertAngle = XYZ.BasisZ.AngleTo(hostNormal).GetInternalAngleByRadians();
+                            double horzAngle = XYZ.BasisX.AngleTo(hostNormal).GetInternalAngleByRadians();
+                            Transform vertical = Transform.CreateRotationAtPoint(XYZ.BasisZ, vertAngle, centroid);
+                            Transform horizont = Transform.CreateRotationAtPoint(XYZ.BasisX, horzAngle, centroid);
                             Transform trans = vertical.Multiply(horizont);
 
-                            widht = 0; hight = 0;
+                            hight = 0; widht = 0; 
                             List<XYZ> pointList = pointSet.ToList();
                             for (int i = 0; i < pointList.Count; i++)
                             {

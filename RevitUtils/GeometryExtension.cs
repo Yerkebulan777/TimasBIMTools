@@ -234,8 +234,8 @@ namespace RevitTimasBIMTools.RevitUtils
             Transform identityTransform = Transform.Identity;
             double angleHorisontDegrees = ConvertRadiansToDegrees(GetHorizontAngleRadiansByNormal(direction));
             double angleVerticalDegrees = ConvertRadiansToDegrees(GetVerticalAngleRadiansByNormal(direction));
-            Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngle(angleHorisontDegrees), centroid);
-            Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngle(angleVerticalDegrees), centroid);
+            Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngleByDegrees(angleHorisontDegrees), centroid);
+            Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngleByDegrees(angleVerticalDegrees), centroid);
             solid = angleHorisontDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, horizont);
             solid = angleVerticalDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, vertical);
             BoundingBoxXYZ interBbox = solid?.GetBoundingBox();
@@ -266,9 +266,15 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        private static double GetInternalAngle(double degrees)
+        public static double GetInternalAngleByDegrees(this double degrees)
         {
             return UnitUtils.ConvertToInternalUnits(degrees, DisplayUnitType.DUT_DECIMAL_DEGREES);
+        }
+
+
+        public static double GetInternalAngleByRadians(this double degrees)
+        {
+            return UnitUtils.ConvertToInternalUnits(degrees, DisplayUnitType.DUT_RADIANS);
         }
 
 
