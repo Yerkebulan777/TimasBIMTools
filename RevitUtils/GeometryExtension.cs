@@ -3,7 +3,10 @@ using Autodesk.Revit.DB.IFC;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using Document = Autodesk.Revit.DB.Document;
+using Line = Autodesk.Revit.DB.Line;
 using Options = Autodesk.Revit.DB.Options;
+
 
 namespace RevitTimasBIMTools.RevitUtils
 {
