@@ -174,29 +174,31 @@ namespace RevitTimasBIMTools.CutOpening
                     if (IsNotParallel(hostNormal, interNormal))
                     {
                         count++;
+                        // WARNING: Reorde solid GetIntersectionSolid !!! SOLID IS EMPTY! 1 ...
                         interSolid = elem.GetIntersectionSolid(global, hostSolid, options);
                         interBbox = interSolid?.GetBoundingBox();
                         if (interBbox != null)
                         {
+                            hight = 0; widht = 0;
                             instanceId = elem.Id;
-
-                            idsExclude.Add(instanceId);
-
-                            HashSet<XYZ> pointSet = new();
 
                             XYZ min = interBbox.Min;
                             XYZ max = interBbox.Max;
 
-                            _ = pointSet.Add(min);
-                            _ = pointSet.Add(max);
+                            idsExclude.Add(instanceId);
 
-                            _ = pointSet.Add(new XYZ(max.X, min.Y, min.Z));
-                            _ = pointSet.Add(new XYZ(min.X, max.Y, min.Z));
-                            _ = pointSet.Add(new XYZ(min.X, min.Y, max.Z));
+                            List<XYZ> points = new List<XYZ>(8);
 
-                            _ = pointSet.Add(new XYZ(min.X, max.Y, max.Z));
-                            _ = pointSet.Add(new XYZ(max.X, min.Y, max.Z));
-                            _ = pointSet.Add(new XYZ(max.X, max.Y, min.Z));
+                            points.Add(min);
+                            points.Add(max);
+
+                            points.Add(new XYZ(max.X, min.Y, min.Z));
+                            points.Add(new XYZ(min.X, max.Y, min.Z));
+                            points.Add(new XYZ(min.X, min.Y, max.Z));
+
+                            points.Add(new XYZ(min.X, max.Y, max.Z));
+                            points.Add(new XYZ(max.X, min.Y, max.Z));
+                            points.Add(new XYZ(max.X, max.Y, min.Z));
 
                             hostNormal = hostNormal.ResetDirectionToPositive();
                             double vertAngle = hostNormal.GetVerticalAngleRadiansByNormal();
@@ -206,20 +208,16 @@ namespace RevitTimasBIMTools.CutOpening
                             Transform horizont = Transform.CreateRotationAtPoint(horzExis, horzAngle, centroid);
                             Transform transfm = vertical.Multiply(horizont);
 
-                            hight = 0; widht = 0;
-                            List<XYZ> pointList = pointSet.ToList();
-                            //StringBuilder builder = new StringBuilder();
-                            for (int i = 0; i < pointList.Count; i++)
+                            for (int i = 0; i < points.Count; i++)
                             {
-                                XYZ curr = pointList[i];
-                                XYZ next = pointList[(i + 1) % pointList.Count];
+                                XYZ curr = points[i];
+                                XYZ next = points[(i + 1) % points.Count];
 
                                 curr = transfm.OfPoint(curr);
                                 next = transfm.OfPoint(next);
 
                                 hight = Math.Max(hight, Math.Abs(next.Z - curr.Z));
                                 widht = Math.Max(widht, Math.Abs(next.X - curr.X));
-                                //builder.Clear();
                             }
 
                             _ = interSolid.GetCountours(doc, levelPlane, levelSketch, cutOffsetSize);
