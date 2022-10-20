@@ -247,20 +247,20 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        private static XYZ ResetDirectionToPositive(XYZ direction)
+        public static XYZ ResetDirectionToPositive(this XYZ direction)
         {
             double radians = XYZ.BasisX.AngleOnPlaneTo(direction, XYZ.BasisZ);
             return radians < Math.PI ? direction : direction.Negate();
         }
 
 
-        private static double GetHorizontAngleRadiansByNormal(XYZ direction)
+        public static double GetHorizontAngleRadiansByNormal(this XYZ direction)
         {
             return Math.Atan(direction.X / direction.Y);
         }
 
 
-        private static double GetVerticalAngleRadiansByNormal(XYZ direction)
+        public static double GetVerticalAngleRadiansByNormal(this XYZ direction)
         {
             return Math.Acos(direction.DotProduct(XYZ.BasisZ)) - (Math.PI / 2);
         }

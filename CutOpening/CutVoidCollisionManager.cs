@@ -4,6 +4,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -90,7 +91,7 @@ namespace RevitTimasBIMTools.CutOpening
         #endregion
 
 
-        #region Cache
+        #region Cache Properties
 
         private ElementModel[] modelTempData = new ElementModel[0];
         private readonly ICollection<ElementId> idsExclude = new List<ElementId>();
@@ -178,31 +179,36 @@ namespace RevitTimasBIMTools.CutOpening
 
                             idsExclude.Add(instanceId);
 
-                            List<XYZ> points = new(6);
+                            SortedSet<XYZ> pointSet = new();
 
                             XYZ min = interBbox.Min;
                             XYZ max = interBbox.Max;
 
-                            points.Add(new XYZ(max.X, min.Y, min.Z));
-                            points.Add(new XYZ(min.X, max.Y, min.Z));
-                            points.Add(new XYZ(min.X, min.Y, max.Z));
+                            _ = pointSet.Add(min);
+                            _ = pointSet.Add(max);
 
-                            points.Add(new XYZ(min.X, max.Y, max.Z));
-                            points.Add(new XYZ(max.X, min.Y, max.Z));
-                            points.Add(new XYZ(max.X, max.Y, min.Z));
+                            _ = pointSet.Add(new XYZ(max.X, min.Y, min.Z));
+                            _ = pointSet.Add(new XYZ(min.X, max.Y, min.Z));
+                            _ = pointSet.Add(new XYZ(min.X, min.Y, max.Z));
 
-                            double vertRad = XYZ.BasisZ.AngleTo(hostNormal);
-                            double horzRad = XYZ.BasisX.AngleTo(hostNormal);
+                            _ = pointSet.Add(new XYZ(min.X, max.Y, max.Z));
+                            _ = pointSet.Add(new XYZ(max.X, min.Y, max.Z));
+                            _ = pointSet.Add(new XYZ(max.X, max.Y, min.Z));
+
+                            hostNormal = hostNormal.ResetDirectionToPositive();
+                            double vertRad = XYZ.BasisZ.AngleTo(hostNormal.Normalize());
+                            double horzRad = XYZ.BasisX.AngleTo(hostNormal.Normalize());
                             Plane section = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
-                            Transform vertical = Transform.CreateRotationAtPoint(XYZ.BasisZ, vertRad, centroid);
                             Transform horizont = Transform.CreateRotationAtPoint(XYZ.BasisX, horzRad, centroid);
+                            Transform vertical = Transform.CreateRotationAtPoint(XYZ.BasisZ, vertRad, centroid);
                             Transform trans = vertical.Multiply(horizont);
 
                             widht = 0; hight = 0;
-                            for (int i = 0; i < points.Count; i++)
+                            List<XYZ> pointList = pointSet.ToList();
+                            for (int i = 0; i < pointList.Count; i++)
                             {
-                                XYZ cur = points[i];
-                                XYZ seq = points[(i + 1) % points.Count];
+                                XYZ cur = pointList[i];
+                                XYZ seq = pointList[(i + 1) % pointList.Count];
                                 cur = trans.OfPoint(ProjectOnto(section, cur));
                                 seq = trans.OfPoint(ProjectOnto(section, seq));
                                 hight = Math.Max(hight, Math.Abs(seq.Z - cur.Z));
