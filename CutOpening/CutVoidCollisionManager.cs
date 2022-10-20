@@ -1,11 +1,11 @@
 ﻿using Autodesk.Revit.DB;
+using log4net.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -64,8 +64,8 @@ namespace RevitTimasBIMTools.CutOpening
         #region Output Properties
 
         private FilteredElementCollector collector;
-        private SketchPlane levelSketch;
-        private Plane levelPlane;
+        private SketchPlane sketchPlan;
+        private Plane plane;
         private double diameter = 0;
         private double hight = 0;
         private double widht = 0;
@@ -108,15 +108,16 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private void CreateSketchPlaneByLevel(Document doc, Level level)
+        private SketchPlane CreateSketchPlaneByNormal(Document doc, XYZ normal, XYZ point)
         {
+            SketchPlane result = null;
             using Transaction transaction = new(doc, "CreateSketchPlane");
             if (transaction.Start() == TransactionStatus.Started)
             {
                 try
                 {
-                    levelPlane = Plane.CreateByNormalAndOrigin(basisZNormal, new XYZ(0, 0, level.Elevation));
-                    levelSketch = SketchPlane.Create(doc, levelPlane);
+                    plane = Plane.CreateByNormalAndOrigin(normal, point);
+                    result = SketchPlane.Create(doc, plane);
                     status = transaction.Commit();
                 }
                 catch (Exception ex)
@@ -128,6 +129,7 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                 }
             }
+            return result;
         }
 
 
@@ -136,7 +138,6 @@ namespace RevitTimasBIMTools.CutOpening
             count = 0;
             InitializeCache(doc);
             levelIntId = level.Id.IntegerValue;
-            CreateSketchPlaneByLevel(doc, level);
             IList<ElementModel> output = new List<ElementModel>(50);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             status = transGroup.Start();
@@ -159,26 +160,32 @@ namespace RevitTimasBIMTools.CutOpening
         private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Element host, Transform global, ElementId catId)
         {
             hostBbox = host.get_BoundingBox(null);
+            XYZ vertExis = identityTransform.BasisX;
+            XYZ horzExis = identityTransform.BasisZ;
             hostSolid = host.GetSolidByVolume(identityTransform, options);
-            hostNormal = host is Wall wall ? wall.Orientation.Normalize() : basisZNormal;
+            hostNormal = host is Wall wall ? wall.Orientation.Normalize() :
+                HostObjectUtils.GetTopFaces(host as HostObject).Cast<PlanarFace>()
+                .Aggregate((fax, fin) => fax.Area > fin.Area ? fax : fin).FaceNormal.Normalize();
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(catId);
-            XYZ vertExis = identityTransform.BasisX;
-            XYZ horzExis = identityTransform.BasisZ;
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(ref interBbox);
                 if (IsValidIntersection(elem, hostSolid, centroid, minSideSize, out interNormal))
                 {
-                    if (IsNotParallel(hostNormal, interNormal))
+                    if (IsValidParallel(hostNormal, interNormal))
                     {
                         count++;
+                        hostNormal = hostNormal.ResetDirectionToPositive();
                         // WARNING: Reorde solid GetIntersectionSolid !!! SOLID IS EMPTY! 1 ...
                         interSolid = elem.GetIntersectionSolid(global, hostSolid, options);
-                        interBbox = interSolid?.GetBoundingBox();
-                        if (interBbox != null)
+                        sketchPlan = CreateSketchPlaneByNormal(doc, hostNormal, centroid);
+                        if (interSolid != null && sketchPlan != null)
                         {
+                            interBbox = interSolid.GetBoundingBox();
+                            centroid = interSolid.ComputeCentroid();
+
                             hight = 0; widht = 0;
                             instanceId = elem.Id;
 
@@ -187,23 +194,19 @@ namespace RevitTimasBIMTools.CutOpening
 
                             idsExclude.Add(instanceId);
 
-                            List<XYZ> points = new List<XYZ>(8);
+                            List<XYZ> points = new(6)
+                            {
+                                new XYZ(max.X, min.Y, min.Z),
+                                new XYZ(min.X, max.Y, min.Z),
+                                new XYZ(min.X, min.Y, max.Z),
+                                new XYZ(min.X, max.Y, max.Z),
+                                new XYZ(max.X, min.Y, max.Z),
+                                new XYZ(max.X, max.Y, min.Z)
+                            };
 
-                            points.Add(min);
-                            points.Add(max);
-
-                            points.Add(new XYZ(max.X, min.Y, min.Z));
-                            points.Add(new XYZ(min.X, max.Y, min.Z));
-                            points.Add(new XYZ(min.X, min.Y, max.Z));
-
-                            points.Add(new XYZ(min.X, max.Y, max.Z));
-                            points.Add(new XYZ(max.X, min.Y, max.Z));
-                            points.Add(new XYZ(max.X, max.Y, min.Z));
-
-                            hostNormal = hostNormal.ResetDirectionToPositive();
+                            plane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
                             double vertAngle = hostNormal.GetVerticalAngleRadiansByNormal();
                             double horzAngle = hostNormal.GetHorizontAngleRadiansByNormal();
-                            //Plane section = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
                             Transform vertical = Transform.CreateRotationAtPoint(vertExis, vertAngle, centroid);
                             Transform horizont = Transform.CreateRotationAtPoint(horzExis, horzAngle, centroid);
                             Transform transfm = vertical.Multiply(horizont);
@@ -220,7 +223,7 @@ namespace RevitTimasBIMTools.CutOpening
                                 widht = Math.Max(widht, Math.Abs(next.X - curr.X));
                             }
 
-                            _ = interSolid.GetCountours(doc, levelPlane, levelSketch, cutOffsetSize);
+                            _ = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
 
                             //_ = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, basisZNormal, height);
 
@@ -282,7 +285,7 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        private bool IsNotParallel(XYZ hostNormal, XYZ direction)
+        private bool IsValidParallel(XYZ hostNormal, XYZ direction)
         {
             return !direction.IsAlmostEqualTo(XYZ.Zero) && Math.Abs(hostNormal.DotProduct(direction)) > thresholdAngle;
         }
@@ -408,10 +411,10 @@ namespace RevitTimasBIMTools.CutOpening
         //        _ = transaction.Start("Create Temporary Sketch Plane");
         //        try
         //        {
-        //            SketchPlane sketch = SketchPlane.Create(doc, reference);
-        //            if (null != sketch)
+        //            SketchPlane sketchPlan = SketchPlane.Create(doc, reference);
+        //            if (null != sketchPlan)
         //            {
-        //                Plane plan = sketch.GetPlane();
+        //                Plane plan = sketchPlan.GetPlane();
         //                normal = plan.Normal;
         //                origin = plan.Origin;
         //                flag = true;
