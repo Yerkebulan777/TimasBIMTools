@@ -179,7 +179,7 @@ namespace RevitTimasBIMTools.CutOpening
 
                             idsExclude.Add(instanceId);
 
-                            SortedSet<XYZ> pointSet = new();
+                            HashSet<XYZ> pointSet = new();
 
                             XYZ min = interBbox.Min;
                             XYZ max = interBbox.Max;

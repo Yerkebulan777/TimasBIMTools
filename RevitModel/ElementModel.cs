@@ -44,8 +44,8 @@ namespace RevitTimasBIMTools.RevitModel
 
         public void SetSizeDescription(double height, double width)
         {
-            int h = (int)Math.Round(height * 304.8);
             int w = (int)Math.Round(width * 304.8);
+            int h = (int)Math.Round(height * 304.8);
             Description = $"{w}x{h}(h)".Normalize();
         }
 
