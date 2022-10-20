@@ -76,25 +76,24 @@ namespace RevitTimasBIMTools.CutOpening
         #region Templory Properties
 
         private Line line = null;
-        private ElementId instanceId = null;
         private XYZ offset = null;
         private XYZ centroid = null;
         private Solid hostSolid = null;
         private Solid interSolid = null;
-        private XYZ interNormal = XYZ.BasisZ;
         private XYZ hostNormal = XYZ.BasisZ;
-        private BoundingBoxXYZ interBbox = null;
+        private XYZ interNormal = XYZ.BasisZ;
+        private Transform transform = null;
         private BoundingBoxXYZ hostBbox = null;
-        private Transform transform = Transform.Identity;
+        private BoundingBoxXYZ interBbox = null;
+        private ElementId instanceId = null;
 
         #endregion
 
 
         #region Cache
 
+        private ElementModel[] modelTempData = new ElementModel[0];
         private readonly ICollection<ElementId> idsExclude = new List<ElementId>();
-        private ElementModel[] modelTempData { get; set; } = new ElementModel[0];
-        private IDictionary<string, ElementTypeData> sizeTempData { get; set; } = CacheDataRepository.SizeTypeData;
 
         #endregion
 
@@ -192,7 +191,6 @@ namespace RevitTimasBIMTools.CutOpening
                             points.Add(new XYZ(max.X, min.Y, max.Z));
                             points.Add(new XYZ(max.X, max.Y, min.Z));
 
-                            
                             double vertRad = XYZ.BasisZ.AngleTo(hostNormal);
                             double horzRad = XYZ.BasisX.AngleTo(hostNormal);
                             Plane section = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
@@ -273,6 +271,12 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
+        private bool IsNotParallel(XYZ hostNormal, XYZ direction)
+        {
+            return !direction.IsAlmostEqualTo(XYZ.Zero) && Math.Abs(hostNormal.DotProduct(direction)) > thresholdAngle;
+        }
+
+
         private bool IsValidIntersection(Element elem, Solid solid, XYZ centroid, double tolerance, out XYZ normal)
         {
             double length = 0;
@@ -299,9 +303,9 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-
         private void GetSectionSize(Element elem)
         {
+            hight = 0; widht = 0;
             int catIdInt = elem.Category.Id.IntegerValue;
             if (elem.Document.GetElement(elem.GetTypeId()) is ElementType)
             {
@@ -319,6 +323,8 @@ namespace RevitTimasBIMTools.CutOpening
                             if (diameterParam != null && diameterParam.HasValue)
                             {
                                 diameter = diameterParam.AsDouble();
+                                hight = diameter;
+                                widht = diameter;
                             }
                             else
                             {
@@ -340,18 +346,10 @@ namespace RevitTimasBIMTools.CutOpening
                         }
                     default:
                         {
-                            hight = 0;
-                            widht = 0;
                             return;
                         }
                 }
             }
-        }
-
-
-        private bool IsNotParallel(XYZ hostNormal, XYZ direction)
-        {
-            return !direction.IsAlmostEqualTo(XYZ.Zero) && Math.Abs(hostNormal.DotProduct(direction)) > thresholdAngle;
         }
 
 
