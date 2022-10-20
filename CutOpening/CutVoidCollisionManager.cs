@@ -5,6 +5,7 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -159,10 +160,12 @@ namespace RevitTimasBIMTools.CutOpening
         {
             hostBbox = host.get_BoundingBox(null);
             hostSolid = host.GetSolidByVolume(identityTransform, options);
-            hostNormal = host is Wall wall ? wall.Orientation : basisZNormal;
+            hostNormal = host is Wall wall ? wall.Orientation.Normalize() : basisZNormal;
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(catId);
+            XYZ vertExis = identityTransform.BasisX;
+            XYZ horzExis = identityTransform.BasisZ;
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(ref interBbox);
@@ -196,28 +199,27 @@ namespace RevitTimasBIMTools.CutOpening
                             _ = pointSet.Add(new XYZ(max.X, max.Y, min.Z));
 
                             hostNormal = hostNormal.ResetDirectionToPositive();
-                            Plane section = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
-                            double vertAngle = XYZ.BasisZ.AngleTo(hostNormal).GetInternalAngleByRadians();
-                            double horzAngle = XYZ.BasisX.AngleTo(hostNormal).GetInternalAngleByRadians();
-                            Transform vertical = Transform.CreateRotationAtPoint(XYZ.BasisZ, vertAngle, centroid);
-                            Transform horizont = Transform.CreateRotationAtPoint(XYZ.BasisX, horzAngle, centroid);
+                            double vertAngle = hostNormal.GetVerticalAngleRadiansByNormal();
+                            double horzAngle = hostNormal.GetHorizontAngleRadiansByNormal();
+                            //Plane section = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
+                            Transform vertical = Transform.CreateRotationAtPoint(vertExis, vertAngle, centroid);
+                            Transform horizont = Transform.CreateRotationAtPoint(horzExis, horzAngle, centroid);
                             Transform transfm = vertical.Multiply(horizont);
 
                             hight = 0; widht = 0;
                             List<XYZ> pointList = pointSet.ToList();
+                            //StringBuilder builder = new StringBuilder();
                             for (int i = 0; i < pointList.Count; i++)
                             {
                                 XYZ curr = pointList[i];
                                 XYZ next = pointList[(i + 1) % pointList.Count];
 
-
-                                //curr = transfm.OfPoint(ProjectOnto(section, curr));
-                                //next = transfm.OfPoint(ProjectOnto(section, next));
                                 curr = transfm.OfPoint(curr);
                                 next = transfm.OfPoint(next);
 
                                 hight = Math.Max(hight, Math.Abs(next.Z - curr.Z));
                                 widht = Math.Max(widht, Math.Abs(next.X - curr.X));
+                                //builder.Clear();
                             }
 
                             _ = interSolid.GetCountours(doc, levelPlane, levelSketch, cutOffsetSize);
