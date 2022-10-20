@@ -234,7 +234,7 @@
     <Compile Include="RevitCommads\CmdChangeElementColor.cs" />
     <Compile Include="RevitCommads\CmdParameterUnitConverter.cs" />
     <Compile Include="RevitModel\IRevitStructuralModel.cs" />
-    <Compile Include="RevitUtils\SolidExtension.cs" />
+    <Compile Include="RevitUtils\GeometryExtension.cs" />
     <Compile Include="RevitModel\DocumentModel.cs" />
     <Compile Include="RevitModel\ElementModel.cs" />
     <Compile Include="RevitUtils\ParameterUtils.cs" />

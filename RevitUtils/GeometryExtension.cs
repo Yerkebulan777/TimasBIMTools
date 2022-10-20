@@ -7,7 +7,7 @@ using Options = Autodesk.Revit.DB.Options;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
-    internal static class SolidExtension
+    internal static class GeometryExtension
     {
         private static Solid result { get; set; } = null;
 
@@ -108,13 +108,13 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static IList<ModelCurveArray> GetCountours(this Solid solid, Document doc,  Plane plane, SketchPlane sketch, double offset = 0)
+        public static IList<ModelCurveArray> GetCountours(this Solid solid, Document doc, Plane plane, SketchPlane sketch, double offset = 0)
         {
             XYZ direction = XYZ.BasisZ;
             IList<ModelCurveArray> curves = new List<ModelCurveArray>();
-            using (Transaction transaction = new(doc))
+            using (Transaction t = new(doc))
             {
-                transaction.Start("GetCountours");
+                _ = t.Start("GetCountours");
                 try
                 {
                     Face face = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
@@ -127,14 +127,14 @@ namespace RevitTimasBIMTools.RevitUtils
                             curves.Add(doc.Create.NewModelCurveArray(array, sketch));
                         }
                     }
-                    transaction.Commit();
+                    _ = t.Commit();
                 }
                 catch (Exception ex)
                 {
                     Logger.Error(ex.Message);
-                    if (!transaction.HasEnded())
+                    if (!t.HasEnded())
                     {
-                        transaction.RollBack();
+                        _ = t.RollBack();
                     }
                 }
             }
@@ -199,5 +199,81 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             return result;
         }
+
+
+        public static void CreateDirectShape(this Solid solid, Document doc, Instance elem, BuiltInCategory builtIn = BuiltInCategory.OST_GenericModel)
+        {
+            using Transaction t = new(doc, "Create DirectShape");
+            try
+            {
+                _ = t.Start();
+                DirectShape ds = DirectShape.CreateElement(doc, new ElementId(builtIn));
+                ds.ApplicationDataId = elem.UniqueId;
+                ds.Name = "Centroid by " + elem.Name;
+                ds.SetShape(new GeometryObject[] { solid });
+                _ = t.Commit();
+            }
+            catch (Exception exc)
+            {
+                Logger.Error(exc.Message);
+                if (!t.HasEnded())
+                {
+                    _ = t.RollBack();
+                }
+            }
+        }
+
+
+        public static void GetSizeByGeometry(this Solid solid, XYZ direction)
+        {
+            XYZ centroid = solid.ComputeCentroid();
+            direction = ResetDirectionToPositive(direction);
+            Transform identityTransform = Transform.Identity;
+            double angleHorisontDegrees = ConvertRadiansToDegrees(GetHorizontAngleRadiansByNormal(direction));
+            double angleVerticalDegrees = ConvertRadiansToDegrees(GetVerticalAngleRadiansByNormal(direction));
+            Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngle(angleHorisontDegrees), centroid);
+            Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngle(angleVerticalDegrees), centroid);
+            solid = angleHorisontDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, horizont);
+            solid = angleVerticalDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, vertical);
+            BoundingBoxXYZ interBbox = solid?.GetBoundingBox();
+            if (interBbox != null)
+            {
+                _ = Math.Abs(interBbox.Max.X - interBbox.Min.X);
+                _ = Math.Abs(interBbox.Max.Z - interBbox.Min.Z);
+            }
+        }
+
+
+        private static XYZ ResetDirectionToPositive(XYZ direction)
+        {
+            double radians = XYZ.BasisX.AngleOnPlaneTo(direction, XYZ.BasisZ);
+            return radians < Math.PI ? direction : direction.Negate();
+        }
+
+
+        private static double GetHorizontAngleRadiansByNormal(XYZ direction)
+        {
+            return Math.Atan(direction.X / direction.Y);
+        }
+
+
+        private static double GetVerticalAngleRadiansByNormal(XYZ direction)
+        {
+            return Math.Acos(direction.DotProduct(XYZ.BasisZ)) - (Math.PI / 2);
+        }
+
+
+        private static double GetInternalAngle(double degrees)
+        {
+            return UnitUtils.ConvertToInternalUnits(degrees, DisplayUnitType.DUT_DECIMAL_DEGREES);
+        }
+
+
+        private static double ConvertRadiansToDegrees(double radians, int digit = 5)
+        {
+            return Math.Round(180 / Math.PI * radians, digit);
+        }
+
+
     }
 }

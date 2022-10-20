@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.IFC;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
@@ -9,7 +8,6 @@ using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
 using Parameter = Autodesk.Revit.DB.Parameter;
-using UnitType = Autodesk.Revit.DB.UnitType;
 
 
 namespace RevitTimasBIMTools.CutOpening
@@ -20,18 +18,15 @@ namespace RevitTimasBIMTools.CutOpening
         #region Default Properties
 
         private readonly XYZ basisZNormal = XYZ.BasisZ;
-        private Units revitUnits { get; set; } = null;
-        private DisplayUnitType angleUnit { get; set; }
-        private Options options { get; } = new()
+        private readonly Options options = new()
         {
             ComputeReferences = true,
             IncludeNonVisibleObjects = true,
             DetailLevel = ViewDetailLevel.Medium
         };
 
-
-        private Transform identityTransform { get; } = Transform.Identity;
-        private SolidCurveIntersectionOptions intersectOptions { get; } = new();
+        private readonly Transform identityTransform = Transform.Identity;
+        private readonly SolidCurveIntersectionOptions intersectOptions = new();
 
         #endregion
 
@@ -40,7 +35,6 @@ namespace RevitTimasBIMTools.CutOpening
 
         private const int invalidInt = -1;
         private const double footToMm = 304.8;
-        private const double rightAngle = Math.PI / 2;
         private readonly double thresholdAngle = Math.Floor(Math.Cos(45 * Math.PI / 180));
 
         #endregion
@@ -67,10 +61,15 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Output Properties
 
-        private ElementTypeData sizeData;
         private FilteredElementCollector collector;
         private SketchPlane levelSketch;
         private Plane levelPlane;
+        private double diameter = 0;
+        private double hight = 0;
+        private double widht = 0;
+        private int count = 0;
+        private TransactionStatus status;
+
         #endregion
 
 
@@ -88,17 +87,6 @@ namespace RevitTimasBIMTools.CutOpening
         private BoundingBoxXYZ hostBbox = null;
         private Transform transform = Transform.Identity;
 
-        private string unique = string.Empty;
-
-        private double angleRadians = 0;
-        private double angleHorisontDegrees = 0;
-        private double angleVerticalDegrees = 0;
-        private double diameter = 0;
-        private double hight = 0;
-        private double widht = 0;
-        private int count = 0;
-        private TransactionStatus status;
-
         #endregion
 
 
@@ -113,11 +101,9 @@ namespace RevitTimasBIMTools.CutOpening
 
         private void InitializeCache(Document doc)
         {
-            revitUnits = doc.GetUnits();
             modelTempData = new ElementModel[100];
             offset = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
             minDistance = cutOffsetSize + ((minSideSize + maxSideSize) * 0.25);
-            angleUnit = revitUnits.GetFormatOptions(UnitType.UT_Angle).DisplayUnits;
         }
 
 
@@ -193,65 +179,53 @@ namespace RevitTimasBIMTools.CutOpening
 
                             idsExclude.Add(instanceId);
 
+                            List<XYZ> points = new(6);
+
                             XYZ min = interBbox.Min;
                             XYZ max = interBbox.Max;
 
-                            XYZ minX = new XYZ(max.X, min.Y, min.Z);
-                            XYZ minY = new XYZ(min.X, max.Y, min.Z);
-                            XYZ minZ = new XYZ(min.X, min.Y, max.Z);
+                            points.Add(new XYZ(max.X, min.Y, min.Z));
+                            points.Add(new XYZ(min.X, max.Y, min.Z));
+                            points.Add(new XYZ(min.X, min.Y, max.Z));
 
-                            XYZ maxX = new XYZ(min.X, max.Y, max.Z);
-                            XYZ maxY = new XYZ(max.X, min.Y, max.Z);
-                            XYZ maxZ = new XYZ(max.X, max.Y, min.Z);
+                            points.Add(new XYZ(min.X, max.Y, max.Z));
+                            points.Add(new XYZ(max.X, min.Y, max.Z));
+                            points.Add(new XYZ(max.X, max.Y, min.Z));
 
-                            angleRadians = XYZ.BasisX.AngleOnPlaneTo(hostNormal, basisZNormal);
+                            
+                            double vertRad = XYZ.BasisZ.AngleTo(hostNormal);
+                            double horzRad = XYZ.BasisX.AngleTo(hostNormal);
                             Plane section = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
-                            Transform vertical = Transform.CreateRotationAtPoint(XYZ.BasisZ, angleRadians, centroid);
-                            Transform horizont = Transform.CreateRotationAtPoint(XYZ.BasisX, angleRadians, centroid);
-                            Transform transform = vertical.Multiply(horizont);
+                            Transform vertical = Transform.CreateRotationAtPoint(XYZ.BasisZ, vertRad, centroid);
+                            Transform horizont = Transform.CreateRotationAtPoint(XYZ.BasisX, horzRad, centroid);
+                            Transform trans = vertical.Multiply(horizont);
 
-                            min = transform.OfPoint(ProjectOnto(section, min));
-                            max = transform.OfPoint(ProjectOnto(section, max));
-                            minX = transform.OfPoint(ProjectOnto(section, minX));
-                            minY = transform.OfPoint(ProjectOnto(section, minY));
-                            minZ = transform.OfPoint(ProjectOnto(section, minZ));
-                            maxX = transform.OfPoint(ProjectOnto(section, maxX));
-                            maxY = transform.OfPoint(ProjectOnto(section, maxY));
-                            maxZ = transform.OfPoint(ProjectOnto(section, maxZ));
-
-
-                            //var angleX = hostNormal.AngleTo(XYZ.BasisX);
-                            //var angleY = hostNormal.AngleTo(XYZ.BasisY);
-                            //var angleZ = hostNormal.AngleTo(XYZ.BasisZ);
-
-                            
-
-                            
-
-
-
-
-                            //_ = Math.Abs(max.Z - min.Z);
+                            widht = 0; hight = 0;
+                            for (int i = 0; i < points.Count; i++)
+                            {
+                                XYZ cur = points[i];
+                                XYZ seq = points[(i + 1) % points.Count];
+                                cur = trans.OfPoint(ProjectOnto(section, cur));
+                                seq = trans.OfPoint(ProjectOnto(section, seq));
+                                hight = Math.Max(hight, Math.Abs(seq.Z - cur.Z));
+                                widht = Math.Max(widht, Math.Abs(seq.X - cur.X));
+                            }
 
                             _ = interSolid.GetCountours(doc, levelPlane, levelSketch, cutOffsetSize);
 
-
                             //_ = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, basisZNormal, height);
 
-                            sizeData = GetSectionSize(elem, interSolid, interNormal);
+                            //GetSectionSize(elem);
 
-                            ElementModel model = new(instanceId, sizeData)
+                            ElementModel model = new(elem)
                             {
                                 Origin = centroid,
+                                LevelIntId = levelIntId,
                                 HostNormal = hostNormal,
                                 ModelNormal = interNormal,
-                                LevelIntId = levelIntId,
                                 HostIntId = host.Id.IntegerValue,
-                                SymbolName = sizeData.SymbolName,
-                                FamilyName = sizeData.FamilyName,
-                                Description = GetSizeDescription(sizeData)
                             };
-
+                            model.SetSizeDescription(hight, widht);
                             yield return model;
                         }
                     }
@@ -273,6 +247,7 @@ namespace RevitTimasBIMTools.CutOpening
             XYZ vector = pnt - plane.Origin;
             return plane.Normal.DotProduct(vector);
         }
+
 
         //private Outline CreateOpening(Document doc, ElementModel model)
         //{
@@ -325,11 +300,10 @@ namespace RevitTimasBIMTools.CutOpening
 
 
 
-        private ElementTypeData GetSectionSize(Element elem, Solid solid, XYZ direction)
+        private void GetSectionSize(Element elem)
         {
-            ElementTypeData structData = new(null);
             int catIdInt = elem.Category.Id.IntegerValue;
-            if (elem.Document.GetElement(elem.GetTypeId()) is ElementType etype)
+            if (elem.Document.GetElement(elem.GetTypeId()) is ElementType)
             {
                 BuiltInCategory builtInCategory = (BuiltInCategory)catIdInt;
                 switch (builtInCategory)
@@ -337,7 +311,7 @@ namespace RevitTimasBIMTools.CutOpening
                     case BuiltInCategory.OST_PipeCurves:
                         {
                             diameter = elem.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM).AsDouble();
-                            return new ElementTypeData(etype, diameter, diameter);
+                            return;
                         }
                     case BuiltInCategory.OST_DuctCurves:
                         {
@@ -345,73 +319,33 @@ namespace RevitTimasBIMTools.CutOpening
                             if (diameterParam != null && diameterParam.HasValue)
                             {
                                 diameter = diameterParam.AsDouble();
-                                return new ElementTypeData(etype, diameter, diameter);
                             }
                             else
                             {
                                 hight = elem.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM).AsDouble();
                                 widht = elem.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM).AsDouble();
-                                return new ElementTypeData(etype, hight, widht);
                             }
+                            return;
                         }
                     case BuiltInCategory.OST_Conduit:
                         {
                             diameter = elem.get_Parameter(BuiltInParameter.RBS_CONDUIT_DIAMETER_PARAM).AsDouble();
-                            return new ElementTypeData(etype, diameter, diameter);
+                            return;
                         }
                     case BuiltInCategory.OST_CableTray:
                         {
                             hight = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM).AsDouble();
                             widht = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM).AsDouble();
-                            return new ElementTypeData(etype, hight, widht);
+                            return;
                         }
                     default:
                         {
-                            unique = etype.UniqueId.Normalize();
-                            if (!sizeTempData.TryGetValue(unique, out structData))
-                            {
-                                structData = GetSizeByGeometry(solid, etype, direction);
-                                sizeTempData.Add(unique, structData);
-                            }
-                            return structData;
+                            hight = 0;
+                            widht = 0;
+                            return;
                         }
                 }
             }
-            return structData;
-        }
-
-
-        private ElementTypeData GetSizeByGeometry(Solid solid, ElementType etype, XYZ direction)
-        {
-            ElementTypeData result = new(null);
-            centroid = solid.ComputeCentroid();
-            direction = ResetDirectionToPositive(direction);
-            angleHorisontDegrees = ConvertRadiansToDegrees(GetHorizontAngleRadiansByNormal(direction));
-            angleVerticalDegrees = ConvertRadiansToDegrees(GetVerticalAngleRadiansByNormal(direction));
-            Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngle(angleHorisontDegrees), centroid);
-            Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngle(angleVerticalDegrees), centroid);
-            solid = angleHorisontDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, horizont);
-            solid = angleVerticalDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, vertical);
-            interBbox = solid?.GetBoundingBox();
-            if (interBbox != null)
-            {
-                widht = Math.Abs(interBbox.Max.X - interBbox.Min.X);
-                hight = Math.Abs(interBbox.Max.Z - interBbox.Min.Z);
-                result = new ElementTypeData(etype, hight, widht);
-            }
-            return result;
-        }
-
-
-        private string GetSizeDescription(ElementTypeData typeData)
-        {
-            if (typeData.IsValidObject)
-            {
-                int h = (int)Math.Round(typeData.Height * 304.8);
-                int w = (int)Math.Round(typeData.Width * 304.8);
-                return $"{w}x{h}(h)".Normalize();
-            }
-            return string.Empty;
         }
 
 
@@ -419,39 +353,6 @@ namespace RevitTimasBIMTools.CutOpening
         {
             return !direction.IsAlmostEqualTo(XYZ.Zero) && Math.Abs(hostNormal.DotProduct(direction)) > thresholdAngle;
         }
-
-
-        private XYZ ResetDirectionToPositive(XYZ direction)
-        {
-            angleRadians = XYZ.BasisX.AngleOnPlaneTo(direction, XYZ.BasisZ);
-            return angleRadians < Math.PI ? direction : direction.Negate();
-        }
-
-
-        private double GetHorizontAngleRadiansByNormal(XYZ direction)
-        {
-            return Math.Atan(direction.X / direction.Y);
-        }
-
-
-        private double GetVerticalAngleRadiansByNormal(XYZ direction)
-        {
-            return Math.Acos(direction.DotProduct(XYZ.BasisZ)) - rightAngle;
-        }
-
-
-        private double GetInternalAngle(double degrees)
-        {
-            return UnitUtils.ConvertToInternalUnits(degrees, angleUnit);
-        }
-
-
-        private double ConvertRadiansToDegrees(double radians, int digit = 5)
-        {
-            return Math.Round(180 / Math.PI * radians, digit);
-        }
-
-
 
 
         #region Other methods
@@ -479,26 +380,6 @@ namespace RevitTimasBIMTools.CutOpening
         //        }
         //    }
         //    return value;
-        //}
-
-
-        //private void CreateDirectShape(Document doc, Instance elem, Centroid solid)
-        //{
-        //    using Transaction trans = new(doc, "Create DirectShape");
-        //    try
-        //    {
-        //        _ = trans.Start();
-        //        DirectShape ds = DirectShape.CreateElement(doc, new ElementId(BuiltInCategory.OST_GenericModel));
-        //        ds.ApplicationDataId = elem.UniqueId;
-        //        ds.Name = "Centroid by " + elem.Name;
-        //        ds.SetShape(new GeometryObject[] { solid });
-        //        _ = trans.Commit();
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        _ = trans.RollBack();
-        //        Logger.Error(exc.Message);
-        //    }
         //}
 
 
@@ -545,25 +426,7 @@ namespace RevitTimasBIMTools.CutOpening
         //    return Math.Acos((trace - 1) / 2.0);
         //}
 
-
-        //private static IEnumerable<CurveLoop> GetCountours(Centroid solid, Instance elem)
-        //{
-        //    try
-        //    {
-        //        Plane section = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, elem.get_BoundingBox(null).Min);
-        //        ExtrusionAnalyzer analyzer = ExtrusionAnalyzer.Create(solid, section, XYZ.BasisZ);
-        //        Face face = analyzer.GetExtrusionBase();
-        //        return face.GetEdgesAsCurveLoops();
-        //    }
-        //    catch (Autodesk.Revit.Exceptions.InvalidOperationException)
-        //    {
-        //        return Enumerable.Empty<CurveLoop>();
-        //    }
-        //}
-
         #endregion
-
-
 
 
         /// Алгоритм проверки семейств отверстия
@@ -589,14 +452,12 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public void Dispose()
         {
-            sizeTempData.Clear();
             transform?.Dispose();
             SearchDoc?.Dispose();
+            hostSolid?.Dispose();
             interSolid?.Dispose();
             SearchGlobal?.Dispose();
             SearchInstance?.Dispose();
-
-            Logger.Log(sizeTempData.Values.Count.ToString());
         }
     }
 }
