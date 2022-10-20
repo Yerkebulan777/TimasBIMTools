@@ -1,12 +1,12 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
-using log4net.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using Document = Autodesk.Revit.DB.Document;
+using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
 using Parameter = Autodesk.Revit.DB.Parameter;
 using UnitType = Autodesk.Revit.DB.UnitType;
@@ -19,7 +19,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Default Properties
 
-        private readonly XYZ basisNormal = XYZ.BasisZ;
+        private readonly XYZ basisZNormal = XYZ.BasisZ;
         private Units revitUnits { get; set; } = null;
         private DisplayUnitType angleUnit { get; set; }
         private Options options { get; } = new()
@@ -69,7 +69,8 @@ namespace RevitTimasBIMTools.CutOpening
 
         private ElementTypeData sizeData;
         private FilteredElementCollector collector;
-        SketchPlane levelSketchPlane;
+        private SketchPlane levelSketch;
+        private Plane levelPlane;
         #endregion
 
 
@@ -120,28 +121,48 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
+        private void CreateSketchPlaneByLevel(Document doc, Level level)
+        {
+            using Transaction transaction = new(doc, "CreateSketchPlane");
+            if (transaction.Start() == TransactionStatus.Started)
+            {
+                try
+                {
+                    levelPlane = Plane.CreateByNormalAndOrigin(basisZNormal, new XYZ(0, 0, level.Elevation));
+                    levelSketch = SketchPlane.Create(doc, levelPlane);
+                    status = transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                    if (!transaction.HasEnded())
+                    {
+                        status = transaction.RollBack();
+                    }
+                }
+            }
+        }
+
+
         public IList<ElementModel> GetCollisionByLevel(Document doc, Level level, IEnumerable<Element> elements)
         {
             count = 0;
             InitializeCache(doc);
             levelIntId = level.Id.IntegerValue;
+            CreateSketchPlaneByLevel(doc, level);
             IList<ElementModel> output = new List<ElementModel>(50);
-            using TransactionGroup transGroup = new(doc);
-            status = transGroup.Start("GetCollision");
-            
+            using TransactionGroup transGroup = new(doc, "GetCollision");
+            status = transGroup.Start();
             foreach (Element host in elements)
             {
-                levelSketchPlane = SketchPlane.Create(doc, level.Id);
                 if (levelIntId == host.LevelId.IntegerValue)
                 {
-                    doc.Regenerate();
                     foreach (ElementModel model in GetIntersectionByElement(doc, host, SearchGlobal, SearchCatId))
                     {
                         output.Add(model);
                     }
                 }
             }
-
             status = transGroup.Assimilate();
             Logger.Info("Result count: " + count);
             return output;
@@ -152,7 +173,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             hostBbox = host.get_BoundingBox(null);
             hostSolid = host.GetSolidByVolume(identityTransform, options);
-            hostNormal = host is Wall wall ? wall.Orientation : basisNormal;
+            hostNormal = host is Wall wall ? wall.Orientation : basisZNormal;
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(catId);
@@ -164,7 +185,6 @@ namespace RevitTimasBIMTools.CutOpening
                     if (IsNotParallel(hostNormal, interNormal))
                     {
                         count++;
-                        Plane sectionPlane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
                         interSolid = elem.GetIntersectionSolid(global, hostSolid, options);
                         interBbox = interSolid?.GetBoundingBox();
                         if (interBbox != null)
@@ -173,12 +193,50 @@ namespace RevitTimasBIMTools.CutOpening
 
                             idsExclude.Add(instanceId);
 
-                            XYZ minPnt = ProjectOnto(sectionPlane, interBbox.Min -= cutOffsetSize * basisNormal);
-                            XYZ maxPnt = ProjectOnto(sectionPlane, interBbox.Max += cutOffsetSize * basisNormal);
-                            double height = Math.Abs(maxPnt.Z - minPnt.Z);
+                            XYZ min = interBbox.Min;
+                            XYZ max = interBbox.Max;
 
-                            IList<CurveLoop> curveloops = GetCountours(doc, interSolid, minPnt, basisNormal, cutOffsetSize);
-                            _ = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, basisNormal, height);
+                            XYZ minX = new XYZ(max.X, min.Y, min.Z);
+                            XYZ minY = new XYZ(min.X, max.Y, min.Z);
+                            XYZ minZ = new XYZ(min.X, min.Y, max.Z);
+
+                            XYZ maxX = new XYZ(min.X, max.Y, max.Z);
+                            XYZ maxY = new XYZ(max.X, min.Y, max.Z);
+                            XYZ maxZ = new XYZ(max.X, max.Y, min.Z);
+
+                            angleRadians = XYZ.BasisX.AngleOnPlaneTo(hostNormal, basisZNormal);
+                            Plane section = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
+                            Transform vertical = Transform.CreateRotationAtPoint(XYZ.BasisZ, angleRadians, centroid);
+                            Transform horizont = Transform.CreateRotationAtPoint(XYZ.BasisX, angleRadians, centroid);
+                            Transform transform = vertical.Multiply(horizont);
+
+                            min = transform.OfPoint(ProjectOnto(section, min));
+                            max = transform.OfPoint(ProjectOnto(section, max));
+                            minX = transform.OfPoint(ProjectOnto(section, minX));
+                            minY = transform.OfPoint(ProjectOnto(section, minY));
+                            minZ = transform.OfPoint(ProjectOnto(section, minZ));
+                            maxX = transform.OfPoint(ProjectOnto(section, maxX));
+                            maxY = transform.OfPoint(ProjectOnto(section, maxY));
+                            maxZ = transform.OfPoint(ProjectOnto(section, maxZ));
+
+
+                            //var angleX = hostNormal.AngleTo(XYZ.BasisX);
+                            //var angleY = hostNormal.AngleTo(XYZ.BasisY);
+                            //var angleZ = hostNormal.AngleTo(XYZ.BasisZ);
+
+                            
+
+                            
+
+
+
+
+                            //_ = Math.Abs(max.Z - min.Z);
+
+                            _ = interSolid.GetCountours(doc, levelPlane, levelSketch, cutOffsetSize);
+
+
+                            //_ = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, basisZNormal, height);
 
                             sizeData = GetSectionSize(elem, interSolid, interNormal);
 
@@ -199,57 +257,6 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                 }
             }
-        }
-
-
-        private IList<CurveLoop> GetCountours(Document doc, ElementId levelId,  Solid solid, XYZ bottom, XYZ direction, double offset)
-        {
-            IList<CurveLoop> curveloops = new List<CurveLoop>();
-            using (Transaction transaction = new(doc))
-            {
-                status = transaction.Start("GetCountours");
-                try
-                {
-                    Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, bottom);
-
-                    Face result = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
-
-                    curveloops = ExporterIFCUtils.ValidateCurveLoops(result.GetEdgesAsCurveLoops(), direction);
-
-                    foreach (CurveLoop loop in curveloops)
-                    {
-                        plane = loop.GetPlane();
-                        CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, plane.Normal));
-                        if (!array.IsEmpty)
-                        {
-                            _ = doc.Create.NewModelCurveArray(array, levelSketchPlane);
-                        }
-                    }
-
-                    status = transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(ex.Message);
-                    if (!transaction.HasEnded())
-                    {
-                        status = transaction.RollBack();
-                        Logger.Log(status.ToString());
-                    }
-                }
-            }
-            return curveloops;
-        }
-
-
-        CurveArray ConvertLoopToArray(CurveLoop loop)
-        {
-            CurveArray a = new CurveArray();
-            foreach (Curve c in loop)
-            {
-                a.Append(c);
-            }
-            return a;
         }
 
 
@@ -543,8 +550,8 @@ namespace RevitTimasBIMTools.CutOpening
         //{
         //    try
         //    {
-        //        Plane sectionPlane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, elem.get_BoundingBox(null).Min);
-        //        ExtrusionAnalyzer analyzer = ExtrusionAnalyzer.Create(solid, sectionPlane, XYZ.BasisZ);
+        //        Plane section = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, elem.get_BoundingBox(null).Min);
+        //        ExtrusionAnalyzer analyzer = ExtrusionAnalyzer.Create(solid, section, XYZ.BasisZ);
         //        Face face = analyzer.GetExtrusionBase();
         //        return face.GetEdgesAsCurveLoops();
         //    }

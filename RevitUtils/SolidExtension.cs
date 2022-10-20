@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.IFC;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
@@ -104,6 +105,51 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
             return result;
+        }
+
+
+        public static IList<ModelCurveArray> GetCountours(this Solid solid, Document doc,  Plane plane, SketchPlane sketch, double offset = 0)
+        {
+            XYZ direction = XYZ.BasisZ;
+            IList<ModelCurveArray> curves = new List<ModelCurveArray>();
+            using (Transaction transaction = new(doc))
+            {
+                transaction.Start("GetCountours");
+                try
+                {
+                    Face face = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
+                    IList<CurveLoop> curveloops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), direction);
+                    foreach (CurveLoop loop in curveloops)
+                    {
+                        CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, direction));
+                        if (!array.IsEmpty)
+                        {
+                            curves.Add(doc.Create.NewModelCurveArray(array, sketch));
+                        }
+                    }
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                    if (!transaction.HasEnded())
+                    {
+                        transaction.RollBack();
+                    }
+                }
+            }
+            return curves;
+        }
+
+
+        public static CurveArray ConvertLoopToArray(CurveLoop loop)
+        {
+            CurveArray a = new();
+            foreach (Curve c in loop)
+            {
+                a.Append(c);
+            }
+            return a;
         }
 
 
