@@ -20,7 +20,6 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Default Properties
 
-        private readonly XYZ basisZNormal = XYZ.BasisZ;
         private readonly Options options = new()
         {
             ComputeReferences = true,
@@ -28,7 +27,8 @@ namespace RevitTimasBIMTools.CutOpening
             DetailLevel = ViewDetailLevel.Medium
         };
 
-        private readonly Transform identityTransform = Transform.Identity;
+        private readonly XYZ basisZNormal = XYZ.BasisZ;
+        private readonly Transform identity = Transform.Identity;
         private readonly SolidCurveIntersectionOptions intersectOptions = new();
 
         #endregion
@@ -158,19 +158,13 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-
-
-
-
         private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Element host, Transform global, ElementId catId)
         {
             hostBbox = host.get_BoundingBox(null);
-            XYZ vertExis = identityTransform.BasisX;
-            XYZ horzExis = identityTransform.BasisZ;
-            hostSolid = host.GetSolidByVolume(identityTransform, options);
-            hostNormal = host is Wall wall ? wall.Orientation.Normalize() :
-                HostObjectUtils.GetTopFaces(host as HostObject).Cast<PlanarFace>()
-                .Aggregate((fax, fin) => fax.Area > fin.Area ? fax : fin).FaceNormal.Normalize();
+            XYZ vertExis = identity.BasisX;
+            XYZ horzExis = identity.BasisZ;
+            hostSolid = host.GetSolidByVolume(identity, options);
+            hostNormal = host is Wall wall ? wall.Orientation.Normalize() : host.GetNormalByTopFace(identity);
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(catId);
