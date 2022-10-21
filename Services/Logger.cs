@@ -74,11 +74,13 @@ namespace RevitTimasBIMTools.Services
             Debug.WriteLine($"\n{text}\n{ex.Message}");
         }
 
+
         public static void Error(string text)
         {
             mainlogger?.Error(text);
             string intro = "Error: ";
             Debug.WriteLine($"\n{intro}\t{text}");
+            System.Windows.Clipboard.SetText(text);
             TaskDialog dlg = new(caption)
             {
                 MainContent = text,

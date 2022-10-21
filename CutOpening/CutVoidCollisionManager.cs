@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using log4net.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
