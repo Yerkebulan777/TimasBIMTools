@@ -202,6 +202,8 @@ namespace RevitTimasBIMTools.CutOpening
                                 new XYZ(max.X, max.Y, min.Z)
                             };
 
+                            _ = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
+
                             plane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
                             double vertAngle = hostNormal.GetVerticalAngleRadiansByNormal();
                             double horzAngle = hostNormal.GetHorizontAngleRadiansByNormal();
@@ -221,7 +223,7 @@ namespace RevitTimasBIMTools.CutOpening
                                 widht = Math.Max(widht, Math.Abs(next.X - curr.X));
                             }
 
-                            _ = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
+                            
 
                             //_ = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, basisZNormal, height);
 
