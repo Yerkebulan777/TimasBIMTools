@@ -28,6 +28,44 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
+        public static XYZ GetNormalByTopFace(this Element elem, Transform local, double tollerance = 0)
+        {
+            XYZ result = XYZ.BasisZ;
+            foreach (Reference refFace in HostObjectUtils.GetTopFaces(elem as HostObject))
+            {
+                GeometryObject geo = elem.GetGeometryObjectFromReference(refFace);
+                Face face = geo as Face;
+                XYZ normal = XYZ.BasisZ;
+                try
+                {
+                    if (face is PlanarFace planar && planar != null)
+                    {
+                        normal = planar.FaceNormal;
+                    }
+                    else
+                    {
+                        BoundingBoxUV box = face.GetBoundingBox();
+                        normal = face.ComputeNormal((box.Max + box.Min) / 2);
+                        normal = local.OfVector(normal);
+                    }
+                }
+                catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
+                {
+                    Logger.Error(ex.Message);
+                    continue;
+                }
+                finally
+                {
+                    if (face.Area > tollerance)
+                    {
+                        result = normal.Normalize();
+                    }
+                }
+            }
+            return result;
+        }
+
+
         public static Solid GetSolidByVolume(this Element element, Transform global, Options options, double tolerance = 0.5)
         {
             result = null;

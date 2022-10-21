@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.Creation;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
@@ -156,6 +158,10 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
+
+
+
+
         private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Element host, Transform global, ElementId catId)
         {
             hostBbox = host.get_BoundingBox(null);
@@ -223,7 +229,7 @@ namespace RevitTimasBIMTools.CutOpening
                                 widht = Math.Max(widht, Math.Abs(next.X - curr.X));
                             }
 
-                            
+
 
                             //_ = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, basisZNormal, height);
 
@@ -429,11 +435,11 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        //private double GetRotationAngleFromTransform(Transform global)
+        //private double GetRotationAngleFromTransform(Transform local)
         //{
-        //    double x = global.BasisX.X;
-        //    double y = global.BasisY.Y;
-        //    double z = global.BasisZ.Z;
+        //    double x = local.BasisX.X;
+        //    double y = local.BasisY.Y;
+        //    double z = local.BasisZ.Z;
         //    double trace = x + y + z;
         //    return Math.Acos((trace - 1) / 2.0);
         //}
