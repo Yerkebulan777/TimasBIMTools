@@ -1,12 +1,9 @@
-﻿using Autodesk.Revit.Creation;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.DB;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -29,6 +26,8 @@ namespace RevitTimasBIMTools.CutOpening
 
         private readonly XYZ basisZNormal = XYZ.BasisZ;
         private readonly Transform identity = Transform.Identity;
+        private readonly XYZ vertExis = Transform.Identity.BasisX;
+        private readonly XYZ horzExis = Transform.Identity.BasisZ;
         private readonly SolidCurveIntersectionOptions intersectOptions = new();
 
         #endregion
@@ -96,7 +95,7 @@ namespace RevitTimasBIMTools.CutOpening
         #region Cache Properties
 
         private ElementModel[] modelTempData = new ElementModel[0];
-        private readonly ICollection<ElementId> idsExclude = new List<ElementId>();
+        private ICollection<ElementId> idsExclude = new List<ElementId>(50);
 
         #endregion
 
@@ -161,8 +160,6 @@ namespace RevitTimasBIMTools.CutOpening
         private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Element host, Transform global, ElementId catId)
         {
             hostBbox = host.get_BoundingBox(null);
-            XYZ vertExis = identity.BasisX;
-            XYZ horzExis = identity.BasisZ;
             hostSolid = host.GetSolidByVolume(identity, options);
             hostNormal = host is Wall wall ? wall.Orientation.Normalize() : host.GetNormalByTopFace(identity);
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
@@ -175,55 +172,53 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     if (IsValidParallel(hostNormal, interNormal))
                     {
-                        count++;
-                        hostNormal = hostNormal.ResetDirectionToPositive();
                         interSolid = hostSolid.GetIntersectionSolid(elem, global, options);
-                        sketchPlan = CreateSketchPlaneByNormal(doc, hostNormal, centroid);
-                        if (interSolid != null && sketchPlan != null)
+                        if (interSolid != null)
                         {
+                            count++;
                             interBbox = interSolid.GetBoundingBox();
                             centroid = interSolid.ComputeCentroid();
-
-                            hight = 0; widht = 0;
-                            instanceId = elem.Id;
-
-                            XYZ min = interBbox.Min;
-                            XYZ max = interBbox.Max;
-
-                            idsExclude.Add(instanceId);
-
-                            List<XYZ> points = new(6)
-                            {
-                                new XYZ(max.X, min.Y, min.Z),
-                                new XYZ(min.X, max.Y, min.Z),
-                                new XYZ(min.X, min.Y, max.Z),
-                                new XYZ(min.X, max.Y, max.Z),
-                                new XYZ(max.X, min.Y, max.Z),
-                                new XYZ(max.X, max.Y, min.Z)
-                            };
-
+                            interNormal = interNormal.ResetDirectionToPositive();
+                            sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             _ = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
 
-                            plane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
-                            double vertAngle = hostNormal.GetVerticalAngleRadiansByNormal();
-                            double horzAngle = hostNormal.GetHorizontAngleRadiansByNormal();
-                            Transform vertical = Transform.CreateRotationAtPoint(vertExis, vertAngle, centroid);
-                            Transform horizont = Transform.CreateRotationAtPoint(horzExis, horzAngle, centroid);
-                            Transform transfm = vertical.Multiply(horizont);
 
-                            for (int i = 0; i < points.Count; i++)
-                            {
-                                XYZ curr = points[i];
-                                XYZ next = points[(i + 1) % points.Count];
+                            //hight = 0; widht = 0;
+                            //instanceId = elem.Id;
 
-                                curr = transfm.OfPoint(curr);
-                                next = transfm.OfPoint(next);
+                            //XYZ min = interBbox.Min;
+                            //XYZ max = interBbox.Max;
 
-                                hight = Math.Max(hight, Math.Abs(next.Z - curr.Z));
-                                widht = Math.Max(widht, Math.Abs(next.X - curr.X));
-                            }
+                            //idsExclude.Add(instanceId);
+
+                            //List<XYZ> points = new(6)
+                            //{
+                            //    new XYZ(max.X, min.Y, min.Z),
+                            //    new XYZ(min.X, max.Y, min.Z),
+                            //    new XYZ(min.X, min.Y, max.Z),
+                            //    new XYZ(min.X, max.Y, max.Z),
+                            //    new XYZ(max.X, min.Y, max.Z),
+                            //    new XYZ(max.X, max.Y, min.Z)
+                            //};
 
 
+                            //double vertAngle = hostNormal.GetVerticalAngleRadiansByNormal();
+                            //double horzAngle = hostNormal.GetHorizontAngleRadiansByNormal();
+                            //Transform vertical = Transform.CreateRotationAtPoint(vertExis, vertAngle, centroid);
+                            //Transform horizont = Transform.CreateRotationAtPoint(horzExis, horzAngle, centroid);
+                            //Transform transfm = vertical.Multiply(horizont);
+
+                            //for (int i = 0; i < points.Count; i++)
+                            //{
+                            //    XYZ curr = points[i];
+                            //    XYZ next = points[(i + 1) % points.Count];
+
+                            //    curr = transfm.OfPoint(curr);
+                            //    next = transfm.OfPoint(next);
+
+                            //    hight = Math.Max(hight, Math.Abs(next.Z - curr.Z));
+                            //    widht = Math.Max(widht, Math.Abs(next.X - curr.X));
+                            //}
 
                             //_ = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, basisZNormal, height);
 
@@ -237,7 +232,7 @@ namespace RevitTimasBIMTools.CutOpening
                                 ModelNormal = interNormal,
                                 HostIntId = host.Id.IntegerValue,
                             };
-                            model.SetSizeDescription(hight, widht);
+                            //model.SetSizeDescription(hight, widht);
                             yield return model;
                         }
                     }
