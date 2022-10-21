@@ -178,8 +178,7 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         count++;
                         hostNormal = hostNormal.ResetDirectionToPositive();
-                        // WARNING: Reorde solid GetIntersectionSolid !!! SOLID IS EMPTY! 1 ...
-                        interSolid = elem.GetIntersectionSolid(global, hostSolid, options);
+                        interSolid = hostSolid.GetIntersectionSolid(elem, global, options);
                         sketchPlan = CreateSketchPlaneByNormal(doc, hostNormal, centroid);
                         if (interSolid != null && sketchPlan != null)
                         {

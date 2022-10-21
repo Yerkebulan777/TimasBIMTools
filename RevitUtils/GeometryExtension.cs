@@ -78,7 +78,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static Solid GetIntersectionSolid(this Element elem, Transform global, Solid source, Options options, double tolerance = 0)
+        public static Solid GetIntersectionSolid(this Solid source, Element elem, Transform global, Options options, double tolerance = 0)
         {
             result = null;
             GeometryElement geomElement = elem.get_Geometry(options);
