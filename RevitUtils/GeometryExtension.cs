@@ -113,7 +113,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static IList<ModelCurveArray> GetCountours(this Solid solid, Document doc, Plane plane, SketchPlane sketch, double offset = 0)
         {
-            XYZ direction = XYZ.BasisZ;
+            XYZ direction = plane.Normal;
             IList<ModelCurveArray> curves = new List<ModelCurveArray>();
             using (Transaction t = new(doc))
             {
@@ -134,7 +134,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex.Message);
+                    Logger.Error(ex.ToString());
                     if (!t.HasEnded())
                     {
                         _ = t.RollBack();
