@@ -60,8 +60,14 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref started, value))
                 {
-                    StartHandlerExecute();
-                    ClearElementDataAsync();
+                    if (started)
+                    {
+                        StartHandlerExecute();
+                    }
+                    else
+                    {
+                        ClearElementDataAsync();
+                    }
                 }
             }
         }
@@ -73,11 +79,20 @@ namespace RevitTimasBIMTools.ViewModels
             get => enableOpt;
             set
             {
-                if (SetProperty(ref enableOpt, value))
+                if (SetProperty(ref enableOpt, value) && enableOpt)
                 {
-                    SetMEPCategoriesToData();
-                    SetCoreMaterialsToData();
-                    SetFamilySymbolsToData();
+                    if (categories.Count == 0)
+                    {
+                        SetMEPCategoriesToData();
+                    }
+                    if (structMats.Count == 0)
+                    {
+                        SetCoreMaterialsToData();
+                    }
+                    if (symbols.Count == 0)
+                    {
+                        SetFamilySymbolsToData();
+                    }
                 }
 
             }
@@ -90,12 +105,12 @@ namespace RevitTimasBIMTools.ViewModels
             get => enableData;
             set
             {
-                if (SetProperty(ref enableData, value))
+                if (SetProperty(ref enableData, value) && enableData)
                 {
                     if (docModel != null && category != null)
                     {
                         Properties.Settings.Default.Upgrade();
-                        IsOptionEnabled = !enableData;
+                        //IsOptionEnabled = !enableData;
                         GetValidLevelsToData();
                         GetGeneral3DView();
                     }
