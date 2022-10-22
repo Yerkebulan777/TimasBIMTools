@@ -1,13 +1,10 @@
-﻿using Autodesk.Revit.Creation;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
-using log4net.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using static UIFramework.WorksharingNotificationWindow;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -156,12 +153,14 @@ namespace RevitTimasBIMTools.CutOpening
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
 
+                            double height= tupleSize.Item1, widht = tupleSize.Item2;
                             ElementModel model = new(elem)
                             {
                                 Level = level,
                                 Origin = centroid,
+
                             };
-                            model.SetDescription(tupleSize.Item1, tupleSize.Item2);
+                            model.SetDescription(height, widht);
 
                             yield return model;
                         }
@@ -171,10 +170,10 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private FamilyInstance CreateOpening(Document doc, ElementModel model, FamilySymbol symbol)
+        private FamilyInstance CreateOpening(Document doc, ElementModel model, FamilySymbol symbol, double offset)
         {
             FamilyInstance opening = null;
-            using (SubTransaction trans = new SubTransaction(doc))
+            using (SubTransaction trans = new(doc))
             {
                 status = trans.Start();
                 try
@@ -187,11 +186,16 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         opening = doc.Create.NewFamilyInstance(model.Origin, symbol, level, StructuralType.NonStructural);
                     }
-                    
+                    if (opening != null && opening.IsValidObject)
+                    {
+                        //opening.get_Parameter("widthParamGuid").Set(model.Width);
+                        //opening.get_Parameter("heightParamGuid").Set(model.Height);
+                    }
                     status = trans.Commit();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Logger.Error(ex.Message);
                     if (!trans.HasEnded())
                     {
                         status = trans.RollBack();

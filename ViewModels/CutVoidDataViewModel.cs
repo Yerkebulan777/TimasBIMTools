@@ -222,6 +222,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+
         private FamilySymbol rectang = null;
         public FamilySymbol RectangSymbol
         {
@@ -230,9 +231,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref rectang, value))
                 {
+                    ActivateFamilySimbolAsync(rectang);
+                    GetSymbolSharedParametersAsync(rectang);
                     Properties.Settings.Default.RectangSymbolUniqueId = rectang.UniqueId;
                     Properties.Settings.Default.Save();
-                    ActivateFamilySimbolAsync(rectang);
                 }
             }
         }
@@ -246,9 +248,24 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref rounded, value))
                 {
+                    ActivateFamilySimbolAsync(rounded);
+                    GetSymbolSharedParametersAsync(rounded);
                     Properties.Settings.Default.RoundedSymbolUniqueId = rounded.UniqueId;
                     Properties.Settings.Default.Save();
-                    ActivateFamilySimbolAsync(rounded);
+                }
+            }
+        }
+
+
+        private IList<Parameter> shared = null;
+        public IList<Parameter> SharedParameters
+        {
+            get => shared;
+            set
+            {
+                if (value != null && SetProperty(ref shared, value))
+                {
+                    shared = value;
                 }
             }
         }
@@ -415,6 +432,33 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        private async void GetSymbolSharedParametersAsync(FamilySymbol symbol)
+        {
+            SharedParameters = await RevitTask.RunAsync(app =>
+            {
+                IList<Parameter> result = new List<Parameter>(5);
+                foreach (Parameter attrib in symbol.GetOrderedParameters())
+                {
+                    if (!attrib.IsReadOnly && attrib.IsShared)
+                    {
+                        switch (attrib.StorageType)
+                        {
+                            case StorageType.Double:
+                                result.Add(attrib);
+                                break;
+                            case StorageType.String:
+                                result.Add(attrib);
+                                break;
+                            default: break;
+                        }
+                    }
+                }
+                return result;
+            });
+        }
+
+
+
         internal async void GetElementInViewByIntId(ElementId id)
         {
             await RevitTask.RunAsync(app =>
@@ -432,7 +476,6 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             });
         }
-
 
         #endregion
 
@@ -598,7 +641,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (model.IsSelected && ElementModelData.Remove(model))
                         {
-                            Element elem = doc.GetElement(model.Id);
+                            Element elem = doc.GetElement(model.Instanse.Id);
                             try
                             {
                                 // Set Openning Logic with doc regenerate and transaction RollBack                                   
