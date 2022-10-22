@@ -276,6 +276,8 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        #region Sizes
+
         private int minSize = Properties.Settings.Default.MinSideSizeInMm;
         public int MinSideSize
         {
@@ -319,6 +321,9 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
         }
+
+        #endregion
+
 
         #endregion
 
