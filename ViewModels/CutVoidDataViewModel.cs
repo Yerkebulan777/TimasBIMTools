@@ -94,8 +94,8 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (docModel != null && category != null)
                     {
+                        Properties.Settings.Default.Upgrade();
                         IsOptionEnabled = !enableData;
-                        DataViewCollection?.Refresh();
                         GetValidLevelsToData();
                         GetGeneral3DView();
                     }
@@ -142,7 +142,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref docModels, value))
                 {
-                    DockPanelView.ComboDocumentModels.SelectedIndex = 1;
+                    DockPanelView.ComboDocumentModels.SelectedIndex = 0;
                     Logger.Log("\tcount:\t" + value.Count.ToString());
                     SelectedDocModel = docModels.FirstOrDefault();
                 }
@@ -158,7 +158,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref categories, value))
                 {
-                    DockPanelView.ComboEngineerCats.SelectedIndex = 1;
+                    DockPanelView.ComboEngineerCats.SelectedIndex = 0;
                     Logger.Log("\tcount:\t" + value.Count.ToString());
                 }
             }
@@ -175,7 +175,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (value != null && SetProperty(ref structMats, value))
                     {
-                        DockPanelView.ComboStructureMats.SelectedIndex = 1;
+                        DockPanelView.ComboStructureMats.SelectedIndex = 0;
                         Logger.Log("\tcount:\t" + value.Count.ToString());
                     }
                 }
@@ -191,8 +191,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref symbols, value))
                 {
-                    DockPanelView.ComboRectangSymbol.SelectedIndex = 1;
-                    DockPanelView.ComboRoundedSymbol.SelectedIndex = 1;
+                    DockPanelView.ComboRectangSymbol.SelectedIndex = 0;
+                    DockPanelView.ComboRoundedSymbol.SelectedIndex = 0;
                     Logger.Log("\tcount:\t" + value.Count.ToString());
                 }
             }
@@ -356,6 +356,7 @@ namespace RevitTimasBIMTools.ViewModels
                     EngineerCategories = new Dictionary<string, Category>();
                     StructureMaterials = new Dictionary<string, Material>();
                     FamilySymbols = new Dictionary<string, FamilySymbol>();
+                    ValidLevels = new Dictionary<double, Level>();
                 }, TaskContext);
             }
         }
@@ -565,7 +566,13 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<double, Level> ValidLevels
         {
             get => allLevels;
-            set => SetProperty(ref allLevels, value);
+            set
+            {
+                if (value != null && SetProperty(ref allLevels, value))
+                {
+                    DockPanelView.ComboLevelFilter.SelectedIndex = 0;
+                }
+            }
         }
 
 
@@ -577,7 +584,6 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref level, value) && level != null)
                 {
-                    Properties.Settings.Default.Upgrade();
                     SnoopIntersectionDataByLevel(level);
                 }
             }
