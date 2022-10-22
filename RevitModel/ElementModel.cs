@@ -34,12 +34,12 @@ namespace RevitTimasBIMTools.RevitModel
             set => SetProperty(ref selected, value);
         }
 
-        public void SetDescription(double height, double width, object other = null)
+        public void SetDescription(double height, double width)
         {
             Height = height; Width = width;
             int w = (int)Math.Round(width * 304.8);
             int h = (int)Math.Round(height * 304.8);
-            Description = ($" {w}x{h}(h) " + other.ToString()).Trim();
+            Description = $" {w}x{h}(h) ".Trim();
         }
 
 
