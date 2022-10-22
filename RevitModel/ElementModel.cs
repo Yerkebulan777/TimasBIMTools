@@ -25,8 +25,6 @@ namespace RevitTimasBIMTools.RevitModel
 
 
         public XYZ Origin { get; internal set; }
-        public XYZ HostNormal { get; internal set; }
-        public XYZ ModelNormal { get; internal set; }
         public int HostIntId { get; internal set; }
         public int LevelIntId { get; internal set; }
         public string SymbolName { get; internal set; }
@@ -42,11 +40,11 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        public void SetSizeDescription(double height, double width)
+        public void SetDescription(double height, double width, object other = null)
         {
             int w = (int)Math.Round(width * 304.8);
             int h = (int)Math.Round(height * 304.8);
-            Description = $"{w}x{h}(h)".Normalize();
+            Description = ($" {w}x{h}(h) " + other.ToString()).Trim();
         }
 
 

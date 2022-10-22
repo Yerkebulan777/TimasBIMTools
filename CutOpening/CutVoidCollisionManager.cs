@@ -152,7 +152,6 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
             status = transGroup.Assimilate();
-            Logger.Info("Result count: " + count);
             return output;
         }
 
@@ -176,8 +175,8 @@ namespace RevitTimasBIMTools.CutOpening
                         if (interSolid != null)
                         {
                             count++;
-                            interBbox = interSolid.GetBoundingBox();
                             centroid = interSolid.ComputeCentroid();
+                            interBbox = interSolid.GetBoundingBox();
                             interNormal = interNormal.ResetDirectionToPositive();
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             Tuple<double, double> tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
@@ -186,32 +185,15 @@ namespace RevitTimasBIMTools.CutOpening
                             {
                                 Origin = centroid,
                                 LevelIntId = levelIntId,
-                                HostNormal = hostNormal,
-                                ModelNormal = interNormal,
                                 HostIntId = host.Id.IntegerValue,
                             };
-                            model.SetSizeDescription(tupleSize.Item1, tupleSize.Item2);
+                            model.SetDescription(tupleSize.Item1, tupleSize.Item2);
 
                             yield return model;
                         }
                     }
                 }
             }
-        }
-
-
-        private XYZ ProjectOnto(Plane plane, XYZ pnt)
-        {
-            double distance = SignedDistanceTo(plane, pnt);
-            XYZ result = pnt - (distance * plane.Normal);
-            return result;
-        }
-
-
-        private double SignedDistanceTo(Plane plane, XYZ pnt)
-        {
-            XYZ vector = pnt - plane.Origin;
-            return plane.Normal.DotProduct(vector);
         }
 
 
