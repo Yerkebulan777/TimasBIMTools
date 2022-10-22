@@ -162,9 +162,14 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     Face face = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
                     IList<CurveLoop> curveloops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), direction);
-                    BoundingBoxUV bb = face.GetBoundingBox();
-                    hight = Math.Abs(bb.Max.U - bb.Min.U);
-                    widht = Math.Abs(bb.Max.V - bb.Min.V);
+                    if (face is PlanarFace planar && planar != null)
+                    {
+                        BoundingBoxUV bb = face.GetBoundingBox();
+                        hight = Math.Abs(bb.Max.V - bb.Min.V);
+                        widht = Math.Abs(bb.Max.U - bb.Min.U);
+                    }
+                    //hight = Math.Abs(bb.Max.V - bb.Min.V);
+                    //widht = Math.Abs(bb.Max.U - bb.Min.U);
                     foreach (CurveLoop loop in curveloops)
                     {
                         CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, direction));
