@@ -63,20 +63,19 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Output Properties
 
+        private TransactionStatus status;
         private FilteredElementCollector collector;
         private SketchPlane sketchPlan;
         private Plane plane;
-        private double diameter = 0;
-        private double hight = 0;
-        private double widht = 0;
-        private int count = 0;
-        private TransactionStatus status;
+
+        Tuple<double, double> tupleSize;
 
         #endregion
 
 
         #region Templory Properties
 
+        private int count = 0;
         private Line line = null;
         private XYZ offsetPnt = null;
         private XYZ centroid = null;
@@ -87,7 +86,6 @@ namespace RevitTimasBIMTools.CutOpening
         private Transform transform = null;
         private BoundingBoxXYZ hostBbox = null;
         private BoundingBoxXYZ interBbox = null;
-        private readonly ElementId instanceId = null;
 
         #endregion
 
@@ -105,31 +103,6 @@ namespace RevitTimasBIMTools.CutOpening
             modelTempData = new ElementModel[100];
             offsetPnt = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
             minDistance = cutOffsetSize + ((minSideSize + maxSideSize) * 0.25);
-        }
-
-
-        private SketchPlane CreateSketchPlaneByNormal(Document doc, XYZ normal, XYZ point)
-        {
-            SketchPlane result = null;
-            using Transaction transaction = new(doc, "CreateSketchPlane");
-            if (transaction.Start() == TransactionStatus.Started)
-            {
-                try
-                {
-                    plane = Plane.CreateByNormalAndOrigin(normal, point);
-                    result = SketchPlane.Create(doc, plane);
-                    status = transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex.Message);
-                    if (!transaction.HasEnded())
-                    {
-                        status = transaction.RollBack();
-                    }
-                }
-            }
-            return result;
         }
 
 
@@ -179,7 +152,7 @@ namespace RevitTimasBIMTools.CutOpening
                             interBbox = interSolid.GetBoundingBox();
                             interNormal = interNormal.ResetDirectionToPositive();
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
-                            Tuple<double, double> tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
+                            tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
 
                             ElementModel model = new(elem)
                             {
@@ -197,12 +170,37 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        //private Outline CreateOpening(Document doc, ElementModel model)
-        //{
+        private SketchPlane CreateSketchPlaneByNormal(Document doc, XYZ normal, XYZ point)
+        {
+            SketchPlane result = null;
+            using Transaction transaction = new(doc, "CreateSketchPlane");
+            if (transaction.Start() == TransactionStatus.Started)
+            {
+                try
+                {
+                    plane = Plane.CreateByNormalAndOrigin(normal, point);
+                    result = SketchPlane.Create(doc, plane);
+                    status = transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                    if (!transaction.HasEnded())
+                    {
+                        status = transaction.RollBack();
+                    }
+                }
+            }
+            return result;
+        }
 
 
-        //    return null;
-        //}
+        private Outline CreateOpening(Document doc, ElementModel model)
+        {
+
+
+            return null;
+        }
 
 
         //private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)
@@ -253,151 +251,149 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private void GetSectionSize(Element elem)
-        {
-            hight = 0; widht = 0;
-            int catIdInt = elem.Category.Id.IntegerValue;
-            if (elem.Document.GetElement(elem.GetTypeId()) is ElementType)
-            {
-                BuiltInCategory builtInCategory = (BuiltInCategory)catIdInt;
-                switch (builtInCategory)
-                {
-                    case BuiltInCategory.OST_PipeCurves:
-                        {
-                            diameter = elem.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM).AsDouble();
-                            return;
-                        }
-                    case BuiltInCategory.OST_DuctCurves:
-                        {
-                            Parameter diameterParam = elem.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM);
-                            if (diameterParam != null && diameterParam.HasValue)
-                            {
-                                diameter = diameterParam.AsDouble();
-                                hight = diameter;
-                                widht = diameter;
-                            }
-                            else
-                            {
-                                hight = elem.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM).AsDouble();
-                                widht = elem.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM).AsDouble();
-                            }
-                            return;
-                        }
-                    case BuiltInCategory.OST_Conduit:
-                        {
-                            diameter = elem.get_Parameter(BuiltInParameter.RBS_CONDUIT_DIAMETER_PARAM).AsDouble();
-                            return;
-                        }
-                    case BuiltInCategory.OST_CableTray:
-                        {
-                            hight = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM).AsDouble();
-                            widht = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM).AsDouble();
-                            return;
-                        }
-                    default:
-                        {
-                            return;
-                        }
-                }
-            }
-        }
+    #region Other methods
+
+    //private double GetLengthValueBySimilarParameterName(Instance elem, string paramName)
+    //{
+    //    double value = invalidInt;
+    //    int minDistance = int.MaxValue;
+    //    char[] delimiters = new[] { ' ', '_', '-' };
+    //    foreach (Parameter param in elem.GetOrderedParameters())
+    //    {
+    //        Definition definition = param.Definition;
+    //        if (param.HasValue && definition.ParameterType == lenParamType)
+    //        {
+    //            string name = definition.Name;
+    //            string[] strArray = name.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+    //            if (strArray.Contains(paramName, StringComparer.CurrentCultureIgnoreCase))
+    //            {
+    //                int tmp = param.IsShared ? name.Length : name.Length + strArray.Length;
+    //                if (minDistance > tmp && UnitFormatUtils.TryParse(revitUnits, UnitType.UT_Length, param.AsValueString(), out value))
+    //                {
+    //                    minDistance = tmp;
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return value;
+    //}
 
 
-        #region Other methods
+    //private bool GetFamilyInstanceReferencePlane(FamilyInstance fi, out XYZ origin, out XYZ normal)
+    //{
+    //    bool flag = false;
+    //    origin = XYZ.Zero;
+    //    normal = XYZ.Zero;
 
-        //private double GetLengthValueBySimilarParameterName(Instance elem, string paramName)
-        //{
-        //    double value = invalidInt;
-        //    int minDistance = int.MaxValue;
-        //    char[] delimiters = new[] { ' ', '_', '-' };
-        //    foreach (Parameter param in elem.GetOrderedParameters())
-        //    {
-        //        Definition definition = param.Definition;
-        //        if (param.HasValue && definition.ParameterType == lenParamType)
-        //        {
-        //            string name = definition.Name;
-        //            string[] strArray = name.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-        //            if (strArray.Contains(paramName, StringComparer.CurrentCultureIgnoreCase))
-        //            {
-        //                int tmp = param.IsShared ? name.Length : name.Length + strArray.Length;
-        //                if (minDistance > tmp && UnitFormatUtils.TryParse(revitUnits, UnitType.UT_Length, param.AsValueString(), out value))
-        //                {
-        //                    minDistance = tmp;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return value;
-        //}
+    //    Reference reference = fi.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
+    //    reference = SearchInstance != null ? reference.CreateLinkReference(SearchInstance) : reference;
 
-
-        //private bool GetFamilyInstanceReferencePlane(FamilyInstance fi, out XYZ origin, out XYZ normal)
-        //{
-        //    bool flag = false;
-        //    origin = XYZ.Zero;
-        //    normal = XYZ.Zero;
-
-        //    Reference reference = fi.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
-        //    reference = SearchInstance != null ? reference.CreateLinkReference(SearchInstance) : reference;
-
-        //    if (null != reference)
-        //    {
-        //        Document doc = fi.Document;
-        //        using Transaction transaction = new(doc);
-        //        _ = transaction.Start("Create Temporary Sketch Plane");
-        //        try
-        //        {
-        //            SketchPlane sketchPlan = SketchPlane.Create(doc, reference);
-        //            if (null != sketchPlan)
-        //            {
-        //                Plane plan = sketchPlan.GetPlane();
-        //                normal = plan.Normal;
-        //                origin = plan.Origin;
-        //                flag = true;
-        //            }
-        //        }
-        //        finally
-        //        {
-        //            _ = transaction.RollBack();
-        //        }
-        //    }
-        //    return flag;
-        //}
+    //    if (null != reference)
+    //    {
+    //        Document doc = fi.Document;
+    //        using Transaction transaction = new(doc);
+    //        _ = transaction.Start("Create Temporary Sketch Plane");
+    //        try
+    //        {
+    //            SketchPlane sketchPlan = SketchPlane.Create(doc, reference);
+    //            if (null != sketchPlan)
+    //            {
+    //                Plane plan = sketchPlan.GetPlane();
+    //                normal = plan.Normal;
+    //                origin = plan.Origin;
+    //                flag = true;
+    //            }
+    //        }
+    //        finally
+    //        {
+    //            _ = transaction.RollBack();
+    //        }
+    //    }
+    //    return flag;
+    //}
 
 
-        //private double GetRotationAngleFromTransform(Transform local)
-        //{
-        //    double x = local.BasisX.X;
-        //    double y = local.BasisY.Y;
-        //    double z = local.BasisZ.Z;
-        //    double trace = x + y + z;
-        //    return Math.Acos((trace - 1) / 2.0);
-        //}
+    //private double GetRotationAngleFromTransform(Transform local)
+    //{
+    //    double x = local.BasisX.X;
+    //    double y = local.BasisY.Y;
+    //    double z = local.BasisZ.Z;
+    //    double trace = x + y + z;
+    //    return Math.Acos((trace - 1) / 2.0);
+    //}
 
-        #endregion
+    //private void GetSectionSize(Element elem)
+    //{
+    //    hight = 0; widht = 0;
+    //    int catIdInt = elem.Category.Id.IntegerValue;
+    //    if (elem.Document.GetElement(elem.GetTypeId()) is ElementType)
+    //    {
+    //        BuiltInCategory builtInCategory = (BuiltInCategory)catIdInt;
+    //        switch (builtInCategory)
+    //        {
+    //            case BuiltInCategory.OST_PipeCurves:
+    //                {
+    //                    diameter = elem.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM).AsDouble();
+    //                    return;
+    //                }
+    //            case BuiltInCategory.OST_DuctCurves:
+    //                {
+    //                    Parameter diameterParam = elem.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM);
+    //                    if (diameterParam != null && diameterParam.HasValue)
+    //                    {
+    //                        diameter = diameterParam.AsDouble();
+    //                        hight = diameter;
+    //                        widht = diameter;
+    //                    }
+    //                    else
+    //                    {
+    //                        hight = elem.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM).AsDouble();
+    //                        widht = elem.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM).AsDouble();
+    //                    }
+    //                    return;
+    //                }
+    //            case BuiltInCategory.OST_Conduit:
+    //                {
+    //                    diameter = elem.get_Parameter(BuiltInParameter.RBS_CONDUIT_DIAMETER_PARAM).AsDouble();
+    //                    return;
+    //                }
+    //            case BuiltInCategory.OST_CableTray:
+    //                {
+    //                    hight = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM).AsDouble();
+    //                    widht = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM).AsDouble();
+    //                    return;
+    //                }
+    //            default:
+    //                {
+    //                    return;
+    //                }
+    //        }
+    //}
+
+    #endregion
 
 
-        /// Алгоритм проверки семейств отверстия
-        /*
-        * Проверить семейство что это реальное отверстие
-        * Найти все семейства и определить пересекается ли оно с чем либо (по краю)
-        * Если не пересекается проверить есть ли по центру елемент если нет то удалить
-        * Если пересекается то удалить
-        */
+    /// Алгоритм проверки семейств отверстия
+    /*
+    * Проверить семейство что это реальное отверстие
+    * Найти все семейства и определить пересекается ли оно с чем либо (по краю)
+    * Если не пересекается проверить есть ли по центру елемент если нет то удалить
+    * Если пересекается то удалить
+    */
 
 
-        /// Общий алгоритм проверки пользователем елементов
-        /*
-         * Объединения елементов в одной точке в один большой bbox если они пересекаются
-         * Объединения проема если пересекаются bbox или находятся очень близко
-         * Создать новое семейство проема с возможностью изменения размеров => CutOffset сохраняется
-         * Реализовать автосинхронизацию при окончание выполнение или изменения проекта
-         * Кнопки = (показать/создать/остановить)
-         * Необходимо использовать Dispose()
-         */
+    /// Общий алгоритм проверки пользователем елементов
+    /*
+     * Объединения елементов в одной точке в один большой bbox если они пересекаются
+     * Объединения проема если пересекаются bbox или находятся очень близко
+     * Создать новое семейство проема с возможностью изменения размеров => CutOffset сохраняется
+     * Реализовать автосинхронизацию при окончание выполнение или изменения проекта
+     * Кнопки = (показать/создать/остановить)
+     * Необходимо использовать Dispose()
+     */
 
 
-        [STAThread]
+    [STAThread]
         public void Dispose()
         {
             transform?.Dispose();
