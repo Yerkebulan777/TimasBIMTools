@@ -1,13 +1,16 @@
-﻿using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.Creation;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Structure;
+using log4net.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using static UIFramework.WorksharingNotificationWindow;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
-using Parameter = Autodesk.Revit.DB.Parameter;
 
 
 namespace RevitTimasBIMTools.CutOpening
@@ -67,8 +70,7 @@ namespace RevitTimasBIMTools.CutOpening
         private FilteredElementCollector collector;
         private SketchPlane sketchPlan;
         private Plane plane;
-
-        Tuple<double, double> tupleSize;
+        private Tuple<double, double> tupleSize;
 
         #endregion
 
@@ -118,7 +120,7 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 if (levelIntId == host.LevelId.IntegerValue)
                 {
-                    foreach (ElementModel model in GetIntersectionByElement(doc, host, SearchGlobal, SearchCatId))
+                    foreach (ElementModel model in GetIntersectionByElement(doc, level, host, SearchGlobal, SearchCatId))
                     {
                         output.Add(model);
                     }
@@ -129,7 +131,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Element host, Transform global, ElementId catId)
+        private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Level level, Element host, Transform global, ElementId catId)
         {
             hostBbox = host.get_BoundingBox(null);
             hostSolid = host.GetSolidByVolume(identity, options);
@@ -156,9 +158,8 @@ namespace RevitTimasBIMTools.CutOpening
 
                             ElementModel model = new(elem)
                             {
+                                Level = level,
                                 Origin = centroid,
-                                LevelIntId = levelIntId,
-                                HostIntId = host.Id.IntegerValue,
                             };
                             model.SetDescription(tupleSize.Item1, tupleSize.Item2);
 
@@ -170,11 +171,34 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private Outline CreateOpening(Document doc, ElementModel model)
+        private FamilyInstance CreateOpening(Document doc, ElementModel model, FamilySymbol symbol)
         {
-
-
-            return null;
+            FamilyInstance opening = null;
+            using (SubTransaction trans = new SubTransaction(doc))
+            {
+                status = trans.Start();
+                try
+                {
+                    if (model.Instanse is Wall wall && wall.IsValidObject)
+                    {
+                        opening = doc.Create.NewFamilyInstance(model.Origin, symbol, wall, StructuralType.NonStructural);
+                    }
+                    else if (model.Level is Level level && level.IsValidObject)
+                    {
+                        opening = doc.Create.NewFamilyInstance(model.Origin, symbol, level, StructuralType.NonStructural);
+                    }
+                    
+                    status = trans.Commit();
+                }
+                catch (Exception)
+                {
+                    if (!trans.HasEnded())
+                    {
+                        status = trans.RollBack();
+                    }
+                }
+            }
+            return opening;
         }
 
 
@@ -291,8 +315,8 @@ namespace RevitTimasBIMTools.CutOpening
         //    if (null != reference)
         //    {
         //        Document doc = fi.Document;
-        //        using Transaction transaction = new(doc);
-        //        _ = transaction.Start("Create Temporary Sketch Plane");
+        //        using Transaction trans = new(doc);
+        //        _ = trans.Start("Create Temporary Sketch Plane");
         //        try
         //        {
         //            SketchPlane sketchPlan = SketchPlane.Create(doc, reference);
@@ -306,7 +330,7 @@ namespace RevitTimasBIMTools.CutOpening
         //        }
         //        finally
         //        {
-        //            _ = transaction.RollBack();
+        //            _ = trans.RollBack();
         //        }
         //    }
         //    return flag;

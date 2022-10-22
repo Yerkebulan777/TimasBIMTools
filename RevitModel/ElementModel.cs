@@ -8,12 +8,14 @@ namespace RevitTimasBIMTools.RevitModel
     {
         public readonly ElementId Id;
         public readonly ElementType Type;
+        public readonly Element Instanse;
         public ElementModel(Element element)
         {
             Type = element.Document.GetElement(element.GetTypeId()) as ElementType;
             if (element.IsValidObject && Type != null)
             {
                 Id = element.Id;
+                Instanse = element;
                 SymbolName = Type.Name;
                 FamilyName = Type.FamilyName;
             }
@@ -23,14 +25,12 @@ namespace RevitTimasBIMTools.RevitModel
             }
         }
 
-
-        public XYZ Origin { get; internal set; }
-        public int HostIntId { get; internal set; }
-        public int LevelIntId { get; internal set; }
         public string SymbolName { get; internal set; }
         public string FamilyName { get; internal set; }
         public string Description { get; internal set; }
-
+        public XYZ Origin { get; internal set; }
+        public Level Level { get; internal set; }
+        
 
         private bool selected = false;
         public bool IsSelected
@@ -38,7 +38,6 @@ namespace RevitTimasBIMTools.RevitModel
             get => selected;
             set => SetProperty(ref selected, value);
         }
-
 
         public void SetDescription(double height, double width, object other = null)
         {
