@@ -142,7 +142,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref docModels, value))
                 {
-                    Logger.Log(nameof(DocumentModelCollection) + "\tcount:\t" + value.Count.ToString());
+                    DockPanelView.ComboDocumentModels.SelectedIndex = 1;
+                    Logger.Log("\tcount:\t" + value.Count.ToString());
                     SelectedDocModel = docModels.FirstOrDefault();
                 }
             }
@@ -157,7 +158,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref categories, value))
                 {
-                    Logger.Log(nameof(EngineerCategories) + "\tcount:\t" + value.Count.ToString());
+                    DockPanelView.ComboEngineerCats.SelectedIndex = 1;
+                    Logger.Log("\tcount:\t" + value.Count.ToString());
                 }
             }
         }
@@ -173,7 +175,8 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (value != null && SetProperty(ref structMats, value))
                     {
-                        Logger.Log(nameof(StructureMaterials) + "\tcount:\t" + value.Count.ToString());
+                        DockPanelView.ComboStructureMats.SelectedIndex = 1;
+                        Logger.Log("\tcount:\t" + value.Count.ToString());
                     }
                 }
             }
@@ -188,7 +191,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null && SetProperty(ref symbols, value))
                 {
-                    Logger.Log(nameof(FamilySymbols) + "\tcount:\t" + value.Count.ToString());
+                    DockPanelView.ComboRectangSymbol.SelectedIndex = 1;
+                    DockPanelView.ComboRoundedSymbol.SelectedIndex = 1;
+                    Logger.Log("\tcount:\t" + value.Count.ToString());
                 }
             }
         }
@@ -456,7 +461,6 @@ namespace RevitTimasBIMTools.ViewModels
                 return result;
             });
         }
-
 
 
         internal async void GetElementInViewByIntId(ElementId id)
