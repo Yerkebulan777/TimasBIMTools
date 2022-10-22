@@ -81,20 +81,19 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref enableOpt, value) && enableOpt)
                 {
-                    if (categories.Count == 0)
+                    if (categos == null || categos.Count == 0)
                     {
                         SetMEPCategoriesToData();
                     }
-                    if (structMats.Count == 0)
+                    if (structs == null || structs.Count == 0)
                     {
                         SetCoreMaterialsToData();
                     }
-                    if (symbols.Count == 0)
+                    if (symbols == null || symbols.Count == 0)
                     {
                         SetFamilySymbolsToData();
                     }
                 }
-
             }
         }
 
@@ -165,13 +164,13 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<string, Category> categories = null;
+        private IDictionary<string, Category> categos = null;
         public IDictionary<string, Category> EngineerCategories
         {
-            get => categories;
+            get => categos;
             set
             {
-                if (value != null && SetProperty(ref categories, value))
+                if (value != null && SetProperty(ref categos, value))
                 {
                     DockPanelView.ComboEngineerCats.SelectedIndex = 0;
                     Logger.Log("\tcount:\t" + value.Count.ToString());
@@ -180,15 +179,15 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<string, Material> structMats = null;
+        private IDictionary<string, Material> structs = null;
         public IDictionary<string, Material> StructureMaterials
         {
-            get => structMats;
+            get => structs;
             set
             {
                 if (value != null)
                 {
-                    if (value != null && SetProperty(ref structMats, value))
+                    if (value != null && SetProperty(ref structs, value))
                     {
                         DockPanelView.ComboStructureMats.SelectedIndex = 0;
                         Logger.Log("\tcount:\t" + value.Count.ToString());
