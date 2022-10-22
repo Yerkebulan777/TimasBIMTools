@@ -149,17 +149,22 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static IList<ModelCurveArray> GetCountours(this Solid solid, Document doc, Plane plane, SketchPlane sketch, double offset = 0)
+        public static Tuple<double, double> GetCountours(this Solid solid, Document doc, Plane plane, SketchPlane sketch, double offset = 0)
         {
+            double hight = 0;
+            double widht = 0;
             XYZ direction = plane.Normal;
             IList<ModelCurveArray> curves = new List<ModelCurveArray>();
-            using (Transaction t = new(doc))
+            using (Transaction t = new(doc, "GetCountours"))
             {
-                _ = t.Start("GetCountours");
+                _ = t.Start();
                 try
                 {
                     Face face = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
                     IList<CurveLoop> curveloops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), direction);
+                    BoundingBoxUV bb = face.GetBoundingBox();
+                    hight = Math.Abs(bb.Max.U - bb.Min.U);
+                    widht = Math.Abs(bb.Max.V - bb.Min.V);
                     foreach (CurveLoop loop in curveloops)
                     {
                         CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, direction));
@@ -179,7 +184,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-            return curves;
+            return Tuple.Create(hight, widht);
         }
 
 
@@ -244,26 +249,24 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static Solid Sphere(this XYZ center, double radius = 0.75)
         {
-            // Use the standard global coordinate system 
-            // as a frame, translated to the sphere bottom.
-            Frame frame = new Frame(center, XYZ.BasisX, XYZ.BasisY, XYZ.BasisZ);
+            Frame frame = new(center, XYZ.BasisX, XYZ.BasisY, XYZ.BasisZ);
 
-            // Create a vertical half-circle loop;
-            // this must be in the frame location.
-            XYZ start = center - radius * XYZ.BasisZ;
-            XYZ end = center + radius * XYZ.BasisZ;
-            XYZ XyzOnArc = center + radius * XYZ.BasisX;
+            XYZ XyzOnArc = center + (radius * XYZ.BasisX);
+            XYZ start = center - (radius * XYZ.BasisZ);
+            XYZ end = center + (radius * XYZ.BasisZ);
 
             Arc arc = Arc.Create(start, end, XyzOnArc);
 
             Line line = Line.CreateBound(arc.GetEndPoint(1), arc.GetEndPoint(0));
 
-            CurveLoop halfCircle = new CurveLoop();
+            CurveLoop halfCircle = new();
             halfCircle.Append(arc);
             halfCircle.Append(line);
 
-            List<CurveLoop> loops = new List<CurveLoop>(1);
-            loops.Add(halfCircle);
+            List<CurveLoop> loops = new(1)
+            {
+                halfCircle
+            };
 
             return GeometryCreationUtilities.CreateRevolvedGeometry(frame, loops, 0, 2 * Math.PI);
         }

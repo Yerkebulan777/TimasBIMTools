@@ -87,7 +87,7 @@ namespace RevitTimasBIMTools.CutOpening
         private Transform transform = null;
         private BoundingBoxXYZ hostBbox = null;
         private BoundingBoxXYZ interBbox = null;
-        private ElementId instanceId = null;
+        private readonly ElementId instanceId = null;
 
         #endregion
 
@@ -95,7 +95,7 @@ namespace RevitTimasBIMTools.CutOpening
         #region Cache Properties
 
         private ElementModel[] modelTempData = new ElementModel[0];
-        private ICollection<ElementId> idsExclude = new List<ElementId>(50);
+        private readonly ICollection<ElementId> idsExclude = new List<ElementId>(50);
 
         #endregion
 
@@ -180,49 +180,7 @@ namespace RevitTimasBIMTools.CutOpening
                             centroid = interSolid.ComputeCentroid();
                             interNormal = interNormal.ResetDirectionToPositive();
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
-                            _ = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
-
-
-                            //hight = 0; widht = 0;
-                            //instanceId = elem.Id;
-
-                            //XYZ min = interBbox.Min;
-                            //XYZ max = interBbox.Max;
-
-                            //idsExclude.Add(instanceId);
-
-                            //List<XYZ> points = new(6)
-                            //{
-                            //    new XYZ(max.X, min.Y, min.Z),
-                            //    new XYZ(min.X, max.Y, min.Z),
-                            //    new XYZ(min.X, min.Y, max.Z),
-                            //    new XYZ(min.X, max.Y, max.Z),
-                            //    new XYZ(max.X, min.Y, max.Z),
-                            //    new XYZ(max.X, max.Y, min.Z)
-                            //};
-
-
-                            //double vertAngle = hostNormal.GetVerticalAngleRadiansByNormal();
-                            //double horzAngle = hostNormal.GetHorizontAngleRadiansByNormal();
-                            //Transform vertical = Transform.CreateRotationAtPoint(vertExis, vertAngle, centroid);
-                            //Transform horizont = Transform.CreateRotationAtPoint(horzExis, horzAngle, centroid);
-                            //Transform transfm = vertical.Multiply(horizont);
-
-                            //for (int i = 0; i < points.Count; i++)
-                            //{
-                            //    XYZ curr = points[i];
-                            //    XYZ next = points[(i + 1) % points.Count];
-
-                            //    curr = transfm.OfPoint(curr);
-                            //    next = transfm.OfPoint(next);
-
-                            //    hight = Math.Max(hight, Math.Abs(next.Z - curr.Z));
-                            //    widht = Math.Max(widht, Math.Abs(next.X - curr.X));
-                            //}
-
-                            //_ = GeometryCreationUtilities.CreateExtrusionGeometry(curveloops, basisZNormal, height);
-
-                            //GetSectionSize(elem);
+                            Tuple<double, double> tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
 
                             ElementModel model = new(elem)
                             {
@@ -232,7 +190,8 @@ namespace RevitTimasBIMTools.CutOpening
                                 ModelNormal = interNormal,
                                 HostIntId = host.Id.IntegerValue,
                             };
-                            //model.SetSizeDescription(hight, widht);
+                            model.SetSizeDescription(tupleSize.Item1, tupleSize.Item2);
+
                             yield return model;
                         }
                     }
