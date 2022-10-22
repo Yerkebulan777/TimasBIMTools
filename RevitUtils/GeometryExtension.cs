@@ -242,6 +242,33 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
+        public static Solid Sphere(this XYZ center, double radius = 0.75)
+        {
+            // Use the standard global coordinate system 
+            // as a frame, translated to the sphere bottom.
+            Frame frame = new Frame(center, XYZ.BasisX, XYZ.BasisY, XYZ.BasisZ);
+
+            // Create a vertical half-circle loop;
+            // this must be in the frame location.
+            XYZ start = center - radius * XYZ.BasisZ;
+            XYZ end = center + radius * XYZ.BasisZ;
+            XYZ XyzOnArc = center + radius * XYZ.BasisX;
+
+            Arc arc = Arc.Create(start, end, XyzOnArc);
+
+            Line line = Line.CreateBound(arc.GetEndPoint(1), arc.GetEndPoint(0));
+
+            CurveLoop halfCircle = new CurveLoop();
+            halfCircle.Append(arc);
+            halfCircle.Append(line);
+
+            List<CurveLoop> loops = new List<CurveLoop>(1);
+            loops.Add(halfCircle);
+
+            return GeometryCreationUtilities.CreateRevolvedGeometry(frame, loops, 0, 2 * Math.PI);
+        }
+
+
         public static void CreateDirectShape(this Solid solid, Document doc, Instance elem, BuiltInCategory builtIn = BuiltInCategory.OST_GenericModel)
         {
             using Transaction t = new(doc, "Create DirectShape");

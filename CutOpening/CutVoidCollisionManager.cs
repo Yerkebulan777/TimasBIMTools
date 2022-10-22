@@ -78,7 +78,7 @@ namespace RevitTimasBIMTools.CutOpening
         #region Templory Properties
 
         private Line line = null;
-        private XYZ offset = null;
+        private XYZ offsetPnt = null;
         private XYZ centroid = null;
         private Solid hostSolid = null;
         private Solid interSolid = null;
@@ -103,7 +103,7 @@ namespace RevitTimasBIMTools.CutOpening
         private void InitializeCache(Document doc)
         {
             modelTempData = new ElementModel[100];
-            offset = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
+            offsetPnt = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
             minDistance = cutOffsetSize + ((minSideSize + maxSideSize) * 0.25);
         }
 
@@ -273,7 +273,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ normal, View view)
         //{
-        //    Outline outline = new(bbox.Min -= offset, bbox.Max += offset);
+        //    Outline outline = new(bbox.Min -= offsetPnt, bbox.Max += offsetPnt);
         //    collector = new FilteredElementCollector(doc, view.Id).Excluding(idsExclude);
         //    instanceId = collector.WherePasses(new BoundingBoxIntersectsFilter(outline)).FirstElementId();
         //    return instanceId == null;

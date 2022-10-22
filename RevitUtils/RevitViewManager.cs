@@ -175,6 +175,8 @@ namespace RevitTimasBIMTools.RevitUtils
                 color.Red = red;
                 color.Green = green;
                 ogs = ogs.SetProjectionLineColor(color);
+                ogs.SetSurfaceForegroundPatternId(elem.Id);
+                ogs.SetSurfaceForegroundPatternColor(color);
                 uidoc.ActiveView.SetElementOverrides(elem.Id, ogs);
             }
         }
