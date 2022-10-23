@@ -40,12 +40,11 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         public void RaiseEvent()
         {
-            Dispatcher.CurrentDispatcher.Invoke(() =>
-            {
-                Disposed = false;
-                DataContextHandler.IsStarted = true;
-                DataContextHandler.DockPanelView = this;
-            });
+
+            Disposed = false;
+            DataContextHandler.IsStarted = true;
+            DataContextHandler.DockPanelView = this;
+
         }
 
 

@@ -81,10 +81,11 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref enableOpt, value) && enableOpt)
                 {
+                    Properties.Settings.Default.Upgrade();
                     if (!string.IsNullOrEmpty(docUniqueId))
                     {
                         SetMEPCategoriesToData();
-                        SetCoreMaterialsToData();
+                        SetCoreMaterialsToDataAsync();
                         SetFamilySymbolsToData();
                     }
                 }
@@ -332,19 +333,19 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        public async void StartHandlerExecute()
+        public void StartHandlerExecute()
         {
-            if (ExternalEventRequest.Accepted == externalEvent.Raise())
+            _ = RevitTask.RunAsync(app =>
             {
-                DocumentModelCollection = await RevitTask.RunAsync(app =>
+                doc = app.ActiveUIDocument.Document;
+                SyncContext = SynchronizationContext.Current;
+                TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
+                if (ExternalEventRequest.Accepted == externalEvent.Raise())
                 {
-                    doc = app.ActiveUIDocument.Document;
-                    SyncContext = SynchronizationContext.Current;
-                    TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                     constructTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
-                    return RevitFilterManager.GetDocumentCollection(doc);
-                });
-            }
+                    DocumentModelCollection = RevitFilterManager.GetDocumentCollection(doc);
+                }
+            });
         }
 
 
@@ -366,58 +367,49 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetGeneral3DView()
         {
-            view3d = await RevitTask.RunAsync(app =>
+            await RevitTask.RunAsync(app =>
             {
-                return RevitViewManager.Get3dView(app.ActiveUIDocument);
+                view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
             });
         }
 
 
         private async void SetMEPCategoriesToData()
         {
-            if (EngineerCategories == null)
+            await RevitTask.RunAsync(app =>
             {
-                EngineerCategories = await RevitTask.RunAsync(app =>
-                {
-                    doc = app.ActiveUIDocument.Document;
-                    return RevitFilterManager.GetEngineerCategories(doc);
-                });
-            }
+                doc = app.ActiveUIDocument.Document;
+                EngineerCategories ??= RevitFilterManager.GetEngineerCategories(doc);
+            });
         }
 
 
-        private async void SetCoreMaterialsToData()
+        private async void SetCoreMaterialsToDataAsync()
         {
-            if (StructureMaterials == null)
+            await RevitTask.RunAsync(app =>
             {
-                StructureMaterials = await RevitTask.RunAsync(app =>
-                {
-                    doc = app.ActiveUIDocument.Document;
-                    return RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds);
-                });
-            }
+                doc = app.ActiveUIDocument.Document;
+                StructureMaterials ??= RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds);
+            });
         }
 
 
         private async void SetFamilySymbolsToData()
         {
-            if (FamilySymbols == null)
+            await RevitTask.RunAsync(app =>
             {
-                FamilySymbols = await RevitTask.RunAsync(app =>
-                {
-                    doc = app.ActiveUIDocument.Document;
-                    return RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
-                });
-            }
+                doc = app.ActiveUIDocument.Document;
+                FamilySymbols ??= RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+            });
         }
 
 
         private async void GetValidLevelsToData()
         {
-            ValidLevels = await RevitTask.RunAsync(app =>
+            await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetValidLevels(doc);
+                ValidLevels ??= RevitFilterManager.GetValidLevels(doc);
             });
         }
 
@@ -462,26 +454,25 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetSymbolSharedParametersAsync(FamilySymbol symbol)
         {
-            SharedParameters = await RevitTask.RunAsync(app =>
+            await RevitTask.RunAsync(app =>
             {
-                IList<Parameter> result = new List<Parameter>(5);
-                foreach (Parameter attrib in symbol.GetOrderedParameters())
+                SharedParameters = new List<Parameter>(5);
+                foreach (Parameter param in symbol.GetOrderedParameters())
                 {
-                    if (!attrib.IsReadOnly && attrib.IsShared)
+                    if (!param.IsReadOnly)
                     {
-                        switch (attrib.StorageType)
+                        switch (param.StorageType)
                         {
                             case StorageType.Double:
-                                result.Add(attrib);
+                                SharedParameters.Add(param);
                                 break;
                             case StorageType.String:
-                                result.Add(attrib);
+                                SharedParameters.Add(param);
                                 break;
                             default: break;
                         }
                     }
                 }
-                return result;
             });
         }
 
