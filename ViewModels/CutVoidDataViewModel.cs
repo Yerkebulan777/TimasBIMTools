@@ -58,16 +58,10 @@ namespace RevitTimasBIMTools.ViewModels
             get => started;
             set
             {
-                if (SetProperty(ref started, value))
+                if (SetProperty(ref started, value) && started)
                 {
-                    if (started)
-                    {
-                        StartHandlerExecute();
-                    }
-                    else
-                    {
-                        ClearElementDataAsync();
-                    }
+
+
                 }
             }
         }
@@ -372,7 +366,7 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
+                    view3d ??= RevitViewManager.Get3dView(app.ActiveUIDocument);
                 }
             });
         }

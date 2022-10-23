@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.UI;
 using RevitTimasBIMTools.RevitModel;
+using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Windows.Controls;
@@ -40,9 +41,20 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         public void RaiseEvent()
         {
-            Disposed = false;
-            DataContextHandler.IsStarted = true;
-            DataContextHandler.DockPanelView = this;
+            try
+            {
+                _ = Dispatcher.CurrentDispatcher.Invoke(() =>
+                {
+                    Disposed = false;
+                    DataContextHandler.IsStarted = true;
+                    DataContextHandler.DockPanelView = this;
+                    DataContextHandler.StartHandlerExecute();
+                }, DispatcherPriorityAwaiter.ReferenceEquals(DataContextHandler, ActiveDocTitle));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex.Message);
+            }
         }
 
 
