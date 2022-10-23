@@ -62,6 +62,7 @@ namespace RevitTimasBIMTools.CutOpening
             });
         }
 
+
         private async void CloseDockablePane(DockablePane pane, CutVoidDockPaneView view)
         {
             await RevitTask.RunAsync(app =>
@@ -72,13 +73,10 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
+        [STAThread]
+        public bool IsCommandAvailable(UIApplication uiapp, CategorySet categories)
         {
-            return RevitTask.RunAsync(app =>
-            {
-                return uiapp.ActiveUIDocument.Document.IsModifiable == false;
-
-            }).Result;
+            return uiapp.ActiveUIDocument.Document.IsModifiable == false;
         }
 
 
