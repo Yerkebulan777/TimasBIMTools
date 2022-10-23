@@ -4,9 +4,10 @@ using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
+using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Views;
 using System;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -18,7 +19,6 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly IDockablePaneProvider paneProvider = SmartToolApp.ServiceProvider.GetRequiredService<IDockablePaneProvider>();
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            message = "Error: " + nameof(CutVoidShowPanelCommand);
             return Execute(commandData.Application, ref message);
         }
 
@@ -76,14 +76,7 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet catSet)
         {
-            Categories cats = uiapp.ActiveUIDocument.Document.Settings.Categories;
-            Category floorCat = cats.get_Item(BuiltInCategory.OST_Floors);
-            Category wallCat = cats.get_Item(BuiltInCategory.OST_Walls);
-            if (catSet.Contains(wallCat) || catSet.Contains(floorCat))
-            {
-                return true;
-            }
-            return false;
+            return RevitFilterManager.GetElementsOfCategory(uiapp.ActiveUIDocument.Document, typeof(Wall), BuiltInCategory.OST_Walls, true).Any();
         }
 
 
