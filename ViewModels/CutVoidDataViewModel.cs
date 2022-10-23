@@ -78,7 +78,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (!string.IsNullOrEmpty(docUniqueId))
                     {
                         SetMEPCategoriesToData();
-                        SetCoreMaterialsToDataAsync();
+                        SetCoreMaterialsToData();
                         SetFamilySymbolsToData();
                     }
                 }
@@ -385,7 +385,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void SetCoreMaterialsToDataAsync()
+        private async void SetCoreMaterialsToData()
         {
             await RevitTask.RunAsync(app =>
             {
