@@ -138,7 +138,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => docModel;
             set
             {
-                if (value != null && SetProperty(ref docModel, value))
+                if (SetProperty(ref docModel, value) && docModel != null)
                 {
                     collisionManager.SearchDoc = docModel.Document;
                     collisionManager.SearchGlobal = docModel.Transform;
@@ -148,17 +148,17 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private ICollection<DocumentModel> docModels = null;
+        private ICollection<DocumentModel> documents = null;
         public ICollection<DocumentModel> DocumentModelCollection
         {
-            get => docModels;
+            get => documents;
             set
             {
-                if (value != null && SetProperty(ref docModels, value))
+                if (SetProperty(ref documents, value) && documents != null)
                 {
-                    DockPanelView.ComboDocumentModels.SelectedIndex = 0;
                     Logger.Log("\tcount:\t" + value.Count.ToString());
-                    SelectedDocModel = docModels.FirstOrDefault();
+                    DockPanelView.ComboDocumentModels.SelectedIndex = 0;
+                    SelectedDocModel = documents.FirstOrDefault();
                 }
             }
         }
@@ -170,10 +170,10 @@ namespace RevitTimasBIMTools.ViewModels
             get => categos;
             set
             {
-                if (value != null && SetProperty(ref categos, value))
+                if (SetProperty(ref categos, value) && categos != null)
                 {
-                    DockPanelView.ComboEngineerCats.SelectedIndex = 0;
                     Logger.Log("\tcount:\t" + value.Count.ToString());
+                    DockPanelView.ComboEngineerCats.SelectedIndex = 0;
                 }
             }
         }
@@ -187,10 +187,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (value != null)
                 {
-                    if (value != null && SetProperty(ref structs, value))
+                    if (SetProperty(ref structs, value) && structs != null)
                     {
-                        DockPanelView.ComboStructureMats.SelectedIndex = 0;
                         Logger.Log("\tcount:\t" + value.Count.ToString());
+                        DockPanelView.ComboStructureMats.SelectedIndex = 0;
                     }
                 }
             }
@@ -203,11 +203,11 @@ namespace RevitTimasBIMTools.ViewModels
             get => symbols;
             set
             {
-                if (value != null && SetProperty(ref symbols, value))
+                if (SetProperty(ref symbols, value) && symbols != null)
                 {
+                    Logger.Log("\tcount:\t" + value.Count.ToString());
                     DockPanelView.ComboRectangSymbol.SelectedIndex = 0;
                     DockPanelView.ComboRoundedSymbol.SelectedIndex = 0;
-                    Logger.Log("\tcount:\t" + value.Count.ToString());
                 }
             }
         }
@@ -219,7 +219,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => category;
             set
             {
-                if (value != null && SetProperty(ref category, value))
+                if (SetProperty(ref category, value) && category != null)
                 {
                     collisionManager.SearchCatId = category.Id;
                 }
@@ -233,7 +233,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => material;
             set
             {
-                if (value != null && SetProperty(ref material, value))
+                if (SetProperty(ref material, value) && material != null)
                 {
                     GetInstancesByCoreMaterialInType(material.Name);
                 }
@@ -248,7 +248,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => rectang;
             set
             {
-                if (value != null && SetProperty(ref rectang, value))
+                if (SetProperty(ref rectang, value) && rectang != null)
                 {
                     ActivateFamilySimbolAsync(rectang);
                     GetSymbolSharedParametersAsync(rectang);
@@ -265,7 +265,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => rounded;
             set
             {
-                if (value != null && SetProperty(ref rounded, value))
+                if (SetProperty(ref rounded, value) && rounded != null)
                 {
                     ActivateFamilySimbolAsync(rounded);
                     GetSymbolSharedParametersAsync(rounded);
@@ -282,7 +282,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => shared;
             set
             {
-                if (value != null && SetProperty(ref shared, value))
+                if (SetProperty(ref shared, value) && shared != null)
                 {
                     shared = value;
                 }
@@ -427,21 +427,27 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetInstancesByCoreMaterialInType(string matName)
         {
-            constructInstances = await RevitTask.RunAsync(app =>
+            if (!string.IsNullOrEmpty(matName))
             {
-                doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetInstancesByCoreMaterial(doc, constructTypeIds, matName);
-            });
+                constructInstances = await RevitTask.RunAsync(app =>
+                {
+                    doc = app.ActiveUIDocument.Document;
+                    return RevitFilterManager.GetInstancesByCoreMaterial(doc, constructTypeIds, matName);
+                });
+            }
         }
 
 
         private async void SnoopIntersectionDataByLevel(Level level)
         {
-            ElementModelData = await RevitTask.RunAsync(app =>
+            if (level != null)
             {
-                doc = app.ActiveUIDocument.Document;
-                return collisionManager.GetCollisionByLevel(doc, level, constructInstances).ToObservableCollection();
-            });
+                ElementModelData = await RevitTask.RunAsync(app =>
+                {
+                    doc = app.ActiveUIDocument.Document;
+                    return collisionManager.GetCollisionByLevel(doc, level, constructInstances).ToObservableCollection();
+                });
+            }
         }
 
 
@@ -576,13 +582,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region DataFilter
 
-        private IDictionary<double, Level> allLevels;
+        private IDictionary<double, Level> levels;
         public IDictionary<double, Level> ValidLevels
         {
-            get => allLevels;
+            get => levels;
             set
             {
-                if (value != null && SetProperty(ref allLevels, value))
+                if (SetProperty(ref levels, value) && levels != null)
                 {
                     DockPanelView.ComboLevelFilter.SelectedIndex = 0;
                 }
