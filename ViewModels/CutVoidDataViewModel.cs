@@ -74,7 +74,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref enableOpt, value) && enableOpt)
                 {
-                    Properties.Settings.Default.Upgrade();
+                    //Properties.Settings.Default.Upgrade();
                     if (!string.IsNullOrEmpty(docUniqueId))
                     {
                         SetMEPCategoriesToData();
@@ -94,7 +94,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref enableData, value) && enableData)
                 {
-                    Properties.Settings.Default.Upgrade();
+                    //Properties.Settings.Default.Upgrade();
                     if (!string.IsNullOrEmpty(docUniqueId))
                     {
                         GetValidLevelsToData();
@@ -109,10 +109,10 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Temporary
 
-        private Document doc { get; set; } = null;
-        private View3D view3d { get; set; } = null;
-        private IDictionary<int, ElementId> constructTypeIds { get; set; } = null;
-        private IEnumerable<Element> constructInstances { get; set; } = null;
+        private Document doc { get; set; }
+        private View3D view3d { get; set; }
+        private IEnumerable<Element> constructInstances { get; set; }
+        private IDictionary<int, ElementId> constructTypeIds { get; set; }
 
         #endregion
 
@@ -326,6 +326,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
+        [STAThread]
         public async void StartHandlerExecute()
         {
             await RevitTask.RunAsync(app =>
@@ -361,65 +362,53 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetGeneral3DView()
         {
-            await RevitTask.RunAsync(app =>
+            view3d ??= await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    view3d ??= RevitViewManager.Get3dView(app.ActiveUIDocument);
-                }
+                return docUniqueId.Equals(doc.ProjectInformation.UniqueId) ? RevitViewManager.Get3dView(app.ActiveUIDocument) : null;
             });
         }
 
 
         private async void SetMEPCategoriesToData()
         {
-            await RevitTask.RunAsync(app =>
+            EngineerCategories ??= await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    EngineerCategories ??= RevitFilterManager.GetEngineerCategories(doc);
-                }
+                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
+                ? RevitFilterManager.GetEngineerCategories(doc) : null;
             });
         }
 
 
         private async void SetCoreMaterialsToData()
         {
-            await RevitTask.RunAsync(app =>
+            StructureMaterials ??= await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    StructureMaterials ??= RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds);
-                }
+                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
+                    ? RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds) : null;
             });
         }
 
 
         private async void SetFamilySymbolsToData()
         {
-            await RevitTask.RunAsync(app =>
+            FamilySymbols ??= await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    FamilySymbols ??= RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
-                }
+                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
+                    ? RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel) : null;
             });
         }
 
 
         private async void GetValidLevelsToData()
         {
-            await RevitTask.RunAsync(app =>
+            ValidLevels ??= await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    ValidLevels ??= RevitFilterManager.GetValidLevels(doc);
-                }
+                return docUniqueId.Equals(doc.ProjectInformation.UniqueId) ? RevitFilterManager.GetValidLevels(doc) : null;
             });
         }
 
@@ -428,13 +417,12 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (!string.IsNullOrEmpty(matName))
             {
-                await RevitTask.RunAsync(app =>
+                constructInstances = await RevitTask.RunAsync(app =>
                 {
                     doc = app.ActiveUIDocument.Document;
-                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-                    {
-                        constructInstances = RevitFilterManager.GetInstancesByCoreMaterial(doc, constructTypeIds, matName);
-                    }
+                    return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
+                        ? RevitFilterManager.GetInstancesByCoreMaterial(doc, constructTypeIds, matName)
+                        : new List<Element>();
                 });
             }
         }
