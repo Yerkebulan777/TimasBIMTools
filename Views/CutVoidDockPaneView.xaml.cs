@@ -43,13 +43,13 @@ namespace RevitTimasBIMTools.Views
         {
             try
             {
-                _ = Dispatcher.CurrentDispatcher.Invoke(() =>
+                Dispatcher.CurrentDispatcher.Invoke(() =>
                 {
                     Disposed = false;
                     DataContextHandler.IsStarted = true;
                     DataContextHandler.DockPanelView = this;
                     DataContextHandler.StartHandlerExecute();
-                }, DispatcherPriorityAwaiter.ReferenceEquals(DataContextHandler, ActiveDocTitle));
+                });
             }
             catch (Exception ex)
             {
@@ -62,7 +62,7 @@ namespace RevitTimasBIMTools.Views
         {
             if (sender is DataGridRow row && row.DataContext is ElementModel model)
             {
-                if (model.Instanse.IsValidObject)
+                if (model != null && model.Instanse.IsValidObject)
                 {
                     DataContextHandler.GetElementInViewByIntId(model.Instanse.Id);
                 }

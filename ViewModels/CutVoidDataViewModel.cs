@@ -504,7 +504,7 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    if (id != null && mutex.WaitOne())
+                    if (mutex.WaitOne())
                     {
                         Element elem = doc.GetElement(id);
                         System.Windows.Clipboard.SetText(id.ToString());
