@@ -329,14 +329,15 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         public async void StartHandlerExecute()
         {
-            await RevitTask.RunAsync(app =>
+            DocumentModelCollection = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (ExternalEventRequest.Accepted == externalEvent.Raise())
                 {
                     constructTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
-                    DocumentModelCollection = RevitFilterManager.GetDocumentCollection(doc);
+                    return RevitFilterManager.GetDocumentCollection(doc);
                 }
+                return null;
             });
         }
 
