@@ -51,25 +51,19 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private async void ShowDockablePane(DockablePane pane, CutVoidDockPaneView view)
+        private void ShowDockablePane(DockablePane pane, CutVoidDockPaneView view)
         {
-            await RevitTask.RunAsync(app =>
-            {
-                pane?.Show();
-                view?.RaiseEvent();
-                toolHelper.IsActiveStart = true;
-            });
+            pane?.Show();
+            view?.RaiseEvent();
+            toolHelper.IsActiveStart = true;
         }
 
 
-        private async void CloseDockablePane(DockablePane pane, CutVoidDockPaneView view)
+        private void CloseDockablePane(DockablePane pane, CutVoidDockPaneView view)
         {
-            await RevitTask.RunAsync(app =>
-            {
-                pane?.Hide();
-                view?.Dispose();
-                toolHelper.IsActiveStart = false;
-            });
+            pane?.Hide();
+            view?.Dispose();
+            toolHelper.IsActiveStart = false;
         }
 
 

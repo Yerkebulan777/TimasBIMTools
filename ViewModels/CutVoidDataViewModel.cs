@@ -722,8 +722,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         public void Dispose()
         {
-            collisionManager?.Dispose();
             ClearElementDataAsync();
+            collisionManager?.Dispose();
         }
     }
 }

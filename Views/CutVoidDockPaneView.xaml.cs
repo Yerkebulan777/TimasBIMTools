@@ -77,11 +77,8 @@ namespace RevitTimasBIMTools.Views
         {
             if (!Disposed)
             {
-                Dispatcher.CurrentDispatcher.Invoke(() =>
-                {
-                    Disposed = true;
-                    DataContextHandler?.Dispose();
-                }, DispatcherPriority.Background);
+                Disposed = true;
+                DataContextHandler?.Dispose();
             }
         }
     }
