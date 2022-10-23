@@ -31,10 +31,8 @@ namespace RevitTimasBIMTools.ViewModels
         public CutVoidDockPaneView DockPanelView { get; set; }
         public CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
-
         private readonly Mutex mutex = new();
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
-        private readonly TaskScheduler TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly APIEventHandler eventHandler = SmartToolApp.ServiceProvider.GetRequiredService<APIEventHandler>();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
         private readonly CutVoidCollisionManager collisionManager = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
@@ -342,6 +340,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         private async void ClearElementDataAsync()
         {
             if (IsOptionEnabled || IsDataEnabled)
@@ -356,7 +355,7 @@ namespace RevitTimasBIMTools.ViewModels
                     StructureMaterials = new Dictionary<string, Material>();
                     FamilySymbols = new Dictionary<string, FamilySymbol>();
                     ValidLevels = new Dictionary<double, Level>();
-                }, TaskContext);
+                }, DockPanelView.TaskContext);
             }
         }
 

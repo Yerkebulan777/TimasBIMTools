@@ -3,6 +3,7 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -14,6 +15,7 @@ namespace RevitTimasBIMTools.Views
     public partial class CutVoidDockPaneView : Page, IDockablePaneProvider
     {
         public bool Disposed { get; set; } = false;
+        public TaskScheduler TaskContext { get; set; }
 
         private readonly CutVoidDataViewModel DataContextHandler;
 
@@ -49,6 +51,7 @@ namespace RevitTimasBIMTools.Views
                     DataContextHandler.IsStarted = true;
                     DataContextHandler.DockPanelView = this;
                     DataContextHandler.StartHandlerExecute();
+                    TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                 });
             }
             catch (Exception ex)
