@@ -18,11 +18,9 @@ namespace RevitTimasBIMTools.RevitUtils
 
         private static readonly string fileName = Path.Combine(SmartToolHelper.DocumentPath, @"TypeData.json");
         private static readonly JsonSerializerSettings options = new() { NullValueHandling = NullValueHandling.Ignore };
-        public static IDictionary<string, ElementTypeData> SizeTypeData { get; set; } = new Dictionary<string, ElementTypeData>(25);
-
 
         [STAThread]
-        public static void SerializeData(IDictionary<string, ElementTypeData> sourceDict)
+        public static void SerializeData(IDictionary<string, object> sourceDict)
         {
             if (sourceDict.Count > 0)
             {

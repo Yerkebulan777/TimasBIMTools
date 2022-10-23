@@ -40,11 +40,9 @@ namespace RevitTimasBIMTools.Views
         [STAThread]
         public void RaiseEvent()
         {
-
             Disposed = false;
             DataContextHandler.IsStarted = true;
             DataContextHandler.DockPanelView = this;
-
         }
 
 
@@ -52,7 +50,10 @@ namespace RevitTimasBIMTools.Views
         {
             if (sender is DataGridRow row && row.DataContext is ElementModel model)
             {
-                DataContextHandler.GetElementInViewByIntId(model.Instanse.Id);
+                if (model.Instanse.IsValidObject)
+                {
+                    DataContextHandler.GetElementInViewByIntId(model.Instanse.Id);
+                }
             }
         }
 

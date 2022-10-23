@@ -207,8 +207,6 @@
     <Compile Include="RevitUtils\CacheDataRepository.cs" />
     <Compile Include="Core\SmartToolHelper.cs" />
     <Compile Include="Core\SmartToolSetupUIPanel.cs" />
-    <Compile Include="RevitModel\ElementTypeData.cs" />
-    <Compile Include="RevitModel\RevitHostConstruction.cs" />
     <Compile Include="CutOpening\CutVoidCollisionManager.cs" />
     <Compile Include="RevitUtils\ProjectLoctionManager.cs" />
     <Compile Include="RevitUtils\RevitViewManager.cs" />
@@ -233,7 +231,6 @@
     <Compile Include="RevitCommads\AutorizedCommand.cs" />
     <Compile Include="RevitCommads\CmdChangeElementColor.cs" />
     <Compile Include="RevitCommads\CmdParameterUnitConverter.cs" />
-    <Compile Include="RevitModel\IRevitStructuralModel.cs" />
     <Compile Include="RevitUtils\GeometryExtension.cs" />
     <Compile Include="RevitModel\DocumentModel.cs" />
     <Compile Include="RevitModel\ElementModel.cs" />

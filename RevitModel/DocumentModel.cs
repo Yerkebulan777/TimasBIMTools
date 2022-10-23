@@ -4,7 +4,7 @@ using System.IO;
 
 namespace RevitTimasBIMTools.RevitModel
 {
-    public sealed class DocumentModel
+    public sealed class DocumentModel : IDisposable
     {
         public readonly string Title = null;
         public readonly bool IsActive = false;
@@ -17,9 +17,16 @@ namespace RevitTimasBIMTools.RevitModel
             Document = document;
             LinkInstance = linkInstance;
             FilePath = document.PathName;
-            IsActive = document.IsLinked ? false : true;
+            IsActive = !document.IsLinked;
             Title = Path.GetFileNameWithoutExtension(FilePath).ToUpper().Trim();
             Transform = linkInstance != null && document.IsLinked ? linkInstance.GetTotalTransform() : Transform.Identity;
+        }
+
+        public void Dispose()
+        {
+            Document.Dispose();
+            Transform.Dispose();
+            LinkInstance.Dispose();
         }
 
         public override string ToString()
