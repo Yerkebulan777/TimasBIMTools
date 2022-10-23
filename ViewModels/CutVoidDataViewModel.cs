@@ -81,7 +81,6 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref enableOpt, value) && enableOpt)
                 {
-                    Properties.Settings.Default.Upgrade();
                     if (!string.IsNullOrEmpty(docUniqueId))
                     {
                         SetMEPCategoriesToData();
@@ -151,7 +150,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref documents, value) && documents != null)
                 {
                     Logger.Log("\tcount:\t" + value.Count.ToString());
-                    DockPanelView.ComboDocumentModels.SelectedIndex = 0;
                     SelectedDocModel = documents.FirstOrDefault();
                 }
             }
@@ -167,7 +165,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref categos, value) && categos != null)
                 {
                     Logger.Log("\tcount:\t" + value.Count.ToString());
-                    DockPanelView.ComboEngineerCats.SelectedIndex = 0;
                 }
             }
         }
@@ -184,7 +181,6 @@ namespace RevitTimasBIMTools.ViewModels
                     if (SetProperty(ref structs, value) && structs != null)
                     {
                         Logger.Log("\tcount:\t" + value.Count.ToString());
-                        DockPanelView.ComboStructureMats.SelectedIndex = 0;
                     }
                 }
             }
@@ -200,8 +196,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref symbols, value) && symbols != null)
                 {
                     Logger.Log("\tcount:\t" + value.Count.ToString());
-                    DockPanelView.ComboRectangSymbol.SelectedIndex = 0;
-                    DockPanelView.ComboRoundedSymbol.SelectedIndex = 0;
                 }
             }
         }
@@ -278,7 +272,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref shared, value) && shared != null)
                 {
-                    shared = value;
+
                 }
             }
         }
@@ -443,7 +437,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SnoopIntersectionDataByLevel(Level level)
         {
-            if (level != null)
+            if (level != null && level.IsValidObject)
             {
                 ElementModelData = await RevitTask.RunAsync(app =>
                 {
