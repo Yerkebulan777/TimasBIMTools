@@ -333,9 +333,9 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        public void StartHandlerExecute()
+        public async void StartHandlerExecute()
         {
-            _ = RevitTask.RunAsync(app =>
+            await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 SyncContext = SynchronizationContext.Current;
@@ -369,7 +369,11 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
+                doc = app.ActiveUIDocument.Document;
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    view3d = RevitViewManager.Get3dView(app.ActiveUIDocument);
+                }
             });
         }
 
@@ -379,7 +383,10 @@ namespace RevitTimasBIMTools.ViewModels
             await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                EngineerCategories ??= RevitFilterManager.GetEngineerCategories(doc);
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    EngineerCategories ??= RevitFilterManager.GetEngineerCategories(doc);
+                }
             });
         }
 
@@ -389,7 +396,10 @@ namespace RevitTimasBIMTools.ViewModels
             await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                StructureMaterials ??= RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds);
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    StructureMaterials ??= RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds);
+                }
             });
         }
 
@@ -399,7 +409,10 @@ namespace RevitTimasBIMTools.ViewModels
             await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                FamilySymbols ??= RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    FamilySymbols ??= RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+                }
             });
         }
 
@@ -409,7 +422,10 @@ namespace RevitTimasBIMTools.ViewModels
             await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                ValidLevels ??= RevitFilterManager.GetValidLevels(doc);
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    ValidLevels ??= RevitFilterManager.GetValidLevels(doc);
+                }
             });
         }
 
@@ -418,10 +434,13 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (!string.IsNullOrEmpty(matName))
             {
-                constructInstances = await RevitTask.RunAsync(app =>
+                await RevitTask.RunAsync(app =>
                 {
                     doc = app.ActiveUIDocument.Document;
-                    return RevitFilterManager.GetInstancesByCoreMaterial(doc, constructTypeIds, matName);
+                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                    {
+                        constructInstances = RevitFilterManager.GetInstancesByCoreMaterial(doc, constructTypeIds, matName);
+                    }
                 });
             }
         }
@@ -431,10 +450,13 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (level != null && level.IsValidObject)
             {
-                ElementModelData = await RevitTask.RunAsync(app =>
+                await RevitTask.RunAsync(app =>
                 {
                     doc = app.ActiveUIDocument.Document;
-                    return collisionManager.GetCollisionByLevel(doc, level, constructInstances).ToObservableCollection();
+                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                    {
+                        ElementModelData = collisionManager.GetCollisionByLevel(doc, level, constructInstances).ToObservableCollection();
+                    }
                 });
             }
         }
@@ -444,7 +466,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                if (symbol != null && !symbol.IsActive)
+                if (symbol.IsValidObject && !symbol.IsActive)
                 {
                     symbol.Activate();
                 }
@@ -456,20 +478,24 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
+                doc = app.ActiveUIDocument.Document;
                 SharedParameters = new List<Parameter>(5);
-                foreach (Parameter param in symbol.GetOrderedParameters())
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    if (!param.IsReadOnly)
+                    foreach (Parameter param in symbol.GetOrderedParameters())
                     {
-                        switch (param.StorageType)
+                        if (!param.IsReadOnly)
                         {
-                            case StorageType.Double:
-                                SharedParameters.Add(param);
-                                break;
-                            case StorageType.String:
-                                SharedParameters.Add(param);
-                                break;
-                            default: break;
+                            switch (param.StorageType)
+                            {
+                                case StorageType.Double:
+                                    SharedParameters.Add(param);
+                                    break;
+                                case StorageType.String:
+                                    SharedParameters.Add(param);
+                                    break;
+                                default: break;
+                            }
                         }
                     }
                 }
@@ -481,7 +507,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                Document doc = app.ActiveUIDocument.Document;
+                doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     if (mutex.WaitOne())
