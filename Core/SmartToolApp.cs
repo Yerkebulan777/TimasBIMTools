@@ -19,6 +19,7 @@ namespace RevitTimasBIMTools.Core
         public Result OnStartup(UIControlledApplication controlledApp)
         {
             controller = controlledApp;
+            RevitTask.Initialize(controlledApp);
             Logger.InitMainLogger(typeof(SmartToolApp));
             SmartToolSetupUIPanel.Initialize(controlledApp);
             ServiceProvider = ContainerConfig.ConfigureServices();

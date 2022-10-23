@@ -6,10 +6,11 @@ namespace RevitTimasBIMTools.RevitModel
 {
     public sealed class DocumentModel : IDisposable
     {
-        public readonly string Title = null;
-        public readonly bool IsActive = false;
+        public string Title { get; private set; }
+        public bool IsActive { get; private set; }
+        public string FilePath { get; private set; }
+
         public readonly Document Document = null;
-        public readonly string FilePath = string.Empty;
         public readonly RevitLinkInstance LinkInstance = null;
         public readonly Transform Transform = Transform.Identity;
         public DocumentModel(Document document, RevitLinkInstance linkInstance = null)
@@ -24,6 +25,8 @@ namespace RevitTimasBIMTools.RevitModel
 
         public void Dispose()
         {
+            Title = null;
+            FilePath = null;
             Document.Dispose();
             Transform.Dispose();
             LinkInstance.Dispose();
