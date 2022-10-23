@@ -28,14 +28,14 @@ namespace RevitTimasBIMTools.ViewModels
     public class CutVoidDataViewModel : ObservableObject
     {
         public TaskScheduler TaskContext { get; set; }
+        public ExternalEvent externalEvent { get; set; }
+        public CutVoidDockPaneView DockPanelView { get; set; }
         public SynchronizationContext SyncContext { get; set; }
-        public ExternalEvent externalEvent { get; set; } = null;
-        public CutVoidDockPaneView DockPanelView { get; set; } = null;
         public CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
 
         private readonly Mutex mutex = new();
-        private readonly string documentId = Properties.Settings.Default.ActiveDocumentUniqueId;
+        private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly APIEventHandler eventHandler = SmartToolApp.ServiceProvider.GetRequiredService<APIEventHandler>();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
         private readonly CutVoidCollisionManager collisionManager = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
@@ -81,16 +81,11 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref enableOpt, value) && enableOpt)
                 {
-                    if (categos == null || categos.Count == 0)
+                    Properties.Settings.Default.Upgrade();
+                    if (!string.IsNullOrEmpty(docUniqueId))
                     {
                         SetMEPCategoriesToData();
-                    }
-                    if (structs == null || structs.Count == 0)
-                    {
                         SetCoreMaterialsToData();
-                    }
-                    if (symbols == null || symbols.Count == 0)
-                    {
                         SetFamilySymbolsToData();
                     }
                 }
@@ -106,10 +101,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref enableData, value) && enableData)
                 {
-                    if (docModel != null && category != null)
+                    Properties.Settings.Default.Upgrade();
+                    if (!string.IsNullOrEmpty(docUniqueId))
                     {
-                        Properties.Settings.Default.Upgrade();
-                        //IsOptionEnabled = !enableData;
                         GetValidLevelsToData();
                         GetGeneral3DView();
                     }
@@ -387,31 +381,40 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SetMEPCategoriesToData()
         {
-            EngineerCategories = await RevitTask.RunAsync(app =>
+            if (EngineerCategories == null)
             {
-                doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetEngineerCategories(doc);
-            });
+                EngineerCategories = await RevitTask.RunAsync(app =>
+                {
+                    doc = app.ActiveUIDocument.Document;
+                    return RevitFilterManager.GetEngineerCategories(doc);
+                });
+            }
         }
 
 
         private async void SetCoreMaterialsToData()
         {
-            StructureMaterials = await RevitTask.RunAsync(app =>
+            if (StructureMaterials == null)
             {
-                doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds);
-            });
+                StructureMaterials = await RevitTask.RunAsync(app =>
+                {
+                    doc = app.ActiveUIDocument.Document;
+                    return RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds);
+                });
+            }
         }
 
 
         private async void SetFamilySymbolsToData()
         {
-            FamilySymbols = await RevitTask.RunAsync(app =>
+            if (FamilySymbols == null)
             {
-                doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
-            });
+                FamilySymbols = await RevitTask.RunAsync(app =>
+                {
+                    doc = app.ActiveUIDocument.Document;
+                    return RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+                });
+            }
         }
 
 
@@ -494,7 +497,7 @@ namespace RevitTimasBIMTools.ViewModels
             await RevitTask.RunAsync(app =>
             {
                 Document doc = app.ActiveUIDocument.Document;
-                if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     if (mutex.WaitOne())
                     {
@@ -670,7 +673,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
-                if (documentId.Equals(doc.ProjectInformation.UniqueId))
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     foreach (ElementModel model in DataViewCollection)
                     {
