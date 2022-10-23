@@ -27,15 +27,14 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public class CutVoidDataViewModel : ObservableObject
     {
-        public TaskScheduler TaskContext { get; set; }
         public ExternalEvent externalEvent { get; set; }
         public CutVoidDockPaneView DockPanelView { get; set; }
-        public SynchronizationContext SyncContext { get; set; }
         public CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
 
         private readonly Mutex mutex = new();
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
+        private readonly TaskScheduler TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly APIEventHandler eventHandler = SmartToolApp.ServiceProvider.GetRequiredService<APIEventHandler>();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
         private readonly CutVoidCollisionManager collisionManager = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
@@ -332,8 +331,6 @@ namespace RevitTimasBIMTools.ViewModels
             await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                SyncContext = SynchronizationContext.Current;
-                TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                 if (ExternalEventRequest.Accepted == externalEvent.Raise())
                 {
                     constructTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
@@ -349,6 +346,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
+                    IsStarted = false;
+                    IsDataEnabled = false;
+                    IsOptionEnabled = false;
                     ElementModelData = new ObservableCollection<ElementModel>();
                     EngineerCategories = new Dictionary<string, Category>();
                     StructureMaterials = new Dictionary<string, Material>();

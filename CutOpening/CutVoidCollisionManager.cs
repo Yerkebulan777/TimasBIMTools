@@ -12,7 +12,7 @@ using Line = Autodesk.Revit.DB.Line;
 
 namespace RevitTimasBIMTools.CutOpening
 {
-    public sealed class CutVoidCollisionManager : IDisposable
+    public sealed class CutVoidCollisionManager
     {
 
         #region Default Properties

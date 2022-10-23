@@ -78,9 +78,6 @@ namespace RevitTimasBIMTools.Views
                 {
                     Disposed = true;
                     DataContextHandler?.Dispose();
-                    DataContextHandler.IsStarted = false;
-                    DataContextHandler.IsDataEnabled = false;
-                    DataContextHandler.IsOptionEnabled = false;
                 }, DispatcherPriority.Background);
                 Dispatcher.CurrentDispatcher.InvokeShutdown();
                 // TODO: освободить управляемое состояние (управляемые объекты)

@@ -26,15 +26,13 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
-            toolHelper.IsActiveStart = true;
-            DockablePane pane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);
-            if (paneProvider is CutVoidDockPaneView view && pane != null)
+            try
             {
-                try
+                DockablePane pane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);
+                if (paneProvider is CutVoidDockPaneView view && pane.IsValidObject)
                 {
                     if (pane.IsShown())
                     {
-
                         CloseDockablePane(pane, view);
                     }
                     else
@@ -42,14 +40,13 @@ namespace RevitTimasBIMTools.CutOpening
                         ShowDockablePane(pane, view);
                     }
                 }
-                catch (Exception ex)
-                {
-                    message = ex.ToString();
-                    return Result.Failed;
-                }
-                return Result.Succeeded;
             }
-            return Result.Failed;
+            catch (Exception ex)
+            {
+                message = ex.ToString();
+                return Result.Failed;
+            }
+            return Result.Succeeded;
         }
 
 
@@ -57,8 +54,9 @@ namespace RevitTimasBIMTools.CutOpening
         {
             await RevitTask.RunAsync(app =>
             {
-                pane.Show();
-                view.RaiseEvent();
+                pane?.Show();
+                view?.RaiseEvent();
+                toolHelper.IsActiveStart = true;
             });
         }
 
@@ -67,8 +65,9 @@ namespace RevitTimasBIMTools.CutOpening
         {
             await RevitTask.RunAsync(app =>
             {
-                pane.Hide();
-                view.Dispose();
+                pane?.Hide();
+                view?.Dispose();
+                toolHelper.IsActiveStart = false;
             });
         }
 
