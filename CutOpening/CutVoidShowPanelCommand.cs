@@ -6,7 +6,7 @@ using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.Views;
 using System;
-
+using System.Threading.Tasks;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -28,6 +28,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             try
             {
+                RevitTask.Initialize(uiapp);
                 DockablePane pane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);
                 if (paneProvider is CutVoidDockPaneView view && pane.IsValidObject)
                 {
@@ -73,9 +74,16 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         [STAThread]
-        public bool IsCommandAvailable(UIApplication uiapp, CategorySet categories)
+        public bool IsCommandAvailable(UIApplication uiapp, CategorySet catSet)
         {
-            return uiapp.ActiveUIDocument.Document.IsModifiable == false;
+            Categories cats = uiapp.ActiveUIDocument.Document.Settings.Categories;
+            Category floorCat = cats.get_Item(BuiltInCategory.OST_Floors);
+            Category wallCat = cats.get_Item(BuiltInCategory.OST_Walls);
+            if (catSet.Contains(wallCat) || catSet.Contains(floorCat))
+            {
+                return true;
+            }
+            return false;
         }
 
 
