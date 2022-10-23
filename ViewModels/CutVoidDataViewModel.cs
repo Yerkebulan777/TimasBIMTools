@@ -1,7 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
@@ -27,9 +26,9 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public class CutVoidDataViewModel : ObservableObject
     {
-        public ExternalEvent externalEvent { get; set; }
         public CutVoidDockPaneView DockPanelView { get; set; }
-        public CancellationToken cancelToken { get; set; } = CancellationToken.None;
+        public static ExternalEvent RevitExternalEvent { get; set; }
+        public static CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
         private readonly Mutex mutex = new();
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
@@ -40,10 +39,10 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutVoidDataViewModel()
         {
-            externalEvent = ExternalEvent.Create(eventHandler);
-            CanselCommand = new RelayCommand(CancelCallbackLogic);
-            SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
-            ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
+            RevitExternalEvent = ExternalEvent.Create(eventHandler);
+            //CanselCommand = new RelayCommand(CancelCallbackLogic);
+            //SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
+            //ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
         }
 
 
@@ -72,7 +71,6 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref enableOpt, value) && enableOpt)
                 {
-                    //Properties.Settings.Default.Upgrade();
                     if (!string.IsNullOrEmpty(docUniqueId))
                     {
                         SetMEPCategoriesToData();
@@ -92,7 +90,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref enableData, value) && enableData)
                 {
-                    //Properties.Settings.Default.Upgrade();
+                    Properties.Settings.Default.Upgrade();
                     if (!string.IsNullOrEmpty(docUniqueId))
                     {
                         GetValidLevelsToData();
@@ -330,7 +328,7 @@ namespace RevitTimasBIMTools.ViewModels
             DocumentModelCollection = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                if (ExternalEventRequest.Accepted == externalEvent.Raise())
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     constructTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
                     return RevitFilterManager.GetDocumentCollection(doc);

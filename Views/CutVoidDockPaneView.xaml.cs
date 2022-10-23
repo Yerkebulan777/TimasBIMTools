@@ -18,6 +18,7 @@ namespace RevitTimasBIMTools.Views
         public TaskScheduler TaskContext { get; set; }
 
         private readonly CutVoidDataViewModel DataContextHandler;
+        private static readonly ExternalEvent externalEvent = CutVoidDataViewModel.RevitExternalEvent;
 
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {
@@ -47,11 +48,14 @@ namespace RevitTimasBIMTools.Views
             {
                 Dispatcher.CurrentDispatcher.Invoke(() =>
                 {
-                    Disposed = false;
-                    DataContextHandler.IsStarted = true;
-                    DataContextHandler.DockPanelView = this;
-                    DataContextHandler.StartHandlerExecute();
-                    TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
+                    if (ExternalEventRequest.Accepted == externalEvent?.Raise())
+                    {
+                        Disposed = false;
+                        DataContextHandler.IsStarted = true;
+                        DataContextHandler.DockPanelView = this;
+                        DataContextHandler.StartHandlerExecute();
+                        TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
+                    }
                 });
             }
             catch (Exception ex)
