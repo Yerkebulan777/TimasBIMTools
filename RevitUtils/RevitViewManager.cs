@@ -13,7 +13,7 @@ namespace RevitTimasBIMTools.RevitUtils
         private static RevitCommandId cmdId { get; set; } = null;
         private static AddInCommandBinding bindedCmdId { get; set; } = null;
 
-        //ContentControl content = new PreviewControl(docModel, view3d.Id);
+        //ContentControl content = new PreviewControl(document, view3d.Id);
 
         #region Get3dView
         public static View3D CreateNew3DView(UIDocument uidoc, string viewName)
@@ -49,7 +49,7 @@ namespace RevitTimasBIMTools.RevitUtils
             return view;
         }
         /// <summary>
-        /// Retrieve a suitable 3D view3d from docModel. 
+        /// Retrieve a suitable 3D view3d from document. 
         /// </summary>
         public static View3D Get3dView(UIDocument uidoc, string viewName = "Isometric3DView")
         {

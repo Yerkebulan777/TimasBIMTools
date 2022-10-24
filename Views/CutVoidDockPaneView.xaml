@@ -79,8 +79,8 @@
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Project title: " Width="125"/>
                                 <ComboBox Name="ComboDocumentModels" Height="23" Width="125" 
-                                          ItemsSource="{Binding Path=DocumentModelCollection}" 
-                                          SelectedItem="{Binding Path=SelectedDocModel}"/>
+                                          ItemsSource="{Binding Path=DocumentCollection}" 
+                                          SelectedItem="{Binding Path=SelectedDocument}"/>
                                 <!--Watermark="Select project..."-->
                             </WrapPanel>
 

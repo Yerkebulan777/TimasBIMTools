@@ -1,8 +1,11 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
+using Microsoft.Extensions.DependencyInjection;
+using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
+using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Collections.Generic;
 using Document = Autodesk.Revit.DB.Document;
@@ -44,12 +47,11 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Input Properties
 
-        private double minDistance { get; set; } = 0;
-        public int levelIntId { get; set; } = invalidInt;
-        public Document SearchDoc { get; internal set; } = null;
-        public ElementId SearchCatId { get; internal set; } = null;
-        public Transform SearchGlobal { get; internal set; } = null;
-        public RevitLinkInstance SearchInstance { get; internal set; } = null;
+        private ElementId searchCategoryId { get; set; } = null;
+        private Document searchDocument { get; set; } = null;
+        private Transform searchTransform { get; set; } = null;
+        private string materialName { get; set; } = null;
+        private IDictionary<int, ElementId> typeIdData { get; set; } = null;
 
         private readonly double minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
         private readonly double maxSideSize = Convert.ToDouble(Properties.Settings.Default.MaxSideSizeInMm / footToMm);
@@ -91,25 +93,42 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Cache Properties
 
-        private ElementModel[] modelTempData = new ElementModel[0];
-        private readonly ICollection<ElementId> idsExclude = new List<ElementId>(50);
+        private IEnumerable<Element> enclosures { get; set; } = null;
+        private readonly CutVoidDataViewModel dataManager = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidDataViewModel>();
 
         #endregion
 
 
-        private void InitializeCache(Document doc)
+        private void InitializeInputData()
         {
-            modelTempData = new ElementModel[100];
+            typeIdData = dataManager.ElementTypeIdData;
+
+            searchDocument = dataManager.SelectedDocument.Document;
+            searchTransform = dataManager.SelectedDocument.Transform;
+
+            searchCategoryId = dataManager.SelectedCategory.Id;
+
             offsetPnt = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
-            minDistance = cutOffsetSize + ((minSideSize + maxSideSize) * 0.25);
         }
 
 
-        public IList<ElementModel> GetCollisionByLevel(Document doc, Level level, IEnumerable<Element> enclosures)
+        private void InitializeInstancesByTypeMaterial(Document doc)
+        {
+            string structureName = dataManager.SelectedMaterial.Name;
+            if (!string.IsNullOrEmpty(structureName) && structureName != materialName)
+            {
+                enclosures = RevitFilterManager.GetInstancesByCoreMaterial(doc, typeIdData, materialName);
+                materialName = dataManager.SelectedMaterial.Name;
+            }
+        }
+
+
+        public IList<ElementModel> GetCollisionByLevel(Document doc, Level level)
         {
             count = 0;
-            InitializeCache(doc);
-            levelIntId = level.Id.IntegerValue;
+            InitializeInputData();
+            InitializeInstancesByTypeMaterial(doc);
+            int levelIntId = level.Id.IntegerValue;
             IList<ElementModel> output = new List<ElementModel>(50);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             status = transGroup.Start();
@@ -119,7 +138,7 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     if (host.IsValidObject && levelIntId == host.LevelId.IntegerValue)
                     {
-                        foreach (ElementModel model in GetIntersectionByElement(doc, level, host, SearchGlobal, SearchCatId))
+                        foreach (ElementModel model in GetIntersectionByElement(doc, level, host, searchTransform, searchCategoryId))
                         {
                             output.Add(model);
                         }
@@ -428,11 +447,10 @@ namespace RevitTimasBIMTools.CutOpening
         public void Dispose()
         {
             transform?.Dispose();
-            SearchDoc?.Dispose();
+            searchDocument?.Dispose();
             hostSolid?.Dispose();
             interSolid?.Dispose();
-            SearchGlobal?.Dispose();
-            SearchInstance?.Dispose();
+            searchTransform?.Dispose();
         }
     }
 }
