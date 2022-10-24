@@ -108,7 +108,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         Properties.Settings.Default.Upgrade();
                         SnoopIntersectionDataByInputLevel(level);
-                        DataViewCollection.Refresh();  
+                        DataViewCollection?.Refresh();  
                         ResetCurrentContext();
                     }
                 }
