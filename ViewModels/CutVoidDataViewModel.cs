@@ -530,14 +530,15 @@ namespace RevitTimasBIMTools.ViewModels
             get => isSelected;
             set
             {
+
                 if (SetProperty(ref isSelected, value))
                 {
-                    bool boolean = (bool)value;
                     if (!DataViewCollection.IsEmpty && value.HasValue)
                     {
+                        bool booleanValue = value.Value;
                         foreach (ElementModel model in DataViewCollection)
                         {
-                            model.IsSelected = boolean;
+                            model.IsSelected = booleanValue;
                         }
                     }
 
