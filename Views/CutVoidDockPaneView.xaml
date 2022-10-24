@@ -178,7 +178,7 @@
                           SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <!--Watermark="Filter by..."-->
 
-                <CheckBox Name="Settings" Content="Show settings" Height="23"  Width="125" Margin="5" 
+                <CheckBox Name="Settings" Content="Show settings" Height="23"  Width="100" Margin="10,5" 
                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center" 
                           IsChecked="{Binding Path=IsOptionEnabled, Mode=TwoWay, Delay=5}" />
 
