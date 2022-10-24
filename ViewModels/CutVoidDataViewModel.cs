@@ -198,6 +198,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref category, value) && category != null)
                 {
                     collisionManager.SearchCatId = category.Id;
+                    RefreshDataWaitAsync();
                 }
             }
         }
@@ -212,6 +213,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref material, value) && material != null)
                 {
                     GetInstancesByCoreMaterialInType(material.Name);
+                    RefreshDataWaitAsync();
                 }
             }
         }
@@ -219,35 +221,37 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region FamilySymbol
 
-        private FamilySymbol rectang = null;
-        public FamilySymbol RectangSymbol
+        private FamilySymbol wallHole = null;
+        public FamilySymbol WallOpenning
         {
-            get => rectang;
+            get => wallHole;
             set
             {
-                if (SetProperty(ref rectang, value) && rectang != null)
+                if (SetProperty(ref wallHole, value) && wallHole != null)
                 {
-                    ActivateFamilySimbolAsync(rectang);
-                    GetSymbolSharedParametersAsync(rectang);
-                    Properties.Settings.Default.RectangSymbolUniqueId = rectang.UniqueId;
+                    ActivateFamilySimbolAsync(wallHole);
+                    GetSymbolSharedParametersAsync(wallHole);
+                    Properties.Settings.Default.RectangSymbolUniqueId = wallHole.UniqueId;
                     Properties.Settings.Default.Save();
+                    RefreshDataWaitAsync();
                 }
             }
         }
 
 
-        private FamilySymbol rounded = null;
-        public FamilySymbol RoundedSymbol
+        private FamilySymbol floorHole = null;
+        public FamilySymbol FloorOpenning
         {
-            get => rounded;
+            get => floorHole;
             set
             {
-                if (SetProperty(ref rounded, value) && rounded != null)
+                if (SetProperty(ref floorHole, value) && floorHole != null)
                 {
-                    ActivateFamilySimbolAsync(rounded);
-                    GetSymbolSharedParametersAsync(rounded);
-                    Properties.Settings.Default.RoundedSymbolUniqueId = rounded.UniqueId;
+                    ActivateFamilySimbolAsync(floorHole);
+                    GetSymbolSharedParametersAsync(floorHole);
+                    Properties.Settings.Default.RoundedSymbolUniqueId = floorHole.UniqueId;
                     Properties.Settings.Default.Save();
+                    RefreshDataWaitAsync();
                 }
             }
         }
@@ -261,7 +265,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref shared, value) && shared != null)
                 {
-
+                    RefreshDataWaitAsync();
                 }
             }
         }
@@ -374,6 +378,13 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        private async void RefreshDataWaitAsync(int delay = 1000)
+        {
+            await Task.Delay(delay);
+            IsDataRefresh = true;
+        }
+
+
         private async void GetGeneral3DView()
         {
             view3d ??= await RevitTask.RunAsync(app =>
@@ -444,7 +455,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SnoopIntersectionDataByLevel(Level level)
         {
-            if (level != null && level.IsValidObject)
+            if (level.IsValidObject)
             {
                 ElementModelData = await RevitTask.RunAsync(app =>
                 {
