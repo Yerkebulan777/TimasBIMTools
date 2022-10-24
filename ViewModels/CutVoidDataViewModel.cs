@@ -50,7 +50,7 @@ namespace RevitTimasBIMTools.ViewModels
         #region Temporary
         private Document doc { get; set; }
         private View3D view3d { get; set; }
-        private IEnumerable<Element> constructInstances { get; set; }
+        private IEnumerable<Element> enclosures { get; set; }
         private IDictionary<int, ElementId> constructTypeIds { get; set; }
         #endregion
 
@@ -65,7 +65,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref started, value))
                 {
+                    GetGeneral3DView();
                     ResetCurrentContext();
+                    GetValidLevelsToData();
                 }
             }
         }
@@ -81,9 +83,9 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (!string.IsNullOrEmpty(docUniqueId))
                     {
-                        SetMEPCategoriesToData();
-                        SetCoreMaterialsToData();
-                        SetFamilySymbolsToData();
+                        GetMEPCategoriesToData();
+                        GetCoreMaterialsToData();
+                        GetHostedSymbolsToData();
                     }
                 }
             }
@@ -101,8 +103,7 @@ namespace RevitTimasBIMTools.ViewModels
                     Properties.Settings.Default.Upgrade();
                     if (category != null && material != null)
                     {
-                        GetValidLevelsToData();
-                        GetGeneral3DView();
+                        SnoopIntersectionDataByInputLevel(level);
                     }
                 }
             }
@@ -112,6 +113,9 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Settings
+
+
+        #region GeneralData
 
         private DocumentModel docModel = null;
         public DocumentModel SelectedDocModel
@@ -164,24 +168,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => structs;
             set
             {
-                if (value != null)
-                {
-                    if (SetProperty(ref structs, value) && structs != null)
-                    {
-                        Logger.Log("\tcount:\t" + value.Count.ToString());
-                    }
-                }
-            }
-        }
-
-
-        private IDictionary<string, FamilySymbol> symbols = null;
-        public IDictionary<string, FamilySymbol> FamilySymbols
-        {
-            get => symbols;
-            set
-            {
-                if (SetProperty(ref symbols, value) && symbols != null)
+                if (SetProperty(ref structs, value) && structs != null)
                 {
                     Logger.Log("\tcount:\t" + value.Count.ToString());
                 }
@@ -198,7 +185,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref category, value) && category != null)
                 {
                     collisionManager.SearchCatId = category.Id;
-                    RefreshDataWaitAsync();
+                    RefreshActiveData();
                 }
             }
         }
@@ -212,14 +199,30 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref material, value) && material != null)
                 {
-                    GetInstancesByCoreMaterialInType(material.Name);
-                    RefreshDataWaitAsync();
+                    GetHostsByTypeCoreMaterial(material.Name);
+                    RefreshActiveData();
                 }
             }
         }
 
+        #endregion
+
 
         #region FamilySymbol
+
+        private IDictionary<string, FamilySymbol> symbols = null;
+        public IDictionary<string, FamilySymbol> FamilySymbols
+        {
+            get => symbols;
+            set
+            {
+                if (SetProperty(ref symbols, value) && symbols != null)
+                {
+                    Logger.Log("\tcount:\t" + value.Count.ToString());
+                }
+            }
+        }
+
 
         private FamilySymbol wallHole = null;
         public FamilySymbol WallOpenning
@@ -229,11 +232,11 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref wallHole, value) && wallHole != null)
                 {
-                    ActivateFamilySimbolAsync(wallHole);
-                    GetSymbolSharedParametersAsync(wallHole);
+                    ActivateFamilySimbol(wallHole);
+                    GetSymbolSharedParameters(wallHole);
                     Properties.Settings.Default.RectangSymbolUniqueId = wallHole.UniqueId;
                     Properties.Settings.Default.Save();
-                    RefreshDataWaitAsync();
+                    RefreshActiveData();
                 }
             }
         }
@@ -247,11 +250,11 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref floorHole, value) && floorHole != null)
                 {
-                    ActivateFamilySimbolAsync(floorHole);
-                    GetSymbolSharedParametersAsync(floorHole);
+                    ActivateFamilySimbol(floorHole);
+                    GetSymbolSharedParameters(floorHole);
                     Properties.Settings.Default.RoundedSymbolUniqueId = floorHole.UniqueId;
                     Properties.Settings.Default.Save();
-                    RefreshDataWaitAsync();
+                    RefreshActiveData();
                 }
             }
         }
@@ -265,7 +268,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref shared, value) && shared != null)
                 {
-                    RefreshDataWaitAsync();
+                    RefreshActiveData();
                 }
             }
         }
@@ -273,7 +276,7 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Sizes
+        #region SizeData
 
         private int minSize = Properties.Settings.Default.MinSideSizeInMm;
         public int MinSideSize
@@ -344,22 +347,6 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         [STAThread]
-        private void ClearElementDataAsync()
-        {
-            if (IsStarted)
-            {
-                IsStarted = false;
-                IsDataRefresh = false;
-                IsOptionEnabled = false;
-                ElementModelData = null;
-                EngineerCategories = null;
-                StructureMaterials = null;
-                FamilySymbols = null;
-                ValidLevels = null;
-            }
-        }
-
-
         private void ResetCurrentContext()
         {
             context = CutVoidDockPaneView.UIContext;
@@ -378,14 +365,20 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void RefreshDataWaitAsync(int delay = 1000)
+        [STAThread]
+        private void ClearElementDataAsync()
         {
-            if (IsDataRefresh)
+            if (IsStarted)
             {
+                IsStarted = false;
                 IsDataRefresh = false;
+                IsOptionEnabled = false;
+                ElementModelData = null;
+                EngineerCategories = null;
+                StructureMaterials = null;
+                FamilySymbols = null;
+                ValidLevels = null;
             }
-            await Task.Delay(delay);
-            IsDataRefresh = true;
         }
 
 
@@ -395,39 +388,6 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 doc = app.ActiveUIDocument.Document;
                 return docUniqueId.Equals(doc.ProjectInformation.UniqueId) ? RevitViewManager.Get3dView(app.ActiveUIDocument) : null;
-            });
-        }
-
-
-        private async void SetMEPCategoriesToData()
-        {
-            EngineerCategories ??= await RevitTask.RunAsync(app =>
-            {
-                doc = app.ActiveUIDocument.Document;
-                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
-                ? RevitFilterManager.GetEngineerCategories(doc) : null;
-            });
-        }
-
-
-        private async void SetCoreMaterialsToData()
-        {
-            StructureMaterials ??= await RevitTask.RunAsync(app =>
-            {
-                doc = app.ActiveUIDocument.Document;
-                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
-                    ? RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds) : null;
-            });
-        }
-
-
-        private async void SetFamilySymbolsToData()
-        {
-            FamilySymbols ??= await RevitTask.RunAsync(app =>
-            {
-                doc = app.ActiveUIDocument.Document;
-                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
-                    ? RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel) : null;
             });
         }
 
@@ -442,11 +402,44 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void GetInstancesByCoreMaterialInType(string matName)
+        private async void GetMEPCategoriesToData()
+        {
+            EngineerCategories ??= await RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
+                ? RevitFilterManager.GetEngineerCategories(doc) : null;
+            });
+        }
+
+
+        private async void GetCoreMaterialsToData()
+        {
+            StructureMaterials ??= await RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
+                    ? RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds) : null;
+            });
+        }
+
+
+        private async void GetHostedSymbolsToData()
+        {
+            FamilySymbols ??= await RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
+                    ? RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel) : null;
+            });
+        }
+
+
+        private async void GetHostsByTypeCoreMaterial(string matName)
         {
             if (!string.IsNullOrEmpty(matName))
             {
-                constructInstances = await RevitTask.RunAsync(app =>
+                enclosures = await RevitTask.RunAsync(app =>
                 {
                     doc = app.ActiveUIDocument.Document;
                     return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
@@ -457,20 +450,20 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void SnoopIntersectionDataByLevel(Level level)
+        private async void SnoopIntersectionDataByInputLevel(Level level)
         {
-            if (level.IsValidObject)
+            if (level != null && level.IsValidObject)
             {
                 ElementModelData = await RevitTask.RunAsync(app =>
                 {
                     doc = app.ActiveUIDocument.Document;
-                    return collisionManager.GetCollisionByLevel(doc, level, constructInstances).ToObservableCollection();
+                    return collisionManager.GetCollisionByLevel(doc, level, enclosures).ToObservableCollection();
                 });
             }
         }
 
 
-        private async void ActivateFamilySimbolAsync(FamilySymbol symbol)
+        private async void ActivateFamilySimbol(FamilySymbol symbol)
         {
             await RevitTask.RunAsync(app =>
             {
@@ -482,7 +475,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void GetSymbolSharedParametersAsync(FamilySymbol symbol)
+        private async void GetSymbolSharedParameters(FamilySymbol symbol)
         {
             await RevitTask.RunAsync(app =>
             {
@@ -527,6 +520,17 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                 }
             });
+        }
+
+
+        private async void RefreshActiveData()
+        {
+            if (IsDataRefresh)
+            {
+                IsDataRefresh = false;
+                await Task.Delay(1000);
+            }
+            IsDataRefresh = true;
         }
 
         #endregion
@@ -627,7 +631,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref level, value) && level != null)
                 {
-                    SnoopIntersectionDataByLevel(level);
+                    SnoopIntersectionDataByInputLevel(level);
                 }
             }
         }
