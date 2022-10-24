@@ -24,7 +24,7 @@ using Parameter = Autodesk.Revit.DB.Parameter;
 
 namespace RevitTimasBIMTools.ViewModels
 {
-    public class CutVoidDataViewModel : ObservableObject
+    public sealed class CutVoidDataViewModel : ObservableObject
     {
         public CutVoidDockPaneView DockPanelView { get; set; }
         public static ExternalEvent RevitExternalEvent { get; set; }
@@ -40,6 +40,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutVoidDataViewModel()
         {
+            collisionManager.ViewModelData = this;
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
             //CanselCommand = new RelayCommand(CancelCallbackLogic);
             //SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
@@ -64,9 +65,12 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref started, value))
                 {
-                    GetGeneral3DView();
-                    StartHandlerExecute();
-                    GetValidLevelsToData();
+                    if (started)
+                    {
+                        StartHandler();
+                        GetGeneral3DView();
+                        GetValidLevelsToData();
+                    }
                 }
             }
         }
@@ -124,7 +128,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => document;
             set
             {
-                if(SetProperty(ref document, value))
+                if(SetProperty(ref document, value) && document != null)
                 {
                     SearchAndRefreshActiveData();
                 }
@@ -327,7 +331,7 @@ namespace RevitTimasBIMTools.ViewModels
         #region Methods
 
         [STAThread]
-        public async void StartHandlerExecute()
+        public async void StartHandler()
         {
             DocumentCollection = await RevitTask.RunAsync(app =>
             {

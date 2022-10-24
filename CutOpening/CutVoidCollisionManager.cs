@@ -1,7 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
-using Microsoft.Extensions.DependencyInjection;
-using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
@@ -94,19 +92,19 @@ namespace RevitTimasBIMTools.CutOpening
         #region Cache Properties
 
         private IEnumerable<Element> enclosures { get; set; } = null;
-        private readonly CutVoidDataViewModel dataManager = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidDataViewModel>();
+        public CutVoidDataViewModel ViewModelData { get; set; } = null;
 
         #endregion
 
 
         private void InitializeInputData()
         {
-            typeIdData = dataManager.ElementTypeIdData;
+            typeIdData = ViewModelData.ElementTypeIdData;
 
-            searchDocument = dataManager.SelectedDocument.Document;
-            searchTransform = dataManager.SelectedDocument.Transform;
+            searchDocument = ViewModelData.SelectedDocument.Document;
+            searchTransform = ViewModelData.SelectedDocument.Transform;
 
-            searchCategoryId = dataManager.SelectedCategory.Id;
+            searchCategoryId = ViewModelData.SelectedCategory.Id;
 
             offsetPnt = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
         }
@@ -114,11 +112,11 @@ namespace RevitTimasBIMTools.CutOpening
 
         private void InitializeInstancesByTypeMaterial(Document doc)
         {
-            string structureName = dataManager.SelectedMaterial.Name;
+            string structureName = ViewModelData.SelectedMaterial.Name;
             if (!string.IsNullOrEmpty(structureName) && structureName != materialName)
             {
                 enclosures = RevitFilterManager.GetInstancesByCoreMaterial(doc, typeIdData, materialName);
-                materialName = dataManager.SelectedMaterial.Name;
+                materialName = ViewModelData.SelectedMaterial.Name;
             }
         }
 

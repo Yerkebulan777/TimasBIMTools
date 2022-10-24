@@ -46,7 +46,7 @@ namespace RevitTimasBIMTools.Core
 
 
         /// <summary>
-        /// StartHandlerExecute the wrapped external event in a valid Revit API context.
+        /// StartHandler the wrapped external event in a valid Revit API context.
         /// </summary>
         public void Raise(TType args)
         {
