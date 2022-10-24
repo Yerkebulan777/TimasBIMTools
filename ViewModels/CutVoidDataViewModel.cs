@@ -538,8 +538,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => isSelected;
             set
             {
-
-                if (SetProperty(ref isSelected, value))
+                if (SetProperty(ref isSelected, value) && dataView != null)
                 {
                     if (!DataViewCollection.IsEmpty && value.HasValue)
                     {

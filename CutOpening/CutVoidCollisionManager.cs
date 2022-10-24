@@ -101,10 +101,10 @@ namespace RevitTimasBIMTools.CutOpening
         {
             typeIdData = ViewModelData.ElementTypeIdData;
 
-            searchDocument = ViewModelData.SelectedDocument.Document;
-            searchTransform = ViewModelData.SelectedDocument.Transform;
+            searchCategoryId = ViewModelData.SelectedCategory?.Id;
 
-            searchCategoryId = ViewModelData.SelectedCategory.Id;
+            searchDocument = ViewModelData.SelectedDocument?.Document;
+            searchTransform = ViewModelData.SelectedDocument?.Transform;
 
             offsetPnt = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
         }
@@ -112,7 +112,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private void InitializeInstancesByTypeMaterial(Document doc)
         {
-            string structureName = ViewModelData.SelectedMaterial.Name;
+            string structureName = ViewModelData.SelectedMaterial?.Name;
             if (!string.IsNullOrEmpty(structureName) && structureName != materialName)
             {
                 enclosures = RevitFilterManager.GetInstancesByCoreMaterial(doc, typeIdData, materialName);
