@@ -105,7 +105,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        public IList<ElementModel> GetCollisionByLevel(Document doc, Level level, IEnumerable<Element> elements)
+        public IList<ElementModel> GetCollisionByLevel(Document doc, Level level, IEnumerable<Element> enclosures)
         {
             count = 0;
             InitializeCache(doc);
@@ -113,13 +113,16 @@ namespace RevitTimasBIMTools.CutOpening
             IList<ElementModel> output = new List<ElementModel>(50);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             status = transGroup.Start();
-            foreach (Element host in elements)
+            if (enclosures != null)
             {
-                if (levelIntId == host.LevelId.IntegerValue)
+                foreach (Element host in enclosures)
                 {
-                    foreach (ElementModel model in GetIntersectionByElement(doc, level, host, SearchGlobal, SearchCatId))
+                    if (host.IsValidObject && levelIntId == host.LevelId.IntegerValue)
                     {
-                        output.Add(model);
+                        foreach (ElementModel model in GetIntersectionByElement(doc, level, host, SearchGlobal, SearchCatId))
+                        {
+                            output.Add(model);
+                        }
                     }
                 }
             }
@@ -153,7 +156,7 @@ namespace RevitTimasBIMTools.CutOpening
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
 
-                            double height= tupleSize.Item1, widht = tupleSize.Item2;
+                            double height = tupleSize.Item1, widht = tupleSize.Item2;
                             ElementModel model = new(elem)
                             {
                                 Level = level,

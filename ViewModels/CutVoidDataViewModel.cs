@@ -51,7 +51,7 @@ namespace RevitTimasBIMTools.ViewModels
         private Document doc { get; set; }
         private View3D view3d { get; set; }
         private IEnumerable<Element> enclosures { get; set; }
-        private IDictionary<int, ElementId> constructTypeIds { get; set; }
+        private IDictionary<int, ElementId> enclosureTypes { get; set; }
         #endregion
 
 
@@ -101,9 +101,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref refresh, value) && refresh)
                 {
-                    Properties.Settings.Default.Upgrade();
-                    if (category != null && material != null)
+                    if (enclosures != null && category != null && material != null)
                     {
+                        Properties.Settings.Default.Upgrade();
                         SnoopIntersectionDataByInputLevel(level);
                         ResetCurrentContext();
                     }
@@ -340,7 +340,7 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    constructTypeIds = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
+                    enclosureTypes = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
                     return RevitFilterManager.GetDocumentCollection(doc);
                 }
                 return null;
@@ -425,7 +425,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 doc = app.ActiveUIDocument.Document;
                 return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
-                    ? RevitFilterManager.GetConstructionCoreMaterials(doc, constructTypeIds) : null;
+                    ? RevitFilterManager.GetConstructionCoreMaterials(doc, enclosureTypes) : null;
             });
         }
 
@@ -451,7 +451,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     doc = app.ActiveUIDocument.Document;
                     return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
-                        ? RevitFilterManager.GetInstancesByCoreMaterial(doc, constructTypeIds, matName)
+                        ? RevitFilterManager.GetInstancesByCoreMaterial(doc, enclosureTypes, matName)
                         : new List<Element>();
                 });
             }
