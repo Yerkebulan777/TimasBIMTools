@@ -108,6 +108,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         Properties.Settings.Default.Upgrade();
                         SnoopIntersectionDataByInputLevel(level);
+                        DataViewCollection.Refresh();  
                         ResetCurrentContext();
                     }
                 }
@@ -349,8 +350,8 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private void ResetCurrentContext()
         {
-            context = CutVoidDockPaneView.UIContext;
-            if (SynchronizationContext.Current != context)
+            context = DataViewCollection.SourceCollection as SynchronizationContext;
+            if (context != null && SynchronizationContext.Current != context)
             {
                 try
                 {
