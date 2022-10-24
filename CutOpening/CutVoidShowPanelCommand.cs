@@ -34,11 +34,15 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     if (pane.IsShown())
                     {
-                        CloseDockablePane(pane, view);
+                        pane.Hide();
+                        view.Dispose();
+                        toolHelper.IsActiveStart = false;
                     }
                     else
                     {
-                        ShowDockablePane(pane, view);
+                        pane.Show();
+                        view.RaiseEvent();
+                        toolHelper.IsActiveStart = true;
                     }
                 }
             }
@@ -48,22 +52,6 @@ namespace RevitTimasBIMTools.CutOpening
                 return Result.Failed;
             }
             return Result.Succeeded;
-        }
-
-
-        private void ShowDockablePane(DockablePane pane, CutVoidDockPaneView view)
-        {
-            pane?.Show();
-            view?.RaiseEvent();
-            toolHelper.IsActiveStart = true;
-        }
-
-
-        private void CloseDockablePane(DockablePane pane, CutVoidDockPaneView view)
-        {
-            pane?.Hide();
-            view?.Dispose();
-            toolHelper.IsActiveStart = false;
         }
 
 
