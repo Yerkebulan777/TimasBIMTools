@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
-
+using Parameter = Autodesk.Revit.DB.Parameter;
 
 namespace RevitTimasBIMTools.ViewModels
 {
@@ -29,6 +29,7 @@ namespace RevitTimasBIMTools.ViewModels
         public CutVoidDockPaneView DockPanelView { get; set; }
         public static ExternalEvent RevitExternalEvent { get; set; }
         public static CancellationToken cancelToken { get; set; } = CancellationToken.None;
+        private static SynchronizationContext context { get; set; } = SynchronizationContext.Current;
 
         private readonly Mutex mutex = new();
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
@@ -54,22 +55,21 @@ namespace RevitTimasBIMTools.ViewModels
             get => started;
             set
             {
-                if (SetProperty(ref started, value) && started)
+                if (SetProperty(ref started, value))
                 {
-
-
+                    ResetCurrentContext();
                 }
             }
         }
 
 
-        private bool enableOpt = false;
+        private bool enabled = false;
         public bool IsOptionEnabled
         {
-            get => enableOpt;
+            get => enabled;
             set
             {
-                if (SetProperty(ref enableOpt, value) && enableOpt)
+                if (SetProperty(ref enabled, value) && enabled)
                 {
                     if (!string.IsNullOrEmpty(docUniqueId))
                     {
@@ -82,16 +82,16 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool enableData = false;
-        public bool IsDataEnabled
+        private bool refresh = false;
+        public bool IsDataRefresh
         {
-            get => enableData;
+            get => refresh;
             set
             {
-                if (SetProperty(ref enableData, value) && enableData)
+                if (SetProperty(ref refresh, value) && refresh)
                 {
                     Properties.Settings.Default.Upgrade();
-                    if (!string.IsNullOrEmpty(docUniqueId))
+                    if (category != null && material != null)
                     {
                         GetValidLevelsToData();
                         GetGeneral3DView();
@@ -219,6 +219,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        #region FamilySymbol
 
         private FamilySymbol rectang = null;
         public FamilySymbol RectangSymbol
@@ -266,6 +267,8 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
         }
+
+        #endregion
 
 
         #region Sizes
@@ -339,21 +342,36 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         [STAThread]
-        private async void ClearElementDataAsync()
+        private void ClearElementDataAsync()
         {
-            if (IsOptionEnabled || IsDataEnabled)
+            if (IsStarted)
             {
-                await Task.Delay(1000).ContinueWith(_ =>
+                IsStarted = false;
+                IsDataRefresh = false;
+                IsOptionEnabled = false;
+                ElementModelData = null;
+                EngineerCategories = null;
+                StructureMaterials = null;
+                FamilySymbols = null;
+                ValidLevels = null;
+            }
+        }
+
+
+        private void ResetCurrentContext()
+        {
+            context = CutVoidDockPaneView.UIContext;
+            if (SynchronizationContext.Current != context)
+            {
+                try
                 {
-                    IsStarted = false;
-                    IsDataEnabled = false;
-                    IsOptionEnabled = false;
-                    ElementModelData = new ObservableCollection<ElementModel>();
-                    EngineerCategories = new Dictionary<string, Category>();
-                    StructureMaterials = new Dictionary<string, Material>();
-                    FamilySymbols = new Dictionary<string, FamilySymbol>();
-                    ValidLevels = new Dictionary<double, Level>();
-                }, DockPanelView.TaskContext);
+                    SynchronizationContext.SetSynchronizationContext(context);
+                    Logger.ThreadProcessLog("Complited: " + nameof(ResetCurrentContext));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(nameof(ResetCurrentContext) + ex.Message);
+                }
             }
         }
 
@@ -514,12 +532,12 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref isSelected, value))
                 {
-                    if (value.HasValue)
+                    bool boolean = (bool)value;
+                    if (!DataViewCollection.IsEmpty && value.HasValue)
                     {
-                        bool val = (bool)value;
                         foreach (ElementModel model in DataViewCollection)
                         {
-                            model.IsSelected = val;
+                            model.IsSelected = boolean;
                         }
                     }
 
@@ -686,7 +704,7 @@ namespace RevitTimasBIMTools.ViewModels
                         }
                     }
                     // seletAll update by ViewItems
-                    // boolSet to buttom IsDataEnabled
+                    // boolSet to buttom IsDataRefresh
                     UniqueItemNames = GetUniqueStringList(ElementModelData);
                 }
             });

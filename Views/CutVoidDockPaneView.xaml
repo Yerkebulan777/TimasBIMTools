@@ -189,7 +189,7 @@
             <!-- DataGridView -->
             <ScrollViewer Grid.Row="3" >
                 <DataGrid Name="dataGridView" IsSynchronizedWithCurrentItem="True" Style="{StaticResource VisibleAnimation}"
-                          Visibility="{Binding  Path=IsDataEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" 
+                          Visibility="{Binding  Path=IsStarted, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" 
                           ItemsSource="{Binding Path=DataViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           AutoGenerateColumns="False">
                     <DataGrid.RowStyle>
