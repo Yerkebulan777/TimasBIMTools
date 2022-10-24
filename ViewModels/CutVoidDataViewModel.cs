@@ -47,6 +47,14 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        #region Temporary
+        private Document doc { get; set; }
+        private View3D view3d { get; set; }
+        private IEnumerable<Element> constructInstances { get; set; }
+        private IDictionary<int, ElementId> constructTypeIds { get; set; }
+        #endregion
+
+
         #region Visibility
 
         private bool started = false;
@@ -99,16 +107,6 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
         }
-
-        #endregion
-
-
-        #region Temporary
-
-        private Document doc { get; set; }
-        private View3D view3d { get; set; }
-        private IEnumerable<Element> constructInstances { get; set; }
-        private IDictionary<int, ElementId> constructTypeIds { get; set; }
 
         #endregion
 
@@ -448,13 +446,10 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (level != null && level.IsValidObject)
             {
-                await RevitTask.RunAsync(app =>
+                ElementModelData = await RevitTask.RunAsync(app =>
                 {
                     doc = app.ActiveUIDocument.Document;
-                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-                    {
-                        ElementModelData = collisionManager.GetCollisionByLevel(doc, level, constructInstances).ToObservableCollection();
-                    }
+                    return collisionManager.GetCollisionByLevel(doc, level, constructInstances).ToObservableCollection();
                 });
             }
         }
