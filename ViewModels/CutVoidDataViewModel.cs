@@ -66,7 +66,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref started, value))
                 {
                     GetGeneral3DView();
-                    ResetCurrentContext();
+                    StartHandlerExecute();
                     GetValidLevelsToData();
                 }
             }
@@ -83,6 +83,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (!string.IsNullOrEmpty(docUniqueId))
                     {
+                        ResetCurrentContext();
                         GetMEPCategoriesToData();
                         GetCoreMaterialsToData();
                         GetHostedSymbolsToData();
@@ -104,6 +105,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (category != null && material != null)
                     {
                         SnoopIntersectionDataByInputLevel(level);
+                        ResetCurrentContext();
                     }
                 }
             }
@@ -382,26 +384,29 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         private async void GetGeneral3DView()
         {
             view3d ??= await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return docUniqueId.Equals(doc.ProjectInformation.UniqueId) ? RevitViewManager.Get3dView(app.ActiveUIDocument) : null;
+                return RevitViewManager.Get3dView(app.ActiveUIDocument);
             });
         }
 
 
+        [STAThread]
         private async void GetValidLevelsToData()
         {
             ValidLevels ??= await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return docUniqueId.Equals(doc.ProjectInformation.UniqueId) ? RevitFilterManager.GetValidLevels(doc) : null;
+                return RevitFilterManager.GetValidLevels(doc);
             });
         }
 
 
+        [STAThread]
         private async void GetMEPCategoriesToData()
         {
             EngineerCategories ??= await RevitTask.RunAsync(app =>
@@ -413,6 +418,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         private async void GetCoreMaterialsToData()
         {
             StructureMaterials ??= await RevitTask.RunAsync(app =>
@@ -424,6 +430,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         private async void GetHostedSymbolsToData()
         {
             FamilySymbols ??= await RevitTask.RunAsync(app =>
@@ -435,6 +442,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         private async void GetHostsByTypeCoreMaterial(string matName)
         {
             if (!string.IsNullOrEmpty(matName))
@@ -450,6 +458,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         private async void SnoopIntersectionDataByInputLevel(Level level)
         {
             if (level != null && level.IsValidObject)
@@ -463,6 +472,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         private async void ActivateFamilySimbol(FamilySymbol symbol)
         {
             await RevitTask.RunAsync(app =>
@@ -475,6 +485,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         private async void GetSymbolSharedParameters(FamilySymbol symbol)
         {
             await RevitTask.RunAsync(app =>
@@ -504,6 +515,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         internal async void GetElementInViewByIntId(ElementId id)
         {
             await RevitTask.RunAsync(app =>

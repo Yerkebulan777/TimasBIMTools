@@ -53,7 +53,6 @@ namespace RevitTimasBIMTools.Views
                         Disposed = false;
                         DataContextHandler.IsStarted = true;
                         DataContextHandler.DockPanelView = this;
-                        DataContextHandler.StartHandlerExecute();
                         TaskContext = TaskScheduler.FromCurrentSynchronizationContext();
                     }
                 });
