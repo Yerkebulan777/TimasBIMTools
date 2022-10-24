@@ -350,7 +350,7 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private void ResetCurrentContext()
         {
-            context = DataViewCollection.SourceCollection as SynchronizationContext;
+            context = DataViewCollection?.SourceCollection as SynchronizationContext;
             if (context != null && SynchronizationContext.Current != context)
             {
                 try
