@@ -380,6 +380,10 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void RefreshDataWaitAsync(int delay = 1000)
         {
+            if (IsDataRefresh)
+            {
+                IsDataRefresh = false;
+            }
             await Task.Delay(delay);
             IsDataRefresh = true;
         }
