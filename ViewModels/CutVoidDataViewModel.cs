@@ -127,7 +127,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref document, value) && document != null)
                 {
-                    SearchAndRefreshActiveData();
+                    SearchAndRefreshActiveDataAsync();
                 }
             }
         }
@@ -141,7 +141,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref material, value) && material != null)
                 {
-                    SearchAndRefreshActiveData();
+                    SearchAndRefreshActiveDataAsync();
                 }
             }
         }
@@ -155,7 +155,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref category, value) && category != null)
                 {
-                    SearchAndRefreshActiveData();
+                    SearchAndRefreshActiveDataAsync();
                 }
             }
         }
@@ -233,7 +233,6 @@ namespace RevitTimasBIMTools.ViewModels
                     GetSymbolSharedParameters(wallHole);
                     Properties.Settings.Default.RectangSymbolUniqueId = wallHole.UniqueId;
                     Properties.Settings.Default.Save();
-                    SearchAndRefreshActiveData();
                 }
             }
         }
@@ -251,7 +250,6 @@ namespace RevitTimasBIMTools.ViewModels
                     GetSymbolSharedParameters(floorHole);
                     Properties.Settings.Default.RoundedSymbolUniqueId = floorHole.UniqueId;
                     Properties.Settings.Default.Save();
-                    SearchAndRefreshActiveData();
                 }
             }
         }
@@ -265,7 +263,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref shared, value) && shared != null)
                 {
-                    SearchAndRefreshActiveData();
+                    SearchAndRefreshActiveDataAsync();
                 }
             }
         }
@@ -519,16 +517,13 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void SearchAndRefreshActiveData()
+        private async void SearchAndRefreshActiveDataAsync()
         {
-            _ = (Task.Delay(1000).ContinueWith(_ =>
+            IsDataRefresh = !IsOptionEnabled;
+            await Task.Delay(1000).ContinueWith(_ =>
             {
-                if (IsDataRefresh)
-                {
-                    IsDataRefresh = false;
-                }
                 IsDataRefresh = true;
-            }, taskContext)?.Wait(1000));
+            }, taskContext);
         }
 
         #endregion
