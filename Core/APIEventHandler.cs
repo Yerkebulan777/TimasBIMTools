@@ -3,7 +3,7 @@ using Autodesk.Revit.UI;
 
 namespace RevitTimasBIMTools.Core
 {
-    internal class APIEventHandler : IExternalEventHandler
+    public class APIEventHandler : IExternalEventHandler
     {
         public void Execute(UIApplication app)
         {

@@ -33,12 +33,12 @@ namespace RevitTimasBIMTools.ViewModels
 
         private readonly Mutex mutex = new();
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
-        private readonly APIEventHandler eventHandler = SmartToolApp.ServiceProvider.GetRequiredService<APIEventHandler>();
+        private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
         private readonly CutVoidCollisionManager collisionManager = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
 
 
-        public CutVoidDataViewModel()
+        public CutVoidDataViewModel(APIEventHandler eventHandler)
         {
             collisionManager.ViewModelData = this;
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
@@ -104,13 +104,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref refresh, value) && refresh)
                 {
-                    if (document != null && category != null && material != null)
-                    {
-                        Properties.Settings.Default.Upgrade();
-                        SnoopIntersectionDataByInputLevel(level);
-                        DataViewCollection?.Refresh();  
-                        ResetCurrentContext();
-                    }
+                    ResetCurrentContext();
+                    ElementModelData?.Clear();
+                    SnoopIntersectionDataByLevel(level);
                 }
             }
         }
@@ -129,7 +125,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => document;
             set
             {
-                if(SetProperty(ref document, value) && document != null)
+                if (SetProperty(ref document, value) && document != null)
                 {
                     SearchAndRefreshActiveData();
                 }
@@ -442,14 +438,19 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         [STAThread]
-        private async void SnoopIntersectionDataByInputLevel(Level level)
+        private async void SnoopIntersectionDataByLevel(Level level)
         {
-            if (level != null && level.IsValidObject)
+            if (document != null && category != null && material != null)
             {
                 ElementModelData = await RevitTask.RunAsync(app =>
                 {
-                    doc = app.ActiveUIDocument.Document;
-                    return collisionManager.GetCollisionByLevel(doc, level).ToObservableCollection();
+                    if (level != null && level.IsValidObject)
+                    {
+                        doc = app.ActiveUIDocument.Document;
+                        Properties.Settings.Default.Upgrade();
+                        return collisionManager.GetCollisionByLevel(doc, level).ToObservableCollection();
+                    }
+                    return new ObservableCollection<ElementModel>();
                 });
             }
         }
@@ -518,14 +519,16 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void SearchAndRefreshActiveData()
+        private void SearchAndRefreshActiveData()
         {
-            if (IsDataRefresh)
+            _ = (Task.Delay(1000).ContinueWith(_ =>
             {
-                IsDataRefresh = false;
-                await Task.Delay(1000);
-            }
-            IsDataRefresh = true;
+                if (IsDataRefresh)
+                {
+                    IsDataRefresh = false;
+                }
+                IsDataRefresh = true;
+            }, taskContext)?.Wait(1000));
         }
 
         #endregion
@@ -555,20 +558,17 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private ObservableCollection<ElementModel> dataModels = new();
+        private ObservableCollection<ElementModel> dataModels = null;
         public ObservableCollection<ElementModel> ElementModelData
         {
             get => dataModels;
             set
             {
-                if (SetProperty(ref dataModels, value))
+                if (SetProperty(ref dataModels, value) && dataModels != null)
                 {
-                    if (dataModels != null && dataModels.Count > 0)
-                    {
-                        DataViewCollection = CollectionViewSource.GetDefaultView(dataModels) as ListCollectionView;
-                        UniqueItemNames = GetUniqueStringList(dataModels);
-                        DataViewCollection.Refresh();
-                    }
+                    DataViewCollection = CollectionViewSource.GetDefaultView(dataModels) as ListCollectionView;
+                    UniqueItemNames = GetUniqueStringList(dataModels);
+                    DataViewCollection.Refresh();
                 }
             }
         }
@@ -625,7 +625,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref level, value) && level != null)
                 {
-                    SnoopIntersectionDataByInputLevel(level);
+                    SnoopIntersectionDataByLevel(level);
                 }
             }
         }
