@@ -59,15 +59,22 @@ namespace RevitTimasBIMTools.RevitUtils
                         new FilterStringEquals(), familyTypeName, true)));
         }
 
+
+        public static FilteredElementCollector GetInstancesByElementTypeId(Document doc, ElementId typeId)
+        {
+            FilterRule rule = ParameterFilterRuleFactory.CreateEqualsRule(new ElementId(BuiltInParameter.ELEM_TYPE_PARAM), typeId);
+            FilteredElementCollector collector = new FilteredElementCollector(doc).WherePasses(new ElementParameterFilter(rule));
+            return collector.WhereElementIsNotElementType();
+        }
+
         #endregion
 
 
-        #region Advance Filtered Element Collector
+        #region Advance Filtered Element
 
         public static FamilySymbol FindFamilySymbol(Document doc, string familyName, string symbolName)
         {
             FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(Family));
-
             foreach (Family f in collector)
             {
                 if (f.Name.Equals(familyName))
@@ -83,34 +90,19 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-
             return null;
-        }
-
-
-        public static Element GetFirstElementOfTypeNamed(Document doc, Type type, string name)
-        {
-            FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(type);
-            bool nameEquals(Element e)
-            {
-                return e.Name.Equals(name);
-            }
-
-            return collector.Any(nameEquals) ? collector.First(nameEquals) : null;
         }
 
 
         public static ElementType GetElementTypeByName(Document doc, string name)
         {
-            return new FilteredElementCollector(doc).OfClass(typeof(ElementType))
-                    .First(q => q.Name.Equals(name)) as ElementType;
+            return new FilteredElementCollector(doc).OfClass(typeof(ElementType)).First(q => q.Name.Equals(name)) as ElementType;
         }
 
 
         public static ElementType GetFamilySymbolByName(Document doc, string name)
         {
-            return new FilteredElementCollector(doc).OfClass(typeof(FamilySymbol))
-                    .First(q => q.Name.Equals(name)) as FamilySymbol;
+            return new FilteredElementCollector(doc).OfClass(typeof(FamilySymbol)).First(q => q.Name.Equals(name)) as FamilySymbol;
         }
 
 
@@ -238,23 +230,6 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Material Filter
 
-        
-
-
-        
-
-
-        public static IEnumerable<Element> GetInstancesByElementTypeAndLevelIds(Document doc, ElementId typeId)
-        {
-            FilterRule rule = ParameterFilterRuleFactory.CreateEqualsRule(new ElementId(BuiltInParameter.ELEM_TYPE_PARAM), typeId);
-            FilteredElementCollector collector = new FilteredElementCollector(doc).WherePasses(new ElementParameterFilter(rule));
-            foreach (Element elem in collector.WhereElementIsNotElementType())
-            {
-                yield return elem;
-            }
-        }
-
-
         public static Material GetCompoundStructureMaterial(Document doc, Element element, CompoundStructure compound)
         {
             Material material = null;
@@ -274,9 +249,6 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             return material;
         }
-
-
-
 
         #endregion
 

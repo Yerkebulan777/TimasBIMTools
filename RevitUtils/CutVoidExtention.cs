@@ -1,11 +1,11 @@
 ﻿using Autodesk.Revit.DB;
 using System.Collections.Generic;
 
+
 namespace RevitTimasBIMTools.RevitUtils
 {
     public static class CutVoidExtention
     {
-
         public static IDictionary<string, Material> GetStructureCoreMaterialData(this IDictionary<int, ElementId> sourceTypeIds, Document doc)
         {
             CompoundStructure compound = null;
@@ -62,17 +62,13 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 if (material != null && material.Name == materialName)
                 {
-                    foreach (Element inst in RevitFilterManager.GetInstancesByElementTypeAndLevelIds(doc, elem.Id))
+                    foreach (Element inst in RevitFilterManager.GetInstancesByElementTypeId(doc, elem.Id))
                     {
                         yield return inst;
                     }
                 }
             }
         }
-
-
-
-
 
     }
 }
