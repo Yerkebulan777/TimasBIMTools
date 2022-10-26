@@ -8,7 +8,7 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitPurginqManager
     {
-        public IDictionary<int, ElementId> PurgeAndGetValidConstructionTypeIds(Document doc)
+        public static IDictionary<int, ElementId> PurgeAndGetValidConstructionTypeIds(Document doc)
         {
             //  Categories whose types will be purged
             List<BuiltInCategory> purgeBuiltInCats = new()

@@ -331,7 +331,7 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    ElementTypeIdData = constructManager.PurgeAndGetValidConstructionTypeIds(doc);
+                    collisionManager.InitializeElementTypeIdData(doc);
                     return RevitFilterManager.GetDocumentCollection(doc);
                 }
                 return null;

@@ -43,11 +43,9 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Input Properties
 
-        private ElementId categoryId { get; set; } = null;
         private Document searchDocument { get; set; } = null;
         private Transform searchTransform { get; set; } = null;
-        private string materialName { get; set; } = null;
-        private IDictionary<int, ElementId> typeIdData { get; set; } = null;
+        private IDictionary<int, ElementId> ElementTypeIdData { get; set; } = null;
 
         private readonly double minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
         private readonly double maxSideSize = Convert.ToDouble(Properties.Settings.Default.MaxSideSizeInMm / footToMm);
@@ -86,8 +84,9 @@ namespace RevitTimasBIMTools.CutOpening
         #endregion
 
 
-        private void InitializeInputData()
+        public void InitializeElementTypeIdData(Document doc)
         {
+            ElementTypeIdData = RevitPurginqManager.PurgeAndGetValidConstructionTypeIds(doc);
             offsetPnt = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
         }
 
@@ -95,10 +94,9 @@ namespace RevitTimasBIMTools.CutOpening
         public IList<ElementModel> GetCollisionByInputData(Document doc, DocumentModel document, Level level, Material material, Category category)
         {
             count = 0;
-            InitializeInputData();
             Transform global = document.Transform;
             IList<ElementModel> output = new List<ElementModel>(25);
-            IEnumerable<Element> enclosures = RevitFilterManager.GetInstancesByLevelAndMaterial(doc, typeIdData, level, material);
+            IEnumerable<Element> enclosures = RevitFilterManager.GetInstancesByLevelAndMaterial(doc, ElementTypeIdData, level, material);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             TransactionStatus status = transGroup.Start();
             foreach (Element host in enclosures)
