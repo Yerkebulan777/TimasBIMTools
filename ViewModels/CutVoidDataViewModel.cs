@@ -50,7 +50,6 @@ namespace RevitTimasBIMTools.ViewModels
         #region GeneralData
         private Document doc { get; set; }
         private View3D view3d { get; set; }
-        public IDictionary<int, ElementId> ElementTypeIdData { get; set; }
         #endregion
 
 
@@ -403,8 +402,7 @@ namespace RevitTimasBIMTools.ViewModels
             EngineerCategories ??= await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
-                ? RevitFilterManager.GetEngineerCategories(doc) : null;
+                return RevitFilterManager.GetEngineerCategories(doc);
             });
         }
 
@@ -415,8 +413,7 @@ namespace RevitTimasBIMTools.ViewModels
             StructureMaterials ??= await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
-                    ? RevitFilterManager.GetConstructionCoreMaterials(doc, ElementTypeIdData) : null;
+                return collisionManager.GetStructureCoreMaterialData(doc);
             });
         }
 
@@ -427,8 +424,7 @@ namespace RevitTimasBIMTools.ViewModels
             FamilySymbols ??= await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return docUniqueId.Equals(doc.ProjectInformation.UniqueId)
-                    ? RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel) : null;
+                return RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
             });
         }
 
@@ -436,17 +432,13 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async void SnoopIntersectionByInputData()
         {
-            if (document != null && category != null && material != null)
+            if (document != null && material != null && category != null)
             {
                 ElementModelData = await RevitTask.RunAsync(app =>
                 {
-                    if (level != null && level.IsValidObject)
-                    {
-                        doc = app.ActiveUIDocument.Document;
-                        Properties.Settings.Default.Upgrade();
-                        return collisionManager.GetCollisionByInputData(doc, document, level, material, category).ToObservableCollection();
-                    }
-                    return new ObservableCollection<ElementModel>();
+                    doc = app.ActiveUIDocument.Document;
+                    Properties.Settings.Default.Upgrade();
+                    return collisionManager.GetCollisionByInputData(doc, document, material, category).ToObservableCollection();
                 });
             }
         }

@@ -203,6 +203,7 @@
     <Compile Include="Core\ContainerConfig.cs" />
     <Compile Include="Core\RevitEventWrapper.cs" />
     <Compile Include="Core\SmartToolApp.cs" />
+    <Compile Include="RevitUtils\CutVoidExtention.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
     <Compile Include="RevitUtils\CacheDataRepository.cs" />
     <Compile Include="Core\SmartToolHelper.cs" />

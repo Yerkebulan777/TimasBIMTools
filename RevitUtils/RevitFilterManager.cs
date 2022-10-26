@@ -238,84 +238,24 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Material Filter
 
-        public static IDictionary<string, Material> GetConstructionCoreMaterials(Document doc, IDictionary<int, ElementId> typeIds)
-        {
-            CompoundStructure compound = null;
-            IDictionary<string, Material> result = new SortedDictionary<string, Material>();
-            if (typeIds != null && typeIds.Count > 0)
-            {
-                foreach (KeyValuePair<int, ElementId> item in typeIds)
-                {
-                    Element elem = doc.GetElement(item.Value);
-                    if (elem is RoofType roofType)
-                    {
-                        compound = roofType.GetCompoundStructure();
-                    }
-                    else if (elem is WallType wallType)
-                    {
-                        compound = wallType.GetCompoundStructure();
-                    }
-                    else if (elem is FloorType floorType)
-                    {
-                        compound = floorType.GetCompoundStructure();
-                    }
-                    Material material = GetCompoundStructureMaterial(doc, elem, compound);
-                    if (material != null)
-                    {
-                        result[material.Name] = material;
-                    }
-                }
-            }
-            return result;
-        }
+        
 
 
-        public static IEnumerable<Element> GetInstancesByLevelAndMaterial(Document doc, IDictionary<int, ElementId> sourceIds, Level level, Material structure)
-        {
-            ElementId levelId = level.Id;
-            string materialName = structure.Name;
-            foreach (KeyValuePair<int, ElementId> item in sourceIds)
-            {
-                Material material = null;
-                Element elem = doc.GetElement(item.Value);
-                if (elem is RoofType roofType)
-                {
-                    CompoundStructure compound = roofType.GetCompoundStructure();
-                    material = GetCompoundStructureMaterial(doc, elem, compound);
-                }
-                else if (elem is WallType wallType)
-                {
-                    CompoundStructure compound = wallType.GetCompoundStructure();
-                    material = GetCompoundStructureMaterial(doc, elem, compound);
-                }
-                else if (elem is FloorType floorType)
-                {
-                    CompoundStructure compound = floorType.GetCompoundStructure();
-                    material = GetCompoundStructureMaterial(doc, elem, compound);
-                }
-                if (material != null && material.Name == materialName)
-                {
-                    foreach (Element inst in GetInstancesByElementTypeAndLevelIds(doc, levelId, elem.Id))
-                    {
-                        yield return inst;
-                    }
-                }
-            }
-        }
+        
 
 
-        public static IEnumerable<Element> GetInstancesByElementTypeAndLevelIds(Document doc, ElementId levelId, ElementId typeId)
+        public static IEnumerable<Element> GetInstancesByElementTypeAndLevelIds(Document doc, ElementId typeId)
         {
             FilterRule rule = ParameterFilterRuleFactory.CreateEqualsRule(new ElementId(BuiltInParameter.ELEM_TYPE_PARAM), typeId);
             FilteredElementCollector collector = new FilteredElementCollector(doc).WherePasses(new ElementParameterFilter(rule));
-            foreach (Element elem in collector.WherePasses(new ElementLevelFilter(levelId)).WhereElementIsNotElementType())
+            foreach (Element elem in collector.WhereElementIsNotElementType())
             {
                 yield return elem;
             }
         }
 
 
-        private static Material GetCompoundStructureMaterial(Document doc, Element element, CompoundStructure compound)
+        public static Material GetCompoundStructureMaterial(Document doc, Element element, CompoundStructure compound)
         {
             Material material = null;
             if (compound != null)
