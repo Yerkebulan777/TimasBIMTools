@@ -28,37 +28,39 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static XYZ GetNormalByTopFace(this Element elem, Transform local, double tollerance = 0)
+        public static XYZ GetHostElementNormal(this Element elem, double tollerance = 0)
         {
             XYZ result = XYZ.BasisZ;
-            foreach (Reference refFace in HostObjectUtils.GetTopFaces(elem as HostObject))
+            if (elem is Wall wall)
             {
-                GeometryObject geo = elem.GetGeometryObjectFromReference(refFace);
-                Face face = geo as Face;
-                XYZ normal = XYZ.BasisZ;
-                try
+                result = wall.Orientation.Normalize();
+            }
+            else if (elem is HostObject hostObject)
+            {
+                Transform local = Transform.Identity;
+                foreach (Reference refFace in HostObjectUtils.GetTopFaces(hostObject))
                 {
-                    if (face is PlanarFace planar && planar != null)
+                    GeometryObject geo = elem.GetGeometryObjectFromReference(refFace);
+                    if (geo is Face face && face.Area > tollerance)
                     {
-                        normal = planar.FaceNormal;
-                    }
-                    else
-                    {
-                        BoundingBoxUV box = face.GetBoundingBox();
-                        normal = face.ComputeNormal((box.Max + box.Min) / 2);
-                        normal = local.OfVector(normal);
-                    }
-                }
-                catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
-                {
-                    Logger.Error(ex.Message);
-                    continue;
-                }
-                finally
-                {
-                    if (face.Area > tollerance)
-                    {
-                        result = normal.Normalize();
+                        try
+                        {
+                            XYZ normal = result;
+                            if (face is PlanarFace planar && planar != null)
+                            {
+                                normal = planar.FaceNormal;
+                            }
+                            else
+                            {
+                                BoundingBoxUV box = face.GetBoundingBox();
+                                normal = face.ComputeNormal((box.Max + box.Min) * 0.5);
+                                result = local.OfVector(normal).Normalize();
+                            }
+                        }
+                        catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
+                        {
+                            Logger.Error(ex.Message);
+                        }
                     }
                 }
             }

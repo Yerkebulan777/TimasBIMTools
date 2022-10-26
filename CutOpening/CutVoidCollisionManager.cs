@@ -36,7 +36,6 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Constant Properties
 
-        private const int invalidInt = -1;
         private const double footToMm = 304.8;
         private readonly double thresholdAngle = Math.Floor(Math.Cos(45 * Math.PI / 180));
 
@@ -45,7 +44,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Input Properties
 
-        private ElementId searchCategoryId { get; set; } = null;
+        private ElementId categoryId { get; set; } = null;
         private Document searchDocument { get; set; } = null;
         private Transform searchTransform { get; set; } = null;
         private string materialName { get; set; } = null;
@@ -91,6 +90,8 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Cache Properties
 
+        private IEnumerable<Element> intersectIds { get; set; } = null;
+        private IEnumerable<Element> enclosureIds { get; set; } = null;
         private IEnumerable<Element> enclosures { get; set; } = null;
         public CutVoidDataViewModel ViewModelData { get; set; } = null;
 
@@ -101,7 +102,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             typeIdData = ViewModelData.ElementTypeIdData;
 
-            searchCategoryId = ViewModelData.SelectedCategory?.Id;
+            categoryId = ViewModelData.SelectedCategory?.Id;
 
             searchDocument = ViewModelData.SelectedDocument?.Document;
             searchTransform = ViewModelData.SelectedDocument?.Transform;
@@ -110,37 +111,28 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private void InitializeInstancesByTypeMaterial(Document doc)
+
+        public bool CheckIntrsectionsByCategory()
         {
-            string structureName = ViewModelData.SelectedMaterial?.Name;
-            if (!string.IsNullOrEmpty(structureName) && structureName != materialName)
-            {
-                enclosures = RevitFilterManager.GetInstancesByCoreMaterial(doc, typeIdData, materialName);
-                materialName = ViewModelData.SelectedMaterial.Name;
-            }
+
+            return true;
         }
 
 
-        public IList<ElementModel> GetCollisionByLevel(Document doc, Level level)
+        public IList<ElementModel> GetCollisionByInputData(Document doc, DocumentModel document, Level level, Material material, Category category)
         {
             count = 0;
             InitializeInputData();
-            InitializeInstancesByTypeMaterial(doc);
-            int levelIntId = level.Id.IntegerValue;
-            IList<ElementModel> output = new List<ElementModel>(50);
-            using TransactionGroup transGroup = new(doc, "GetCollision");
-            status = transGroup.Start();
-            if (enclosures != null)
+            Transform global = document.Transform;
+            IList<ElementModel> output = new List<ElementModel>(25);
+            IEnumerable<Element> enclosures = RevitFilterManager.GetInstancesByLevelAndMaterial(doc, typeIdData, level, material);
+            using TransactionGroup transGroup = new(doc);
+            status = transGroup.Start("GetCollision");
+            foreach (Element host in enclosures)
             {
-                foreach (Element host in enclosures)
+                foreach (ElementModel model in GetIntersectionByElement(doc, level, host, global, category))
                 {
-                    if (host.IsValidObject && levelIntId == host.LevelId.IntegerValue)
-                    {
-                        foreach (ElementModel model in GetIntersectionByElement(doc, level, host, searchTransform, searchCategoryId))
-                        {
-                            output.Add(model);
-                        }
-                    }
+                    output.Add(model);
                 }
             }
             status = transGroup.Assimilate();
@@ -148,14 +140,14 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Level level, Element host, Transform global, ElementId catId)
+        private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Level level, Element host, Transform global, Category category)
         {
             hostBbox = host.get_BoundingBox(null);
+            hostNormal = host.GetHostElementNormal();
             hostSolid = host.GetSolidByVolume(identity, options);
-            hostNormal = host is Wall wall ? wall.Orientation.Normalize() : host.GetNormalByTopFace(identity);
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
-            collector = new FilteredElementCollector(doc).WherePasses(intersectFilter).OfCategoryId(catId);
+            collector = new FilteredElementCollector(doc).OfCategoryId(category.Id).WherePasses(intersectFilter);
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(ref interBbox);
@@ -172,16 +164,13 @@ namespace RevitTimasBIMTools.CutOpening
                             interNormal = interNormal.ResetDirectionToPositive();
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
-
                             double height = tupleSize.Item1, widht = tupleSize.Item2;
                             ElementModel model = new(elem)
                             {
                                 Level = level,
                                 Origin = centroid,
-
                             };
                             model.SetDescription(height, widht);
-
                             yield return model;
                         }
                     }

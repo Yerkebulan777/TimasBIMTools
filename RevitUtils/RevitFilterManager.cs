@@ -1,8 +1,8 @@
 ﻿using Autodesk.Revit.DB;
-using log4net;
 using RevitTimasBIMTools.RevitModel;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
@@ -11,10 +11,6 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitFilterManager
     {
-
-        public static List<Element> ElementTypeList = new(50);
-
-
         #region Document Collector
 
         public static FilteredElementCollector GetRevitLinkInstanceCollector(Document doc)
@@ -67,21 +63,6 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region Advance Filtered Element Collector
-
-        public static IEnumerable<Element> GetInstancesByTypeId(Document doc, ElementId catId, ElementId typeId)
-        {
-            int typeIntId = typeId.IntegerValue;
-            FilteredElementCollector collector = new FilteredElementCollector(doc).OfCategoryId(catId);
-            foreach (Element elem in collector.WhereElementIsNotElementType())
-            {
-                ElementId elemTypeId = elem.GetTypeId();
-                if (typeIntId.Equals(elemTypeId.IntegerValue))
-                {
-                    yield return elem;
-                }
-            }
-        }
-
 
         public static FamilySymbol FindFamilySymbol(Document doc, string familyName, string symbolName)
         {
@@ -289,32 +270,47 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static IEnumerable<Element> GetInstancesByCoreMaterial(Document doc, IDictionary<int, ElementId> typeIds, string matName)
+        public static IEnumerable<Element> GetInstancesByLevelAndMaterial(Document doc, IDictionary<int, ElementId> sourceIds, Level level, Material structure)
         {
-            CompoundStructure compound = null;
-            foreach (KeyValuePair<int, ElementId> item in typeIds)
+            ElementId levelId = level.Id;
+            string materialName = structure.Name;
+            foreach (KeyValuePair<int, ElementId> item in sourceIds)
             {
+                Material material = null;
                 Element elem = doc.GetElement(item.Value);
                 if (elem is RoofType roofType)
                 {
-                    compound = roofType.GetCompoundStructure();
+                    CompoundStructure compound = roofType.GetCompoundStructure();
+                    material = GetCompoundStructureMaterial(doc, elem, compound);
                 }
                 else if (elem is WallType wallType)
                 {
-                    compound = wallType.GetCompoundStructure();
+                    CompoundStructure compound = wallType.GetCompoundStructure();
+                    material = GetCompoundStructureMaterial(doc, elem, compound);
                 }
                 else if (elem is FloorType floorType)
                 {
-                    compound = floorType.GetCompoundStructure();
+                    CompoundStructure compound = floorType.GetCompoundStructure();
+                    material = GetCompoundStructureMaterial(doc, elem, compound);
                 }
-                Material material = GetCompoundStructureMaterial(doc, elem, compound);
-                if (material != null && material.Name == matName)
+                if (material != null && material.Name == materialName)
                 {
-                    foreach (Element inst in GetInstancesByTypeId(doc, elem.Category.Id, elem.Id))
+                    foreach (Element inst in GetInstancesByElementTypeAndLevelIds(doc, levelId, elem.Id))
                     {
                         yield return inst;
                     }
                 }
+            }
+        }
+
+
+        public static IEnumerable<Element> GetInstancesByElementTypeAndLevelIds(Document doc, ElementId levelId, ElementId typeId)
+        {
+            FilterRule rule = ParameterFilterRuleFactory.CreateEqualsRule(new ElementId(BuiltInParameter.ELEM_TYPE_PARAM), typeId);
+            FilteredElementCollector collector = new FilteredElementCollector(doc).WherePasses(new ElementParameterFilter(rule));
+            foreach (Element elem in collector.WherePasses(new ElementLevelFilter(levelId)).WhereElementIsNotElementType())
+            {
+                yield return elem;
             }
         }
 
@@ -338,6 +334,9 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             return material;
         }
+
+
+
 
         #endregion
 
