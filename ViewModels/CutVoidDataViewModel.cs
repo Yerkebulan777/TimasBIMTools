@@ -40,7 +40,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         public CutVoidDataViewModel(APIEventHandler eventHandler)
         {
-            collisionManager.ViewModelData = this;
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
             //CanselCommand = new RelayCommand(CancelCallbackLogic);
             //SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);

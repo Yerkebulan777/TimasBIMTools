@@ -3,7 +3,6 @@ using Autodesk.Revit.DB.Structure;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
-using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Collections.Generic;
 using Document = Autodesk.Revit.DB.Document;
@@ -62,7 +61,6 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Output Properties
 
-        private TransactionStatus status;
         private FilteredElementCollector collector;
         private SketchPlane sketchPlan;
         private Plane plane;
@@ -88,34 +86,9 @@ namespace RevitTimasBIMTools.CutOpening
         #endregion
 
 
-        #region Cache Properties
-
-        private IEnumerable<Element> intersectIds { get; set; } = null;
-        private IEnumerable<Element> enclosureIds { get; set; } = null;
-        private IEnumerable<Element> enclosures { get; set; } = null;
-        public CutVoidDataViewModel ViewModelData { get; set; } = null;
-
-        #endregion
-
-
         private void InitializeInputData()
         {
-            typeIdData = ViewModelData.ElementTypeIdData;
-
-            categoryId = ViewModelData.SelectedCategory?.Id;
-
-            searchDocument = ViewModelData.SelectedDocument?.Document;
-            searchTransform = ViewModelData.SelectedDocument?.Transform;
-
             offsetPnt = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
-        }
-
-
-
-        public bool CheckIntrsectionsByCategory()
-        {
-
-            return true;
         }
 
 
@@ -126,8 +99,8 @@ namespace RevitTimasBIMTools.CutOpening
             Transform global = document.Transform;
             IList<ElementModel> output = new List<ElementModel>(25);
             IEnumerable<Element> enclosures = RevitFilterManager.GetInstancesByLevelAndMaterial(doc, typeIdData, level, material);
-            using TransactionGroup transGroup = new(doc);
-            status = transGroup.Start("GetCollision");
+            using TransactionGroup transGroup = new(doc, "GetCollision");
+            TransactionStatus status = transGroup.Start();
             foreach (Element host in enclosures)
             {
                 foreach (ElementModel model in GetIntersectionByElement(doc, level, host, global, category))
@@ -184,7 +157,7 @@ namespace RevitTimasBIMTools.CutOpening
             FamilyInstance opening = null;
             using (SubTransaction trans = new(doc))
             {
-                status = trans.Start();
+                TransactionStatus status = trans.Start();
                 try
                 {
                     if (model.Instanse is Wall wall && wall.IsValidObject)
@@ -273,14 +246,14 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     plane = Plane.CreateByNormalAndOrigin(normal, point);
                     result = SketchPlane.Create(doc, plane);
-                    status = transaction.Commit();
+                    _ = transaction.Commit();
                 }
                 catch (Exception ex)
                 {
                     Logger.Error(ex.Message);
                     if (!transaction.HasEnded())
                     {
-                        status = transaction.RollBack();
+                        _ = transaction.RollBack();
                     }
                 }
             }
