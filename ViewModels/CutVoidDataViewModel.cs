@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
@@ -41,6 +42,7 @@ namespace RevitTimasBIMTools.ViewModels
         public CutVoidDataViewModel(APIEventHandler eventHandler)
         {
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
+            RefreshDataCommand = new AsyncRelayCommand(RefreshActiveDataHandler);
             //CanselCommand = new RelayCommand(CancelCallbackLogic);
             //SelectItemCommand = new RelayCommand(SelectAllModelHandelCommand);
             //ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
@@ -123,7 +125,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref document, value) && document != null)
                 {
-                    RefreshActiveDataAsync();
+                    RefreshActiveData();
                 }
             }
         }
@@ -137,7 +139,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref material, value) && material != null)
                 {
-                    RefreshActiveDataAsync();
+                    RefreshActiveData();
                 }
             }
         }
@@ -151,7 +153,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref category, value) && category != null)
                 {
-                    RefreshActiveDataAsync();
+                    RefreshActiveData();
                 }
             }
         }
@@ -259,7 +261,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref shared, value) && shared != null)
                 {
-                    RefreshActiveDataAsync();
+                    RefreshActiveData();
                 }
             }
         }
@@ -494,21 +496,29 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
-        private async void RefreshActiveDataAsync()
+        private async void RefreshActiveData()
         {
             if (IsDataRefresh)
             {
                 IsDataRefresh = false;
-                await Task.Delay(1000).ContinueWith(_ =>
-                {
-                    if (document != null && material != null && category != null)
-                    {
-                        IsDataRefresh = true;
-                    }
-                }, taskContext);
+                await RefreshActiveDataHandler();
             }
         }
+
+
+        public ICommand RefreshDataCommand { get; private set; }
+        private async Task RefreshActiveDataHandler()
+        {
+            IsDataRefresh = false;
+            await Task.Delay(1000).ContinueWith(_ =>
+            {
+                if (document != null && material != null && category != null)
+                {
+                    IsDataRefresh = true;
+                }
+            }, taskContext);
+        }
+
 
         #endregion
 
@@ -651,6 +661,9 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         #endregion
+
+
+
 
 
         #region SelectItemCommand
