@@ -76,26 +76,28 @@
                         <StackPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Project title: " Width="125"/>
+                                <Label Content="Project name: " Width="100"/>
                                 <ComboBox Name="ComboDocumentModels" Height="23" Width="125" 
                                           ItemsSource="{Binding Path=DocumentCollection}" 
-                                          SelectedItem="{Binding Path=SelectedDocument}"/>
+                                          SelectedItem="{Binding Path=SelectedDocument}" />
                                 <!--Watermark="Select project..."-->
                             </WrapPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Structure material: " Width="125"/>
+                                <Label Content="Structure material: " Width="100"/>
                                 <ComboBox Name="ComboStructureMats" Height="23" Width="125" DisplayMemberPath="Value.Name" 
                                           ItemsSource="{Binding Path=StructureMaterials, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                                          SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedMaterial}" />
+                                          SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedMaterial}" 
+                                          SelectedIndex="-1" />
                                 <!--Watermark="Select material..."-->
                             </WrapPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Collision category: " Width="125"/>
+                                <Label Content="Collision category: " Width="100"/>
                                 <ComboBox Name="ComboEngineerCats" Height="23" Width="125" DisplayMemberPath="Value.Name" 
-                                          ItemsSource="{Binding Path=EngineerCategories, Mode=OneWay}"
-                                          SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedCategory}" />
+                                          ItemsSource="{Binding Path=EngineerCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedCategory}"
+                                          SelectedIndex="-1" />
                                 <!--Watermark="Select category..."-->
                             </WrapPanel>
 
@@ -107,14 +109,14 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <StackPanel>
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Wall opening:" Width="125" />
+                                <Label Content="Wall opening:" Width="100" />
                                 <ComboBox Name="ComboWallOpenning" Height="23" Width="125" DisplayMemberPath="Value.Name" 
                                           ItemsSource="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=WallOpenning}" />
                                 <!--Watermark="Select family..."-->
                             </WrapPanel>
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Floor opening: " Width="125" />
+                                <Label Content="Floor opening: " Width="100" />
                                 <ComboBox Name="ComboFloorOpenning" Height="23" Width="125" DisplayMemberPath="Value.Name" 
                                           ItemsSource="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=FloorOpenning}" />
@@ -129,15 +131,15 @@
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Minimum side size: " Width="125"/>
-                                <Slider Name="MinSideSize" Minimum="0" Maximum="100" Interval="5" Height="23" Width="125" 
+                                <Label Content="Minimum side size: " Width="100"/>
+                                <Slider Name="MinSideSize" Minimum="0" Maximum="100" TickFrequency="5" Height="23" Width="125" 
                                         Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <TextBox Text="{Binding ElementName=MinSideSize, Path=Value}" Height="23" Width="50"/>
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Maximum side size: " Width="125"/>
-                                <Slider Name="MaxSideSize" Minimum="100" Maximum="1000" Interval="50" Height="23" Width="125" 
+                                <Label Content="Maximum side size: " Width="100"/>
+                                <Slider Name="MaxSideSize" Minimum="100" Maximum="1000" TickFrequency="50" Height="23" Width="125" 
                                         Value="{Binding Path=MaxSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <TextBox Text="{Binding ElementName=MaxSideSize, Path=Value}" Height="23" Width="50"/>
                             </WrapPanel>
@@ -150,7 +152,7 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                             <Label Content="Cut offset: " Width="125"/>
-                            <Slider Name="CutOffset" Minimum="0" Maximum="100" Interval="10" Height="23" Width="125" 
+                            <Slider Name="CutOffset" Minimum="0" Maximum="100" TickFrequency="10" Height="23" Width="125" 
                                     Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBox Text="{Binding ElementName=CutOffset, Path=Value}" Height="23" Width="50" />
                         </WrapPanel>
@@ -251,24 +253,27 @@
 
 
             <!-- ButtonPanel -->
-            <Border Grid.Row="4" Background="Silver" VerticalAlignment="Bottom" Style="{StaticResource VisibleAnimation}"
-                    Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}">
+            <Border Grid.Row="4" Background="Silver" VerticalAlignment="Bottom" >
                 <DockPanel Grid.Row="3" LastChildFill="True" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
-                    <Button Name="SnoopCmd" Height="30" Width="75" Margin="5" 
-                        Command="{Binding SnoopCommand, Mode=OneTime}">
+                    <ToggleButton Name="SnoopCmd" Height="30" Width="75" Margin="5"
+                        IsChecked="{Binding Path=IsDataRefresh, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=5}" >
                         <Label FontFamily="Segoe MDL2 Assets" Content="&#59647;" Foreground="BlueViolet"  FontSize="15" />
-                    </Button>
-                    <RepeatButton Name="ApplyCmd" Delay="5000" Interval="2500" Height="30" Width="75" Margin="5"
-                        Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                    </ToggleButton>
+                    <RepeatButton Name="ApplyCmd" Delay="1000" Interval="500" Height="30" Width="75" Margin="5"
+                        IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
+                        Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" 
                         CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}">
                         <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" Foreground="Green"  FontSize="15" />
                     </RepeatButton>
                     <Button Name="CancelCmd"  Height="30" Width="75" Margin="5" 
-                        Command="{Binding Path=CloseCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}">
+                            IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
+                            Command="{Binding Path=CloseCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                            CommandParameter="{Binding IsEnabled, ElementName=CancelCmd}">
                         <Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" Foreground="Red" FontSize="15" />
                     </Button>
                 </DockPanel>
             </Border>
+
 
         </Grid>
     </Border>

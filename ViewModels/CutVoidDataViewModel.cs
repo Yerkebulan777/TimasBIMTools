@@ -26,12 +26,12 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutVoidDataViewModel : ObservableObject
     {
+        private readonly Mutex mutex = new();
         public CutVoidDockPaneView DockPanelView { get; set; }
         public static ExternalEvent RevitExternalEvent { get; set; }
         public static CancellationToken cancelToken { get; set; } = CancellationToken.None;
         private static SynchronizationContext context { get; set; } = SynchronizationContext.Current;
 
-        private readonly Mutex mutex = new();
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
@@ -362,11 +362,10 @@ namespace RevitTimasBIMTools.ViewModels
                 IsStarted = false;
                 IsDataRefresh = false;
                 IsOptionEnabled = false;
+                FamilySymbols = null;
                 ElementModelData = null;
                 EngineerCategories = null;
                 StructureMaterials = null;
-                FamilySymbols = null;
-                UniqueLevelNames = null;
             }
         }
 
@@ -495,10 +494,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void RefreshActiveDataAsync()
         {
-            IsDataRefresh = !IsOptionEnabled;
+            IsDataRefresh = false;
             await Task.Delay(1000).ContinueWith(_ =>
             {
-                IsDataRefresh = true;
+                if (document != null && material != null && category != null)
+                {
+                    IsDataRefresh = true;
+                }
             }, taskContext);
         }
 
@@ -538,8 +540,8 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref dataModels, value) && dataModels != null)
                 {
                     DataViewCollection = CollectionViewSource.GetDefaultView(dataModels) as ListCollectionView;
-                    UniqueSymbolNames = GetUniqueSymbolNameList(dataModels);
-                    UniqueLevelNames = GetUniqueLevelNameList(dataModels);
+                    UniqueSymbolNames = GetUniqueSymbolNameList(dataModels).ToObservableCollection();
+                    UniqueLevelNames = GetUniqueLevelNameList(dataModels).ToObservableCollection();
                     DataViewCollection.Refresh();
                 }
             }
@@ -561,9 +563,9 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             dataView.SortDescriptions.Clear();
                             dataView.GroupDescriptions.Clear();
-                            dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.Description)));
+                            dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
+                            dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
-                            dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.FamilyName), ListSortDirection.Ascending));
                         }
                     }
                 }
@@ -590,36 +592,38 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-        private IList<string> levelNames;
-        public IList<string> UniqueLevelNames
+        private ObservableCollection<string> levelNames;
+        public ObservableCollection<string> UniqueLevelNames
         {
             get => levelNames;
             set => SetProperty(ref levelNames, value);
         }
 
 
-        private IList<string> uniqueNames = null;
-        public IList<string> UniqueSymbolNames
+        private ObservableCollection<string> uniqueNames = null;
+        public ObservableCollection<string> UniqueSymbolNames
         {
             get => uniqueNames;
             set => SetProperty(ref uniqueNames, value);
         }
 
-        private IList<string> GetUniqueLevelNameList(ICollection<ElementModel> collection)
+
+        private ICollection<string> GetUniqueLevelNameList(ICollection<ElementModel> collection)
         {
-            return new SortedSet<string>(collection.Select(c => c.LevelName).Append(string.Empty)).ToList();
+            return new SortedSet<string>(collection.Select(c => c.LevelName).Append(string.Empty));
         }
 
-        private IList<string> GetUniqueSymbolNameList(ICollection<ElementModel> collection)
+        private ICollection<string> GetUniqueSymbolNameList(ICollection<ElementModel> collection)
         {
-            return new SortedSet<string>(collection.Select(c => c.SymbolName).Append(string.Empty)).ToList();
+            return new SortedSet<string>(collection.Select(c => c.SymbolName).Append(string.Empty));
         }
 
 
         private bool FilterModelCollection(object obj)
         {
-            return string.IsNullOrEmpty(FilterText) 
-                || obj is not ElementModel model || model.LevelName.Contains(FilterText)
+            return string.IsNullOrEmpty(FilterText)
+                || obj is not ElementModel model
+                || model.LevelName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase)
                 || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
                 || model.SymbolName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -672,7 +676,6 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                     // seletAll update by ViewItems
                     // boolSet to buttom IsDataRefresh
-                    UniqueSymbolNames = GetUniqueSymbolNameList(ElementModelData);
                 }
             });
         }
