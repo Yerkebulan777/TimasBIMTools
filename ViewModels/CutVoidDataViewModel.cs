@@ -493,16 +493,20 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        [STAThread]
         private async void RefreshActiveDataAsync()
         {
-            IsDataRefresh = false;
-            await Task.Delay(1000).ContinueWith(_ =>
+            if (IsDataRefresh)
             {
-                if (document != null && material != null && category != null)
+                IsDataRefresh = false;
+                await Task.Delay(1000).ContinueWith(_ =>
                 {
-                    IsDataRefresh = true;
-                }
-            }, taskContext);
+                    if (document != null && material != null && category != null)
+                    {
+                        IsDataRefresh = true;
+                    }
+                }, taskContext);
+            }
         }
 
         #endregion
@@ -628,7 +632,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private bool FilterModelCollection(object obj)
         {
-            return string.IsNullOrEmpty(LevelTextFilter) && string.IsNullOrEmpty(SymbolTextFilter) 
+            return (string.IsNullOrEmpty(LevelTextFilter) && string.IsNullOrEmpty(SymbolTextFilter))
             || obj is not ElementModel model || (model.LevelName.Contains(LevelTextFilter) && model.SymbolName.Contains(SymbolTextFilter))
             || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(model.SymbolName))
             || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(model.LevelName));
