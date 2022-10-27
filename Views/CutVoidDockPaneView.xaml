@@ -149,7 +149,7 @@
                 <ListViewItem>
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
-                            <Label Content="Cut offset: " Width="125" Margin="5"/>
+                            <Label Content="Cut offset size: " Width="125" Margin="5"/>
                             <Slider Name="CutOffset" Height="23" Width="125" Margin="5"
                                     Minimum="0" Maximum="100" TickFrequency="10" IsSnapToTickEnabled="True"
                                     Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

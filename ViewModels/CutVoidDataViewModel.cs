@@ -510,7 +510,7 @@ namespace RevitTimasBIMTools.ViewModels
         private async Task RefreshActiveDataHandler()
         {
             IsDataRefresh = false;
-            await Task.Delay(1000).ContinueWith(_ =>
+            await Task.Delay(100).ContinueWith(_ =>
             {
                 if (document != null && material != null && category != null)
                 {
@@ -518,7 +518,6 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }, taskContext);
         }
-
 
         #endregion
 
