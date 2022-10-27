@@ -540,8 +540,8 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref dataModels, value) && dataModels != null)
                 {
                     DataViewCollection = CollectionViewSource.GetDefaultView(dataModels) as ListCollectionView;
-                    UniqueSymbolNames = GetUniqueSymbolNameList(dataModels).ToObservableCollection();
-                    UniqueLevelNames = GetUniqueLevelNameList(dataModels).ToObservableCollection();
+                    UniqueSymbolNames = GetUniqueSymbolNameList(dataModels).ToReadOnlyCollection();
+                    UniqueLevelNames = GetUniqueLevelNameList(dataModels).ToReadOnlyCollection();
                     DataViewCollection.Refresh();
                 }
             }
@@ -592,16 +592,16 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-        private ObservableCollection<string> levelNames;
-        public ObservableCollection<string> UniqueLevelNames
+        private ReadOnlyObservableCollection<string> levelNames;
+        public ReadOnlyObservableCollection<string> UniqueLevelNames
         {
             get => levelNames;
             set => SetProperty(ref levelNames, value);
         }
 
 
-        private ObservableCollection<string> uniqueNames = null;
-        public ObservableCollection<string> UniqueSymbolNames
+        private ReadOnlyObservableCollection<string> uniqueNames = null;
+        public ReadOnlyObservableCollection<string> UniqueSymbolNames
         {
             get => uniqueNames;
             set => SetProperty(ref uniqueNames, value);
