@@ -599,7 +599,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => levelText;
             set
             {
-                if (SetProperty(ref levelText, value) && levelText != null)
+                if (SetProperty(ref levelText, value))
                 {
                     DataViewCollection.Filter = FilterModelCollection;
                     SelectAllModelHandelCommand();
@@ -615,7 +615,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => symbolText;
             set
             {
-                if (SetProperty(ref symbolText, value) && symbolText != null)
+                if (SetProperty(ref symbolText, value))
                 {
                     DataViewCollection.Filter = FilterModelCollection;
                     SelectAllModelHandelCommand();
@@ -661,9 +661,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         #endregion
-
-
-
 
 
         #region SelectItemCommand
