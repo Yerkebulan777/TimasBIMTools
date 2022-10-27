@@ -50,6 +50,7 @@ namespace RevitTimasBIMTools.ViewModels
         #region Templory
         private Document doc { get; set; }
         private View3D view3d { get; set; }
+
         #endregion
 
 
@@ -658,7 +659,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
             ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
-            IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem?.IsSelected : null;
+            IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem?.IsSelected : false;
         }
 
         #endregion
