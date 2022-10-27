@@ -42,12 +42,12 @@ namespace RevitTimasBIMTools.ViewModels
         {
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
             //CanselCommand = new RelayCommand(CancelCallbackLogic);
-            //SelectItemCommand = new RelayCommand(SelectAllVaueHandelCommand);
+            //SelectItemCommand = new RelayCommand(SelectAllModelHandelCommand);
             //ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
         }
 
 
-        #region GeneralData
+        #region Templory
         private Document doc { get; set; }
         private View3D view3d { get; set; }
         #endregion
@@ -532,17 +532,17 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private ObservableCollection<ElementModel> dataModels = null;
+        private ObservableCollection<ElementModel> collection = null;
         public ObservableCollection<ElementModel> ElementModelData
         {
-            get => dataModels;
+            get => collection;
             set
             {
-                if (SetProperty(ref dataModels, value) && dataModels != null)
+                if (SetProperty(ref collection, value) && collection != null)
                 {
-                    DataViewCollection = CollectionViewSource.GetDefaultView(dataModels) as ListCollectionView;
-                    UniqueSymbolNames = GetUniqueSymbolNameList(dataModels).ToObservableCollection();
-                    UniqueLevelNames = GetUniqueLevelNameList(dataModels).ToObservableCollection();
+                    DataViewCollection = CollectionViewSource.GetDefaultView(collection) as ListCollectionView;
+                    GetUniqueSymbolNameList(collection);
+                    GetUniqueLevelNameList(collection);
                     DataViewCollection.Refresh();
                 }
             }
@@ -578,55 +578,71 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region DataFilter
 
-        private string filterText = string.Empty;
-        public string FilterText
+        private string levelText;
+        public string LevelTextFilter
         {
-            get => filterText;
+            get => levelText;
             set
             {
-                if (SetProperty(ref filterText, value) && filterText != null)
+                if (SetProperty(ref levelText, value) && levelText != null)
                 {
                     DataViewCollection.Filter = FilterModelCollection;
-                    SelectAllVaueHandelCommand();
+                    SelectAllModelHandelCommand();
                     DataViewCollection.Refresh();
                 }
             }
         }
 
-        private ObservableCollection<string> levelNames;
-        public ObservableCollection<string> UniqueLevelNames
+
+        private string symbolText;
+        public string SymbolTextFilter
+        {
+            get => symbolText;
+            set
+            {
+                if (SetProperty(ref symbolText, value) && symbolText != null)
+                {
+                    DataViewCollection.Filter = FilterModelCollection;
+                    SelectAllModelHandelCommand();
+                    DataViewCollection.Refresh();
+                }
+            }
+        }
+
+
+        private IList<string> levelNames;
+        public IList<string> UniqueLevelNames
         {
             get => levelNames;
             set => SetProperty(ref levelNames, value);
         }
 
 
-        private ObservableCollection<string> uniqueNames = null;
-        public ObservableCollection<string> UniqueSymbolNames
+        private IList<string> uniqueNames = null;
+        public IList<string> UniqueSymbolNames
         {
             get => uniqueNames;
             set => SetProperty(ref uniqueNames, value);
         }
 
 
-        private ICollection<string> GetUniqueLevelNameList(ICollection<ElementModel> collection)
-        {
-            return new SortedSet<string>(collection.Select(c => c.LevelName).Append(string.Empty));
-        }
-
-        private ICollection<string> GetUniqueSymbolNameList(ICollection<ElementModel> collection)
-        {
-            return new SortedSet<string>(collection.Select(c => c.SymbolName).Append(string.Empty));
-        }
-
-
         private bool FilterModelCollection(object obj)
         {
-            return string.IsNullOrEmpty(FilterText)
-                || obj is not ElementModel model
-                || model.LevelName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase)
-                || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
-                || model.SymbolName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
+            return string.IsNullOrEmpty(LevelTextFilter) && string.IsNullOrEmpty(SymbolTextFilter) 
+            || obj is not ElementModel model || (model.LevelName.Contains(LevelTextFilter) && model.SymbolName.Contains(SymbolTextFilter))
+            || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(model.SymbolName))
+            || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(model.LevelName));
+        }
+
+
+        private void GetUniqueLevelNameList(IList<ElementModel> collection)
+        {
+            UniqueLevelNames = new SortedSet<string>(collection.Select(c => c.LevelName).Append(string.Empty)).ToList();
+        }
+
+        private void GetUniqueSymbolNameList(IList<ElementModel> collection)
+        {
+            UniqueSymbolNames = new SortedSet<string>(collection.Select(c => c.SymbolName).Append(string.Empty)).ToList();
         }
 
         #endregion
@@ -634,7 +650,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region SelectItemCommand
         public ICommand SelectItemCommand { get; private set; }
-        private void SelectAllVaueHandelCommand()
+        private void SelectAllModelHandelCommand()
         {
             IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
             ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();

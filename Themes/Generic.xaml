@@ -10,18 +10,8 @@
 
     <BooleanToVisibilityConverter x:Key="BoolToViz"/>
 
-    <!--DropShadowEffect-->
     <DropShadowEffect x:Key="ShadowBlur" />
-    <!--HeaderTextBox-->
-    <Style x:Key="Header" TargetType="{x:Type Label}" >
-        <Setter Property="Margin" Value="10,0"/>
-        <Setter Property="FontSize" Value="11"/>
-        <Setter Property="MinWidth" Value="150"/>
-        <Setter Property="MaxWidth" Value="1500"/>
-        <Setter Property="FontWeight" Value="Medium"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Foreground" Value="DarkOliveGreen"/>
-    </Style>
+    
     <!--TextBox-->
     <Style TargetType="{x:Type TextBox}">
         <Setter Property="IsUndoEnabled" Value="False"/>
@@ -37,6 +27,7 @@
             </MultiTrigger>
         </Style.Triggers>
     </Style>
+    
     <!--ScrollViewer-->
     <Style TargetType="{x:Type ScrollViewer}">
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -45,9 +36,10 @@
         <Setter Property="HorizontalScrollBarVisibility"  Value="Auto"/>
         <Setter Property="CanContentScroll" Value="True"/>
     </Style>
+    
     <!--ComboBox-->
     <Style TargetType="{x:Type ComboBox}">
-        <Setter Property="Margin" Value="50,0"/>
+        <Setter Property="Margin" Value="10,5"/>
         <Setter Property="IsReadOnly" Value="True"/>
         <Setter Property="SelectedIndex" Value="0"/>
         <Setter Property="SnapsToDevicePixels" Value="true" />
@@ -58,15 +50,7 @@
         <Setter Property="MaxWidth" Value="250" />
         <Setter Property="Height" Value="23" />
     </Style>
-    <!--CenterHeaderTextBlock-->
-    <Style TargetType="{x:Type TextBlock}" x:Key="CenterHeaderTextBlock">
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="TextAlignment" Value="Center"/>
-        <Setter Property="TextWrapping" Value="NoWrap"/>
-        <Setter Property="FontSize" Value="13"/>
-        <Setter Property="Padding" Value="5"/>
-    </Style>
+
     <!--DataGrid-->
     <Style TargetType="{x:Type DataGrid}">
         <Setter Property="RowHeight" Value="25"/>
@@ -96,6 +80,7 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    
     <!--DataGridCell-->
     <Style TargetType="{x:Type DataGridCell}">
         <Setter Property="TextBlock.TextAlignment" Value="Left" />
@@ -111,6 +96,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
     <!--SingleClickEditStyle-->
     <Style x:Key="SingleClickEditStyle" TargetType="{x:Type DataGridCell}"
            BasedOn="{StaticResource {x:Type DataGridCell}}">
@@ -121,6 +107,7 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    
     <!--GroupBoxBorderStyle-->
     <Style x:Key="GroupBoxBorderStyle"  TargetType="{x:Type Border}" >
         <Setter Property="BorderBrush" Value="Silver"/>

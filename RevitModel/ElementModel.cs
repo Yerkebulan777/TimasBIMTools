@@ -19,7 +19,6 @@ namespace RevitTimasBIMTools.RevitModel
                 SymbolName = etype.Name;
                 FamilyName = etype.FamilyName;
             }
-
         }
 
         public string LevelName { get; private set; }

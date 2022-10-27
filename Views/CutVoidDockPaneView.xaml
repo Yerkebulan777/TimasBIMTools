@@ -75,7 +75,7 @@
                         <StackPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Project name: " Width="100"/>
+                                <Label Content="Project name: " Width="125"/>
                                 <ComboBox Name="ComboDocumentModels" Height="23" Width="125" 
                                           ItemsSource="{Binding Path=DocumentCollection}" 
                                           SelectedItem="{Binding Path=SelectedDocument}" />
@@ -83,7 +83,7 @@
                             </WrapPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Structure material: " Width="100"/>
+                                <Label Content="Structure material: " Width="125"/>
                                 <ComboBox Name="ComboStructureMats" Height="23" Width="125" DisplayMemberPath="Value.Name" 
                                           ItemsSource="{Binding Path=StructureMaterials, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedMaterial}" 
@@ -92,7 +92,7 @@
                             </WrapPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Collision category: " Width="100"/>
+                                <Label Content="Collision category: " Width="125"/>
                                 <ComboBox Name="ComboEngineerCats" Height="23" Width="125" DisplayMemberPath="Value.Name" 
                                           ItemsSource="{Binding Path=EngineerCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedCategory}"
@@ -108,14 +108,14 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <StackPanel>
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Wall opening:" Width="100" />
+                                <Label Content="Wall opening:" Width="125" />
                                 <ComboBox Name="ComboWallOpenning" Height="23" Width="125" DisplayMemberPath="Value.Name" 
                                           ItemsSource="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=WallOpenning}" />
                                 <!--Watermark="Select family..."-->
                             </WrapPanel>
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Floor opening: " Width="100" />
+                                <Label Content="Floor opening: " Width="125" />
                                 <ComboBox Name="ComboFloorOpenning" Height="23" Width="125" DisplayMemberPath="Value.Name" 
                                           ItemsSource="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=FloorOpenning}" />
@@ -129,18 +129,20 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
-                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Minimum side size: " Width="100"/>
-                                <Slider Name="MinSideSize" Minimum="0" Maximum="100" TickFrequency="5" Height="23" Width="125" 
+                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
+                                <Label Content="Minimum side size: " Width="125" Margin="5" />
+                                <Slider Name="MinSideSize" Minimum="0" Maximum="100" TickFrequency="5" Height="23" Width="125" Margin="5"
                                         Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBox Text="{Binding ElementName=MinSideSize, Path=Value}" Height="23" Width="50"/>
+                                <TextBox Text="{Binding ElementName=MinSideSize, Path=Value}" 
+                                         Height="23" Width="50" TextAlignment="Center" Margin="5" />
                             </WrapPanel>
 
-                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Maximum side size: " Width="100"/>
-                                <Slider Name="MaxSideSize" Minimum="100" Maximum="1000" TickFrequency="50" Height="23" Width="125" 
+                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
+                                <Label Content="Maximum side size: " Width="125" Margin="5" />
+                                <Slider Name="MaxSideSize" Minimum="100" Maximum="1000" TickFrequency="50" Height="23" Width="125" Margin="5"
                                         Value="{Binding Path=MaxSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBox Text="{Binding ElementName=MaxSideSize, Path=Value}" Height="23" Width="50"/>
+                                <TextBox Text="{Binding ElementName=MaxSideSize, Path=Value}"
+                                         Height="23" Width="50" TextAlignment="Center" Margin="5" />
                             </WrapPanel>
 
                         </StackPanel>
@@ -149,11 +151,12 @@
 
                 <ListViewItem>
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
-                        <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                            <Label Content="Cut offset: " Width="125"/>
-                            <Slider Name="CutOffset" Minimum="0" Maximum="100" TickFrequency="10" Height="23" Width="125" 
+                        <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
+                            <Label Content="Cut offset: " Width="125" Margin="5"/>
+                            <Slider Name="CutOffset" Minimum="0" Maximum="100" TickFrequency="10" Height="23" Width="125" Margin="5"
                                     Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBox Text="{Binding ElementName=CutOffset, Path=Value}" Height="23" Width="50" />
+                            <TextBox Text="{Binding ElementName=CutOffset, Path=Value}" 
+                                     Height="23" Width="50" TextAlignment="Center" Margin="5" />
                         </WrapPanel>
                     </Border>
                 </ListViewItem>
@@ -163,18 +166,17 @@
 
             <!-- Filter Control -->
             <WrapPanel Grid.Row="2" Style="{StaticResource VisibleAnimation}" 
-                       Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="5" 
-                       Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
+                    Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="5" 
+                    Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
 
                 <ComboBox Name="ComboLevelFilter" Height="23" Width="125" Margin="5" 
-                          ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                          SelectedValue="{Binding Path=FilterText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" 
-                          DisplayMemberPath="Value.Name" SelectedValuePath="Value"/>
+                    ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                    SelectedValue="{Binding Path=LevelTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
                 <!--Watermark="Select level..."-->
 
-                <ComboBox Name="ComboDataFilter" Height="23" Width="125" Margin="5" 
-                          ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                          SelectedValue="{Binding Path=FilterText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox Name="ComboSymbolFilter" Height="23" Width="125" Margin="5" 
+                    ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                    SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
                 <!--Watermark="Filter by..."-->
 
                 <!--<CheckBox Name="Settings" Content="Refresh data" Height="23"  Width="100" Margin="10,5" 
@@ -185,11 +187,10 @@
 
 
             <!-- DataGridView -->
-            <ScrollViewer Grid.Row="3" >
-                <DataGrid Name="dataGridView" IsSynchronizedWithCurrentItem="True" Style="{StaticResource VisibleAnimation}"
-                          Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" 
-                          ItemsSource="{Binding Path=DataViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          AutoGenerateColumns="False">
+            <ScrollViewer Grid.Row="3"  Style="{StaticResource VisibleAnimation}" 
+                          Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
+                <DataGrid Name="dataGridView" IsSynchronizedWithCurrentItem="True" AutoGenerateColumns="False"
+                          ItemsSource="{Binding Path=DataViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <DataGrid.RowStyle>
                         <Style TargetType="{x:Type DataGridRow}">
                             <EventSetter Event="MouseDoubleClick" Handler="DataGrid_MouseDoubleClick"/>
@@ -231,7 +232,7 @@
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Width="150" Header="Level Name" Binding="{Binding LevelName, Mode=OneWay}">
+                        <DataGridTextColumn Width="100" Header="Level Name" Binding="{Binding LevelName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
