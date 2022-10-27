@@ -328,6 +328,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     collisionManager.InitializeElementTypeIdData(doc);
+                    DockPanelView.ActiveDocTitle.Content = doc.Title.ToUpper();
                     return RevitFilterManager.GetDocumentCollection(doc);
                 }
                 return null;
