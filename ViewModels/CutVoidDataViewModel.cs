@@ -67,7 +67,6 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         StartHandler();
                         GetGeneral3DView();
-                        GetValidLevelsToData();
                     }
                 }
             }
@@ -102,7 +101,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref refresh, value) && refresh)
                 {
-                    ElementModelData?.Clear();
+                    SnoopIntersectionByInputData();
                     ResetCurrentContext();
                 }
             }
@@ -112,7 +111,6 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Settings
-
 
         #region GeneralData
 
@@ -124,7 +122,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref document, value) && document != null)
                 {
-                    SearchAndRefreshActiveDataAsync();
+                    RefreshActiveDataAsync();
                 }
             }
         }
@@ -136,9 +134,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => material;
             set
             {
-                if (SetProperty(ref material, value) && material != null && material.IsValidObject)
+                if (SetProperty(ref material, value) && material != null)
                 {
-
+                    RefreshActiveDataAsync();
                 }
             }
         }
@@ -152,7 +150,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref category, value) && category != null)
                 {
-                    SearchAndRefreshActiveDataAsync();
+                    RefreshActiveDataAsync();
                 }
             }
         }
@@ -260,7 +258,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref shared, value) && shared != null)
                 {
-                    SearchAndRefreshActiveDataAsync();
+                    RefreshActiveDataAsync();
                 }
             }
         }
@@ -316,7 +314,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         #endregion
 
-
         #endregion
 
 
@@ -369,7 +366,7 @@ namespace RevitTimasBIMTools.ViewModels
                 EngineerCategories = null;
                 StructureMaterials = null;
                 FamilySymbols = null;
-                ValidLevels = null;
+                UniqueLevelNames = null;
             }
         }
 
@@ -381,17 +378,6 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 doc = app.ActiveUIDocument.Document;
                 return RevitViewManager.Get3dView(app.ActiveUIDocument);
-            });
-        }
-
-
-        [STAThread]
-        private async void GetValidLevelsToData()
-        {
-            ValidLevels ??= await RevitTask.RunAsync(app =>
-            {
-                doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetValidLevels(doc);
             });
         }
 
@@ -507,7 +493,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void SearchAndRefreshActiveDataAsync()
+        private async void RefreshActiveDataAsync()
         {
             IsDataRefresh = !IsOptionEnabled;
             await Task.Delay(1000).ContinueWith(_ =>
@@ -552,7 +538,8 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref dataModels, value) && dataModels != null)
                 {
                     DataViewCollection = CollectionViewSource.GetDefaultView(dataModels) as ListCollectionView;
-                    UniqueItemNames = GetUniqueStringList(dataModels);
+                    UniqueSymbolNames = GetUniqueSymbolNameList(dataModels);
+                    UniqueLevelNames = GetUniqueLevelNameList(dataModels);
                     DataViewCollection.Refresh();
                 }
             }
@@ -588,41 +575,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region DataFilter
 
-        private IDictionary<double, Level> levels;
-        public IDictionary<double, Level> ValidLevels
-        {
-            get => levels;
-            set
-            {
-                if (SetProperty(ref levels, value) && levels != null)
-                {
-                    DockPanelView.ComboLevelFilter.SelectedIndex = 0;
-                }
-            }
-        }
-
-
-        private Level level = null;
-        public Level SelectedLevel
-        {
-            get => level;
-            set
-            {
-                if (SetProperty(ref level, value) && level != null)
-                {
-                    SnoopIntersectionByInputData();
-                }
-            }
-        }
-
-
         private string filterText = string.Empty;
         public string FilterText
         {
             get => filterText;
             set
             {
-                if (SetProperty(ref filterText, value))
+                if (SetProperty(ref filterText, value) && filterText != null)
                 {
                     DataViewCollection.Filter = FilterModelCollection;
                     SelectAllVaueHandelCommand();
@@ -631,24 +590,38 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
+        private IList<string> levelNames;
+        public IList<string> UniqueLevelNames
+        {
+            get => levelNames;
+            set => SetProperty(ref levelNames, value);
+        }
+
+
         private IList<string> uniqueNames = null;
-        public IList<string> UniqueItemNames
+        public IList<string> UniqueSymbolNames
         {
             get => uniqueNames;
             set => SetProperty(ref uniqueNames, value);
         }
 
-        private IList<string> GetUniqueStringList(Collection<ElementModel> collection)
+        private IList<string> GetUniqueLevelNameList(ICollection<ElementModel> collection)
+        {
+            return new SortedSet<string>(collection.Select(c => c.LevelName).Append(string.Empty)).ToList();
+        }
+
+        private IList<string> GetUniqueSymbolNameList(ICollection<ElementModel> collection)
         {
             return new SortedSet<string>(collection.Select(c => c.SymbolName).Append(string.Empty)).ToList();
         }
 
+
         private bool FilterModelCollection(object obj)
         {
-            return string.IsNullOrEmpty(FilterText)
-            || obj is not ElementModel model || model.SymbolName.Contains(FilterText)
-            || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
-            || model.SymbolName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
+            return string.IsNullOrEmpty(FilterText) 
+                || obj is not ElementModel model || model.LevelName.Contains(FilterText)
+                || model.SymbolName.StartsWith(FilterText, StringComparison.InvariantCultureIgnoreCase)
+                || model.SymbolName.Equals(FilterText, StringComparison.InvariantCultureIgnoreCase);
         }
 
         #endregion
@@ -699,7 +672,7 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                     // seletAll update by ViewItems
                     // boolSet to buttom IsDataRefresh
-                    UniqueItemNames = GetUniqueStringList(ElementModelData);
+                    UniqueSymbolNames = GetUniqueSymbolNameList(ElementModelData);
                 }
             });
         }

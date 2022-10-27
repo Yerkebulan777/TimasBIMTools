@@ -6,25 +6,29 @@ namespace RevitTimasBIMTools.RevitModel
 {
     public sealed class ElementModel : ObservableObject
     {
+        public readonly Level Level;
         public readonly Element Instanse;
-        public ElementModel(Element elem)
+        public ElementModel(Element elem, Level level)
         {
             ElementType etype = elem.Document.GetElement(elem.GetTypeId()) as ElementType;
-            if (elem.IsValidObject && etype.IsValidObject)
+            if (elem.IsValidObject && level != null && etype.IsValidObject)
             {
+                Level = level;
                 Instanse = elem;
+                LevelName = level.Name;
                 SymbolName = etype.Name;
                 FamilyName = etype.FamilyName;
             }
+
         }
 
-        public string SymbolName { get; internal set; }
-        public string FamilyName { get; internal set; }
-        public string Description { get; internal set; }
-        public double Height { get; internal set; }
-        public double Width { get; internal set; }
+        public string LevelName { get; private set; }
+        public string SymbolName { get; private set; }
+        public string FamilyName { get; private set; }
+        public string Description { get; private set; }
+        public double Height { get; private set; }
+        public double Width { get; private set; }
         public XYZ Origin { get; internal set; }
-        public Level Level { get; internal set; }
 
 
         private bool selected = false;

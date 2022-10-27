@@ -228,7 +228,7 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
-        #region Material Filter
+        #region Material filter
 
         public static Material GetCompoundStructureMaterial(Document doc, Element element, CompoundStructure compound)
         {
@@ -298,7 +298,7 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
-        #region LevelFilter
+        #region Level filter
 
         public static IDictionary<double, Level> GetValidLevels(Document doc)
         {

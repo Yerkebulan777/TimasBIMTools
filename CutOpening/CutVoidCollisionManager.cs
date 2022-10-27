@@ -123,7 +123,7 @@ namespace RevitTimasBIMTools.CutOpening
             hostBbox = host.get_BoundingBox(null);
             hostNormal = host.GetHostElementNormal();
             hostSolid = host.GetSolidByVolume(identity, options);
-            Level hostLevel = doc.GetElement(host.LevelId) as Level;
+            Level level = doc.GetElement(host.LevelId) as Level;
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).OfCategoryId(category.Id).WherePasses(intersectFilter);
@@ -143,12 +143,8 @@ namespace RevitTimasBIMTools.CutOpening
                             interNormal = interNormal.ResetDirectionToPositive();
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
+                            ElementModel model = new(elem, level) { Origin = centroid };
                             double height = tupleSize.Item1, widht = tupleSize.Item2;
-                            ElementModel model = new(elem)
-                            {
-                                Level = hostLevel,
-                                Origin = centroid,
-                            };
                             model.SetDescription(height, widht);
                             yield return model;
                         }
@@ -413,9 +409,9 @@ namespace RevitTimasBIMTools.CutOpening
         public void Dispose()
         {
             transform?.Dispose();
-            searchDocument?.Dispose();
             hostSolid?.Dispose();
             interSolid?.Dispose();
+            searchDocument?.Dispose();
             searchTransform?.Dispose();
         }
     }

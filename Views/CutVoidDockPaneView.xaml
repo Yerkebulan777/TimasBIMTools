@@ -46,7 +46,6 @@
                                   HorizontalAlignment="Right" VerticalAlignment="Center"
                                   Background="Transparent" BorderBrush="Transparent"
                                   IsChecked="{Binding Path=IsOptionEnabled, Mode=TwoWay}"
-                                  Command="{Binding Path=SettingsCommand, Mode=OneTime}"
                                   CommandParameter="{Binding Path=IsStarted}">
                         <ToggleButton.Style>
                             <Style TargetType="ToggleButton">
@@ -130,14 +129,14 @@
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Minimum size: " Width="125"/>
+                                <Label Content="Minimum side size: " Width="125"/>
                                 <Slider Name="MinSideSize" Minimum="0" Maximum="100" Interval="5" Height="23" Width="125" 
                                         Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <TextBox Text="{Binding ElementName=MinSideSize, Path=Value}" Height="23" Width="50"/>
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Maximum size: " Width="125"/>
+                                <Label Content="Maximum side size: " Width="125"/>
                                 <Slider Name="MaxSideSize" Minimum="100" Maximum="1000" Interval="50" Height="23" Width="125" 
                                         Value="{Binding Path=MaxSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <TextBox Text="{Binding ElementName=MaxSideSize, Path=Value}" Height="23" Width="50"/>
@@ -167,19 +166,19 @@
                        Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
 
                 <ComboBox Name="ComboLevelFilter" Height="23" Width="125" Margin="5" 
-                          ItemsSource="{Binding Path=ValidLevels, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                          SelectedValue="{Binding Path=SelectedLevel, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" 
+                          ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                          SelectedValue="{Binding Path=FilterText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" 
                           DisplayMemberPath="Value.Name" SelectedValuePath="Value"/>
                 <!--Watermark="Select level..."-->
 
                 <ComboBox Name="ComboDataFilter" Height="23" Width="125" Margin="5" 
-                          ItemsSource="{Binding Path=UniqueItemNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                          SelectedValue="{Binding Path=FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                          ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                          SelectedValue="{Binding Path=FilterText, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
                 <!--Watermark="Filter by..."-->
 
-                <CheckBox Name="Settings" Content="Show settings" Height="23"  Width="100" Margin="10,5" 
+                <!--<CheckBox Name="Settings" Content="Refresh data" Height="23"  Width="100" Margin="10,5" 
                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center" 
-                          IsChecked="{Binding Path=IsOptionEnabled, Mode=TwoWay, Delay=5}" />
+                          IsChecked="{Binding Path=IsDataRefresh, Mode=TwoWay, Delay=5}" />-->
 
             </WrapPanel>
 
@@ -231,7 +230,7 @@
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Width="150" Header="Level Name" Binding="{Binding Level.Name, Mode=OneWay}">
+                        <DataGridTextColumn Width="150" Header="Level Name" Binding="{Binding LevelName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
@@ -252,7 +251,8 @@
 
 
             <!-- ButtonPanel -->
-            <Border Grid.Row="4" Background="Silver">
+            <Border Grid.Row="4" Background="Silver" VerticalAlignment="Bottom" Style="{StaticResource VisibleAnimation}"
+                    Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}">
                 <DockPanel Grid.Row="3" LastChildFill="True" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">
                     <Button Name="SnoopCmd" Height="30" Width="75" Margin="5" 
                         Command="{Binding SnoopCommand, Mode=OneTime}">
