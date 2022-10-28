@@ -1,10 +1,6 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using GlobalParameter = Autodesk.Revit.DB.GlobalParameter;
 
 namespace RevitTimasBIMTools.RevitUtils
@@ -12,23 +8,6 @@ namespace RevitTimasBIMTools.RevitUtils
     public static class ParameterExtention
     {
         public const string Caption = "Smart BIM Tools";
-        public static List<Element> GetSelection(this UIDocument uidoc)
-        {
-            Document doc = uidoc.Document;
-            Type stp = uidoc.Selection.GetType();
-            List<Element> value = new();
-            if (stp.GetMethod("GetElementIds") != null)
-            {
-                MethodInfo met = stp.GetMethod("GetElementIds");
-                value = ((ICollection<ElementId>)met.Invoke(uidoc.Selection, null)).Select(doc.GetElement).ToList();
-            }
-            else
-            {
-                value = ((System.Collections.IEnumerable)stp.GetProperty("ElementModelData").GetValue(uidoc.Selection, null)).Cast<Element>().ToList();
-            }
-            return value.OrderBy(x => x.Name).ToList();
-        }
-
 
         /// <summary>
         /// Return Real String Of Double
@@ -122,6 +101,7 @@ namespace RevitTimasBIMTools.RevitUtils
             return description;
         }
 
+
         /// <summary>
         /// SmartToolHelper to return parameter value as string.
         /// One can also use param.AsValueString() to
@@ -140,6 +120,7 @@ namespace RevitTimasBIMTools.RevitUtils
             return parameterString;
         }
 
+
         /// <summary>
         /// Return Result of parameter share
         /// </summary>
@@ -149,6 +130,7 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             return parameter.IsShared ? "Shared" : "Non-parameters";
         }
+
 
         /// <summary>
         /// Return Guid Of Parameter Share
@@ -179,6 +161,7 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             return string.Empty;
         }
+
 
         /// <summary>
         /// Return Global Parameter Content
