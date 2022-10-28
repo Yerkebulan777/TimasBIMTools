@@ -45,7 +45,7 @@ namespace RevitTimasBIMTools.ViewModels
             RefreshDataCommand = new AsyncRelayCommand(RefreshActiveDataHandler);
             //CanselCommand = new RelayCommand(CancelCallbackLogic);
             //SelectItemCommand = new RelayCommand(SelectAllModelHandelCommand);
-            //ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
+            ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
         }
 
 
@@ -359,17 +359,18 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         [STAThread]
-        private void ClearElementDataAsync()
+        private void ClearAndResetData()
         {
             if (IsStarted)
             {
                 IsStarted = false;
                 IsDataRefresh = false;
                 IsOptionEnabled = false;
-                FamilySymbols = null;
-                ElementModelData = null;
+                DocumentCollection = null;
                 EngineerCategories = null;
                 StructureMaterials = null;
+                ElementModelData = null;
+                FamilySymbols = null;
             }
         }
 
@@ -663,6 +664,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region SelectItemCommand
+
         public ICommand SelectItemCommand { get; private set; }
         private void SelectAllModelHandelCommand()
         {
@@ -680,7 +682,7 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteHandelCommandAsync()
         {
-            await RevitTask.RunAsync(app =>
+            await RevitTask.RunAsync(async app =>
             {
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
@@ -693,20 +695,19 @@ namespace RevitTimasBIMTools.ViewModels
                             Element elem = doc.GetElement(model.Instanse.Id);
                             try
                             {
-                                // Set Openning Logic with doc regenerate and transaction RollBack                                   
+                                RevitViewManager.SetColor(uidoc, elem);                                
                                 view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
-                                RevitViewManager.SetColorElement(uidoc, elem);
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Error(ex.Message);
                             }
                             finally
                             {
-                                Task.Delay(1000).Wait();
+                                await Task.Delay(TimeSpan.FromSeconds(3));
                             }
-
-                            break;
                         }
                     }
-                    // seletAll update by ViewItems
-                    // boolSet to buttom IsDataRefresh
                 }
             });
         }
@@ -739,7 +740,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         public void Dispose()
         {
-            ClearElementDataAsync();
+            ClearAndResetData();
             collisionManager?.Dispose();
         }
     }
