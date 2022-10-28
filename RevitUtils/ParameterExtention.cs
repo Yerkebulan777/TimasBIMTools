@@ -15,13 +15,13 @@ namespace RevitTimasBIMTools.RevitUtils
         public static List<Element> GetSelection(this UIDocument uidoc)
         {
             Document doc = uidoc.Document;
-            uidoc.Selection.GetElementIds();
+            _ = uidoc.Selection.GetElementIds();
             Type stp = uidoc.Selection.GetType();
-            List<Element> value = new List<Element>();
+            List<Element> value = new();
             if (stp.GetMethod("GetElementIds") != null)
             {
                 MethodInfo met = stp.GetMethod("GetElementIds");
-                value = ((ICollection<ElementId>)met.Invoke(uidoc.Selection, null)).Select(a => doc.GetElement(a)).ToList();
+                value = ((ICollection<ElementId>)met.Invoke(uidoc.Selection, null)).Select(doc.GetElement).ToList();
             }
             else
             {
@@ -30,24 +30,6 @@ namespace RevitTimasBIMTools.RevitUtils
             return value.OrderBy(x => x.Name).ToList();
         }
 
-        /// <summary>
-        /// MessageBox wrapper for question message.
-        /// </summary>
-        public static bool QuestionMsg(string msg)
-        {
-            Debug.WriteLine(msg);
-
-            TaskDialog dialog = new TaskDialog(Caption)
-            {
-                MainIcon = TaskDialogIcon.TaskDialogIconNone,
-                MainInstruction = msg
-            };
-
-            dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "instance parameters");
-            dialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Type parameters");
-
-            return dialog.Show() == TaskDialogResult.CommandLink1;
-        }
 
         /// <summary>
         /// Return Real String Of Double
@@ -108,21 +90,11 @@ namespace RevitTimasBIMTools.RevitUtils
         /// </summary>
         public static string GetParameterValue2(this Parameter param, Document doc)
         {
-            if (param.StorageType == StorageType.ElementId && doc != null)
+            if (param.StorageType == StorageType.ElementId)
             {
                 ElementId paramId = param.AsElementId();
-                int id = paramId.IntegerValue;
-
-                if (id < 0)
-                {
-                    return id.ToString() + BuiltInCategoryString(id);
-                }
-                else
-                {
-                    Element element = doc.GetElement(paramId);
-
-                    return ElementDescription(element, true);
-                }
+                Element element = doc.GetElement(paramId);
+                return element.Name;
             }
             else
             {
@@ -130,39 +102,7 @@ namespace RevitTimasBIMTools.RevitUtils
             }
         }
 
-        private static int _min_bic = 0;
-        private static int _max_bic = 0;
 
-        private static string BuiltInCategoryString(int id)
-        {
-            if (_min_bic == 0)
-            {
-                SetMinAndMaxBuiltInCategory();
-            }
-
-            return _min_bic < id && id < _max_bic ? " " + ((BuiltInCategory)id).ToString() : string.Empty;
-        }
-
-        private static void SetMinAndMaxBuiltInCategory()
-        {
-            Array values = Enum.GetValues(typeof(BuiltInCategory));
-            _max_bic = values.Cast<int>().Max();
-            _min_bic = values.Cast<int>().Min();
-        }
-        /// <summary>
-        /// Return a description string including instance instanceId for a given instance.
-        /// </summary>
-        public static string ElementDescription(Element element, bool includeId)
-        {
-            string description = ElementDescription(element);
-
-            if (includeId)
-            {
-                description += " " + element.Id.IntegerValue.ToString();
-            }
-
-            return description;
-        }
         /// <summary>
         /// Return a description string for a given instance.
         /// </summary>
@@ -190,28 +130,15 @@ namespace RevitTimasBIMTools.RevitUtils
         /// </summary>
         public static string GetParameterValue(Parameter param)
         {
-            string parameterString;
-            switch (param.StorageType)
+            string parameterString = param.StorageType switch
             {
-                case StorageType.Double:
-                    parameterString = param.AsValueString();
-                    break;
-                case StorageType.Integer:
-                    parameterString = param.AsInteger().ToString();
-                    break;
-                case StorageType.String:
-                    parameterString = param.AsString();
-                    break;
-                case StorageType.ElementId:
-                    parameterString = param.AsElementId().IntegerValue.ToString();
-                    break;
-                case StorageType.None:
-                    parameterString = "?NONE?";
-                    break;
-                default:
-                    parameterString = "?ELSE?";
-                    break;
-            }
+                StorageType.Double => param.AsValueString(),
+                StorageType.Integer => param.AsInteger().ToString(),
+                StorageType.String => param.AsString(),
+                StorageType.ElementId => param.AsElementId().IntegerValue.ToString(),
+                StorageType.None => "?NONE?",
+                _ => "?ELSE?",
+            };
             return parameterString;
         }
 
@@ -244,7 +171,6 @@ namespace RevitTimasBIMTools.RevitUtils
         /// <returns></returns>
         public static string GetAssGlobalParameter(this Parameter parameter, Document doc)
         {
-            Dictionary<string, string> gloDictionary = new Dictionary<string, string>();
             ElementId elementId = parameter.GetAssociatedGlobalParameter();
             if (elementId != null)
             {
@@ -264,24 +190,14 @@ namespace RevitTimasBIMTools.RevitUtils
         /// <returns></returns>
         public static string GetAssGlobalParameterValue(this Parameter parameter, Document doc)
         {
-            Dictionary<string, string> gloDictionary = new Dictionary<string, string>();
             ElementId elementId = parameter.GetAssociatedGlobalParameter();
             if (elementId != null)
             {
                 if (doc.GetElement(elementId) is GlobalParameter globalParameter)
                 {
-                    DoubleParameterValue doublevalue = globalParameter.GetValue() as DoubleParameterValue;
-                    StringParameterValue strpra = globalParameter.GetValue() as StringParameterValue;
-                    if (doublevalue != null)
-                    {
-                        return RealString(doublevalue.Value);
-                    }
-                    if (strpra != null)
-                    {
-                        return strpra.Value;
-                    }
-                    return string.Empty;
-
+                    return globalParameter.GetValue() is DoubleParameterValue doublevalue
+                        ? RealString(doublevalue.Value)
+                        : globalParameter.GetValue() is StringParameterValue strpra ? strpra.Value : string.Empty;
                 }
             }
             return string.Empty;

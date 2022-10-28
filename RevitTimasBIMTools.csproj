@@ -236,7 +236,7 @@
     <Compile Include="RevitUtils\GeometryExtension.cs" />
     <Compile Include="RevitModel\DocumentModel.cs" />
     <Compile Include="RevitModel\ElementModel.cs" />
-    <Compile Include="RevitUtils\ParameterUtils.cs" />
+    <Compile Include="RevitUtils\ParameterExtention.cs" />
     <Compile Include="RevitUtils\PurginqManager.cs" />
     <Compile Include="RevitUtils\RevitFilterManager.cs" />
     <Compile Include="RevitUtils\TransactionManager.cs" />
