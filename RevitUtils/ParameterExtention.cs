@@ -11,11 +11,10 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     public static class ParameterExtention
     {
-        public const string Caption = "BIM Tools";
+        public const string Caption = "Smart BIM Tools";
         public static List<Element> GetSelection(this UIDocument uidoc)
         {
             Document doc = uidoc.Document;
-            _ = uidoc.Selection.GetElementIds();
             Type stp = uidoc.Selection.GetType();
             List<Element> value = new();
             if (stp.GetMethod("GetElementIds") != null)
@@ -132,12 +131,11 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             string parameterString = param.StorageType switch
             {
+                StorageType.String => param.AsString(),
                 StorageType.Double => param.AsValueString(),
                 StorageType.Integer => param.AsInteger().ToString(),
-                StorageType.String => param.AsString(),
                 StorageType.ElementId => param.AsElementId().IntegerValue.ToString(),
-                StorageType.None => "?NONE?",
-                _ => "?ELSE?",
+                _ => throw new NotImplementedException(),
             };
             return parameterString;
         }
@@ -204,5 +202,17 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
+        public static double ConvertFromInternalUnits(double value, string displayUnitType)
+        {
+            if (string.IsNullOrWhiteSpace(displayUnitType))
+            {
+                throw new ArgumentNullException(nameof(displayUnitType));
+            }
+
+            DisplayUnitType dut = (DisplayUnitType)Enum.Parse(typeof(DisplayUnitType), displayUnitType);
+            double result = UnitUtils.ConvertFromInternalUnits(value, dut);
+
+            return result;
+        }
     }
 }
