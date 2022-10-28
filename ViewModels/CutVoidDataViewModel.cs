@@ -683,30 +683,28 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteHandelCommandAsync()
         {
-            await RevitTask.RunAsync(async app =>
+            var items = DataViewCollection;
+            await RevitTask.RunAsync(app =>
             {
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    foreach (ElementModel model in DataViewCollection)
+                    foreach (ElementModel model in items)
                     {
                         if (model.IsSelected && ElementModelData.Remove(model))
                         {
                             Element elem = doc.GetElement(model.Instanse.Id);
-                            try
-                            {
-                                RevitViewManager.SetColor(uidoc, elem);
-                                view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Error(ex.Message);
-                            }
-                            finally
-                            {
-                                await Task.Delay(TimeSpan.FromSeconds(3));
-                            }
+                            RevitViewManager.SetColor(uidoc, elem);
+                            view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
+                            //try
+                            //{
+
+                            //}
+                            //catch (Exception ex)
+                            //{
+                            //    Logger.Error(ex.Message);
+                            //}
                         }
                     }
                 }
