@@ -686,22 +686,25 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (DataViewCollection?.IsEmpty == false)
             {
-                DataGrid dataGrid = DockPanelView.dataGridView;
                 object item = DataViewCollection.GetItemAt(0);
+                DataGrid dataGrid = DockPanelView.dataGridView;
                 IsOptionEnabled = await RevitTask.RunAsync(app =>
                 {
-                    dataGrid.SelectedItem = item;
-                    dataGrid.ScrollIntoView(item);
-                    UIDocument uidoc = app.ActiveUIDocument;
-                    Document doc = app.ActiveUIDocument.Document;
                     if (item is ElementModel model && model.IsSelected)
                     {
+                        dataGrid.ScrollIntoView(item);
+                        UIDocument uidoc = app.ActiveUIDocument;
+                        Document doc = app.ActiveUIDocument.Document;
                         if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                         {
                             Element elem = doc.GetElement(model.Instanse.Id);
-                            view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
                             RevitViewManager.SetCustomColorInView(uidoc, elem);
-                            return !ElementModelData.Remove(model);
+                            view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
+                            
+                            if (ElementModelData.Remove(model))
+                            {
+                                collisionManager.CreateOpening(doc, model, wallHole, floorHole);
+                            }
                         }
                     }
                     return DataViewCollection.IsEmpty;

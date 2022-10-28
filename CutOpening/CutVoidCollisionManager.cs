@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
+using Autodesk.Revit.UI;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
@@ -154,35 +155,47 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private FamilyInstance CreateOpening(Document doc, ElementModel model, FamilySymbol symbol, double offset)
+        public FamilyInstance CreateOpening(Document doc, ElementModel model, FamilySymbol wallHole, FamilySymbol floorHole, double offset = 0)
         {
             FamilyInstance opening = null;
-            using (SubTransaction trans = new(doc))
+            using Transaction trans = new(doc, "Create opening");
+            if (trans.Start() == TransactionStatus.Started)
             {
-                TransactionStatus status = trans.Start();
                 try
                 {
-                    if (model.Instanse is Wall wall && wall.IsValidObject)
+                    if (wallHole != null && model.Instanse is Wall wall && wall.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, symbol, wall, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(model.Origin, wallHole, wall, StructuralType.NonStructural);
                     }
-                    else if (model.Level is Level level && level.IsValidObject)
+                    else if (floorHole != null && model.Level is Level level && level.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, symbol, level, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(model.Origin, floorHole, level, StructuralType.NonStructural);
                     }
-                    if (opening != null && opening.IsValidObject)
+                }
+                finally
+                {
+                    if (opening != null)
                     {
+                        doc.Regenerate();
                         //opening.get_Parameter("widthParamGuid").Set(model.Width);
                         //opening.get_Parameter("heightParamGuid").Set(model.Height);
-                    }
-                    status = trans.Commit();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex.Message);
-                    if (!trans.HasEnded())
-                    {
-                        status = trans.RollBack();
+                        TaskDialog taskDialog = new("Revit")
+                        {
+                            MainContent = "Click either [OK] to Create openning, or [Cancel] to back the transaction.",
+                            CommonButtons = TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel
+                        };
+
+                        if (TaskDialogResult.Ok == taskDialog.Show())
+                        {
+                            if (TransactionStatus.Committed != trans.Commit())
+                            {
+                                Logger.Error("Transaction could not be committed");
+                            }
+                        }
+                        else
+                        {
+                            _ = trans.RollBack();
+                        }
                     }
                 }
             }
