@@ -18,12 +18,9 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
 using Document = Autodesk.Revit.DB.Document;
 using Parameter = Autodesk.Revit.DB.Parameter;
 
@@ -687,30 +684,29 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteHandelCommandAsync()
         {
-            object item = DataViewCollection?.GetItemAt(0);
-            DataGrid dataGrid = DockPanelView.dataGridView;
-            dataGrid.SelectedItem = item;
-            dataGrid.ScrollIntoView(item);
-            await RevitTask.RunAsync(app =>
+            if (DataViewCollection?.IsEmpty == false)
             {
-                UIDocument uidoc = app.ActiveUIDocument;
-                Document doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                DataGrid dataGrid = DockPanelView.dataGridView;
+                object item = DataViewCollection.GetItemAt(0);
+                IsOptionEnabled = await RevitTask.RunAsync(app =>
                 {
+                    dataGrid.SelectedItem = item;
+                    dataGrid.ScrollIntoView(item);
+                    UIDocument uidoc = app.ActiveUIDocument;
+                    Document doc = app.ActiveUIDocument.Document;
                     if (item is ElementModel model && model.IsSelected)
                     {
-                        if (DataViewCollection.MoveCurrentToFirst())
+                        if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                         {
                             Element elem = doc.GetElement(model.Instanse.Id);
-                            if (ElementModelData.Remove(model))
-                            {
-                                view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
-                                RevitViewManager.SetCustomColorInView(uidoc, elem);
-                            }
+                            view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
+                            RevitViewManager.SetCustomColorInView(uidoc, elem);
+                            return !ElementModelData.Remove(model);
                         }
                     }
-                }
-            });
+                    return DataViewCollection.IsEmpty;
+                });
+            }
         }
 
         #endregion
