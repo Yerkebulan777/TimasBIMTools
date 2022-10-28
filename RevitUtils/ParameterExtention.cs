@@ -9,7 +9,7 @@ using GlobalParameter = Autodesk.Revit.DB.GlobalParameter;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
-    public static class RevitParameterUtils
+    public static class ParameterExtention
     {
         public const string Caption = "BIM Tools";
         public static List<Element> GetSelection(this UIDocument uidoc)
