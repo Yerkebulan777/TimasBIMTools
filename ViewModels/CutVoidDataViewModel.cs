@@ -683,7 +683,7 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteHandelCommandAsync()
         {
-            var items = DataViewCollection;
+            ListCollectionView items = DataViewCollection;
             await RevitTask.RunAsync(app =>
             {
                 UIDocument uidoc = app.ActiveUIDocument;
