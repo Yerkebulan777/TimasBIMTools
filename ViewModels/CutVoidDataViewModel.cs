@@ -253,18 +253,27 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IList<Parameter> shared = null;
-        public IList<Parameter> SharedParameters
+        private IList<Parameter> parameters;
+        public IList<Parameter> FamilyParameters
         {
-            get => shared;
+            get => parameters;
             set
             {
-                if (SetProperty(ref shared, value) && shared != null)
+                if (SetProperty(ref parameters, value) && parameters != null)
                 {
                     RefreshActiveData();
                 }
             }
         }
+
+        private Parameter param;
+
+        public Parameter SelectedParameter
+        {
+            get => param;
+            set => SetProperty(ref param, value);
+        }
+
 
         #endregion
 
@@ -453,7 +462,7 @@ namespace RevitTimasBIMTools.ViewModels
             await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                SharedParameters = new List<Parameter>(5);
+                FamilyParameters = new List<Parameter>(5);
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     foreach (Parameter param in symbol.GetOrderedParameters())
@@ -463,10 +472,10 @@ namespace RevitTimasBIMTools.ViewModels
                             switch (param.StorageType)
                             {
                                 case StorageType.Double:
-                                    SharedParameters.Add(param);
+                                    FamilyParameters.Add(param);
                                     break;
                                 case StorageType.String:
-                                    SharedParameters.Add(param);
+                                    FamilyParameters.Add(param);
                                     break;
                                 default: break;
                             }
@@ -695,7 +704,7 @@ namespace RevitTimasBIMTools.ViewModels
                             Element elem = doc.GetElement(model.Instanse.Id);
                             try
                             {
-                                RevitViewManager.SetColor(uidoc, elem);                                
+                                RevitViewManager.SetColor(uidoc, elem);
                                 view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
                             }
                             catch (Exception ex)

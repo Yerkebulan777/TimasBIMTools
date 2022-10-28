@@ -222,7 +222,7 @@ namespace RevitTimasBIMTools.RevitUtils
         /// <returns></returns>
         public static string Shared(this Parameter parameter)
         {
-            return parameter.IsShared ? "Shared" : "Non-shared";
+            return parameter.IsShared ? "Shared" : "Non-parameters";
         }
 
         /// <summary>

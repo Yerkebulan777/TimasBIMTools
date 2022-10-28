@@ -116,6 +116,12 @@
                                           ItemsSource="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=FloorOpenning}" />
                             </WrapPanel>
+                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Parameter: " Width="125" />
+                                <ComboBox Name="ComboParameter" Height="23" Width="125" DisplayMemberPath="Value.Name" 
+                                          ItemsSource="{Binding Path=FamilyParameters, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                          SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedParameter}" />
+                            </WrapPanel>
                         </StackPanel>
                     </Border>
                 </ListViewItem>
