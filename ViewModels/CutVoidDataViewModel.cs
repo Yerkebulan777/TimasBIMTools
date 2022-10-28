@@ -18,8 +18,12 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 using Document = Autodesk.Revit.DB.Document;
 using Parameter = Autodesk.Revit.DB.Parameter;
 
@@ -683,28 +687,26 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async Task ExecuteHandelCommandAsync()
         {
-            ListCollectionView items = DataViewCollection;
+            object item = DataViewCollection?.GetItemAt(0);
+            DataGrid dataGrid = DockPanelView.dataGridView;
+            dataGrid.SelectedItem = item;
+            dataGrid.ScrollIntoView(item);
             await RevitTask.RunAsync(app =>
             {
                 UIDocument uidoc = app.ActiveUIDocument;
                 Document doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    foreach (ElementModel model in items)
+                    if (item is ElementModel model && model.IsSelected)
                     {
-                        if (model.IsSelected && ElementModelData.Remove(model))
+                        if (DataViewCollection.MoveCurrentToFirst())
                         {
                             Element elem = doc.GetElement(model.Instanse.Id);
-                            RevitViewManager.SetColor(uidoc, elem);
-                            view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
-                            //try
-                            //{
-
-                            //}
-                            //catch (Exception ex)
-                            //{
-                            //    Logger.Error(ex.Message);
-                            //}
+                            if (ElementModelData.Remove(model))
+                            {
+                                view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
+                                RevitViewManager.SetCustomColorInView(uidoc, elem);
+                            }
                         }
                     }
                 }

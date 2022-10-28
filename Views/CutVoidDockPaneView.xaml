@@ -259,12 +259,12 @@
                         <Label FontFamily="Segoe MDL2 Assets" Content="&#59647;" Foreground="BlueViolet"  FontSize="15" />
                     </Button>
                     
-                    <RepeatButton Name="ApplyCmd" Delay="1000" Interval="500" Height="30" Width="75" Margin="5"
+                    <Button Name="ApplyCmd" Height="30" Width="75" Margin="5"
                             IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
                             Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" 
                             CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}">
                         <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" Foreground="Green"  FontSize="15" />
-                    </RepeatButton>
+                    </Button>
                     
                     <Button Name="CancelCmd"  Height="30" Width="75" Margin="5" 
                             IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
