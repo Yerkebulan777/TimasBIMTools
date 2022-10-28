@@ -29,9 +29,9 @@ namespace RevitTimasBIMTools.ViewModels
     {
         private readonly Mutex mutex = new();
         public CutVoidDockPaneView DockPanelView { get; set; }
+        private static SynchronizationContext context { get; set; }
         public static ExternalEvent RevitExternalEvent { get; set; }
         public static CancellationToken cancelToken { get; set; } = CancellationToken.None;
-        private static SynchronizationContext context { get; set; } = SynchronizationContext.Current;
 
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
@@ -43,9 +43,9 @@ namespace RevitTimasBIMTools.ViewModels
         {
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
             RefreshDataCommand = new AsyncRelayCommand(RefreshActiveDataHandler);
+            ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             //CanselCommand = new RelayCommand(CancelCallbackLogic);
             //SelectItemCommand = new RelayCommand(SelectAllModelHandelCommand);
-            ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
         }
 
 
@@ -257,23 +257,15 @@ namespace RevitTimasBIMTools.ViewModels
         public IList<Parameter> FamilyParameters
         {
             get => parameters;
-            set
-            {
-                if (SetProperty(ref parameters, value) && parameters != null)
-                {
-                    RefreshActiveData();
-                }
-            }
+            set => SetProperty(ref parameters, value);
         }
 
         private Parameter param;
-
         public Parameter SelectedParameter
         {
             get => param;
             set => SetProperty(ref param, value);
         }
-
 
         #endregion
 

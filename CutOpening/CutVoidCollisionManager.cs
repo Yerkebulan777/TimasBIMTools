@@ -102,7 +102,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             count = 0;
             Transform global = document.Transform;
-            IList<ElementModel> output = new List<ElementModel>(25);
+            IList<ElementModel> output = new List<ElementModel>(50);
             IEnumerable<Element> enclosures = ElementTypeIdData?.GetInstancesByTypeIdDataAndMaterial(doc, material);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             TransactionStatus status = transGroup.Start();
