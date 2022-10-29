@@ -92,47 +92,16 @@ namespace RevitTimasBIMTools.RevitUtils
         #region SetCustomSectionBox
         public static View3D SetCustomSectionBox(UIDocument uidoc, Element elem, View3D view3d)
         {
-            uidoc.ActiveView = view3d;
-            uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
-            cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.SelectionBox);
-            bindedCmdId = uidoc.Application.CreateAddInCommandBinding(cmdId);
-            bindedCmdId.Executed += BindedSectionBoxCmdId_Executed;
-            uidoc.Application.PostCommand(cmdId);
-            return view3d;
-        }
-
-
-        private static void BindedSectionBoxCmdId_Executed(object sender, Autodesk.Revit.UI.Events.ExecutedEventArgs e)
-        {
-            bindedCmdId.Executed -= BindedSectionBoxCmdId_Executed;
-            UIApplication uiapp = sender as UIApplication;
-            UIDocument uidoc = uiapp.ActiveUIDocument;
-            if (uidoc.ActiveView is View3D view3d)
+            if (uidoc.ActiveView.Id.Equals(view3d.Id))
             {
-                Document doc = uiapp.ActiveUIDocument.Document;
-                ICollection<ElementId> selectedIds = uidoc.Selection.GetElementIds();
-                Element elem = doc.GetElement(selectedIds.Cast<ElementId>().FirstOrDefault());
-                using (Transaction t = new Transaction(uidoc.Document, "SetCustomSectionBox"))
-                {
-                    BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
-                    if (TransactionStatus.Started == t.Start())
-                    {
-                        view3d.SetSectionBox(bbox);
-                    }
-                    if (TransactionStatus.Committed == t.Commit())
-                    {
-                        try
-                        {
-                            ZoomElementInView(uidoc, view3d, bbox);
-                        }
-                        finally
-                        {
-                            uidoc.RefreshActiveView();
-                        }
-
-                    }
-                }
+                uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
+                BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
+                ZoomElementInView(uidoc, view3d, bbox);
+                view3d.SetSectionBox(bbox);
+                uidoc.RefreshActiveView();
+                uidoc.ShowElements(elem);
             }
+            return view3d;
         }
 
 
@@ -155,8 +124,6 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static void ZoomElementInView(UIDocument uidoc, View3D view3d, BoundingBoxXYZ box)
         {
-            uidoc.ActiveView = view3d;
-            uidoc.RequestViewChange(view3d);
             UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view3d.Id));
             if (uiview != null)
             {

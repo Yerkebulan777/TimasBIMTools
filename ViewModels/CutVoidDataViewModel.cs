@@ -220,34 +220,34 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private FamilySymbol wallHole = null;
+        private FamilySymbol wallOpenning = null;
         public FamilySymbol WallOpenning
         {
-            get => wallHole;
+            get => wallOpenning;
             set
             {
-                if (SetProperty(ref wallHole, value) && wallHole != null)
+                if (SetProperty(ref wallOpenning, value) && wallOpenning != null)
                 {
-                    ActivateFamilySimbol(wallHole);
-                    GetSymbolSharedParameters(wallHole);
-                    Properties.Settings.Default.RectangSymbolUniqueId = wallHole.UniqueId;
+                    ActivateFamilySimbol(wallOpenning);
+                    GetSymbolSharedParameters(wallOpenning);
+                    Properties.Settings.Default.RectangSymbolUniqueId = wallOpenning.UniqueId;
                     Properties.Settings.Default.Save();
                 }
             }
         }
 
 
-        private FamilySymbol floorHole = null;
+        private FamilySymbol floorOpenning = null;
         public FamilySymbol FloorOpenning
         {
-            get => floorHole;
+            get => floorOpenning;
             set
             {
-                if (SetProperty(ref floorHole, value) && floorHole != null)
+                if (SetProperty(ref floorOpenning, value) && floorOpenning != null)
                 {
-                    ActivateFamilySimbol(floorHole);
-                    GetSymbolSharedParameters(floorHole);
-                    Properties.Settings.Default.RoundedSymbolUniqueId = floorHole.UniqueId;
+                    ActivateFamilySimbol(floorOpenning);
+                    GetSymbolSharedParameters(floorOpenning);
+                    Properties.Settings.Default.RoundedSymbolUniqueId = floorOpenning.UniqueId;
                     Properties.Settings.Default.Save();
                 }
             }
@@ -693,17 +693,14 @@ namespace RevitTimasBIMTools.ViewModels
                     if (item is ElementModel model && model.IsSelected)
                     {
                         dataGrid.ScrollIntoView(item);
-                        UIDocument uidoc = app.ActiveUIDocument;
-                        Document doc = app.ActiveUIDocument.Document;
+                        doc = app.ActiveUIDocument.Document;
                         if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                         {
-                            Element elem = doc.GetElement(model.Instanse.Id);
-                            RevitViewManager.SetCustomColorInView(uidoc, elem);
-                            view3d = RevitViewManager.SetCustomSectionBox(uidoc, elem, view3d);
-                            
-                            if (ElementModelData.Remove(model))
+                            UIDocument uidoc = app.ActiveUIDocument;
+                            collisionManager.CreateOpening(uidoc, model, view3d, wallOpenning, floorOpenning);
+                            if (model != null && ElementModelData.Remove(model))
                             {
-                                collisionManager.CreateOpening(doc, model, wallHole, floorHole);
+                                Logger.Log("Yes");
                             }
                         }
                     }

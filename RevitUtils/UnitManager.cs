@@ -37,7 +37,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         /// <summary>
         ///     Convert a given lenght in feet to millimetres,
-        ///     floorHole to the closest millimetre.
+        ///     floorOpenning to the closest millimetre.
         /// </summary>
         public static int FootToMmInt(double length)
         {
