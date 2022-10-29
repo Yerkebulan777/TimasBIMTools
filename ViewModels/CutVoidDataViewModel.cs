@@ -71,6 +71,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         StartHandler();
                         GetGeneral3DView();
+                        ResetCurrentContext();
                     }
                 }
             }
@@ -83,7 +84,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => enabled;
             set
             {
-                if (SetProperty(ref enabled, value) && enabled)
+                if (SetProperty(ref enabled, value) && started && enabled)
                 {
                     if (!string.IsNullOrEmpty(docUniqueId))
                     {
@@ -106,7 +107,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref refresh, value) && refresh)
                 {
                     SnoopIntersectionByInputData();
-                    ResetCurrentContext();
                 }
             }
         }
