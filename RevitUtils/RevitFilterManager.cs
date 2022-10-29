@@ -337,18 +337,14 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static IDictionary<string, FamilySymbol> GetHostedFamilySymbols(Document doc, BuiltInCategory bic)
         {
-            FamilyPlacementType placement = FamilyPlacementType.OneLevelBasedHosted;
             IDictionary<string, FamilySymbol> result = new SortedDictionary<string, FamilySymbol>();
             FilteredElementCollector collector = GetElementsOfCategory(doc, typeof(FamilySymbol), bic);
             foreach (FamilySymbol smb in collector)
             {
                 Family fam = smb.Family;
-                if (fam.IsValidObject && fam.IsEditable)
+                if (fam.IsEditable && fam.IsUserCreated)
                 {
-                    if (fam.FamilyPlacementType.Equals(placement))
-                    {
-                        result[smb.Name] = smb;
-                    }
+                    result[smb.Name] = smb;
                 }
             }
             return result;
