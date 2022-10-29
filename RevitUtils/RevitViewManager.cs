@@ -97,8 +97,8 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 BoundingBoxXYZ bbox = GetBoundingBox(centroid);
                 using Transaction tx = new(uidoc.Document);
-                _ = tx.Start("Move And Resize Section Box");
                 ZoomElementInView(uidoc, view3d, bbox);
+                _ = tx.Start("Set Section Box");
                 view3d.SetSectionBox(bbox);
                 uidoc.RefreshActiveView();
                 _ = tx.Commit();
@@ -139,7 +139,14 @@ namespace RevitTimasBIMTools.RevitUtils
             UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view3d.Id));
             if (uiview != null)
             {
-                uiview.ZoomAndCenterRectangle(box.Min, box.Max);
+                try
+                {
+                    uiview.ZoomAndCenterRectangle(box.Min, box.Max);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                }
             }
         }
 
