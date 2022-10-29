@@ -511,9 +511,9 @@ namespace RevitTimasBIMTools.ViewModels
         public ICommand RefreshDataCommand { get; private set; }
         private async Task RefreshActiveDataHandler()
         {
+            IsDataRefresh = false;
             if (document != null && material != null && category != null)
             {
-                IsDataRefresh = false;
                 await Task.Delay(1000).ContinueWith(_ =>
                 {
                     IsDataRefresh = true;
