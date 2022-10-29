@@ -109,8 +109,8 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static BoundingBoxXYZ GetBoundingBox(XYZ centroid, double factor = 3)
         {
-            BoundingBoxXYZ bbox = new BoundingBoxXYZ();
-            XYZ vector = new XYZ(factor, factor, factor);
+            BoundingBoxXYZ bbox = new();
+            XYZ vector = new(factor, factor, factor);
             bbox.Min = centroid - vector;
             bbox.Max = centroid + vector;
             return bbox;
