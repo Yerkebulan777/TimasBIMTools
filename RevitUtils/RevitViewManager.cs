@@ -103,7 +103,6 @@ namespace RevitTimasBIMTools.RevitUtils
                     ZoomElementInView(uidoc, view3d, bbox);
                     view3d.SetSectionBox(bbox);
                     uidoc.RefreshActiveView();
-                    uidoc.ShowElements(elem);
                     tx.Commit();
                 }
             }
