@@ -92,14 +92,20 @@ namespace RevitTimasBIMTools.RevitUtils
         #region SetCustomSectionBox
         public static View3D SetCustomSectionBox(UIDocument uidoc, Element elem, View3D view3d)
         {
+            uidoc.RequestViewChange(view3d);
             if (uidoc.ActiveView.Id.Equals(view3d.Id))
             {
-                uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
                 BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
-                ZoomElementInView(uidoc, view3d, bbox);
-                view3d.SetSectionBox(bbox);
-                uidoc.RefreshActiveView();
-                uidoc.ShowElements(elem);
+                uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
+                using (Transaction tx = new Transaction(uidoc.Document))
+                {
+                    tx.Start("Move And Resize Section Box");
+                    ZoomElementInView(uidoc, view3d, bbox);
+                    view3d.SetSectionBox(bbox);
+                    uidoc.RefreshActiveView();
+                    uidoc.ShowElements(elem);
+                    tx.Commit();
+                }
             }
             return view3d;
         }

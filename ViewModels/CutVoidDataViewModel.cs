@@ -503,7 +503,6 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (IsDataRefresh)
             {
-                IsDataRefresh = false;
                 await RefreshActiveDataHandler();
             }
         }
@@ -512,14 +511,15 @@ namespace RevitTimasBIMTools.ViewModels
         public ICommand RefreshDataCommand { get; private set; }
         private async Task RefreshActiveDataHandler()
         {
-            IsDataRefresh = false;
-            await Task.Delay(100).ContinueWith(_ =>
+            if (document != null && material != null && category != null)
             {
-                if (document != null && material != null && category != null)
+                IsDataRefresh = false;
+                await Task.Delay(1000).ContinueWith(_ =>
                 {
                     IsDataRefresh = true;
-                }
-            }, taskContext);
+                    IsOptionEnabled = false;
+                }, taskContext);
+            }
         }
 
         #endregion
@@ -692,15 +692,16 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (item is ElementModel model && model.IsSelected)
                     {
+                        dataGrid.SelectedItem = item;
                         dataGrid.ScrollIntoView(item);
                         doc = app.ActiveUIDocument.Document;
                         if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                         {
                             UIDocument uidoc = app.ActiveUIDocument;
-                            collisionManager.CreateOpening(uidoc, model, view3d, wallOpenning, floorOpenning);
-                            if (model != null && ElementModelData.Remove(model))
+                            bool result = collisionManager.CreateOpening(uidoc, model, view3d, wallOpenning, floorOpenning);
+                            if (result && model != null && ElementModelData.Remove(model))
                             {
-                                Logger.Log("Yes");
+                                Logger.Log("Remove item:\t" + item.ToString());
                             }
                         }
                     }

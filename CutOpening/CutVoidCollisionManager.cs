@@ -155,23 +155,23 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        public void CreateOpening(UIDocument uidoc, ElementModel model, View3D view3d, FamilySymbol wallOpenning, FamilySymbol floorOpenning, double offset = 0)
+        public bool CreateOpening(UIDocument uidoc, ElementModel model, View3D view3d, FamilySymbol wallOpenning, FamilySymbol floorOpenning, double offset = 0)
         {
+            bool result = false;
             FamilyInstance opening = null;
             Document doc = uidoc.Document;
-            uidoc.RequestViewChange(view3d);
+            RevitViewManager.SetCustomColorInView(uidoc, model.Instanse);
+            View3D view = RevitViewManager.SetCustomSectionBox(uidoc, model.Instanse, view3d);
             using Transaction trans = new(doc, "Create opening");
             if (trans.Start() == TransactionStatus.Started)
             {
                 try
                 {
-                    RevitViewManager.SetCustomColorInView(uidoc, model.Instanse);
-                    View3D view = RevitViewManager.SetCustomSectionBox(uidoc, model.Instanse, view3d);
-                    if (view3d.IsSectionBoxActive && wallOpenning != null && model.Instanse is Wall wall && wall.IsValidObject)
+                    if (view.IsSectionBoxActive && wallOpenning != null && model.Instanse is Wall wall && wall.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(model.Origin, wallOpenning, wall, StructuralType.NonStructural);
                     }
-                    else if (view3d.IsSectionBoxActive && floorOpenning != null && model.Level is Level level && level.IsValidObject)
+                    else if (view.IsSectionBoxActive && floorOpenning != null && model.Level is Level level && level.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, level, StructuralType.NonStructural);
                     }
@@ -180,7 +180,7 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     if (opening != null)
                     {
-                        //doc.Regenerate();
+                        result = true;
                         //opening.get_Parameter("widthParamGuid").Set(model.Width);
                         //opening.get_Parameter("heightParamGuid").Set(model.Height);
                         TaskDialog taskDialog = new("Revit")
@@ -203,6 +203,7 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                 }
             }
+            return result;
         }
 
 
