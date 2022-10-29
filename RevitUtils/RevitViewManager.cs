@@ -117,23 +117,6 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        //public static BoundingBoxXYZ GetBoundingBox(Element elem, View view = null, double factor = 3)
-        //{
-        //    BoundingBoxXYZ bbox = elem.get_BoundingBox(view);
-        //    if (bbox != null && bbox.Enabled)
-        //    {
-        //        double sizeX = bbox.Max.X - bbox.Min.X;
-        //        double sizeY = bbox.Max.Y - bbox.Min.Y;
-        //        double sizeZ = bbox.Max.Z - bbox.Min.Z;
-        //        double size = new double[] { sizeX, sizeY, sizeZ }.Min();
-        //        XYZ vector = new XYZ(size, size, size) * factor;
-        //        bbox.Min -= vector;
-        //        bbox.Max += vector;
-        //    }
-        //    return bbox;
-        //}
-
-
         public static void ZoomElementInView(UIDocument uidoc, View3D view3d, BoundingBoxXYZ box)
         {
             UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view3d.Id));
@@ -142,6 +125,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 try
                 {
                     uiview.ZoomAndCenterRectangle(box.Min, box.Max);
+                    uiview.Zoom(0.85);
                 }
                 catch (Exception ex)
                 {
