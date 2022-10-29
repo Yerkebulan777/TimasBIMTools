@@ -25,7 +25,7 @@ namespace RevitTimasBIMTools.RevitUtils
             ViewFamilyType vft = new FilteredElementCollector(doc)
                 .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
                 .FirstOrDefault(q => q.ViewFamily == ViewFamily.ThreeDimensional);
-            using (Transaction t = new Transaction(doc, "CreateNew3DView"))
+            using (Transaction t = new(doc, "CreateNew3DView"))
             {
                 try
                 {
@@ -96,14 +96,12 @@ namespace RevitTimasBIMTools.RevitUtils
             if (uidoc.ActiveView.Id.Equals(view3d.Id))
             {
                 BoundingBoxXYZ bbox = GetBoundingBox(centroid);
-                using (Transaction tx = new Transaction(uidoc.Document))
-                {
-                    tx.Start("Move And Resize Section Box");
-                    ZoomElementInView(uidoc, view3d, bbox);
-                    view3d.SetSectionBox(bbox);
-                    uidoc.RefreshActiveView();
-                    tx.Commit();
-                }
+                using Transaction tx = new(uidoc.Document);
+                _ = tx.Start("Move And Resize Section Box");
+                ZoomElementInView(uidoc, view3d, bbox);
+                view3d.SetSectionBox(bbox);
+                uidoc.RefreshActiveView();
+                _ = tx.Commit();
             }
             return view3d;
         }
@@ -112,14 +110,9 @@ namespace RevitTimasBIMTools.RevitUtils
         public static BoundingBoxXYZ GetBoundingBox(XYZ centroid, double factor = 3)
         {
             BoundingBoxXYZ bbox = new BoundingBoxXYZ();
-            Transform t = Transform.CreateTranslation(centroid);
-            if (bbox != null && bbox.Enabled)
-            {
-                bbox.Min -= XYZ.Zero * factor;
-                bbox.Max += XYZ.Zero * factor;
-                bbox.Min = t.OfPoint(bbox.Min);
-                bbox.Max = t.OfPoint(bbox.Max);
-            }
+            XYZ vector = new XYZ(factor, factor, factor);
+            bbox.Min = centroid - vector;
+            bbox.Max = centroid + vector;
             return bbox;
         }
 
@@ -154,15 +147,15 @@ namespace RevitTimasBIMTools.RevitUtils
         public static void SetCustomColorInView(UIDocument uidoc, Element elem, byte blue = 0, byte red = 0, byte green = 0)
         {
             Color color = uidoc.Application.Application.Create.NewColor();
-            OverrideGraphicSettings ogs = new OverrideGraphicSettings();
+            OverrideGraphicSettings ogs = new();
             if (!color.IsReadOnly)
             {
                 color.Blue = blue;
                 color.Red = red;
                 color.Green = green;
                 ogs = ogs.SetProjectionLineColor(color);
-                ogs.SetSurfaceForegroundPatternId(elem.Id);
-                ogs.SetSurfaceForegroundPatternColor(color);
+                _ = ogs.SetSurfaceForegroundPatternId(elem.Id);
+                _ = ogs.SetSurfaceForegroundPatternColor(color);
                 uidoc.ActiveView.SetElementOverrides(elem.Id, ogs);
             }
         }
@@ -175,43 +168,41 @@ namespace RevitTimasBIMTools.RevitUtils
         public static void IsolateElementIn3DView(UIDocument uidoc, Element elem, View3D view3d)
         {
             cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
-            using (Transaction t = new Transaction(uidoc.Document, "IsolateElementIn3DView"))
+            using Transaction t = new(uidoc.Document, "IsolateElementIn3DView");
+            View view = view3d;
+            uidoc.ActiveView = view3d;
+            uidoc.RequestViewChange(view);
+            TransactionStatus status = TransactionStatus.Error;
+            if (TransactionStatus.Started == t.Start())
             {
-                View view = view3d;
-                uidoc.ActiveView = view3d;
-                uidoc.RequestViewChange(view);
-                TransactionStatus status = TransactionStatus.Error;
-                if (TransactionStatus.Started == t.Start())
+                try
                 {
-                    try
+                    if (elem.IsHidden(view))
                     {
-                        if (elem.IsHidden(view))
-                        {
-                            view.UnhideElements(new List<ElementId>() { elem.Id });
-                        }
-                        if (true == view3d.IsSectionBoxActive)
-                        {
-                            view3d.IsSectionBoxActive = false;
-                        }
-                        if (view.IsTemporaryHideIsolateActive())
-                        {
-                            view.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
-                        }
-                        view.IsolateElementTemporary(elem.Id);
-                        status = t.Commit();
+                        view.UnhideElements(new List<ElementId>() { elem.Id });
                     }
-                    catch (Exception ex)
+                    if (true == view3d.IsSectionBoxActive)
                     {
-                        if (status != t.RollBack())
-                        {
-                            status = t.GetStatus();
-                            Logger.Error(ex.Message);
-                        }
+                        view3d.IsSectionBoxActive = false;
                     }
-                    finally
+                    if (view.IsTemporaryHideIsolateActive())
                     {
-                        uidoc.Application.PostCommand(cmdId);
+                        view.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
                     }
+                    view.IsolateElementTemporary(elem.Id);
+                    status = t.Commit();
+                }
+                catch (Exception ex)
+                {
+                    if (status != t.RollBack())
+                    {
+                        status = t.GetStatus();
+                        Logger.Error(ex.Message);
+                    }
+                }
+                finally
+                {
+                    uidoc.Application.PostCommand(cmdId);
                 }
             }
         }
