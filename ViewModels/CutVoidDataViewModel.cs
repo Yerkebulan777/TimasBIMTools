@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
@@ -443,7 +444,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (symbol.IsValidObject && !symbol.IsActive)
                 {
+                    using Transaction tx = new(app.ActiveUIDocument.Document);
+                    tx.Start("Activate family");
                     symbol.Activate();
+                    tx.Commit();
                 }
             });
         }
