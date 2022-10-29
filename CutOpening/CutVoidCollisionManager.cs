@@ -161,7 +161,7 @@ namespace RevitTimasBIMTools.CutOpening
             FamilyInstance opening = null;
             Document doc = uidoc.Document;
             RevitViewManager.SetCustomColorInView(uidoc, model.Instanse);
-            View3D view = RevitViewManager.SetCustomSectionBox(uidoc, model.Instanse, view3d);
+            View3D view = RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d);
             using Transaction trans = new(doc, "Create opening");
             if (trans.Start() == TransactionStatus.Started)
             {

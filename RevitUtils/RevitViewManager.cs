@@ -90,13 +90,12 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region SetCustomSectionBox
-        public static View3D SetCustomSectionBox(UIDocument uidoc, Element elem, View3D view3d)
+        public static View3D SetCustomSectionBox(UIDocument uidoc, XYZ centroid, View3D view3d)
         {
             uidoc.RequestViewChange(view3d);
             if (uidoc.ActiveView.Id.Equals(view3d.Id))
             {
-                BoundingBoxXYZ bbox = GetBoundingBox(elem, view3d);
-                uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
+                BoundingBoxXYZ bbox = GetBoundingBox(centroid);
                 using (Transaction tx = new Transaction(uidoc.Document))
                 {
                     tx.Start("Move And Resize Section Box");
@@ -110,21 +109,36 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxXYZ GetBoundingBox(Element elem, View view = null, double factor = 3)
+        public static BoundingBoxXYZ GetBoundingBox(XYZ centroid, double factor = 3)
         {
-            BoundingBoxXYZ bbox = elem.get_BoundingBox(view);
+            BoundingBoxXYZ bbox = new BoundingBoxXYZ();
+            Transform t = Transform.CreateTranslation(centroid);
             if (bbox != null && bbox.Enabled)
             {
-                double sizeX = bbox.Max.X - bbox.Min.X;
-                double sizeY = bbox.Max.Y - bbox.Min.Y;
-                double sizeZ = bbox.Max.Z - bbox.Min.Z;
-                double size = new double[] { sizeX, sizeY, sizeZ }.Min();
-                XYZ vector = new XYZ(size, size, size) * factor;
-                bbox.Min -= vector;
-                bbox.Max += vector;
+                bbox.Min -= XYZ.Zero * factor;
+                bbox.Max += XYZ.Zero * factor;
+                bbox.Min = t.OfPoint(bbox.Min);
+                bbox.Max = t.OfPoint(bbox.Max);
             }
             return bbox;
         }
+
+
+        //public static BoundingBoxXYZ GetBoundingBox(Element elem, View view = null, double factor = 3)
+        //{
+        //    BoundingBoxXYZ bbox = elem.get_BoundingBox(view);
+        //    if (bbox != null && bbox.Enabled)
+        //    {
+        //        double sizeX = bbox.Max.X - bbox.Min.X;
+        //        double sizeY = bbox.Max.Y - bbox.Min.Y;
+        //        double sizeZ = bbox.Max.Z - bbox.Min.Z;
+        //        double size = new double[] { sizeX, sizeY, sizeZ }.Min();
+        //        XYZ vector = new XYZ(size, size, size) * factor;
+        //        bbox.Min -= vector;
+        //        bbox.Max += vector;
+        //    }
+        //    return bbox;
+        //}
 
 
         public static void ZoomElementInView(UIDocument uidoc, View3D view3d, BoundingBoxXYZ box)
