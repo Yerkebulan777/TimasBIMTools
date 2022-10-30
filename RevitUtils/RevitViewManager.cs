@@ -93,15 +93,16 @@ namespace RevitTimasBIMTools.RevitUtils
         public static View3D SetCustomSectionBox(UIDocument uidoc, XYZ centroid, View3D view3d)
         {
             uidoc.RequestViewChange(view3d);
+
             if (uidoc.ActiveView.Id.Equals(view3d.Id))
             {
                 BoundingBoxXYZ bbox = GetBoundingBox(centroid);
-                using Transaction tx = new(uidoc.Document);
+                using Transaction tx = new(uidoc.Document, "Set Section Box");
+                TransactionStatus status = tx.Start();
                 ZoomElementInView(uidoc, view3d, bbox);
-                _ = tx.Start("Set Section Box");
                 view3d.SetSectionBox(bbox);
                 uidoc.RefreshActiveView();
-                _ = tx.Commit();
+                status = tx.Commit();
             }
             return view3d;
         }
@@ -135,71 +136,68 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void SetCustomColorInView(UIDocument uidoc, Element elem, byte blue = 0, byte red = 0, byte green = 0)
+        public static ElementId GetSolidFillPatternId(Document doc)
+        {
+            ElementId solidFillPatternId = null;
+            foreach (FillPatternElement fp in new FilteredElementCollector(doc).WherePasses(new ElementClassFilter(typeof(FillPatternElement))))
+            {
+                FillPattern pattern = fp.GetFillPattern();
+                if (pattern.IsSolidFill)
+                {
+                    solidFillPatternId = fp.Id;
+                    break;
+                }
+            }
+            return solidFillPatternId;
+        }
+
+
+        public static void SetCustomColorInView(UIDocument uidoc, View3D view, ElementId solidFillId, Element elem, byte blue = 0, byte red = 0, byte green = 0)
         {
             Color color = uidoc.Application.Application.Create.NewColor();
-            OverrideGraphicSettings ogs = new();
+            OverrideGraphicSettings graphics = new();
             if (!color.IsReadOnly)
             {
-                color.Blue = blue;
                 color.Red = red;
+                color.Blue = blue;
                 color.Green = green;
-                ogs = ogs.SetProjectionLineColor(color);
-                _ = ogs.SetSurfaceForegroundPatternId(elem.Id);
-                _ = ogs.SetSurfaceForegroundPatternColor(color);
-                uidoc.ActiveView.SetElementOverrides(elem.Id, ogs);
+
+                graphics = graphics.SetSurfaceForegroundPatternColor(color);
+                graphics = graphics.SetSurfaceForegroundPatternVisible(true);
+                graphics = graphics.SetSurfaceForegroundPatternId(solidFillId);
+
+                view.SetElementOverrides(elem.Id, graphics);
             }
         }
 
-        #endregion
 
-
-        #region IsolateElementIn3DView
-
-        public static void IsolateElementIn3DView(UIDocument uidoc, Element elem, View3D view3d)
+        public static void SetCategoryTransparency(Document doc, View3D view, Category category, int transparency = 0, bool halftone = false)
         {
-            cmdId = RevitCommandId.LookupPostableCommandId(PostableCommand.CloseInactiveViews);
-            using Transaction t = new(uidoc.Document, "IsolateElementIn3DView");
-            View view = view3d;
-            uidoc.ActiveView = view3d;
-            uidoc.RequestViewChange(view);
-            TransactionStatus status = TransactionStatus.Error;
-            if (TransactionStatus.Started == t.Start())
+            ElementId catId = category.Id;
+            if (view.IsCategoryOverridable(catId))
             {
+                OverrideGraphicSettings graphics = new();
+                graphics = graphics.SetHalftone(halftone);
+                graphics = graphics.SetSurfaceTransparency(transparency);
+                using Transaction tx = new(doc, "Override Categories");
+                TransactionStatus status = tx.Start();
                 try
                 {
-                    if (elem.IsHidden(view))
-                    {
-                        view.UnhideElements(new List<ElementId>() { elem.Id });
-                    }
-                    if (true == view3d.IsSectionBoxActive)
-                    {
-                        view3d.IsSectionBoxActive = false;
-                    }
-                    if (view.IsTemporaryHideIsolateActive())
-                    {
-                        view.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
-                    }
-                    view.IsolateElementTemporary(elem.Id);
-                    status = t.Commit();
+                    view.SetCategoryOverrides(catId, graphics);
+                    status = tx.Commit();
                 }
-                catch (Exception ex)
+                catch (Exception exc)
                 {
-                    if (status != t.RollBack())
+                    Logger.Error(exc.Message);
+                    if (!tx.HasEnded())
                     {
-                        status = t.GetStatus();
-                        Logger.Error(ex.Message);
+                        status = tx.RollBack();
                     }
-                }
-                finally
-                {
-                    uidoc.Application.PostCommand(cmdId);
                 }
             }
+
+            #endregion
+
         }
-
-        #endregion
-
-
     }
 }

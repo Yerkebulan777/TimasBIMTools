@@ -167,7 +167,8 @@ namespace RevitTimasBIMTools.CutOpening
             bool result = false;
             FamilyInstance opening = null;
             Document doc = uidoc.Document;
-            RevitViewManager.SetCustomColorInView(uidoc, model.Instanse);
+            ElementId patternId = RevitViewManager.GetSolidFillPatternId(doc);
+            RevitViewManager.SetCustomColorInView(uidoc, view3d, patternId, model.Instanse);
             View3D view = RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d);
             using Transaction trans = new(doc, "Create opening");
             if (trans.Start() == TransactionStatus.Started)
@@ -198,7 +199,7 @@ namespace RevitTimasBIMTools.CutOpening
 
                         if (TaskDialogResult.Ok == taskDialog.Show())
                         {
-                            
+
                             if (TransactionStatus.Committed != trans.Commit())
                             {
                                 Logger.Error("Transaction could not be committed");

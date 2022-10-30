@@ -286,24 +286,27 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        //public static void GetSizeByGeometry(this Solid solid, XYZ direction)
-        //{
-        //    XYZ centroid = solid.ComputeCentroid();
-        //    direction = ResetDirectionToPositive(direction);
-        //    Transform identityTransform = Transform.Identity;
-        //    double angleHorisontDegrees = ConvertRadiansToDegrees(GetHorizontAngleRadiansByNormal(direction));
-        //    double angleVerticalDegrees = ConvertRadiansToDegrees(GetVerticalAngleRadiansByNormal(direction));
-        //    Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngleByDegrees(angleHorisontDegrees), centroid);
-        //    Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngleByDegrees(angleVerticalDegrees), centroid);
-        //    solid = angleHorisontDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, horizont);
-        //    solid = angleVerticalDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, vertical);
-        //    BoundingBoxXYZ interBbox = solid?.GetBoundingBox();
-        //    if (interBbox != null)
-        //    {
-        //        _ = Math.Abs(interBbox.Max.X - interBbox.Min.X);
-        //        _ = Math.Abs(interBbox.Max.Z - interBbox.Min.Z);
-        //    }
-        //}
+        public static Solid CreateRectangularPrism(XYZ center, double d1, double d2, double d3)
+        {
+            List<Curve> profile = new();
+            XYZ profile00 = new(-d1 / 2, -d2 / 2, -d3 / 2);
+            XYZ profile01 = new(-d1 / 2, d2 / 2, -d3 / 2);
+            XYZ profile11 = new(d1 / 2, d2 / 2, -d3 / 2);
+            XYZ profile10 = new(d1 / 2, -d2 / 2, -d3 / 2);
+
+            profile.Add(Line.CreateBound(profile00, profile01));
+            profile.Add(Line.CreateBound(profile01, profile11));
+            profile.Add(Line.CreateBound(profile11, profile10));
+            profile.Add(Line.CreateBound(profile10, profile00));
+
+            CurveLoop curveLoop = CurveLoop.Create(profile);
+
+            SolidOptions options = new(
+                ElementId.InvalidElementId,
+                ElementId.InvalidElementId);
+
+            return GeometryCreationUtilities.CreateExtrusionGeometry(new[] { curveLoop }, XYZ.BasisZ, d3, options);
+        }
 
 
         public static XYZ ResetDirectionToPositive(this XYZ direction)
