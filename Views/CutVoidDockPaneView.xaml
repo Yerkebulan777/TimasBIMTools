@@ -252,28 +252,33 @@
 
             <!-- ButtonPanel -->
             <Border Grid.Row="4" Background="Silver" VerticalAlignment="Bottom" >
-                <DockPanel Grid.Row="3" LastChildFill="True" Margin="5">
-                    
-                    <Button Name="SnoopCmd" Height="30" Width="75" Margin="10,5" 
+                <ToolBarPanel Orientation="Horizontal" Grid.Row="3" Margin="5" >
+
+                    <StackPanel Margin="10,0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
+                            IsEnabled="{Binding Path=IsStarted, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                             Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" >
-                        <Label FontFamily="Segoe MDL2 Assets" Content="&#59165;" Foreground="BlueViolet"  FontSize="17" />
-                    </Button>
-                    
-                    <Button Name="ApplyCmd" Height="25" Width="75" Margin="5"
+                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59165;" Foreground="DarkBlue"  FontSize="17" />
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel Margin="10,0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Name="ApplyCmd" Height="25" Width="75" Margin="5"
                             IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
                             Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" 
                             CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}">
-                        <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" FontSize="13" FontWeight="Heavy"/>
-                    </Button>
-                    
-                    <Button Name="CancelCmd"  Height="25" Width="75" Margin="5" 
+                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" FontSize="13" FontWeight="Heavy"/>
+                        </Button>
+
+                        <Button Name="CancelCmd"  Height="25" Width="75" Margin="5" 
                             IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
                             Command="{Binding Path=CloseCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                             CommandParameter="{Binding IsEnabled, ElementName=CancelCmd}">
-                        <Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" FontSize="13" FontWeight="Heavy"/>
-                    </Button>
-                    
-                </DockPanel>
+                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" FontSize="13" FontWeight="Heavy"/>
+                        </Button>
+                    </StackPanel>
+
+                </ToolBarPanel>
             </Border>
 
         </Grid>
