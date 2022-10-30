@@ -7,24 +7,6 @@ namespace RevitTimasBIMTools.RevitUtils
     public static class CutVoidExtention
     {
 
-        public static int GetIntersectingLinkedElementIds(this Solid solid, IList<RevitLinkInstance> links, List<ElementId> ids)
-        {
-            int count = ids.Count;
-            foreach (RevitLinkInstance lnk in links)
-            {
-                Transform transform = lnk.GetTransform();
-                if (!transform.AlmostEqual(Transform.Identity))
-                {
-                    solid = SolidUtils.CreateTransformed(solid, transform.Inverse);
-                }
-                ElementIntersectsSolidFilter filter = new(solid);
-                FilteredElementCollector intersecting = new FilteredElementCollector(lnk.GetLinkDocument()).OfClass(typeof(FamilyInstance)).WherePasses(filter);
-                ids.AddRange(intersecting.ToElementIds());
-            }
-            return ids.Count - count;
-        }
-
-
         public static IDictionary<string, Material> GetStructureCoreMaterialData(this IDictionary<int, ElementId> sourceTypeIds, Document doc)
         {
             CompoundStructure compound = null;

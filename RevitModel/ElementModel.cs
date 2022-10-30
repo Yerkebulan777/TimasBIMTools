@@ -28,6 +28,7 @@ namespace RevitTimasBIMTools.RevitModel
         public double Height { get; private set; }
         public double Width { get; private set; }
         public XYZ Origin { get; internal set; }
+        public Solid Intersection { get; internal set; }
 
 
         private bool selected = false;

@@ -12,7 +12,6 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal static class GeometryExtension
     {
-        private static Solid result { get; set; } = null;
 
         public static Outline GetOutLine(this BoundingBoxXYZ bbox)
         {
@@ -70,7 +69,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static Solid GetSolidByVolume(this Element element, Transform global, Options options, double tolerance = 0.5)
         {
-            result = null;
+            Solid result = null;
             GeometryElement geomElem = element.get_Geometry(options);
             foreach (GeometryObject obj in geomElem.GetTransformed(global))
             {
@@ -90,7 +89,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static Solid GetUnionSolidByVolume(this Element elem, Transform global, Options options, double tolerance = 0.5)
         {
-            result = null;
+            Solid result = null;
             GeometryElement geomElement = elem.get_Geometry(options);
             BooleanOperationsType unionType = BooleanOperationsType.Union;
             foreach (GeometryObject obj in geomElement.GetTransformed(global))
@@ -120,7 +119,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static Solid GetIntersectionSolid(this Solid source, Element elem, Transform global, Options options, double tolerance = 0)
         {
-            result = null;
+            Solid result = null;
             GeometryElement geomElement = elem.get_Geometry(options);
             BooleanOperationsType unionType = BooleanOperationsType.Union;
             BooleanOperationsType interType = BooleanOperationsType.Intersect;
@@ -156,10 +155,9 @@ namespace RevitTimasBIMTools.RevitUtils
             double hight = 0;
             double widht = 0;
             XYZ direction = plane.Normal;
-            IList<ModelCurveArray> curves = new List<ModelCurveArray>();
-            using (Transaction t = new(doc, "GetCountours"))
+            using (Transaction tx = new(doc, "GetCountours"))
             {
-                _ = t.Start();
+                TransactionStatus status = tx.Start();
                 try
                 {
                     Face face = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
@@ -176,23 +174,23 @@ namespace RevitTimasBIMTools.RevitUtils
                         hight = Math.Abs(bb.Max.U - bb.Min.U);
                         widht = Math.Abs(bb.Max.V - bb.Min.V);
                     }
-
-                    foreach (CurveLoop loop in curveloops)
-                    {
-                        CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, direction));
-                        if (!array.IsEmpty)
-                        {
-                            curves.Add(doc.Create.NewModelCurveArray(array, sketch));
-                        }
-                    }
-                    _ = t.Commit();
+                    //IList<ModelCurveArray> curves = new List<ModelCurveArray>();
+                    //foreach (CurveLoop loop in curveloops)
+                    //{
+                    //    CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, direction));
+                    //    if (!array.IsEmpty)
+                    //    {
+                    //        curves.Add(doc.Create.NewModelCurveArray(array, sketch));
+                    //    }
+                    //}
+                    status = tx.Commit();
                 }
                 catch (Exception ex)
                 {
                     Logger.Error(ex.ToString());
-                    if (!t.HasEnded())
+                    if (!tx.HasEnded())
                     {
-                        _ = t.RollBack();
+                        status = tx.RollBack();
                     }
                 }
             }
@@ -211,51 +209,32 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static Solid CreateSolidFromBoundingBox(this BoundingBoxXYZ boundBox, Transform transform, SolidOptions options)
+        public static Solid CreateScaledSolid(this Solid solid, BoundingBoxXYZ bbox, XYZ offsetPnt)
         {
-            result = null;
-            if (boundBox != null && boundBox.Enabled)
+            XYZ minPnt = bbox.Min;
+            XYZ maxPnt = bbox.Max;
+            XYZ offsetMin = minPnt - offsetPnt;
+            XYZ offsetMax = maxPnt + offsetPnt;
+            double scale = offsetMin.DistanceTo(offsetMax) / minPnt.DistanceTo(maxPnt);
+            return SolidUtils.CreateTransformed(solid, Transform.Identity.ScaleBasis(scale));
+        }
+
+
+        public static int GetIntersectingLinkedElementIds(this Solid solid, IList<RevitLinkInstance> links, List<ElementId> ids)
+        {
+            int count = ids.Count;
+            foreach (RevitLinkInstance lnk in links)
             {
-                try
+                Transform transform = lnk.GetTransform();
+                if (!transform.AlmostEqual(Transform.Identity))
                 {
-                    // Create a global based on the incoming global coordinate system and the bounding box coordinate system.
-                    Transform bboxTransform = (transform == null) ? boundBox.Transform : transform.Multiply(boundBox.Transform);
-
-                    XYZ[] profilePts = new XYZ[4];
-                    profilePts[0] = bboxTransform.OfPoint(boundBox.Min);
-                    profilePts[1] = bboxTransform.OfPoint(new XYZ(boundBox.Max.X, boundBox.Min.Y, boundBox.Min.Z));
-                    profilePts[2] = bboxTransform.OfPoint(new XYZ(boundBox.Max.X, boundBox.Max.Y, boundBox.Min.Z));
-                    profilePts[3] = bboxTransform.OfPoint(new XYZ(boundBox.Min.X, boundBox.Max.Y, boundBox.Min.Z));
-
-                    XYZ upperRightXYZ = bboxTransform.OfPoint(boundBox.Max);
-
-                    // If we assumed that the transforms had no scaling, then we could simply take boundBox.Max.Z - boundBox.Min.Z.
-                    // This code removes that assumption.
-
-                    XYZ origExtrusionVector = new XYZ(boundBox.Min.X, boundBox.Min.Y, boundBox.Max.Z) - boundBox.Min;
-
-                    XYZ extrusionVector = bboxTransform.OfVector(origExtrusionVector);
-
-                    double extrusionDistance = extrusionVector.GetLength();
-                    XYZ extrusionDirection = extrusionVector.Normalize();
-
-                    CurveLoop baseLoop = new();
-
-                    for (int i = 0; i < 4; i++)
-                    {
-                        baseLoop.Append(Line.CreateBound(profilePts[i], profilePts[(i + 1) % 4]));
-                    }
-
-                    IList<CurveLoop> baseLoops = new List<CurveLoop> { baseLoop };
-
-                    result = GeometryCreationUtilities.CreateExtrusionGeometry(baseLoops, extrusionDirection, extrusionDistance, options);
+                    solid = SolidUtils.CreateTransformed(solid, transform.Inverse);
                 }
-                catch (Exception exc)
-                {
-                    Logger.Error(exc.Message);
-                }
+                ElementIntersectsSolidFilter filter = new(solid);
+                FilteredElementCollector intersecting = new FilteredElementCollector(lnk.GetLinkDocument()).OfClass(typeof(FamilyInstance)).WherePasses(filter);
+                ids.AddRange(intersecting.ToElementIds());
             }
-            return result;
+            return ids.Count - count;
         }
 
 
@@ -284,47 +263,47 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void CreateDirectShape(this Solid solid, Document doc, Instance elem, BuiltInCategory builtIn = BuiltInCategory.OST_GenericModel)
+        public static void CreateDirectShape(this Solid solid, Document doc, BuiltInCategory builtIn = BuiltInCategory.OST_GenericModel)
         {
             using Transaction t = new(doc, "Create DirectShape");
+            TransactionStatus status = t.Start();
             try
             {
-                _ = t.Start();
                 DirectShape ds = DirectShape.CreateElement(doc, new ElementId(builtIn));
-                ds.ApplicationDataId = elem.UniqueId;
-                ds.Name = "Centroid by " + elem.Name;
+                ds.ApplicationDataId = doc.ProjectInformation.UniqueId;
                 ds.SetShape(new GeometryObject[] { solid });
-                _ = t.Commit();
+                ds.Name = "DirectShapeBySolid";
+                status = t.Commit();
             }
             catch (Exception exc)
             {
                 Logger.Error(exc.Message);
                 if (!t.HasEnded())
                 {
-                    _ = t.RollBack();
+                    status = t.RollBack();
                 }
             }
         }
 
 
-        public static void GetSizeByGeometry(this Solid solid, XYZ direction)
-        {
-            XYZ centroid = solid.ComputeCentroid();
-            direction = ResetDirectionToPositive(direction);
-            Transform identityTransform = Transform.Identity;
-            double angleHorisontDegrees = ConvertRadiansToDegrees(GetHorizontAngleRadiansByNormal(direction));
-            double angleVerticalDegrees = ConvertRadiansToDegrees(GetVerticalAngleRadiansByNormal(direction));
-            Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngleByDegrees(angleHorisontDegrees), centroid);
-            Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngleByDegrees(angleVerticalDegrees), centroid);
-            solid = angleHorisontDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, horizont);
-            solid = angleVerticalDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, vertical);
-            BoundingBoxXYZ interBbox = solid?.GetBoundingBox();
-            if (interBbox != null)
-            {
-                _ = Math.Abs(interBbox.Max.X - interBbox.Min.X);
-                _ = Math.Abs(interBbox.Max.Z - interBbox.Min.Z);
-            }
-        }
+        //public static void GetSizeByGeometry(this Solid solid, XYZ direction)
+        //{
+        //    XYZ centroid = solid.ComputeCentroid();
+        //    direction = ResetDirectionToPositive(direction);
+        //    Transform identityTransform = Transform.Identity;
+        //    double angleHorisontDegrees = ConvertRadiansToDegrees(GetHorizontAngleRadiansByNormal(direction));
+        //    double angleVerticalDegrees = ConvertRadiansToDegrees(GetVerticalAngleRadiansByNormal(direction));
+        //    Transform horizont = Transform.CreateRotationAtPoint(identityTransform.BasisZ, GetInternalAngleByDegrees(angleHorisontDegrees), centroid);
+        //    Transform vertical = Transform.CreateRotationAtPoint(identityTransform.BasisX, GetInternalAngleByDegrees(angleVerticalDegrees), centroid);
+        //    solid = angleHorisontDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, horizont);
+        //    solid = angleVerticalDegrees == 0 ? solid : SolidUtils.CreateTransformed(solid, vertical);
+        //    BoundingBoxXYZ interBbox = solid?.GetBoundingBox();
+        //    if (interBbox != null)
+        //    {
+        //        _ = Math.Abs(interBbox.Max.X - interBbox.Min.X);
+        //        _ = Math.Abs(interBbox.Max.Z - interBbox.Min.Z);
+        //    }
+        //}
 
 
         public static XYZ ResetDirectionToPositive(this XYZ direction)

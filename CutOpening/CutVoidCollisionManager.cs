@@ -144,7 +144,13 @@ namespace RevitTimasBIMTools.CutOpening
                             interNormal = interNormal.ResetDirectionToPositive();
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
-                            ElementModel model = new(elem, level) { Origin = centroid };
+                            interSolid = interSolid.CreateScaledSolid(interBbox, offsetPnt);
+                            ElementModel model = new(elem, level)
+                            {
+                                Origin = centroid,
+                                Intersection = interSolid,
+                            };
+
                             double height = tupleSize.Item1, widht = tupleSize.Item2;
                             model.SetDescription(height, widht);
                             yield return model;
@@ -153,6 +159,7 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
         }
+
 
 
         public bool CreateOpening(UIDocument uidoc, ElementModel model, View3D view3d, FamilySymbol wallOpenning, FamilySymbol floorOpenning, double offset = 0)
@@ -191,6 +198,7 @@ namespace RevitTimasBIMTools.CutOpening
 
                         if (TaskDialogResult.Ok == taskDialog.Show())
                         {
+                            model.Intersection.CreateDirectShape(doc);
                             if (TransactionStatus.Committed != trans.Commit())
                             {
                                 Logger.Error("Transaction could not be committed");
