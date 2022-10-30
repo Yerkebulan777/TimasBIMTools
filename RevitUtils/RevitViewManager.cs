@@ -33,9 +33,9 @@ namespace RevitTimasBIMTools.RevitUtils
                     try
                     {
                         view = View3D.CreateIsometric(uidoc.Document, vft.Id);
-                        view.DetailLevel = ViewDetailLevel.Fine;
-                        view.DisplayStyle = DisplayStyle.FlatColors;
                         view.Discipline = ViewDiscipline.Coordination;
+                        view.DisplayStyle = DisplayStyle.Realistic;
+                        view.DetailLevel = ViewDetailLevel.Fine;
                         view.Name = viewName;
                         view.Pinned = false;
                         status = t.Commit();
@@ -88,6 +88,8 @@ namespace RevitTimasBIMTools.RevitUtils
             if (view3d != null)
             {
                 uidoc.RequestViewChange(view3d);
+                view3d.ViewTemplateId = ElementId.InvalidElementId;
+                view3d.ShadowIntensity = 50;
                 uidoc.RefreshActiveView();
             }
         }
