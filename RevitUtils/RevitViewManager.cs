@@ -152,7 +152,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void SetCustomColorInView(UIDocument uidoc, View3D view, ElementId solidFillId, Element elem, byte blue = 0, byte red = 0, byte green = 0)
+        public static void SetCustomColorInView(UIDocument uidoc, View3D view, ElementId solidFillId, Element elem, byte blue = 128, byte red = 128, byte green = 128)
         {
             Color color = uidoc.Application.Application.Create.NewColor();
             OverrideGraphicSettings graphics = new();
