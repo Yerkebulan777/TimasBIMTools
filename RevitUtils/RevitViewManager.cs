@@ -27,28 +27,28 @@ namespace RevitTimasBIMTools.RevitUtils
                 .FirstOrDefault(q => q.ViewFamily == ViewFamily.ThreeDimensional);
             using (Transaction t = new(doc, "CreateNew3DView"))
             {
-                try
+                status = t.Start();
+                if (status == TransactionStatus.Started)
                 {
-                    status = t.Start();
-                    view = View3D.CreateIsometric(uidoc.Document, vft.Id);
-                    if (view.get_Parameter(BuiltInParameter.VIEW_DISCIPLINE).Set(3))
+                    try
                     {
-                        if (view.get_Parameter(BuiltInParameter.VIEW_DETAIL_LEVEL).Set(3))
-                        {
-                            flag = view.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE).Set(5);
-                        }
+                        view = View3D.CreateIsometric(uidoc.Document, vft.Id);
+                        view.DetailLevel = ViewDetailLevel.Fine;
+                        view.DisplayStyle = DisplayStyle.FlatColors;
+                        view.Discipline = ViewDiscipline.Coordination;
+                        view.Name = viewName;
+                        view.Pinned = false;
+                        status = t.Commit();
                     }
-                    view.Name = viewName;
-                    status = t.Commit();
-                }
-                catch (Exception ex)
-                {
-                    status = t.RollBack();
-                    Logger.Error($"Error 3Dview {ex.Message} flag => {flag}");
-                }
-                finally
-                {
-                    vft.Dispose();
+                    catch (Exception ex)
+                    {
+                        status = t.RollBack();
+                        Logger.Error($"Error 3Dview {ex.Message} flag => {flag}");
+                    }
+                    finally
+                    {
+                        vft.Dispose();
+                    }
                 }
             }
             return view;
