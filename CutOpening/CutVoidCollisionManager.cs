@@ -198,7 +198,7 @@ namespace RevitTimasBIMTools.CutOpening
 
                         if (TaskDialogResult.Ok == taskDialog.Show())
                         {
-                            model.Intersection.CreateDirectShape(doc);
+                            
                             if (TransactionStatus.Committed != trans.Commit())
                             {
                                 Logger.Error("Transaction could not be committed");
@@ -208,6 +208,7 @@ namespace RevitTimasBIMTools.CutOpening
                         {
                             _ = trans.RollBack();
                         }
+                        model.Intersection.CreateDirectShape(doc);
                     }
                 }
             }
