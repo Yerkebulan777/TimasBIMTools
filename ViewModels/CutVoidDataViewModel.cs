@@ -1,7 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
@@ -445,9 +444,9 @@ namespace RevitTimasBIMTools.ViewModels
                 if (symbol.IsValidObject && !symbol.IsActive)
                 {
                     using Transaction tx = new(app.ActiveUIDocument.Document);
-                    tx.Start("Activate family");
+                    _ = tx.Start("Activate family");
                     symbol.Activate();
-                    tx.Commit();
+                    _ = tx.Commit();
                 }
             });
         }
@@ -516,6 +515,7 @@ namespace RevitTimasBIMTools.ViewModels
         private async Task RefreshActiveDataHandler()
         {
             IsDataRefresh = false;
+            Show3DViewAsync(view3d);
             if (document != null && material != null && category != null)
             {
                 await Task.Delay(1000).ContinueWith(_ =>
@@ -525,6 +525,25 @@ namespace RevitTimasBIMTools.ViewModels
                 }, taskContext);
             }
         }
+
+
+        private async void Show3DViewAsync(View3D view3d)
+        {
+            await RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    if (mutex.WaitOne())
+                    {
+                        RevitViewManager.Show3DView(app.ActiveUIDocument, view3d);
+                        mutex.ReleaseMutex();
+                    }
+                }
+            });
+        }
+
+
 
         #endregion
 

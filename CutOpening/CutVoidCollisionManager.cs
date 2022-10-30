@@ -161,7 +161,6 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-
         public bool CreateOpening(UIDocument uidoc, ElementModel model, View3D view3d, FamilySymbol wallOpenning, FamilySymbol floorOpenning, double offset = 0)
         {
             bool result = false;

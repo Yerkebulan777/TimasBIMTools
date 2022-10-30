@@ -31,8 +31,9 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     status = t.Start();
                     view = View3D.CreateIsometric(uidoc.Document, vft.Id);
+                    flag = view.get_Parameter(BuiltInParameter.VIEW_DISCIPLINE).Set(3);
                     flag = view.get_Parameter(BuiltInParameter.VIEW_DETAIL_LEVEL).Set(3);
-                    flag = view.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE).Set(6);
+                    flag = view.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE).Set(5);
                     view.Name = viewName;
                     status = t.Commit();
                 }
@@ -134,6 +135,9 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
         }
+
+
+
 
 
         public static ElementId GetSolidFillPatternId(Document doc)
