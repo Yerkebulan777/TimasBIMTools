@@ -31,16 +31,20 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     status = t.Start();
                     view = View3D.CreateIsometric(uidoc.Document, vft.Id);
-                    flag = view.get_Parameter(BuiltInParameter.VIEW_DISCIPLINE).Set(3);
-                    flag = view.get_Parameter(BuiltInParameter.VIEW_DETAIL_LEVEL).Set(3);
-                    flag = view.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE).Set(5);
+                    if (view.get_Parameter(BuiltInParameter.VIEW_DISCIPLINE).Set(3))
+                    {
+                        if (view.get_Parameter(BuiltInParameter.VIEW_DETAIL_LEVEL).Set(3))
+                        {
+                            flag = view.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE).Set(5);
+                        }
+                    }
                     view.Name = viewName;
                     status = t.Commit();
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
                     status = t.RollBack();
-                    Logger.Error($"Error 3Dview {ex.Message}");
+                    Logger.Error($"Error 3Dview {ex.Message} flag => {flag}");
                 }
                 finally
                 {
@@ -49,6 +53,7 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             return view;
         }
+
         /// <summary>
         /// Retrieve a suitable 3D view3d from document. 
         /// </summary>
