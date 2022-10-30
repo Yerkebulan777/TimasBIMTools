@@ -254,18 +254,19 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IList<Parameter> parameters;
-        public IList<Parameter> FamilyParameters
+        private IList<Definition> definitions;
+        public IList<Definition> ParameterDefinitions
         {
-            get => parameters;
-            set => SetProperty(ref parameters, value);
+            get => definitions;
+            set => SetProperty(ref definitions, value);
         }
 
-        private Parameter param;
-        public Parameter SelectedParameter
+
+        private Definition definition;
+        public Definition SelectedDefinition
         {
-            get => param;
-            set => SetProperty(ref param, value);
+            get => definition;
+            set => SetProperty(ref definition, value);
         }
 
         #endregion
@@ -444,9 +445,9 @@ namespace RevitTimasBIMTools.ViewModels
                 if (symbol.IsValidObject && !symbol.IsActive)
                 {
                     using Transaction tx = new(app.ActiveUIDocument.Document);
-                    _ = tx.Start("Activate family");
+                    TransactionStatus status = tx.Start("Activate family");
                     symbol.Activate();
-                    _ = tx.Commit();
+                    status = tx.Commit();
                 }
             });
         }
@@ -455,29 +456,31 @@ namespace RevitTimasBIMTools.ViewModels
         [STAThread]
         private async void GetSymbolSharedParameters(FamilySymbol symbol)
         {
-            await RevitTask.RunAsync(app =>
+            ParameterDefinitions = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                FamilyParameters = new List<Parameter>(5);
+                List<Definition> definitions = new(3);
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     foreach (Parameter param in symbol.GetOrderedParameters())
                     {
-                        if (!param.IsReadOnly)
+                        if (!param.IsReadOnly && param.UserModifiable)
                         {
+                            Definition defin = param.Definition;
                             switch (param.StorageType)
                             {
                                 case StorageType.Double:
-                                    FamilyParameters.Add(param);
+                                    definitions.Add(defin);
                                     break;
                                 case StorageType.String:
-                                    FamilyParameters.Add(param);
+                                    definitions.Add(defin);
                                     break;
                                 default: break;
                             }
                         }
                     }
                 }
+                return definitions;
             });
         }
 
