@@ -270,14 +270,14 @@
                             IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
                             Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" 
                             CommandParameter="{Binding IsEnabled, ElementName=ApplyCmd}">
-                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" FontSize="13" FontWeight="Heavy"/>
+                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
                         </Button>
 
                         <Button Name="CancelCmd"  Height="25" Width="75" Margin="5" 
                             IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
                             Command="{Binding Path=CloseCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                             CommandParameter="{Binding IsEnabled, ElementName=CancelCmd}">
-                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" FontSize="13" FontWeight="Heavy"/>
+                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
                         </Button>
                     </StackPanel>
 
