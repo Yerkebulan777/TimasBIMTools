@@ -53,6 +53,7 @@ namespace RevitTimasBIMTools.ViewModels
         #region Templory
         private Document doc { get; set; }
         private View3D view3d { get; set; }
+        private ElementId patternId { get; set; }
 
         #endregion
 
@@ -485,7 +486,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
         internal async void GetElementInViewByIntId(ElementId id)
         {
             await RevitTask.RunAsync(app =>
@@ -498,7 +498,7 @@ namespace RevitTimasBIMTools.ViewModels
                         Element elem = doc.GetElement(id);
                         System.Windows.Clipboard.SetText(id.ToString());
                         RevitViewManager.ShowElement(app.ActiveUIDocument, elem);
-                        manualResetEvent.Set();
+                        _ = manualResetEvent.Set();
                     }
                 }
             });
@@ -512,41 +512,6 @@ namespace RevitTimasBIMTools.ViewModels
                 await RefreshActiveDataHandler();
             }
         }
-
-
-        public ICommand RefreshDataCommand { get; private set; }
-        private async Task RefreshActiveDataHandler()
-        {
-            IsDataRefresh = false;
-            Show3DViewAsync(view3d);
-            if (document != null && material != null && category != null)
-            {
-                await Task.Delay(1000).ContinueWith(_ =>
-                {
-                    IsDataRefresh = true;
-                    IsOptionEnabled = false;
-                }, taskContext);
-            }
-        }
-
-
-        private async void Show3DViewAsync(View3D view3d)
-        {
-            await RevitTask.RunAsync(app =>
-            {
-                doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    if (manualResetEvent.WaitOne())
-                    {
-                        RevitViewManager.Show3DView(app.ActiveUIDocument, view3d);
-                        manualResetEvent.Set();
-                    }
-                }
-            });
-        }
-
-
 
         #endregion
 
@@ -704,6 +669,44 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
+        #region RefreshActiveDataHandler
+
+        public ICommand RefreshDataCommand { get; private set; }
+        private async Task RefreshActiveDataHandler()
+        {
+            IsDataRefresh = false;
+            Show3DViewAsync(view3d);
+            if (document != null && material != null && category != null)
+            {
+                await Task.Delay(1000).ContinueWith(_ =>
+                {
+                    IsDataRefresh = true;
+                    IsOptionEnabled = false;
+                }, taskContext);
+            }
+        }
+
+
+        private async void Show3DViewAsync(View3D view3d)
+        {
+            await RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                {
+                    if (manualResetEvent.WaitOne())
+                    {
+                        patternId = RevitViewManager.GetSolidFillPatternId(doc);
+                        RevitViewManager.Show3DView(app.ActiveUIDocument, view3d);
+                        _ = manualResetEvent.Set();
+                    }
+                }
+            });
+        }
+
+        #endregion
+
+
         #region ShowExecuteCommand
         public ICommand ShowExecuteCommand { get; private set; }
 
@@ -724,7 +727,7 @@ namespace RevitTimasBIMTools.ViewModels
                         if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                         {
                             UIDocument uidoc = app.ActiveUIDocument;
-                            bool result = collisionManager.CreateOpening(uidoc, model, view3d, wallOpenning, floorOpenning);
+                            bool result = collisionManager.CreateOpening(uidoc, model, wallOpenning, floorOpenning);
                             if (result && model != null && ElementModelData.Remove(model))
                             {
                                 Logger.Log("Remove item:\t" + item.ToString());

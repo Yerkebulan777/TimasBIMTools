@@ -161,14 +161,11 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        public bool CreateOpening(UIDocument uidoc, ElementModel model, View3D view3d, FamilySymbol wallOpenning, FamilySymbol floorOpenning, double offset = 0)
+        public bool CreateOpening(UIDocument uidoc, ElementModel model, FamilySymbol wallOpenning, FamilySymbol floorOpenning, Definition definition = null, double offset = 0)
         {
             bool result = false;
             FamilyInstance opening = null;
             Document doc = uidoc.Document;
-            ElementId patternId = RevitViewManager.GetSolidFillPatternId(doc);
-            RevitViewManager.SetCustomColorInView(uidoc, view3d, patternId, model.Instanse);
-            View3D view = RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d);
             using Transaction trans = new(doc, "Create opening");
             if (trans.Start() == TransactionStatus.Started)
             {
@@ -185,35 +182,19 @@ namespace RevitTimasBIMTools.CutOpening
                 }
                 finally
                 {
-                    if (opening != null)
+                    if (opening != null && definition != null)
                     {
-                        result = true;
-                        //opening.get_Parameter("widthParamGuid").Set(model.Width);
-                        //opening.get_Parameter("heightParamGuid").Set(model.Height);
-                        TaskDialog taskDialog = new("Revit")
-                        {
-                            MainContent = "Click either [OK] to Create openning, or [Cancel] to back the transaction.",
-                            CommonButtons = TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel
-                        };
-
-                        if (TaskDialogResult.Ok == taskDialog.Show())
-                        {
-
-                            if (TransactionStatus.Committed != trans.Commit())
-                            {
-                                Logger.Error("Transaction could not be committed");
-                            }
-                        }
-                        else
-                        {
-                            _ = trans.RollBack();
-                        }
+                        _ = opening.get_Parameter(definition).Set(model.Width);
+                        _ = opening.get_Parameter(definition).Set(model.Height);
                         model.Intersection.CreateDirectShape(doc);
+                        result = true;
                     }
                 }
             }
             return result;
         }
+
+
 
 
         //private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)

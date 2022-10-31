@@ -111,13 +111,16 @@ namespace RevitTimasBIMTools.RevitUtils
             uidoc.RequestViewChange(view3d);
             if (uidoc.ActiveView.Id.Equals(view3d.Id))
             {
+                using Transaction tx = new(uidoc.Document);
                 BoundingBoxXYZ bbox = GetBoundingBox(centroid);
-                using Transaction tx = new(uidoc.Document, "Set Section Box");
-                TransactionStatus status = tx.Start();
-                ZoomElementInView(uidoc, view3d, bbox);
-                view3d.SetSectionBox(bbox);
+                TransactionStatus status = tx.Start("SetSectionBox");
+                if (status == TransactionStatus.Started)
+                {
+                    ZoomElementInView(uidoc, view3d, bbox);
+                    view3d.SetSectionBox(bbox);
+                    status = tx.Commit();
+                }
                 uidoc.RefreshActiveView();
-                status = tx.Commit();
             }
             return view3d;
         }
