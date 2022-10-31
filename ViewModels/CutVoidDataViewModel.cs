@@ -359,18 +359,22 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         [STAThread]
-        private void ClearAndResetData()
+        private async void ClearAndResetData()
         {
             if (IsStarted)
             {
-                IsStarted = false;
-                IsDataRefresh = false;
-                IsOptionEnabled = false;
-                DocumentCollection = null;
-                EngineerCategories = null;
-                StructureMaterials = null;
-                ElementModelData = null;
-                FamilySymbols = null;
+                await Task.Delay(1000)
+                .ContinueWith(_ =>
+                {
+                    IsStarted = false;
+                    IsDataRefresh = false;
+                    IsOptionEnabled = false;
+                    DocumentCollection = null;
+                    EngineerCategories = null;
+                    StructureMaterials = null;
+                    ElementModelData = null;
+                    FamilySymbols = null;
+                }, taskContext);
             }
         }
 
@@ -631,10 +635,11 @@ namespace RevitTimasBIMTools.ViewModels
 
         private bool FilterModelCollection(object obj)
         {
-            return (string.IsNullOrEmpty(LevelTextFilter) && string.IsNullOrEmpty(SymbolTextFilter))
-            || obj is not ElementModel model || (model.LevelName.Contains(LevelTextFilter) && model.SymbolName.Contains(SymbolTextFilter))
+            return obj is ElementModel model
+            && ((string.IsNullOrEmpty(LevelTextFilter) && string.IsNullOrEmpty(SymbolTextFilter))
+            || (model.LevelName.Contains(LevelTextFilter) && model.SymbolName.Contains(SymbolTextFilter))
             || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(model.SymbolName))
-            || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(model.LevelName));
+            || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(model.LevelName)));
         }
 
 
