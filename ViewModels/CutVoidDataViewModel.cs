@@ -733,7 +733,6 @@ namespace RevitTimasBIMTools.ViewModels
                             bool voidBool = collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
                             if (viewBool && voidBool && ElementModelData.Remove(model))
                             {
-
                                 Logger.Log("Remove item:\t" + item.ToString());
                             }
 
