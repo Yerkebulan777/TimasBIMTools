@@ -30,7 +30,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     try
                     {
                         view = View3D.CreateIsometric(uidoc.Document, vft.Id);
-                        view.Discipline = ViewDiscipline.Coordination;
+                        view.Discipline = ViewDiscipline.Mechanical;
                         view.DisplayStyle = DisplayStyle.Realistic;
                         view.DetailLevel = ViewDetailLevel.Fine;
                         view.Name = viewName;
@@ -83,11 +83,21 @@ namespace RevitTimasBIMTools.RevitUtils
         #region Show3DView
         public static void Show3DView(UIDocument uidoc, View3D view3d)
         {
-            if (view3d != null)
+            if (view3d is not null and View view)
             {
                 uidoc.RequestViewChange(view3d);
-                view3d.ViewTemplateId = ElementId.InvalidElementId;
-                view3d.ShadowIntensity = 50;
+                using Transaction t = new(uidoc.Document);
+                TransactionStatus status = t.Start("Get3DView");
+                if (status == TransactionStatus.Started)
+                {
+                    view3d.ViewTemplateId = ElementId.InvalidElementId;
+
+                    view.Discipline = ViewDiscipline.Mechanical;
+                    view.DisplayStyle = DisplayStyle.Realistic;
+                    view.DetailLevel = ViewDetailLevel.Fine;
+
+                    status = t.Commit();
+                }
                 uidoc.RefreshActiveView();
             }
         }
@@ -139,9 +149,6 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
         }
-
-
-
 
 
         public static ElementId GetSolidFillPatternId(Document doc)
