@@ -15,11 +15,11 @@ namespace RevitTimasBIMTools.Views
     {
         public bool Disposed { get; set; } = false;
         private readonly CutVoidDataViewModel DataContextHandler;
-
         private static readonly ExternalEvent externalEvent = CutVoidDataViewModel.RevitExternalEvent;
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {
             InitializeComponent();
+            Loaded += DockPaneView_Loaded;
             DataContext = DataContextHandler = viewModel;
             DataContextHandler = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         }
@@ -39,13 +39,14 @@ namespace RevitTimasBIMTools.Views
 
 
         [STAThread]
-        public void RaiseEvent()
+        private void DockPaneView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             try
             {
+                Loaded -= DockPaneView_Loaded;
                 Dispatcher.CurrentDispatcher.Invoke(() =>
                 {
-                    if (ExternalEventRequest.Accepted == externalEvent?.Raise())
+                    if (ExternalEventRequest.Accepted == externalEvent.Raise())
                     {
                         Disposed = false;
                         DataContextHandler.IsStarted = true;

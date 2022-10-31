@@ -28,12 +28,12 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutVoidDataViewModel : ObservableObject
     {
-        private readonly Mutex mutex = new();
         public CutVoidDockPaneView DockPanelView { get; set; }
         private static SynchronizationContext context { get; set; }
         public static ExternalEvent RevitExternalEvent { get; set; }
         public static CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
+        private static readonly AutoResetEvent manualResetEvent = new(false);
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
@@ -493,12 +493,12 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    if (mutex.WaitOne())
+                    if (manualResetEvent.WaitOne())
                     {
                         Element elem = doc.GetElement(id);
                         System.Windows.Clipboard.SetText(id.ToString());
                         RevitViewManager.ShowElement(app.ActiveUIDocument, elem);
-                        mutex.ReleaseMutex();
+                        manualResetEvent.Set();
                     }
                 }
             });
@@ -537,10 +537,10 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    if (mutex.WaitOne())
+                    if (manualResetEvent.WaitOne())
                     {
                         RevitViewManager.Show3DView(app.ActiveUIDocument, view3d);
-                        mutex.ReleaseMutex();
+                        manualResetEvent.Set();
                     }
                 }
             });

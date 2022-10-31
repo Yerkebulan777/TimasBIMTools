@@ -259,8 +259,9 @@
 
                     <StackPanel Margin="10,0" Orientation="Horizontal" VerticalAlignment="Center">
                         <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
-                            IsEnabled="{Binding Path=IsStarted, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                            Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" >
+                                IsEnabled="{Binding Path=IsOptionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                                Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource Self}}" >
                             <Label FontFamily="Segoe MDL2 Assets" Content="&#59165;" Foreground="DarkBlue"  FontSize="17" />
                         </Button>
                     </StackPanel>

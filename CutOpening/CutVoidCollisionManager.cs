@@ -174,11 +174,11 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 try
                 {
-                    if (view.IsSectionBoxActive && wallOpenning != null && model.Instanse is Wall wall && wall.IsValidObject)
+                    if (wallOpenning != null && model.Instanse is Wall wall && wall.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(model.Origin, wallOpenning, wall, StructuralType.NonStructural);
                     }
-                    else if (view.IsSectionBoxActive && floorOpenning != null && model.Level is Level level && level.IsValidObject)
+                    else if (floorOpenning != null && model.Level is Level level && level.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, level, StructuralType.NonStructural);
                     }
