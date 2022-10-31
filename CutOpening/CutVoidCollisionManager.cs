@@ -194,8 +194,6 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-
-
         //private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)
         //{
         //    Solid intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
