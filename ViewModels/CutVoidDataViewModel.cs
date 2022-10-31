@@ -115,8 +115,6 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Settings
-
         #region GeneralData
 
         private DocumentModel document = null;
@@ -318,8 +316,6 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
         }
-
-        #endregion
 
         #endregion
 
@@ -738,6 +734,14 @@ namespace RevitTimasBIMTools.ViewModels
                 });
             }
         }
+
+
+        public View3D SetColorToModel(UIDocument uidoc, View3D view3d, ElementModel model, ElementId patternId)
+        {
+            RevitViewManager.SetCustomColorInView(uidoc, view3d, patternId, model.Instanse);
+            return RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d);
+        }
+
 
         #endregion
 
