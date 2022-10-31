@@ -657,15 +657,16 @@ namespace RevitTimasBIMTools.ViewModels
         public ICommand SelectItemCommand { get; private set; }
         private void SelectAllModelHandelCommand()
         {
+            DataViewCollection?.Refresh();
             IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
             ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
-            IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem?.IsSelected : false;
+            IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem.IsSelected : false;
         }
 
         #endregion
 
 
-        #region RefreshActiveDataHandler
+        #region RefreshDataCommand
 
         public ICommand RefreshDataCommand { get; private set; }
         private async Task RefreshActiveDataHandler()
