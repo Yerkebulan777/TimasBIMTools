@@ -81,7 +81,7 @@ namespace RevitTimasBIMTools.Views
         {
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
-                if (sender is DataGridRow row && row.DataContext is ElementModel model)
+                if (sender is CheckBox checkBox)
                 {
                     DataContextHandler.VerifyAllSelectedData();
                 }

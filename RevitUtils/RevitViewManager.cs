@@ -174,13 +174,14 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static void SetCustomColorInView(UIDocument uidoc, View3D view, ElementId solidFillId, Element elem, byte blue = 128, byte red = 128, byte green = 128)
         {
-            Color color = uidoc.Application.Application.Create.NewColor();
+            Color color = new(red, green, blue);
             OverrideGraphicSettings graphics = new();
-            if (!color.IsReadOnly)
+            if (!view.AreGraphicsOverridesAllowed())
             {
-                color.Red = red;
-                color.Blue = blue;
-                color.Green = green;
+                Logger.Error($"Graphic overrides are not alowed for the '{view.Name}' view");
+            }
+            else
+            {
 
                 graphics = graphics.SetSurfaceForegroundPatternVisible(true);
                 graphics = graphics.SetSurfaceBackgroundPatternVisible(true);
