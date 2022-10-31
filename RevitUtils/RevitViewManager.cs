@@ -106,8 +106,9 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region SetCustomSectionBox
-        public static View3D SetCustomSectionBox(UIDocument uidoc, XYZ centroid, View3D view3d)
+        public static bool SetCustomSectionBox(UIDocument uidoc, XYZ centroid, View3D view3d)
         {
+            bool result = false;
             uidoc.RequestViewChange(view3d);
             if (uidoc.ActiveView.Id.Equals(view3d.Id))
             {
@@ -119,10 +120,11 @@ namespace RevitTimasBIMTools.RevitUtils
                     ZoomElementInView(uidoc, view3d, bbox);
                     view3d.SetSectionBox(bbox);
                     status = tx.Commit();
+                    result = true;
                 }
                 uidoc.RefreshActiveView();
             }
-            return view3d;
+            return result;
         }
 
 

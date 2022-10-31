@@ -46,8 +46,8 @@ namespace RevitTimasBIMTools.ViewModels
             RefreshDataCommand = new AsyncRelayCommand(RefreshActiveDataHandler);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
             //CanselCommand = new RelayCommand(CancelCallbackLogic);
-            //SelectItemCommand = new RelayCommand(SelectAllModelHandelCommand);
         }
+
 
 
         #region Templory
@@ -547,7 +547,6 @@ namespace RevitTimasBIMTools.ViewModels
                     DataViewCollection = CollectionViewSource.GetDefaultView(collection) as ListCollectionView;
                     GetUniqueSymbolNameList(collection);
                     GetUniqueLevelNameList(collection);
-                    DataViewCollection.Refresh();
                 }
             }
         }
@@ -559,9 +558,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => dataView;
             set
             {
-                IsAllSelectChecked = false;
                 if (SetProperty(ref dataView, value))
                 {
+                    VerifyAllSelectedData();
                     if (dataView != null && !dataView.IsEmpty)
                     {
                         using (dataView.DeferRefresh())
@@ -591,8 +590,8 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref levelText, value))
                 {
                     DataViewCollection.Filter = FilterModelCollection;
-                    SelectAllModelHandelCommand();
                     DataViewCollection.Refresh();
+                    VerifyAllSelectedData();
                 }
             }
         }
@@ -607,8 +606,8 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref symbolText, value))
                 {
                     DataViewCollection.Filter = FilterModelCollection;
-                    SelectAllModelHandelCommand();
                     DataViewCollection.Refresh();
+                    VerifyAllSelectedData();
                 }
             }
         }
@@ -622,11 +621,11 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IList<string> uniqueNames = null;
+        private IList<string> symbolNames = null;
         public IList<string> UniqueSymbolNames
         {
-            get => uniqueNames;
-            set => SetProperty(ref uniqueNames, value);
+            get => symbolNames;
+            set => SetProperty(ref symbolNames, value);
         }
 
 
@@ -652,22 +651,29 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region SelectItemCommand
-
-        public ICommand SelectItemCommand { get; private set; }
-        private void SelectAllModelHandelCommand()
+        #region VerifyAllSelectedData
+        private void VerifyAllSelectedData()
         {
-            DataViewCollection?.Refresh();
-            IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
-            ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
-            IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem.IsSelected : false;
+            if (manualResetEvent.WaitOne())
+            {
+                if (DataViewCollection.IsInUse)
+                {
+                    DataViewCollection.Refresh();
+                    IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
+                    ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
+                    IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem.IsSelected : null;
+                }
+                else
+                {
+                    IsAllSelectChecked = false;
+                }
+                _ = manualResetEvent.Set();
+            }
         }
-
         #endregion
 
 
         #region RefreshDataCommand
-
         public ICommand RefreshDataCommand { get; private set; }
         private async Task RefreshActiveDataHandler()
         {
@@ -723,12 +729,14 @@ namespace RevitTimasBIMTools.ViewModels
                         doc = app.ActiveUIDocument.Document;
                         if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                         {
-                            UIDocument uidoc = app.ActiveUIDocument;
-                            bool result = collisionManager.CreateOpening(uidoc, model, wallOpenning, floorOpenning);
-                            if (result && model != null && ElementModelData.Remove(model))
+                            bool viewBool = SetSectionBoxModelView(app.ActiveUIDocument, model, view3d, patternId);
+                            bool voidBool = collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
+                            if (viewBool && voidBool && ElementModelData.Remove(model))
                             {
+
                                 Logger.Log("Remove item:\t" + item.ToString());
                             }
+
                         }
                     }
                     return DataViewCollection.IsEmpty;
@@ -737,12 +745,11 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        public View3D SetColorToModel(UIDocument uidoc, View3D view3d, ElementModel model, ElementId patternId)
+        public bool SetSectionBoxModelView(UIDocument uidoc, ElementModel model, View3D view3d, ElementId patternId)
         {
             RevitViewManager.SetCustomColorInView(uidoc, view3d, patternId, model.Instanse);
             return RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d);
         }
-
 
         #endregion
 
@@ -768,6 +775,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         #endregion
+
 
 
         public void Dispose()

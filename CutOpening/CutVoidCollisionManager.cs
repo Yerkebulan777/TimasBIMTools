@@ -161,11 +161,10 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        public bool CreateOpening(UIDocument uidoc, ElementModel model, FamilySymbol wallOpenning, FamilySymbol floorOpenning, Definition definition = null, double offset = 0)
+        public bool CreateOpening(Document doc, ElementModel model, FamilySymbol wallOpenning, FamilySymbol floorOpenning, Definition definition = null, double offset = 0)
         {
             bool result = false;
             FamilyInstance opening = null;
-            Document doc = uidoc.Document;
             using Transaction trans = new(doc, "Create opening");
             if (trans.Start() == TransactionStatus.Started)
             {

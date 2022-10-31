@@ -210,9 +210,7 @@
                             </DataGridTemplateColumn.HeaderTemplate>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                              Command="{Binding DataContext.SelectItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
-                                              CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}" />
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -254,33 +252,42 @@
 
 
             <!-- ButtonPanel -->
-            <Border Grid.Row="4" Background="Silver" VerticalAlignment="Bottom" >
-                <ToolBarPanel Orientation="Horizontal" Grid.Row="3" Margin="5" >
+            <Border Grid.Row="4" Background="Silver" >
+                
+                <ToolBarPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="5">
 
-                    <StackPanel Margin="10,0" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
+                    <StackPanel Margin="10,0" Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
+                                Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToViz}, UpdateSourceTrigger=Explicit, FallbackValue=Collapsed}" >
+                        <Button Name="SnoopCmd" Height="30" Width="75" Margin="15,5"
                                 IsEnabled="{Binding Path=IsOptionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                 Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
-                                CommandParameter="{Binding RelativeSource={RelativeSource Self}}" >
-                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59165;" Foreground="DarkBlue"  FontSize="17" 
-                                   IsEnabled="{Binding IsEnabled, ElementName=SnoopCmd}"/>
+                                CommandParameter="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}}" >
+                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59165;" Foreground="DarkBlue"  FontSize="15" />
                         </Button>
                     </StackPanel>
 
-                    <StackPanel Margin="10,0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel Margin="10,0" Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
+                                Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, UpdateSourceTrigger=Explicit, FallbackValue=Collapsed}">
+                        
+                        <Button Name="CutVoidCmd" Height="30" Width="75" Margin="15,5"
+                                IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                                Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                                CommandParameter="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}}" >
+                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59538;" Foreground="DarkBlue"  FontSize="15" />
+                        </Button>
+
                         <Button Name="ApplyCmd" Height="25" Width="75" Margin="5"
                             IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
-                            Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" 
-                            CommandParameter="{Binding RelativeSource={RelativeSource Self}}">
+                            CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}">
                             <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
                         </Button>
 
                         <Button Name="CancelCmd"  Height="25" Width="75" Margin="5" 
                             IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
-                            Command="{Binding Path=CloseCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
-                            CommandParameter="{Binding RelativeSource={RelativeSource Self}}">
+                            CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}">
                             <Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
                         </Button>
+                        
                     </StackPanel>
 
                 </ToolBarPanel>
