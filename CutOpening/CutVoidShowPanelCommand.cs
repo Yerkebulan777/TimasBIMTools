@@ -2,12 +2,13 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
-using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Views;
 using System;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -19,6 +20,7 @@ namespace RevitTimasBIMTools.CutOpening
         private readonly IDockablePaneProvider paneProvider = SmartToolApp.ServiceProvider.GetRequiredService<IDockablePaneProvider>();
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             return Execute(commandData.Application, ref message);
         }
 

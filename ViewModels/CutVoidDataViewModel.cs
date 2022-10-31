@@ -33,7 +33,7 @@ namespace RevitTimasBIMTools.ViewModels
         public static ExternalEvent RevitExternalEvent { get; set; }
         public static CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
-        private static readonly AutoResetEvent manualResetEvent = new(false);
+        private static readonly AutoResetEvent manualResetEvent = new(true);
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();

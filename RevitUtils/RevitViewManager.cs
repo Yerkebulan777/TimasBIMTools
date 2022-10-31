@@ -10,9 +10,6 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitViewManager
     {
-        private static RevitCommandId cmdId { get; set; } = null;
-        private static AddInCommandBinding bindedCmdId { get; set; } = null;
-
         //ContentControl content = new PreviewControl(document, view3d.Id);
 
         #region Get3dView
@@ -102,7 +99,6 @@ namespace RevitTimasBIMTools.RevitUtils
         public static View3D SetCustomSectionBox(UIDocument uidoc, XYZ centroid, View3D view3d)
         {
             uidoc.RequestViewChange(view3d);
-
             if (uidoc.ActiveView.Id.Equals(view3d.Id))
             {
                 BoundingBoxXYZ bbox = GetBoundingBox(centroid);
@@ -174,11 +170,28 @@ namespace RevitTimasBIMTools.RevitUtils
                 color.Blue = blue;
                 color.Green = green;
 
-                graphics = graphics.SetSurfaceForegroundPatternColor(color);
                 graphics = graphics.SetSurfaceForegroundPatternVisible(true);
+                graphics = graphics.SetSurfaceBackgroundPatternVisible(true);
+                graphics = graphics.SetSurfaceForegroundPatternColor(color);
+                graphics = graphics.SetSurfaceBackgroundPatternColor(color);
                 graphics = graphics.SetSurfaceForegroundPatternId(solidFillId);
+                graphics = graphics.SetSurfaceBackgroundPatternId(solidFillId);
 
-                view.SetElementOverrides(elem.Id, graphics);
+                using Transaction tx = new(uidoc.Document, "Override Color");
+                TransactionStatus status = tx.Start();
+                try
+                {
+                    view.SetElementOverrides(elem.Id, graphics);
+                    status = tx.Commit();
+                }
+                catch (Exception exc)
+                {
+                    Logger.Error(exc.Message);
+                    if (!tx.HasEnded())
+                    {
+                        status = tx.RollBack();
+                    }
+                }
             }
         }
 

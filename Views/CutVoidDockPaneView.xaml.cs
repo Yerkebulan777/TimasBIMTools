@@ -43,7 +43,6 @@ namespace RevitTimasBIMTools.Views
         {
             try
             {
-                Loaded -= DockPaneView_Loaded;
                 Dispatcher.CurrentDispatcher.Invoke(() =>
                 {
                     if (ExternalEventRequest.Accepted == externalEvent.Raise())
@@ -51,6 +50,7 @@ namespace RevitTimasBIMTools.Views
                         Disposed = false;
                         DataContextHandler.IsStarted = true;
                         DataContextHandler.DockPanelView = this;
+                        Loaded -= DockPaneView_Loaded;
                     }
                 });
             }
@@ -61,15 +61,19 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        [STAThread]
         private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (sender is DataGridRow row && row.DataContext is ElementModel model)
+            Dispatcher.CurrentDispatcher.Invoke(() =>
             {
-                if (model != null && model.Instanse.IsValidObject)
+                if (sender is DataGridRow row && row.DataContext is ElementModel model)
                 {
-                    DataContextHandler.GetElementInViewByIntId(model.Instanse.Id);
+                    if (model != null && model.Instanse.IsValidObject)
+                    {
+                        DataContextHandler.GetElementInViewByIntId(model.Instanse.Id);
+                    }
                 }
-            }
+            });
         }
 
 
