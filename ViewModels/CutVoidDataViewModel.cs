@@ -654,19 +654,15 @@ namespace RevitTimasBIMTools.ViewModels
         #region VerifyAllSelectedData
         internal void VerifyAllSelectedData()
         {
-            if (manualResetEvent.WaitOne())
+            if (DataViewCollection.IsInUse && !DataViewCollection.IsEmpty)
             {
-                if (DataViewCollection.IsInUse && !DataViewCollection.IsEmpty)
-                {
-                    IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
-                    ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
-                    IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem.IsSelected : null;
-                }
-                else
-                {
-                    IsAllSelectChecked = false;
-                }
-                _ = manualResetEvent.Set();
+                IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
+                ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
+                IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem.IsSelected : null;
+            }
+            else
+            {
+                IsAllSelectChecked = false;
             }
         }
         #endregion

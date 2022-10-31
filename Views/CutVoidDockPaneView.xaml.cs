@@ -61,31 +61,21 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        [STAThread]
         private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Dispatcher.CurrentDispatcher.Invoke(() =>
+            if (sender is DataGridRow row && row.DataContext is ElementModel model)
             {
-                if (sender is DataGridRow row && row.DataContext is ElementModel model)
+                if (model != null && model.Instanse.IsValidObject)
                 {
-                    if (model != null && model.Instanse.IsValidObject)
-                    {
-                        DataContextHandler.GetElementInViewByIntId(model.Instanse.Id);
-                    }
+                    DataContextHandler.GetElementInViewByIntId(model.Instanse.Id);
                 }
-            });
+            }
         }
 
 
         private void CheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            Dispatcher.CurrentDispatcher.Invoke(() =>
-            {
-                if (sender is CheckBox checkBox)
-                {
-                    DataContextHandler.VerifyAllSelectedData();
-                }
-            }, DispatcherPriority.Normal);
+            DataContextHandler.VerifyAllSelectedData();
         }
 
 
