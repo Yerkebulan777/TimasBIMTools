@@ -85,7 +85,7 @@ namespace RevitTimasBIMTools.Views
                 {
                     DataContextHandler.VerifyAllSelectedData();
                 }
-            });
+            }, DispatcherPriority.Normal);
         }
 
 
