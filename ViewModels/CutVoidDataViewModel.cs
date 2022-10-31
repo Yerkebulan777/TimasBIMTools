@@ -656,9 +656,8 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (manualResetEvent.WaitOne())
             {
-                if (DataViewCollection.IsInUse)
+                if (DataViewCollection.IsInUse && !DataViewCollection.IsEmpty)
                 {
-                    DataViewCollection.Refresh();
                     IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
                     ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
                     IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem.IsSelected : null;
