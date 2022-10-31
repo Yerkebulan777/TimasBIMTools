@@ -652,7 +652,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region VerifyAllSelectedData
-        private void VerifyAllSelectedData()
+        internal void VerifyAllSelectedData()
         {
             if (manualResetEvent.WaitOne())
             {

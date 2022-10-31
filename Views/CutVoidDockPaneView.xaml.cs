@@ -77,6 +77,18 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        private void CheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                if (sender is DataGridRow row && row.DataContext is ElementModel model)
+                {
+                    DataContextHandler.VerifyAllSelectedData();
+                }
+            });
+        }
+
+
         public void Dispose()
         {
             if (!Disposed)
@@ -85,5 +97,7 @@ namespace RevitTimasBIMTools.Views
                 DataContextHandler?.Dispose();
             }
         }
+
+
     }
 }
