@@ -42,6 +42,7 @@ namespace RevitTimasBIMTools.CutOpening
                     else
                     {
                         pane.Show();
+                        view.MinWidth = 1000;
                         toolHelper.IsActiveStart = true;
                     }
                 }
