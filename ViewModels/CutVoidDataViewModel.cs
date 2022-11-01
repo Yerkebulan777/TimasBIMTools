@@ -49,7 +49,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-
         #region Templory
         private Document doc { get; set; }
         private View3D view3d { get; set; }
@@ -374,6 +373,7 @@ namespace RevitTimasBIMTools.ViewModels
                     StructureMaterials = null;
                     ElementModelData = null;
                     FamilySymbols = null;
+
                 }, taskContext);
             }
         }
@@ -626,6 +626,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         private IList<string> symbolNames = null;
+
         public IList<string> UniqueSymbolNames
         {
             get => symbolNames;
@@ -710,7 +711,14 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
+
+
+
         #region ShowExecuteCommand
+
+        public bool? DialogResult { get; set; }
+
+
         public ICommand ShowExecuteCommand { get; private set; }
 
         [STAThread]
@@ -729,13 +737,15 @@ namespace RevitTimasBIMTools.ViewModels
                         doc = app.ActiveUIDocument.Document;
                         if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                         {
+                            using TransactionGroup transGroup = new(doc);
+                            TransactionStatus status = transGroup.Start("GetCollision");
                             bool viewBool = SetSectionBoxModelView(app.ActiveUIDocument, model, view3d, patternId);
                             bool voidBool = collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
+                            bool removeBool = ElementModelData.Remove(model);
                             if (viewBool && voidBool && ElementModelData.Remove(model))
                             {
-                                Logger.Log("Remove item:\t" + item.ToString());
+                                status = transGroup.Assimilate();
                             }
-
                         }
                     }
                     return DataViewCollection.IsEmpty;
@@ -750,7 +760,29 @@ namespace RevitTimasBIMTools.ViewModels
             return RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d);
         }
 
+
+        private bool GetDialogResultAsync()
+        {
+            bool result = false;
+            Task.Delay(1000).ContinueWith(task =>
+            {
+                while (true)
+                {
+                    task.Wait(1000);
+                    if (DialogResult.HasValue)
+                    {
+                        result = DialogResult.Value;
+                    }
+                }
+            }, taskContext).Wait(TimeSpan.FromSeconds(30));
+            return result;
+        }
+
         #endregion
+
+
+
+
 
 
         #region CloseCommand
@@ -783,4 +815,7 @@ namespace RevitTimasBIMTools.ViewModels
             collisionManager?.Dispose();
         }
     }
+
+
+
 }

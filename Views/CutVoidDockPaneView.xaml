@@ -276,16 +276,17 @@
                             <Label FontFamily="Segoe MDL2 Assets" Content="&#59538;" Foreground="DarkBlue"  FontSize="15" />
                         </Button>
 
-                        <Button Name="ApplyCmd" Height="25" Width="75" Margin="5"
+                        <Button Name="ApplyCmd" Height="25" Width="75" Margin="5" IsDefault="True"
                             IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
                             CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}">
-                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
+                            <!--<Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"-->/>
+                            
                         </Button>
 
-                        <Button Name="CancelCmd"  Height="25" Width="75" Margin="5" 
+                        <Button Name="CancelCmd"  Height="25" Width="75" Margin="5" IsCancel="True"
                             IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
                             CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}">
-                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
+                            <!--<Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"-->/>
                         </Button>
                         
                     </StackPanel>
