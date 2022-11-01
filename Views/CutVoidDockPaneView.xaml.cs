@@ -19,7 +19,6 @@ namespace RevitTimasBIMTools.Views
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {
             InitializeComponent();
-            Loaded += DockPaneView_Loaded;
             DataContext = DataContextHandler = viewModel;
             DataContextHandler = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         }
@@ -38,32 +37,28 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        
-        private void DockPaneView_Loaded(object sender, System.Windows.RoutedEventArgs e)
-        {
-            RaiseExternalEvent();
-        }
-
 
         [STAThread]
         internal void RaiseExternalEvent()
         {
-            try
+            if (!DataContextHandler.IsStarted)
             {
-                Dispatcher.CurrentDispatcher.Invoke(() =>
+                try
                 {
-                    if (ExternalEventRequest.Accepted == externalEvent.Raise())
+                    Dispatcher.CurrentDispatcher.Invoke(() =>
                     {
-                        Disposed = false;
-                        DataContextHandler.IsStarted = true;
-                        DataContextHandler.DockPanelView = this;
-                        Loaded -= DockPaneView_Loaded;
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex.Message);
+                        if (ExternalEventRequest.Accepted == externalEvent.Raise())
+                        {
+                            Disposed = false;
+                            DataContextHandler.IsStarted = true;
+                            DataContextHandler.DockPanelView = this;
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                }
             }
         }
 

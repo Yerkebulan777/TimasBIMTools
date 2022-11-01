@@ -32,7 +32,7 @@
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
 
-            
+
             <!--Header -->
             <Border  Grid.Row="0" Background="{DynamicResource FloralGradientBrush}" >
                 <Grid Grid.Row="0" VerticalAlignment="Center" >
@@ -256,9 +256,9 @@
                 
                 <DockPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" >
 
-                    <StackPanel Margin="10,0" Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
                                 Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToViz}, UpdateSourceTrigger=Explicit, FallbackValue=Collapsed}" >
-                        <Button Name="SnoopCmd" Height="30" Width="75" Margin="15,5"
+                        <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
                                 IsEnabled="{Binding Path=IsOptionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                 Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                                 CommandParameter="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}}" >
@@ -266,10 +266,10 @@
                         </Button>
                     </StackPanel>
 
-                    <StackPanel Margin="10,0" Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
                                 Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, UpdateSourceTrigger=Explicit, FallbackValue=Collapsed}">
                         
-                        <Button Name="CutVoidCmd" Height="30" Width="75" Margin="15,5"
+                        <Button Name="CutVoidCmd" Height="30" Width="75" Margin="5"
                                 IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                 Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                                 CommandParameter="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}}" >

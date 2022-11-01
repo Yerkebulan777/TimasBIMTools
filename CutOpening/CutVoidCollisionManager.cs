@@ -17,6 +17,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Default Properties
 
+        private const double footToMm = 304.8;
         private readonly Options options = new()
         {
             ComputeReferences = true,
@@ -24,24 +25,14 @@ namespace RevitTimasBIMTools.CutOpening
             DetailLevel = ViewDetailLevel.Medium
         };
 
-        private readonly XYZ basisZNormal = XYZ.BasisZ;
         private readonly Transform identity = Transform.Identity;
-        private readonly XYZ vertExis = Transform.Identity.BasisX;
-        private readonly XYZ horzExis = Transform.Identity.BasisZ;
         private readonly SolidCurveIntersectionOptions intersectOptions = new();
-
-        #endregion
-
-
-        #region Constant Properties
-
-        private const double footToMm = 304.8;
         private readonly double thresholdAngle = Math.Floor(Math.Cos(45 * Math.PI / 180));
 
         #endregion
 
 
-        #region Input Properties
+        #region Input Members
 
         private Document searchDocument { get; set; } = null;
         private Transform searchTransform { get; set; } = null;
@@ -57,19 +48,13 @@ namespace RevitTimasBIMTools.CutOpening
         #endregion
 
 
-        #region Output Properties
+        #region Fields
 
         private FilteredElementCollector collector;
         private Tuple<double, double> tupleSize;
         private SketchPlane sketchPlan;
         private Plane plane;
 
-        #endregion
-
-
-        #region Templory Properties
-
-        private int count = 0;
         private Line line = null;
         private XYZ offsetPnt = null;
         private XYZ centroid = null;
@@ -100,7 +85,6 @@ namespace RevitTimasBIMTools.CutOpening
 
         public IList<ElementModel> GetCollisionByInputData(Document doc, DocumentModel document, Material material, Category category)
         {
-            count = 0;
             Transform global = document.Transform;
             IList<ElementModel> output = new List<ElementModel>(50);
             IEnumerable<Element> enclosures = ElementTypeIdData?.GetInstancesByTypeIdDataAndMaterial(doc, material);
@@ -137,7 +121,6 @@ namespace RevitTimasBIMTools.CutOpening
                         interSolid = hostSolid.GetIntersectionSolid(elem, global, options);
                         if (interSolid != null)
                         {
-                            count++;
                             centroid = interSolid.ComputeCentroid();
                             interBbox = interSolid.GetBoundingBox();
                             interNormal = interNormal.ResetDirectionToPositive();
@@ -165,28 +148,26 @@ namespace RevitTimasBIMTools.CutOpening
             bool result = false;
             FamilyInstance opening = null;
             using Transaction trans = new(doc, "Create opening");
-            if (trans.Start() == TransactionStatus.Started)
+            TransactionStatus status = trans.Start();
+            if (status == TransactionStatus.Started)
             {
                 try
                 {
-                    if (wallOpenning != null && model.Instanse is Wall wall && wall.IsValidObject)
-                    {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, wallOpenning, wall, StructuralType.NonStructural);
-                    }
-                    else if (floorOpenning != null && model.Level is Level level && level.IsValidObject)
-                    {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, level, StructuralType.NonStructural);
-                    }
+                    opening = wallOpenning != null && model.Instanse is Wall wall && wall.IsValidObject
+                    ? doc.Create.NewFamilyInstance(model.Origin, wallOpenning, wall, StructuralType.NonStructural)
+                    : doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.Level, StructuralType.NonStructural);
                 }
                 finally
                 {
+                    model.Intersection.CreateDirectShape(doc);
                     if (opening != null && definition != null)
                     {
-                        _ = opening.get_Parameter(definition).Set(model.Width);
-                        _ = opening.get_Parameter(definition).Set(model.Height);
-                        model.Intersection.CreateDirectShape(doc);
-                        result = true;
+                        double addition = offset + offset;
+                        bool setWidth = opening.get_Parameter(definition).Set(model.Width + addition);
+                        bool setHeight = opening.get_Parameter(definition).Set(model.Height + addition);
+                        result = setWidth && setHeight;
                     }
+                    status = trans.Commit();
                 }
             }
             return result;
@@ -245,20 +226,21 @@ namespace RevitTimasBIMTools.CutOpening
         {
             SketchPlane result = null;
             using Transaction transaction = new(doc, "CreateSketchPlane");
-            if (transaction.Start() == TransactionStatus.Started)
+            TransactionStatus status = transaction.Start();
+            if (status == TransactionStatus.Started)
             {
                 try
                 {
                     plane = Plane.CreateByNormalAndOrigin(normal, point);
                     result = SketchPlane.Create(doc, plane);
-                    _ = transaction.Commit();
+                    status = transaction.Commit();
                 }
                 catch (Exception ex)
                 {
                     Logger.Error(ex.Message);
                     if (!transaction.HasEnded())
                     {
-                        _ = transaction.RollBack();
+                        status = transaction.RollBack();
                     }
                 }
             }
