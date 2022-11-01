@@ -80,6 +80,16 @@ namespace RevitTimasBIMTools.Views
             DataContextHandler.VerifyAllSelectedData();
         }
 
+        private void ApplyCmd_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            DataContextHandler.DialogResult = true;
+        }
+
+        private void CancelCmd_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            DataContextHandler.DialogResult = false;
+        }
+
 
         public void Dispose()
         {
@@ -89,5 +99,7 @@ namespace RevitTimasBIMTools.Views
                 DataContextHandler?.Dispose();
             }
         }
+
+
     }
 }

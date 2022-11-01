@@ -627,6 +627,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private IList<string> symbolNames = null;
 
+
         public IList<string> UniqueSymbolNames
         {
             get => symbolNames;
@@ -711,12 +712,14 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-
-
-
         #region ShowExecuteCommand
 
-        public bool? DialogResult { get; set; }
+        private bool? dialogResult;
+        public bool? DialogResult
+        {
+            get => dialogResult;
+            set => SetProperty(ref dialogResult, value);
+        }
 
 
         public ICommand ShowExecuteCommand { get; private set; }
@@ -728,7 +731,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 object item = DataViewCollection.GetItemAt(0);
                 DataGrid dataGrid = DockPanelView.dataGridView;
-                IsOptionEnabled = await RevitTask.RunAsync(app =>
+                await RevitTask.RunAsync(app =>
                 {
                     if (item is ElementModel model && model.IsSelected)
                     {
@@ -739,16 +742,20 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             using TransactionGroup transGroup = new(doc);
                             TransactionStatus status = transGroup.Start("GetCollision");
-                            bool viewBool = SetSectionBoxModelView(app.ActiveUIDocument, model, view3d, patternId);
-                            bool voidBool = collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
-                            bool removeBool = ElementModelData.Remove(model);
-                            if (viewBool && voidBool && ElementModelData.Remove(model))
+                            bool setViewBool = SetSectionBoxModelView(app.ActiveUIDocument, model, view3d, patternId);
+                            bool setVoidBool = collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
+                            if (setViewBool && setVoidBool && ElementModelData.Remove(model) && GetDialogResultAsync())
                             {
+                                DialogResult = null;
                                 status = transGroup.Assimilate();
+                            }
+                            else
+                            {
+                                DialogResult = null;
+                                status = transGroup.RollBack();
                             }
                         }
                     }
-                    return DataViewCollection.IsEmpty;
                 });
             }
         }
@@ -764,11 +771,11 @@ namespace RevitTimasBIMTools.ViewModels
         private bool GetDialogResultAsync()
         {
             bool result = false;
-            Task.Delay(1000).ContinueWith(task =>
+            _ = Task.Delay(1000).ContinueWith(task =>
             {
                 while (true)
                 {
-                    task.Wait(1000);
+                    _ = task.Wait(1000);
                     if (DialogResult.HasValue)
                     {
                         result = DialogResult.Value;
@@ -779,10 +786,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         #endregion
-
-
-
-
 
 
         #region CloseCommand
@@ -815,7 +818,5 @@ namespace RevitTimasBIMTools.ViewModels
             collisionManager?.Dispose();
         }
     }
-
-
 
 }
