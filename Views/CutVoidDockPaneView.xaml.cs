@@ -38,8 +38,15 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        [STAThread]
+        
         private void DockPaneView_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            RaiseExternalEvent();
+        }
+
+
+        [STAThread]
+        internal void RaiseExternalEvent()
         {
             try
             {
@@ -84,7 +91,6 @@ namespace RevitTimasBIMTools.Views
             if (!Disposed)
             {
                 Disposed = true;
-                externalEvent?.Dispose();
                 DataContextHandler?.Dispose();
             }
         }
