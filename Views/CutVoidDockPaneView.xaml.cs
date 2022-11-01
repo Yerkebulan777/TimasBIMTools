@@ -84,10 +84,9 @@ namespace RevitTimasBIMTools.Views
             if (!Disposed)
             {
                 Disposed = true;
+                externalEvent?.Dispose();
                 DataContextHandler?.Dispose();
             }
         }
-
-
     }
 }
