@@ -3,6 +3,8 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
+using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -13,7 +15,7 @@ namespace RevitTimasBIMTools.Views
     /// <summary> Логика взаимодействия для CutVoidDockPaneView.xaml </summary>
     public partial class CutVoidDockPaneView : Page, IDockablePaneProvider
     {
-        public bool Disposed { get; set; } = false;
+        private bool Disposed { get; set; } = false;
         private readonly CutVoidDataViewModel DataContextHandler;
         private static readonly ExternalEvent externalEvent = CutVoidDataViewModel.RevitExternalEvent;
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)

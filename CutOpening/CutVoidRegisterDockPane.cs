@@ -19,8 +19,8 @@ namespace RevitTimasBIMTools.CutOpening
                     FrameworkElement = dockPane as FrameworkElement,
                 };
                 data.InitialState.TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser;
-                data.EditorInteraction = new EditorInteraction(EditorInteractionType.Dismiss);
-                data.InitialState.DockPosition = DockPosition.Tabbed;
+                data.EditorInteraction = new EditorInteraction(EditorInteractionType.KeepAlive);
+                data.InitialState.DockPosition = DockPosition.Right;
                 data.VisibleByDefault = false;
                 try
                 {
