@@ -254,7 +254,7 @@
             <!-- ButtonPanel -->
             <Border Grid.Row="4" Background="Silver" >
                 
-                <ToolBarPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="5">
+                <DockPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" >
 
                     <StackPanel Margin="10,0" Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
                                 Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToViz}, UpdateSourceTrigger=Explicit, FallbackValue=Collapsed}" >
@@ -290,7 +290,7 @@
                         
                     </StackPanel>
 
-                </ToolBarPanel>
+                </DockPanel>
             </Border>
 
         </Grid>
