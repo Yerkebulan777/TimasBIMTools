@@ -18,9 +18,9 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using DataGrid = System.Windows.Controls.DataGrid;
 using Document = Autodesk.Revit.DB.Document;
 using Parameter = Autodesk.Revit.DB.Parameter;
 
@@ -31,7 +31,6 @@ namespace RevitTimasBIMTools.ViewModels
         public CutVoidDockPaneView DockPanelView { get; set; }
         private static SynchronizationContext context { get; set; }
         public static ExternalEvent RevitExternalEvent { get; set; }
-        public static CancellationToken cancelToken { get; set; } = CancellationToken.None;
 
         private static readonly AutoResetEvent manualResetEvent = new(true);
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
@@ -45,7 +44,6 @@ namespace RevitTimasBIMTools.ViewModels
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
             RefreshDataCommand = new AsyncRelayCommand(RefreshActiveDataHandler);
             ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
-            //CanselCommand = new RelayCommand(CancelCallbackLogic);
         }
 
 
@@ -744,23 +742,27 @@ namespace RevitTimasBIMTools.ViewModels
                             TransactionStatus status = transGroup.Start("GetCollision");
                             bool setViewBool = SetSectionBoxModelView(app.ActiveUIDocument, model, view3d, patternId);
                             bool setVoidBool = collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
-                            if (setViewBool && setVoidBool && ElementModelData.Remove(model) && GetDialogResultAsync())
+                            if (setViewBool && setVoidBool && GetDialogResult(TimeSpan.FromSeconds(30)))
                             {
                                 DialogResult = null;
-                                status = transGroup.Assimilate();
+                                if (ElementModelData.Remove(model))
+                                {
+                                    status = transGroup.Assimilate();
+                                }
                             }
                             else
                             {
                                 DialogResult = null;
-                                status = transGroup.RollBack();
+                                if (ElementModelData.Remove(model))
+                                {
+                                    status = transGroup.RollBack();
+                                }
                             }
                         }
                     }
                 });
             }
         }
-
-
 
 
         public bool SetSectionBoxModelView(UIDocument uidoc, ElementModel model, View3D view3d, ElementId patternId)
@@ -770,44 +772,22 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool GetDialogResultAsync()
+        private bool GetDialogResult(TimeSpan timeSpan)
         {
-            bool result = false;
-            _ = Task.Delay(1000).ContinueWith(task =>
+            int elapsed = 0;
+            bool result = Task.Delay(1000).ContinueWith(task =>
             {
-                while (true)
+                while (elapsed < timeSpan.TotalMilliseconds)
                 {
-                    _ = task.Wait(1000);
-                    if (DialogResult.HasValue)
+                    elapsed += 1000;
+                    if (task.Wait(1000) && dialogResult.HasValue)
                     {
-                        result = DialogResult.Value;
+                        return dialogResult.Value;
                     }
                 }
-            }, taskContext).Wait(TimeSpan.FromSeconds(30));
+                return false;
+            }, taskContext).Result;
             return result;
-        }
-
-        #endregion
-
-
-        #region CloseCommand
-
-        public ICommand CanselCommand { get; private set; }
-        private void CancelCallbackLogic()
-        {
-            CancellationTokenSource cts = new();
-            try
-            {
-                cts.Cancel(true);
-                cancelToken = cts.Token;
-            }
-            catch (AggregateException)
-            {
-                if (cancelToken.IsCancellationRequested)
-                {
-                    _ = Task.Delay(1000).ContinueWith((action) => Logger.Warning("Task cansceled"));
-                }
-            }
         }
 
         #endregion
