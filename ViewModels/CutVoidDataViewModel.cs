@@ -744,18 +744,18 @@ namespace RevitTimasBIMTools.ViewModels
                             bool setVoidBool = collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
                             if (setViewBool && setVoidBool && GetDialogResult(TimeSpan.FromSeconds(30)))
                             {
-                                DialogResult = null;
                                 if (ElementModelData.Remove(model))
                                 {
                                     status = transGroup.Assimilate();
+                                    DialogResult = null;
                                 }
                             }
                             else
                             {
-                                DialogResult = null;
                                 if (ElementModelData.Remove(model))
                                 {
                                     status = transGroup.RollBack();
+                                    DialogResult = null;
                                 }
                             }
                         }
