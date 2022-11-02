@@ -730,11 +730,11 @@ namespace RevitTimasBIMTools.ViewModels
                 DataGrid dataGrid = DockPanelView.dataGridView;
                 DialogResult = await RevitTask.RunAsync(app =>
                 {
+                    dataGrid.SelectedItem = item;
+                    dataGrid.ScrollIntoView(item);
+                    doc = app.ActiveUIDocument.Document;
                     if (item is ElementModel model && model.IsSelected)
                     {
-                        dataGrid.SelectedItem = item;
-                        dataGrid.ScrollIntoView(item);
-                        doc = app.ActiveUIDocument.Document;
                         if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                         {
                             if (SetSectionBoxModelView(app.ActiveUIDocument, model, view3d, patternId))
@@ -758,20 +758,20 @@ namespace RevitTimasBIMTools.ViewModels
                 DataGrid dataGrid = DockPanelView.dataGridView;
                 await RevitTask.RunAsync(app =>
                 {
+                    dataGrid.SelectedItem = item;
+                    dataGrid.ScrollIntoView(item);
+                    doc = app.ActiveUIDocument.Document;
                     if (item is ElementModel model && model.IsSelected)
                     {
-                        dataGrid.SelectedItem = item;
-                        dataGrid.ScrollIntoView(item);
-                        doc = app.ActiveUIDocument.Document;
                         if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                         {
-                            if (ElementModelData.Remove(model) && dialogResult.Value)
+                            if (dialogResult.Value && ElementModelData.Remove(model))
                             {
                                 collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
                             }
                             else
                             {
-                                Logger.Info("XXX");
+                                Logger.Info("XXX........................");
                             }
                         }
                     }
