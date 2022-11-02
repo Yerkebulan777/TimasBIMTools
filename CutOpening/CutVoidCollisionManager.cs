@@ -147,15 +147,25 @@ namespace RevitTimasBIMTools.CutOpening
         {
             bool result = false;
             FamilyInstance opening = null;
-            using Transaction trans = new(doc, "Create opening");
-            TransactionStatus status = trans.Start();
+            using Transaction trans = new(doc);
+            TransactionStatus status = trans.Start("Create opening");
             if (status == TransactionStatus.Started)
             {
+                Element instanse = model.Instanse;
                 try
                 {
-                    opening = wallOpenning != null && model.Instanse is Wall wall && wall.IsValidObject
-                    ? doc.Create.NewFamilyInstance(model.Origin, wallOpenning, wall, StructuralType.NonStructural)
-                    : doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.Level, StructuralType.NonStructural);
+                    if (floorOpenning != null && instanse is RoofBase roof && roof.IsValidObject)
+                    {
+                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.Level, StructuralType.NonStructural);
+                    }
+                    if (wallOpenning != null && instanse is Wall wall && wall.IsValidObject)
+                    {
+                        opening = doc.Create.NewFamilyInstance(model.Origin, wallOpenning, wall, StructuralType.NonStructural);
+                    }
+                    if (floorOpenning != null && instanse is Floor floor && floor.IsValidObject)
+                    {
+                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.Level, StructuralType.NonStructural);
+                    }
                 }
                 finally
                 {
@@ -250,12 +260,12 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Other methods
 
-        //private double GetLengthValueBySimilarParameterName(Instance elem, string paramName)
+        //private double GetLengthValueBySimilarParameterName(Instance floor, string paramName)
         //{
         //    double value = invalidInt;
         //    int minDistance = int.MaxValue;
         //    char[] delimiters = new[] { ' ', '_', '-' };
-        //    foreach (Parameter param in elem.GetOrderedParameters())
+        //    foreach (Parameter param in floor.GetOrderedParameters())
         //    {
         //        Definition definition = param.Definition;
         //        if (param.HasValue && definition.ParameterType == lenParamType)
@@ -319,23 +329,23 @@ namespace RevitTimasBIMTools.CutOpening
         //    return Math.Acos((trace - 1) / 2.0);
         //}
 
-        //private void GetSectionSize(Element elem)
+        //private void GetSectionSize(Element floor)
         //{
         //    hight = 0; widht = 0;
-        //    int catIdInt = elem.Category.Id.IntegerValue;
-        //    if (elem.Document.GetElement(elem.GetTypeId()) is ElementType)
+        //    int catIdInt = floor.Category.Id.IntegerValue;
+        //    if (floor.Document.GetElement(floor.GetTypeId()) is ElementType)
         //    {
         //        BuiltInCategory builtInCategory = (BuiltInCategory)catIdInt;
         //        switch (builtInCategory)
         //        {
         //            case BuiltInCategory.OST_PipeCurves:
         //                {
-        //                    diameter = elem.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM).AsDouble();
+        //                    diameter = floor.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM).AsDouble();
         //                    return;
         //                }
         //            case BuiltInCategory.OST_DuctCurves:
         //                {
-        //                    Parameter diameterParam = elem.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM);
+        //                    Parameter diameterParam = floor.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM);
         //                    if (diameterParam != null && diameterParam.HasValue)
         //                    {
         //                        diameter = diameterParam.AsDouble();
@@ -344,20 +354,20 @@ namespace RevitTimasBIMTools.CutOpening
         //                    }
         //                    else
         //                    {
-        //                        hight = elem.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM).AsDouble();
-        //                        widht = elem.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM).AsDouble();
+        //                        hight = floor.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM).AsDouble();
+        //                        widht = floor.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM).AsDouble();
         //                    }
         //                    return;
         //                }
         //            case BuiltInCategory.OST_Conduit:
         //                {
-        //                    diameter = elem.get_Parameter(BuiltInParameter.RBS_CONDUIT_DIAMETER_PARAM).AsDouble();
+        //                    diameter = floor.get_Parameter(BuiltInParameter.RBS_CONDUIT_DIAMETER_PARAM).AsDouble();
         //                    return;
         //                }
         //            case BuiltInCategory.OST_CableTray:
         //                {
-        //                    hight = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM).AsDouble();
-        //                    widht = elem.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM).AsDouble();
+        //                    hight = floor.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM).AsDouble();
+        //                    widht = floor.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM).AsDouble();
         //                    return;
         //                }
         //            default:

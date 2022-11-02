@@ -761,6 +761,8 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+
+
         public bool SetSectionBoxModelView(UIDocument uidoc, ElementModel model, View3D view3d, ElementId patternId)
         {
             RevitViewManager.SetCustomColorInView(uidoc, view3d, patternId, model.Instanse);

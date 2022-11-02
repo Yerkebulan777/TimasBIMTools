@@ -265,23 +265,23 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static void CreateDirectShape(this Solid solid, Document doc, BuiltInCategory builtIn = BuiltInCategory.OST_GenericModel)
         {
-            using Transaction t = new(doc, "Create DirectShape");
-            TransactionStatus status = t.Start();
+            //using Transaction t = new(doc, "Create DirectShape");
+            //TransactionStatus status = t.Start();
             try
             {
                 DirectShape ds = DirectShape.CreateElement(doc, new ElementId(builtIn));
                 ds.ApplicationDataId = doc.ProjectInformation.UniqueId;
                 ds.SetShape(new GeometryObject[] { solid });
                 ds.Name = "DirectShapeBySolid";
-                status = t.Commit();
+                //status = t.Commit();
             }
             catch (Exception exc)
             {
                 Logger.Error(exc.Message);
-                if (!t.HasEnded())
-                {
-                    status = t.RollBack();
-                }
+                //if (!t.HasEnded())
+                //{
+                //    status = t.RollBack();
+                //}
             }
         }
 
