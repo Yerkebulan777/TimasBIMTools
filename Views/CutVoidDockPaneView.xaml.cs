@@ -77,8 +77,9 @@ namespace RevitTimasBIMTools.Views
 
         private void CheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            DataContextHandler.VerifyAllSelectedData();
+            Dispatcher.CurrentDispatcher.Invoke(DataContextHandler.VerifyAllSelectedData);
         }
+
 
         private void ApplyCmd_Click(object sender, System.Windows.RoutedEventArgs e)
         {
@@ -87,6 +88,7 @@ namespace RevitTimasBIMTools.Views
                 DataContextHandler.DialogResult = true;
             });
         }
+
 
         private void CancelCmd_Click(object sender, System.Windows.RoutedEventArgs e)
         {
