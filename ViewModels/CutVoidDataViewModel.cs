@@ -43,7 +43,8 @@ namespace RevitTimasBIMTools.ViewModels
         {
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
             RefreshDataCommand = new AsyncRelayCommand(RefreshActiveDataHandler);
-            ShowExecuteCommand = new AsyncRelayCommand(ExecuteHandelCommandAsync);
+            VerifyExecuteCommand = new AsyncRelayCommand(VerifyHandelCommandAsync);
+            ChoiseExecuteCommand = new AsyncRelayCommand(ChoiseHandelCommandAsync);
         }
 
 
@@ -720,10 +721,36 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        public ICommand ShowExecuteCommand { get; private set; }
+        public ICommand VerifyExecuteCommand { get; private set; }
+        private async Task VerifyHandelCommandAsync()
+        {
+            if (DataViewCollection?.IsEmpty == false)
+            {
+                object item = DataViewCollection.GetItemAt(0);
+                DataGrid dataGrid = DockPanelView.dataGridView;
+                DialogResult = await RevitTask.RunAsync(app =>
+                {
+                    if (item is ElementModel model && model.IsSelected)
+                    {
+                        dataGrid.SelectedItem = item;
+                        dataGrid.ScrollIntoView(item);
+                        doc = app.ActiveUIDocument.Document;
+                        if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                        {
+                            if (SetSectionBoxModelView(app.ActiveUIDocument, model, view3d, patternId))
+                            {
+                                dialogResult = null;
+                            }
+                        }
+                    }
+                    return dialogResult;
+                });
+            }
+        }
 
-        [STAThread]
-        private async Task ExecuteHandelCommandAsync()
+
+        public ICommand ChoiseExecuteCommand { get; private set; }
+        private async Task ChoiseHandelCommandAsync()
         {
             if (DataViewCollection?.IsEmpty == false)
             {
@@ -738,25 +765,13 @@ namespace RevitTimasBIMTools.ViewModels
                         doc = app.ActiveUIDocument.Document;
                         if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                         {
-                            using TransactionGroup transGroup = new(doc);
-                            TransactionStatus status = transGroup.Start("GetCollision");
-                            bool setViewBool = SetSectionBoxModelView(app.ActiveUIDocument, model, view3d, patternId);
-                            bool setVoidBool = collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
-                            if (setViewBool && setVoidBool && GetDialogResult(TimeSpan.FromSeconds(30)))
+                            if (ElementModelData.Remove(model) && dialogResult.Value)
                             {
-                                if (ElementModelData.Remove(model))
-                                {
-                                    status = transGroup.Assimilate();
-                                    DialogResult = null;
-                                }
+                                collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
                             }
                             else
                             {
-                                if (ElementModelData.Remove(model))
-                                {
-                                    status = transGroup.RollBack();
-                                    DialogResult = null;
-                                }
+                                Logger.Info("XXX");
                             }
                         }
                     }
@@ -771,27 +786,7 @@ namespace RevitTimasBIMTools.ViewModels
             return RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d);
         }
 
-
-        private bool GetDialogResult(TimeSpan timeSpan)
-        {
-            int elapsed = 0;
-            bool result = Task.Delay(1000).ContinueWith(task =>
-            {
-                while (elapsed < timeSpan.TotalMilliseconds)
-                {
-                    elapsed += 1000;
-                    if (task.Wait(1000) && dialogResult.HasValue)
-                    {
-                        return dialogResult.Value;
-                    }
-                }
-                return false;
-            }, taskContext).Result;
-            return result;
-        }
-
         #endregion
-
 
 
         public void Dispose()

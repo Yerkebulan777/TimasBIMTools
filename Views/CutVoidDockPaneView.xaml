@@ -256,42 +256,56 @@
                 
                 <DockPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" >
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
-                                Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToViz}, UpdateSourceTrigger=Explicit, FallbackValue=Collapsed}" >
+                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
+                                Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
                         <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
                                 IsEnabled="{Binding Path=IsOptionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                 Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                                 CommandParameter="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}}" >
                             <Label FontFamily="Segoe MDL2 Assets" Content="&#59165;" Foreground="DarkBlue"  FontSize="15" />
                         </Button>
-                    </StackPanel>
+                    </WrapPanel>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
-                                Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, UpdateSourceTrigger=Explicit, FallbackValue=Collapsed}">
-                        
+                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
+                                Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}">
                         <Button Name="CutVoidCmd" Height="30" Width="75" Margin="5"
                                 IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                                Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
-                                CommandParameter="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}}" >
+                                Command="{Binding Path=VerifyExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                                CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}" >
                             <Label FontFamily="Segoe MDL2 Assets" Content="&#59538;" Foreground="DarkBlue"  FontSize="15" />
+                            <!--<Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.Click">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="OkCanselPanel"  Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:3" Value="{x:Static Visibility.Hidden}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Button.Triggers>-->
                         </Button>
+                    </WrapPanel>
 
-                        <Button Name="ApplyCmd" Height="25" Width="75" Margin="5" IsDefault="True"
-                                Click="ApplyCmd_Click"
-                            IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
-                            CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}">
-                            <!--<Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"-->/>
-                            
-                        </Button>
-
-                        <Button Name="CancelCmd"  Height="25" Width="75" Margin="5" IsCancel="True"
-                                Click="CancelCmd_Click"
-                            IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}" 
-                            CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}">
-                            <!--<Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"-->/>
-                        </Button>
+                    <WrapPanel Name="OkCanselPanel" Orientation="Horizontal">
                         
-                    </StackPanel>
+                        <Button Name="ApplyCmd" Height="25" Width="75" Margin="5" IsDefault="True"
+                                IsEnabled ="{Binding ElementName=OkCanselPanel, Path=IsVisible}"
+                                Command="{Binding Path=ChoiseExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                                CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}"
+                                Click="ApplyCmd_Click" >
+                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
+                        </Button>
+
+                        <Button Name="CancelCmd"  Height="25" Width="75" Margin="5" IsCancel="True" 
+                                IsEnabled ="{Binding ElementName=OkCanselPanel, Path=IsVisible}"
+                                Command="{Binding Path=ChoiseExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                                CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}"
+                                Click="CancelCmd_Click" >
+                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
+                        </Button>
+
+                    </WrapPanel>
 
                 </DockPanel>
             </Border>

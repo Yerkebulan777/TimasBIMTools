@@ -56,7 +56,6 @@ namespace RevitTimasBIMTools.CutOpening
         private Plane plane;
 
         private Line line = null;
-        private XYZ offsetPnt = null;
         private XYZ centroid = null;
         private Solid hostSolid = null;
         private Solid interSolid = null;
@@ -71,9 +70,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public void InitializeElementTypeIdData(Document doc)
         {
-            offsetPnt = new XYZ(cutOffsetSize, cutOffsetSize, cutOffsetSize);
             ElementTypeIdData = RevitPurginqManager.PurgeAndGetValidConstructionTypeIds(doc);
-
         }
 
 
@@ -126,7 +123,7 @@ namespace RevitTimasBIMTools.CutOpening
                             interNormal = interNormal.ResetDirectionToPositive();
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
-                            interSolid = interSolid.CreateScaledSolid(interBbox, offsetPnt);
+                            interSolid = interSolid.ScaledSolidByOffset(interBbox, cutOffsetSize);
                             ElementModel model = new(elem, level)
                             {
                                 Origin = centroid,
@@ -143,14 +140,14 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        public bool CreateOpening(Document doc, ElementModel model, FamilySymbol wallOpenning, FamilySymbol floorOpenning, Definition definition = null, double offset = 0)
+        public void CreateOpening(Document doc, ElementModel model, FamilySymbol wallOpenning, FamilySymbol floorOpenning, Definition definition = null, double offset = 0)
         {
-            bool result = false;
             FamilyInstance opening = null;
             using Transaction trans = new(doc);
             TransactionStatus status = trans.Start("Create opening");
             if (status == TransactionStatus.Started)
             {
+                model.Intersection.CreateDirectShape(doc);
                 Element instanse = model.Instanse;
                 try
                 {
@@ -166,21 +163,22 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.Level, StructuralType.NonStructural);
                     }
-                }
-                finally
-                {
-                    model.Intersection.CreateDirectShape(doc);
                     if (opening != null && definition != null)
                     {
                         double addition = offset + offset;
-                        bool setWidth = opening.get_Parameter(definition).Set(model.Width + addition);
-                        bool setHeight = opening.get_Parameter(definition).Set(model.Height + addition);
-                        result = setWidth && setHeight;
+                        _ = opening.get_Parameter(definition).Set(model.Width + addition);
+                        _ = opening.get_Parameter(definition).Set(model.Height + addition);
                     }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                }
+                finally
+                {
                     status = trans.Commit();
                 }
             }
-            return result;
         }
 
 

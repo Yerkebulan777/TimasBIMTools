@@ -209,14 +209,14 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static Solid CreateScaledSolid(this Solid solid, BoundingBoxXYZ bbox, XYZ offsetPnt)
+        public static Solid ScaledSolidByOffset(this Solid solid, BoundingBoxXYZ bbox, double offset, int factor = 3)
         {
             XYZ minPnt = bbox.Min;
             XYZ maxPnt = bbox.Max;
-            XYZ offsetMin = minPnt - offsetPnt;
-            XYZ offsetMax = maxPnt + offsetPnt;
-            double scale = offsetMin.DistanceTo(offsetMax) / minPnt.DistanceTo(maxPnt);
-            return SolidUtils.CreateTransformed(solid, Transform.Identity.ScaleBasis(scale));
+            XYZ pnt = new(offset, offset, offset);
+            double minDiagonal = minPnt.DistanceTo(maxPnt);
+            double maxDiagonal = (minPnt - (pnt * factor)).DistanceTo(maxPnt + (pnt * factor));
+            return SolidUtils.CreateTransformed(solid, Transform.Identity.ScaleBasis(maxDiagonal / minDiagonal));
         }
 
 
