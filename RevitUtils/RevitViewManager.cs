@@ -5,12 +5,13 @@ using RevitTimasBIMTools.Views;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using Color = Autodesk.Revit.DB.Color;
-using HorizontalAlignment = System.Windows.HorizontalAlignment;
+
+
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -261,72 +262,46 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static Task<bool?> ShowDialogBox(UIDocument uidoc, string promptInfo)
+        public static void ShowDialogBox(UIDocument uidoc, string promptInfo)
         {
-            bool? dialogResult = null;
-            Process process = System.Diagnostics.Process.GetCurrentProcess();
-            IntPtr revitHandle = process.MainWindowHandle;
-
-            if (revitHandle != IntPtr.Zero)
+            Window window = new()
             {
-                IList<UIView> uiViewsWithActiveView = uidoc.GetOpenUIViews();
-                UIView activeUIView = uiViewsWithActiveView.FirstOrDefault();
-                Rectangle rectParent = activeUIView.GetWindowRectangle();
+                Content = new DialogBox(),
+                ClipToBounds = true,
+                Title = promptInfo,
+                WindowStartupLocation = WindowStartupLocation.Manual,
+            };
+            window.Show();
 
-                System.Drawing.Rectangle screen = Screen.FromHandle(revitHandle).Bounds;
 
-                int widthParent = rectParent.Right - rectParent.Left;
-                int heightParent = rectParent.Bottom - rectParent.Top;
+            //TaskDialogCommonButtons buttons = TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel;
+            //TaskDialog taskDialog = new("SmartBIMTools")
+            //{
+            //    Id = "Customer DialogId",
+            //    MainContent = promptInfo,
+            //    CommonButtons = buttons,
+            //    DefaultButton = TaskDialogResult.Ok,
+            //};
 
-                int centreParentX = screen.Left + (screen.Width / 2) - (widthParent / 2);
-                int centreParentY = screen.Top + (screen.Height / 2) - (heightParent / 2);
+            //await Task.Delay(1000);
+            //TaskDialogResult result = taskDialog.Show();
+            //process = Process.GetProcessesByName("SmartBIMTools").FirstOrDefault();
+            //IntPtr handle = process.MainWindowHandle;
+            //if (handle != IntPtr.Zero)
+            //{
 
-                int pntX = centreParentX + (widthParent / 5);
-                int pntY = centreParentY + (heightParent / 5);
-
-                Window window = new()
-                {
-                    VerticalAlignment = VerticalAlignment.Stretch,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    Content = new DialogBox(),
-                    ClipToBounds = true,
-                    Title = promptInfo,
-                    Left = pntX,
-                    Top = pntY,
-                };
-                window.Show();
-                window.Focus();
-
-                //TaskDialogCommonButtons buttons = TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel;
-                //TaskDialog taskDialog = new("SmartBIMTools")
-                //{
-                //    Id = "Customer DialogId",
-                //    MainContent = promptInfo,
-                //    CommonButtons = buttons,
-                //    DefaultButton = TaskDialogResult.Ok,
-                //};
-
-                //await Task.Delay(1000);
-                //TaskDialogResult result = taskDialog.Show();
-                //process = Process.GetProcessesByName("SmartBIMTools").FirstOrDefault();
-                //IntPtr handle = process.MainWindowHandle;
-                //if (handle != IntPtr.Zero)
-                //{
-
-                //    NativeWindowMethod.MoveWindow(handle, pntX, pntY, 500, 300, true);
-                //}
-                //if (TaskDialogResult.Cancel == result)
-                //{
-                //    dialogResult = false;
-                //    taskDialog.Dispose();
-                //}
-                //else if (TaskDialogResult.Ok == result)
-                //{
-                //    dialogResult = true;
-                //    taskDialog.Dispose();
-                //}
-            }
-            return Task.FromResult(dialogResult);
+            //    NativeWindowMethod.MoveWindow(handle, pntX, pntY, 500, 300, true);
+            //}
+            //if (TaskDialogResult.Cancel == result)
+            //{
+            //    dialogResult = false;
+            //    taskDialog.Dispose();
+            //}
+            //else if (TaskDialogResult.Ok == result)
+            //{
+            //    dialogResult = true;
+            //    taskDialog.Dispose();
+            //}
         }
 
 

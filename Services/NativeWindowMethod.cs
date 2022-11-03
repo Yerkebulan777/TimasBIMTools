@@ -1,8 +1,11 @@
-﻿using System;
-using System.Drawing;
+﻿using Autodesk.Revit.UI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
+
 
 namespace RevitTimasBIMTools.Services
 {
@@ -16,7 +19,7 @@ namespace RevitTimasBIMTools.Services
         public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
         [DllImport(user32, SetLastError = true)]
-        public static extern bool GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
+        public static extern bool GetWindowRect(IntPtr hWnd, ref System.Drawing.Rectangle lpRect);
 
         [DllImport(user32, SetLastError = true)]
         public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
@@ -58,5 +61,30 @@ namespace RevitTimasBIMTools.Services
         private const uint ASYNCWINDOWPOS = 0x4000;
 
         public const uint TOPMOST_FLAGS = NOACTIVATE | NOOWNERZORDER | NOSIZE | NOZORDER | NOSENDCHANGING | ASYNCWINDOWPOS;
+
+
+        public static System.Windows.Point GetRevitWindowLocationPoint(this UIApplication uiapp, double offset = 3)
+        {
+            System.Windows.Point point = new();
+            IntPtr revitHandle = uiapp.MainWindowHandle;
+            if (revitHandle != IntPtr.Zero)
+            {
+                UIDocument uidoc = uiapp.ActiveUIDocument;
+                IList<UIView> uiViewsWithActiveView = uidoc.GetOpenUIViews();
+                UIView activeUIView = uiViewsWithActiveView.FirstOrDefault();
+                Autodesk.Revit.DB.Rectangle rectParent = activeUIView.GetWindowRectangle();
+                System.Drawing.Rectangle screen = System.Windows.Forms.Screen.FromHandle(revitHandle).Bounds;
+
+                int widthParent = rectParent.Right - rectParent.Left;
+                int heightParent = rectParent.Bottom - rectParent.Top;
+
+                int centreParentX = screen.Left + (screen.Width / 2) - (widthParent / 2);
+                int centreParentY = screen.Top + (screen.Height / 2) - (heightParent / 2);
+
+                point.X = centreParentX + (widthParent / offset);
+                point.Y = centreParentY + (heightParent / offset);
+            }
+            return point;
+        }
     }
 }

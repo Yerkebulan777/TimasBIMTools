@@ -4,6 +4,7 @@ using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
 using System;
 using System.Globalization;
@@ -28,8 +29,10 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
+
             try
             {
+                _ = uiapp.GetRevitWindowLocationPoint();
                 DockablePane pane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);
                 if (paneProvider is CutVoidDockPaneView view && pane.IsValidObject)
                 {
