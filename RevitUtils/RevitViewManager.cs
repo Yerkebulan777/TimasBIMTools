@@ -4,6 +4,7 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Automation;
 using Color = Autodesk.Revit.DB.Color;
 
 namespace RevitTimasBIMTools.RevitUtils
@@ -130,7 +131,6 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
-        #region SetCustomSectionBox
         public static bool SetCustomSectionBox(UIDocument uidoc, XYZ centroid, View3D view3d)
         {
             bool result = false;
@@ -259,8 +259,68 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
 
-            #endregion
-
         }
+
+
+        public static void GetRectangleView(UIDocument uidoc)
+        {
+            View activeView = uidoc.ActiveView;
+            List<UIView> uiViewsWithActiveView = new();
+            foreach (UIView uiv in uidoc.GetOpenUIViews())
+            {
+                if (uiv.ViewId.IntegerValue == activeView.Id.IntegerValue)
+                {
+                    uiViewsWithActiveView.Add(uiv);
+                }
+            }
+
+            UIView ActiveUIView = uiViewsWithActiveView.FirstOrDefault();
+            if (uiViewsWithActiveView.Count > 1)
+            {
+                System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
+
+                IntPtr revitHandle = process.MainWindowHandle;
+                AutomationElement root = AutomationElement.FromHandle(revitHandle);
+                // find the container control for the open views   				
+                PropertyCondition workSpaceCondition = new(AutomationElement.ClassNameProperty, "MDIClient");
+                AutomationElement workspace = root.FindFirst(TreeScope.Descendants, workSpaceCondition);
+                //find the active window in the workspace == first childwindow
+                AutomationElement firstviewWindow = workspace.FindFirst(TreeScope.Children, Condition.TrueCondition);
+                PropertyCondition classCondition = new(AutomationElement.ClassNameProperty, "AfxFrameOrView110u");
+                AutomationElement viewPane = firstviewWindow.FindFirst(TreeScope.Children, classCondition);
+
+                object boundingRectNoDefault = viewPane.GetCurrentPropertyValue(AutomationElement.BoundingRectangleProperty, true);
+
+                //select uiview with identical clientrectangle
+                System.Windows.Rect boundingRect = (System.Windows.Rect)boundingRectNoDefault;
+
+                foreach (UIView uiv in uiViewsWithActiveView)
+                {
+                    Rectangle rectangle = uiv.GetWindowRectangle();
+                    if (rectangle.Left == boundingRect.Left && rectangle.Top == boundingRect.Top
+                       && rectangle.Right == boundingRect.Right && rectangle.Bottom == boundingRect.Bottom)
+                    {
+                        ActiveUIView = uiv;
+                        break;
+                    }
+                }
+            }
+            if (ActiveUIView == null)
+            {
+                return;
+            }
+
+
+            Rectangle rect = ActiveUIView.GetWindowRectangle();
+            IList<XYZ> corners = ActiveUIView.GetZoomCorners();
+            XYZ p = corners[0];
+            XYZ q = corners[1];
+
+            string msg = $"UIView Windows rectangle size: {rect.Left} {rect.Right}  {rect.Top} {rect.Bottom}  and Corners: {p} {q}";
+
+            Logger.Info(msg);
+        }
+
+
     }
 }

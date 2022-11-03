@@ -190,6 +190,8 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="UIAutomationClient" />
+    <Reference Include="UIAutomationTypes" />
     <Reference Include="UIFramework, Version=19.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>packages\Revit_All_Main_Versions_API_x64.2019.0.1\lib\net47\UIFramework.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
