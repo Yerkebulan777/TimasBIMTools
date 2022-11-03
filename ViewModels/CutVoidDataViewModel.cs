@@ -722,7 +722,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 object item = DataViewCollection.GetItemAt(0);
                 DataGrid dataGrid = DockPanelView.dataGridView;
-                DialogResult = await RevitTask.RunAsync(app =>
+                DialogResult = await RevitTask.RunAsync(async app =>
                 {
                     dataGrid.SelectedItem = item;
                     dataGrid.ScrollIntoView(item);
@@ -733,7 +733,7 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             if (SetSectionBoxModelView(app.ActiveUIDocument, model, view3d, patternId))
                             {
-                                dialogResult = null;
+                                dialogResult = await RevitViewManager.ShowDialogBox(app.ActiveUIDocument, "SHOW!!!");
                             }
                         }
                     }

@@ -1,14 +1,16 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using RevitTimasBIMTools.Services;
+using RevitTimasBIMTools.Views;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Automation;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using Color = Autodesk.Revit.DB.Color;
-using View = Autodesk.Revit.DB.View;
+using HorizontalAlignment = System.Windows.HorizontalAlignment;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -75,25 +77,23 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static void SetView3DSettings(Document doc, View3D view, ViewDiscipline discipline, DisplayStyle style, ViewDetailLevel level)
         {
-            using (Transaction t = new(doc, "SetView3DSettings"))
+            using Transaction t = new(doc, "SetView3DSettings");
+            TransactionStatus status = t.Start();
+            if (status == TransactionStatus.Started)
             {
-                TransactionStatus status = t.Start();
-                if (status == TransactionStatus.Started)
+                try
                 {
-                    try
-                    {
-                        view.ViewTemplateId = ElementId.InvalidElementId;
-                        view.IsSectionBoxActive = false;
-                        view.Discipline = discipline;
-                        view.DisplayStyle = style;
-                        view.DetailLevel = level;
-                        status = t.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        status = t.RollBack();
-                        Logger.Error(ex.Message);
-                    }
+                    view.ViewTemplateId = ElementId.InvalidElementId;
+                    view.IsSectionBoxActive = false;
+                    view.Discipline = discipline;
+                    view.DisplayStyle = style;
+                    view.DetailLevel = level;
+                    status = t.Commit();
+                }
+                catch (Exception ex)
+                {
+                    status = t.RollBack();
+                    Logger.Error(ex.Message);
                 }
             }
         }
@@ -126,6 +126,8 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
         #endregion
+
+
 
 
         public static bool SetCustomSectionBox(UIDocument uidoc, XYZ centroid, View3D view3d)
@@ -259,68 +261,9 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void GetRectangleView(UIDocument uidoc)
+        public static Task<bool?> ShowDialogBox(UIDocument uidoc, string promptInfo)
         {
-            View activeView = uidoc.ActiveView;
-            List<UIView> uiViewsWithActiveView = new();
-            foreach (UIView uiv in uidoc.GetOpenUIViews())
-            {
-                if (uiv.ViewId.IntegerValue == activeView.Id.IntegerValue)
-                {
-                    uiViewsWithActiveView.Add(uiv);
-                }
-            }
-
-            UIView ActiveUIView = uiViewsWithActiveView.FirstOrDefault();
-            if (uiViewsWithActiveView.Count > 1)
-            {
-                Process process = System.Diagnostics.Process.GetCurrentProcess();
-
-                IntPtr revitHandle = process.MainWindowHandle;
-                AutomationElement root = AutomationElement.FromHandle(revitHandle);
-                // find the container control for the open views   				
-                PropertyCondition workSpaceCondition = new(AutomationElement.ClassNameProperty, "MDIClient");
-                AutomationElement workspace = root.FindFirst(TreeScope.Descendants, workSpaceCondition);
-                //find the active window in the workspace == first childwindow
-                AutomationElement firstviewWindow = workspace.FindFirst(TreeScope.Children, Condition.TrueCondition);
-                PropertyCondition classCondition = new(AutomationElement.ClassNameProperty, "AfxFrameOrView110u");
-                AutomationElement viewPane = firstviewWindow.FindFirst(TreeScope.Children, classCondition);
-
-                object boundingRectNoDefault = viewPane.GetCurrentPropertyValue(AutomationElement.BoundingRectangleProperty, true);
-
-                //select uiview with identical clientrectangle
-                System.Windows.Rect boundingRect = (System.Windows.Rect)boundingRectNoDefault;
-
-                foreach (UIView uiv in uiViewsWithActiveView)
-                {
-                    Rectangle rectangle = uiv.GetWindowRectangle();
-                    if (rectangle.Left == boundingRect.Left && rectangle.Top == boundingRect.Top
-                       && rectangle.Right == boundingRect.Right && rectangle.Bottom == boundingRect.Bottom)
-                    {
-                        ActiveUIView = uiv;
-                        break;
-                    }
-                }
-            }
-            if (ActiveUIView == null)
-            {
-                return;
-            }
-
-
-            Rectangle rect = ActiveUIView.GetWindowRectangle();
-            IList<XYZ> corners = ActiveUIView.GetZoomCorners();
-            XYZ p = corners[0];
-            XYZ q = corners[1];
-
-            string msg = $"UIView Windows rectangle size: {rect.Left} {rect.Right}  {rect.Top} {rect.Bottom}  and Corners: {p} {q}";
-
-            Logger.Info(msg);
-        }
-
-
-        public bool ShowDialogBox(UIDocument uidoc, string promptInfo)
-        {
+            bool? dialogResult = null;
             Process process = System.Diagnostics.Process.GetCurrentProcess();
             IntPtr revitHandle = process.MainWindowHandle;
 
@@ -338,33 +281,113 @@ namespace RevitTimasBIMTools.RevitUtils
                 int centreParentX = screen.Left + (screen.Width / 2) - (widthParent / 2);
                 int centreParentY = screen.Top + (screen.Height / 2) - (heightParent / 2);
 
+                int pntX = centreParentX + (widthParent / 5);
+                int pntY = centreParentY + (heightParent / 5);
 
-                TaskDialogCommonButtons buttons = TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel;
-                TaskDialog taskDialog = new("SmartBIMTools")
+                Window window = new()
                 {
-                    Id = "Customer DialogId",
-                    MainContent = promptInfo,
-                    CommonButtons = buttons,
-                    DefaultButton = TaskDialogResult.Ok,
+                    VerticalAlignment = VerticalAlignment.Stretch,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    Content = new DialogBox(),
+                    ClipToBounds = true,
+                    Title = promptInfo,
+                    Left = pntX,
+                    Top = pntY,
                 };
+                window.Show();
+                window.Focus();
 
-                TaskDialogResult result = taskDialog.Show();
-                process = Process.GetProcessesByName("SmartBIMTools").FirstOrDefault();
-                IntPtr handle = process.MainWindowHandle;
-                if (handle != IntPtr.Zero)
-                {
-                    int pntX = centreParentX + (widthParent / 5);
-                    int pntY = centreParentY + (heightParent / 5);
-                    NativeWindowMethod.MoveWindow(handle, pntX, pntY, 500, 300, true);
-                }
-                if (TaskDialogResult.Cancel == result)
-                {
-                    // Do not show the Revit dialog
-                    return true;
-                }
+                //TaskDialogCommonButtons buttons = TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel;
+                //TaskDialog taskDialog = new("SmartBIMTools")
+                //{
+                //    Id = "Customer DialogId",
+                //    MainContent = promptInfo,
+                //    CommonButtons = buttons,
+                //    DefaultButton = TaskDialogResult.Ok,
+                //};
+
+                //await Task.Delay(1000);
+                //TaskDialogResult result = taskDialog.Show();
+                //process = Process.GetProcessesByName("SmartBIMTools").FirstOrDefault();
+                //IntPtr handle = process.MainWindowHandle;
+                //if (handle != IntPtr.Zero)
+                //{
+
+                //    NativeWindowMethod.MoveWindow(handle, pntX, pntY, 500, 300, true);
+                //}
+                //if (TaskDialogResult.Cancel == result)
+                //{
+                //    dialogResult = false;
+                //    taskDialog.Dispose();
+                //}
+                //else if (TaskDialogResult.Ok == result)
+                //{
+                //    dialogResult = true;
+                //    taskDialog.Dispose();
+                //}
             }
-            return false;
+            return Task.FromResult(dialogResult);
         }
+
+
+        //public static void GetRectangleView(UIDocument uidoc)
+        //{
+        //    View activeView = uidoc.ActiveView;
+        //    List<UIView> uiViewsWithActiveView = new();
+        //    foreach (UIView uiv in uidoc.GetOpenUIViews())
+        //    {
+        //        if (uiv.ViewId.IntegerValue == activeView.Id.IntegerValue)
+        //        {
+        //            uiViewsWithActiveView.Add(uiv);
+        //        }
+        //    }
+
+        //    UIView ActiveUIView = uiViewsWithActiveView.FirstOrDefault();
+        //    if (uiViewsWithActiveView.Count > 1)
+        //    {
+        //        Process process = System.Diagnostics.Process.GetCurrentProcess();
+
+        //        IntPtr revitHandle = process.MainWindowHandle;
+        //        AutomationElement root = AutomationElement.FromHandle(revitHandle);
+        //        // find the container control for the open views   				
+        //        PropertyCondition workSpaceCondition = new(AutomationElement.ClassNameProperty, "MDIClient");
+        //        AutomationElement workspace = root.FindFirst(TreeScope.Descendants, workSpaceCondition);
+        //        //find the active window in the workspace == first childwindow
+        //        AutomationElement firstviewWindow = workspace.FindFirst(TreeScope.Children, Condition.TrueCondition);
+        //        PropertyCondition classCondition = new(AutomationElement.ClassNameProperty, "AfxFrameOrView110u");
+        //        AutomationElement viewPane = firstviewWindow.FindFirst(TreeScope.Children, classCondition);
+
+        //        object boundingRectNoDefault = viewPane.GetCurrentPropertyValue(AutomationElement.BoundingRectangleProperty, true);
+
+        //        //select uiview with identical clientrectangle
+        //        System.Windows.Rect boundingRect = (System.Windows.Rect)boundingRectNoDefault;
+
+        //        foreach (UIView uiv in uiViewsWithActiveView)
+        //        {
+        //            Rectangle rectangle = uiv.GetWindowRectangle();
+        //            if (rectangle.Left == boundingRect.Left && rectangle.Top == boundingRect.Top
+        //               && rectangle.Right == boundingRect.Right && rectangle.Bottom == boundingRect.Bottom)
+        //            {
+        //                ActiveUIView = uiv;
+        //                break;
+        //            }
+        //        }
+        //    }
+        //    if (ActiveUIView == null)
+        //    {
+        //        return;
+        //    }
+
+
+        //    Rectangle rect = ActiveUIView.GetWindowRectangle();
+        //    IList<XYZ> corners = ActiveUIView.GetZoomCorners();
+        //    XYZ p = corners[0];
+        //    XYZ q = corners[1];
+
+        //    string msg = $"UIView Windows rectangle size: {rect.Left} {rect.Right}  {rect.Top} {rect.Bottom}  and Corners: {p} {q}";
+
+        //    Logger.Info(msg);
+        //}
 
     }
 }
