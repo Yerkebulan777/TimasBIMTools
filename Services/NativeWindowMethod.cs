@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
-
+using System.Windows;
 
 namespace RevitTimasBIMTools.Services
 {
@@ -73,13 +73,15 @@ namespace RevitTimasBIMTools.Services
                 IList<UIView> uiViewsWithActiveView = uidoc.GetOpenUIViews();
                 UIView activeUIView = uiViewsWithActiveView.FirstOrDefault();
                 Autodesk.Revit.DB.Rectangle rectParent = activeUIView.GetWindowRectangle();
-                System.Drawing.Rectangle screen = System.Windows.Forms.Screen.FromHandle(revitHandle).Bounds;
+
+                double screenWidth = SystemParameters.FullPrimaryScreenWidth;
+                double screenHeight = SystemParameters.FullPrimaryScreenHeight;
 
                 int widthParent = rectParent.Right - rectParent.Left;
                 int heightParent = rectParent.Bottom - rectParent.Top;
 
-                int centreParentX = screen.Left + (screen.Width / 2) - (widthParent / 2);
-                int centreParentY = screen.Top + (screen.Height / 2) - (heightParent / 2);
+                int centreParentX = Convert.ToInt32(screenWidth / 2) - (widthParent / 2);
+                int centreParentY = Convert.ToInt32(screenHeight / 2) - (heightParent / 2);
 
                 point.X = centreParentX + (widthParent / offset);
                 point.Y = centreParentY + (heightParent / offset);
