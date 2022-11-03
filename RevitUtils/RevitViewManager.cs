@@ -33,8 +33,8 @@ namespace RevitTimasBIMTools.RevitUtils
                         view.Discipline = ViewDiscipline.Mechanical;
                         view.DisplayStyle = DisplayStyle.Realistic;
                         view.DetailLevel = ViewDetailLevel.Fine;
+                        view.CropBoxActive = false;
                         view.Name = viewName;
-                        view.Pinned = false;
                         status = t.Commit();
                     }
                     catch (Exception ex)
@@ -61,6 +61,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 if (!view.IsTemplate && view.ViewType == ViewType.ThreeD && view.Name.Equals(viewName))
                 {
                     view.ViewTemplateId = ElementId.InvalidElementId;
+                    view.CropBoxActive = false;
                     return view;
                 }
             }

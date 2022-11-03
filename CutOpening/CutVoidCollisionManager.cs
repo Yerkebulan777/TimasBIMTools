@@ -149,25 +149,25 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 model.Intersection.CreateDirectShape(doc);
                 Element instanse = model.Instanse;
+
                 try
                 {
-                    if (floorOpenning != null && instanse is RoofBase roof && roof.IsValidObject)
+                    if (instanse is RoofBase roof && roof.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.Level, StructuralType.NonStructural);
                     }
-                    if (wallOpenning != null && instanse is Wall wall && wall.IsValidObject)
+                    if (instanse is Wall wall && wall.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(model.Origin, wallOpenning, wall, StructuralType.NonStructural);
                     }
-                    if (floorOpenning != null && instanse is Floor floor && floor.IsValidObject)
+                    if (instanse is Floor floor && floor.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.Level, StructuralType.NonStructural);
                     }
-                    if (opening != null && definition != null)
+                    if (opening != null)
                     {
-                        double addition = offset + offset;
-                        _ = opening.get_Parameter(definition).Set(model.Width + addition);
-                        _ = opening.get_Parameter(definition).Set(model.Height + addition);
+                        _ = opening.get_Parameter(definition).Set(model.Width + offset * 2);
+                        _ = opening.get_Parameter(definition).Set(model.Height + offset * 2);
                     }
                 }
                 catch (Exception ex)
