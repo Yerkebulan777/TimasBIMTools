@@ -378,7 +378,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
         private async void GetGeneral3DView()
         {
             view3d ??= await RevitTask.RunAsync(app =>
@@ -389,7 +388,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
         private async void GetMEPCategoriesToData()
         {
             EngineerCategories ??= await RevitTask.RunAsync(app =>
@@ -400,7 +398,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
         private async void GetCoreMaterialsToData()
         {
             StructureMaterials ??= await RevitTask.RunAsync(app =>
@@ -411,7 +408,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
         private async void GetHostedSymbolsToData()
         {
             FamilySymbols ??= await RevitTask.RunAsync(app =>
@@ -422,7 +418,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
         private async void SnoopIntersectionByInputData()
         {
             if (document != null && material != null && category != null)
@@ -437,7 +432,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
         private async void ActivateFamilySimbol(FamilySymbol symbol)
         {
             await RevitTask.RunAsync(app =>
@@ -453,7 +447,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
         private async void GetSymbolSharedParameters(FamilySymbol symbol)
         {
             ParameterDefinitions = await RevitTask.RunAsync(app =>

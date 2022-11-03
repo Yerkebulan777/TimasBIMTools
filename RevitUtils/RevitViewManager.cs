@@ -16,25 +16,20 @@ namespace RevitTimasBIMTools.RevitUtils
         public static View3D CreateNew3DView(UIDocument uidoc, string viewName)
         {
             bool flag = false;
-            View3D view = null;
+            View3D view3d = null;
             Document doc = uidoc.Document;
-            TransactionStatus status = TransactionStatus.Error;
             ViewFamilyType vft = new FilteredElementCollector(doc)
-                .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
-                .FirstOrDefault(q => q.ViewFamily == ViewFamily.ThreeDimensional);
+            .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
+            .FirstOrDefault(q => q.ViewFamily == ViewFamily.ThreeDimensional);
             using (Transaction t = new(doc, "CreateNew3DView"))
             {
-                status = t.Start();
+                TransactionStatus status = t.Start();
                 if (status == TransactionStatus.Started)
                 {
                     try
                     {
-                        view = View3D.CreateIsometric(uidoc.Document, vft.Id);
-                        view.Discipline = ViewDiscipline.Mechanical;
-                        view.DisplayStyle = DisplayStyle.Realistic;
-                        view.DetailLevel = ViewDetailLevel.Fine;
-                        view.CropBoxActive = false;
-                        view.Name = viewName;
+                        view3d = View3D.CreateIsometric(uidoc.Document, vft.Id);
+                        view3d.Name = viewName;
                         status = t.Commit();
                     }
                     catch (Exception ex)
@@ -48,26 +43,55 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-            return view;
+            return view3d;
         }
+
 
         /// <summary>
         /// Retrieve a suitable 3D view3d from document. 
         /// </summary>
         public static View3D Get3dView(UIDocument uidoc, string viewName = "Isometric3DView")
         {
-            foreach (View3D view in new FilteredElementCollector(uidoc.Document).OfClass(typeof(View3D)))
+            Document doc = uidoc.Document;
+            foreach (View3D view3d in new FilteredElementCollector(doc).OfClass(typeof(View3D)))
             {
-                if (!view.IsTemplate && view.ViewType == ViewType.ThreeD && view.Name.Equals(viewName))
+                if (!view3d.IsTemplate && view3d.Name.Equals(viewName))
                 {
-                    view.ViewTemplateId = ElementId.InvalidElementId;
-                    view.CropBoxActive = false;
-                    return view;
+                    DisplayStyle style = DisplayStyle.Realistic;
+                    ViewDetailLevel level = ViewDetailLevel.Fine;
+                    ViewDiscipline discipline = ViewDiscipline.Coordination;
+                    return SetView3DSettings(doc, view3d, discipline, style, level);
                 }
             }
             return CreateNew3DView(uidoc, viewName);
         }
 
+
+        public static View3D SetView3DSettings(Document doc, View3D view, ViewDiscipline discipline, DisplayStyle style, ViewDetailLevel level)
+        {
+            using (Transaction t = new(doc, "SetView3DSettings"))
+            {
+                TransactionStatus status = t.Start();
+                if (status == TransactionStatus.Started)
+                {
+                    try
+                    {
+                        view.ViewTemplateId = ElementId.InvalidElementId;
+                        view.IsSectionBoxActive = false;
+                        view.Discipline = discipline;
+                        view.DisplayStyle = style;
+                        view.DetailLevel = level;
+                        status = t.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        status = t.RollBack();
+                        Logger.Error(ex.Message);
+                    }
+                }
+            }
+            return view;
+        }
         #endregion
 
 
@@ -179,7 +203,7 @@ namespace RevitTimasBIMTools.RevitUtils
             OverrideGraphicSettings graphics = new();
             if (!view.AreGraphicsOverridesAllowed())
             {
-                Logger.Error($"Graphic overrides are not alowed for the '{view.Name}' view");
+                Logger.Error($"Graphic overrides are not alowed for the '{view.Name}' view3d");
             }
             else
             {
