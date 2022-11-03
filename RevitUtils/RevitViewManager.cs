@@ -3,7 +3,10 @@ using Autodesk.Revit.UI;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Windows.Automation;
 using Color = Autodesk.Revit.DB.Color;
 
@@ -277,7 +280,7 @@ namespace RevitTimasBIMTools.RevitUtils
             UIView ActiveUIView = uiViewsWithActiveView.FirstOrDefault();
             if (uiViewsWithActiveView.Count > 1)
             {
-                System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
+                Process process = System.Diagnostics.Process.GetCurrentProcess();
 
                 IntPtr revitHandle = process.MainWindowHandle;
                 AutomationElement root = AutomationElement.FromHandle(revitHandle);
@@ -320,6 +323,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
             Logger.Info(msg);
         }
+
 
 
     }
