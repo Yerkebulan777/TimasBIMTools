@@ -22,6 +22,9 @@ namespace RevitTimasBIMTools.Services
         public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
         [DllImport(user32, SetLastError = true)]
+        public static extern void MoveWindow(IntPtr hwnd, int X, int Y, int nWidth, int nHeight, bool rePaint);
+
+        [DllImport(user32, SetLastError = true)]
         public static extern IntPtr SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, uint threadId);
 
         [DllImport(user32, SetLastError = true)]
@@ -48,17 +51,12 @@ namespace RevitTimasBIMTools.Services
         private static readonly IntPtr HWND_NOTOPMOST = new(-2);
 
         private const uint NOSIZE = 0x0001;
-        private const uint NOMOVE = 0x0002;
         private const uint NOZORDER = 0x0004;
-        private const uint NOREDRAW = 0x0008;
         private const uint NOACTIVATE = 0x0010;
-        private const uint FRAMECHANGED = 0x0020;
-        private const uint SHOWWINDOW = 0x0040;
-        private const uint HIDEWINDOW = 0x0080;
-        private const uint NOCOPYBITS = 0x0100;
         private const uint NOOWNERZORDER = 0x0200;
         private const uint NOSENDCHANGING = 0x0400;
+        private const uint ASYNCWINDOWPOS = 0x4000;
 
-        private const uint TOPMOST_FLAGS = NOACTIVATE | NOOWNERZORDER | NOSIZE | NOMOVE | NOREDRAW | NOSENDCHANGING;
+        public const uint TOPMOST_FLAGS = NOACTIVATE | NOOWNERZORDER | NOSIZE | NOZORDER | NOSENDCHANGING | ASYNCWINDOWPOS;
     }
 }

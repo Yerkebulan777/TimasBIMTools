@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security;
 using System.Windows.Automation;
+using System.Windows.Forms;
 using Color = Autodesk.Revit.DB.Color;
+using View = Autodesk.Revit.DB.View;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -51,9 +51,6 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        /// <summary>
-        /// Retrieve a suitable 3D view3d from document. 
-        /// </summary>
         public static View3D Get3dView(UIDocument uidoc, string viewName = "Isometric3DView")
         {
             Document doc = uidoc.Document;
@@ -64,14 +61,19 @@ namespace RevitTimasBIMTools.RevitUtils
                     DisplayStyle style = DisplayStyle.Realistic;
                     ViewDetailLevel level = ViewDetailLevel.Fine;
                     ViewDiscipline discipline = ViewDiscipline.Coordination;
-                    return SetView3DSettings(doc, view3d, discipline, style, level);
+                    SetView3DSettings(doc, view3d, discipline, style, level);
+                    return view3d;
                 }
             }
             return CreateNew3DView(uidoc, viewName);
         }
 
+        #endregion
 
-        public static View3D SetView3DSettings(Document doc, View3D view, ViewDiscipline discipline, DisplayStyle style, ViewDetailLevel level)
+
+        #region SetView3DSettings
+
+        public static void SetView3DSettings(Document doc, View3D view, ViewDiscipline discipline, DisplayStyle style, ViewDetailLevel level)
         {
             using (Transaction t = new(doc, "SetView3DSettings"))
             {
@@ -94,8 +96,8 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-            return view;
         }
+
         #endregion
 
 
@@ -112,21 +114,13 @@ namespace RevitTimasBIMTools.RevitUtils
         #region Show3DView
         public static void Show3DView(UIDocument uidoc, View3D view3d)
         {
-            if (view3d is not null and View view)
+            if (view3d is not null)
             {
                 uidoc.RequestViewChange(view3d);
-                using Transaction t = new(uidoc.Document);
-                TransactionStatus status = t.Start("Get3DView");
-                if (status == TransactionStatus.Started)
-                {
-                    view3d.ViewTemplateId = ElementId.InvalidElementId;
-
-                    view.Discipline = ViewDiscipline.Mechanical;
-                    view.DisplayStyle = DisplayStyle.Realistic;
-                    view.DetailLevel = ViewDetailLevel.Fine;
-
-                    status = t.Commit();
-                }
+                DisplayStyle style = DisplayStyle.Realistic;
+                ViewDetailLevel level = ViewDetailLevel.Fine;
+                ViewDiscipline discipline = ViewDiscipline.Coordination;
+                SetView3DSettings(uidoc.Document, view3d, discipline, style, level);
                 uidoc.RefreshActiveView();
             }
         }
@@ -325,6 +319,52 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
+        public bool ShowDialogBox(UIDocument uidoc, string promptInfo)
+        {
+            Process process = System.Diagnostics.Process.GetCurrentProcess();
+            IntPtr revitHandle = process.MainWindowHandle;
+
+            if (revitHandle != IntPtr.Zero)
+            {
+                IList<UIView> uiViewsWithActiveView = uidoc.GetOpenUIViews();
+                UIView activeUIView = uiViewsWithActiveView.FirstOrDefault();
+                Rectangle rectParent = activeUIView.GetWindowRectangle();
+
+                System.Drawing.Rectangle screen = Screen.FromHandle(revitHandle).Bounds;
+
+                int widthParent = rectParent.Right - rectParent.Left;
+                int heightParent = rectParent.Bottom - rectParent.Top;
+
+                int centreParentX = screen.Left + (screen.Width / 2) - (widthParent / 2);
+                int centreParentY = screen.Top + (screen.Height / 2) - (heightParent / 2);
+
+
+                TaskDialogCommonButtons buttons = TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel;
+                TaskDialog taskDialog = new("SmartBIMTools")
+                {
+                    Id = "Customer DialogId",
+                    MainContent = promptInfo,
+                    CommonButtons = buttons,
+                    DefaultButton = TaskDialogResult.Ok,
+                };
+
+                TaskDialogResult result = taskDialog.Show();
+                process = Process.GetProcessesByName("SmartBIMTools").FirstOrDefault();
+                IntPtr handle = process.MainWindowHandle;
+                if (handle != IntPtr.Zero)
+                {
+                    int pntX = centreParentX + (widthParent / 5);
+                    int pntY = centreParentY + (heightParent / 5);
+                    NativeWindowMethod.MoveWindow(handle, pntX, pntY, 500, 300, true);
+                }
+                if (TaskDialogResult.Cancel == result)
+                {
+                    // Do not show the Revit dialog
+                    return true;
+                }
+            }
+            return false;
+        }
 
     }
 }
