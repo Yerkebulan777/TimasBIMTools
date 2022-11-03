@@ -570,6 +570,7 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             dataView.SortDescriptions.Clear();
                             dataView.GroupDescriptions.Clear();
+                            dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.IsSelected)));
                             dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
@@ -713,7 +714,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region ShowExecuteCommand
 
-        private bool? dialogResult;
+        private bool? dialogResult = false;
         public bool? DialogResult
         {
             get => dialogResult;
@@ -771,7 +772,7 @@ namespace RevitTimasBIMTools.ViewModels
                             }
                             else
                             {
-                                Logger.Info("XXX........................");
+                                model.IsSelected = false;
                             }
                         }
                     }

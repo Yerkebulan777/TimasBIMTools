@@ -1,14 +1,15 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-    xmlns:Converters ="clr-namespace:RevitTimasBIMTools.ViewConverters" >
+    xmlns:converters ="clr-namespace:RevitTimasBIMTools.ViewConverters" >
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Animation.xaml"/>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Colors.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
-    <BooleanToVisibilityConverter x:Key="BoolToViz"/>
+    <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    <converters:NullVisibilityConverter x:Key="NullToVis"/>
 
     <DropShadowEffect x:Key="ShadowBlur" />
     

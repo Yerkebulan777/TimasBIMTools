@@ -67,7 +67,7 @@
 
             <!-- Options -->
             <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch" 
-                      Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}"
+                      Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}"
                       Style="{StaticResource VisibleAnimation}" >
 
                 <ListViewItem>
@@ -174,7 +174,7 @@
             <!-- Filter Control -->
             <WrapPanel Grid.Row="2" Style="{StaticResource VisibleAnimation}" 
                     Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="5" 
-                    Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
+                    Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
 
                 <ComboBox Name="ComboLevelFilter" Height="23" Width="125" Margin="5" 
                     ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
@@ -189,7 +189,7 @@
 
             <!-- DataGridView -->
             <ScrollViewer Grid.Row="3"  Style="{StaticResource VisibleAnimation}" 
-                          Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
+                          Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
                 <DataGrid Name="dataGridView" IsSynchronizedWithCurrentItem="True" AutoGenerateColumns="False"
                           ItemsSource="{Binding Path=DataViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <DataGrid.RowStyle>
@@ -257,7 +257,7 @@
                 <DockPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" >
 
                     <WrapPanel Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
-                                Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}" >
+                                Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
                         <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
                                 IsEnabled="{Binding Path=IsOptionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                 Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
@@ -267,27 +267,17 @@
                     </WrapPanel>
 
                     <WrapPanel Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
-                                Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToViz}, FallbackValue=Collapsed}">
+                                Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
                         <Button Name="CutVoidCmd" Height="30" Width="75" Margin="5"
                                 IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                                 Command="{Binding Path=VerifyExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                                 CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}" >
                             <Label FontFamily="Segoe MDL2 Assets" Content="&#59538;" Foreground="DarkBlue"  FontSize="15" />
-                            <!--<Button.Triggers>
-                                <EventTrigger RoutedEvent="Button.Click">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="OkCanselPanel"  Storyboard.TargetProperty="Visibility">
-                                                <DiscreteObjectKeyFrame KeyTime="0:0:3" Value="{x:Static Visibility.Hidden}"/>
-                                            </ObjectAnimationUsingKeyFrames>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Button.Triggers>-->
                         </Button>
                     </WrapPanel>
 
-                    <WrapPanel Name="OkCanselPanel" Orientation="Horizontal">
+                    <WrapPanel Name="OkCanselPanel" Orientation="Horizontal" Style="{StaticResource VisibleAnimation}"
+                               Visibility="{Binding  Path=DialogResult, Converter={StaticResource NullToVis}}">
                         
                         <Button Name="ApplyCmd" Height="25" Width="75" Margin="5" IsDefault="True"
                                 IsEnabled ="{Binding ElementName=OkCanselPanel, Path=IsVisible}"

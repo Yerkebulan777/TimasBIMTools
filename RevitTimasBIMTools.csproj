@@ -247,6 +247,7 @@
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Services\Timer.cs" />
     <Compile Include="ViewConverters\ElementNameConverter.cs" />
+    <Compile Include="ViewConverters\NullVisibilityConverter.cs" />
     <Compile Include="ViewModels\CutVoidDataViewModel.cs" />
     <Compile Include="Views\CutVoidDockPaneView.xaml.cs">
       <DependentUpon>CutVoidDockPaneView.xaml</DependentUpon>
