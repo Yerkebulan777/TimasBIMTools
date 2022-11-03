@@ -77,14 +77,14 @@ namespace RevitTimasBIMTools.Services
                 double screenWidth = SystemParameters.FullPrimaryScreenWidth;
                 double screenHeight = SystemParameters.FullPrimaryScreenHeight;
 
-                int widthParent = rectParent.Right - rectParent.Left;
-                int heightParent = rectParent.Bottom - rectParent.Top;
+                int parentWidth = rectParent.Right - rectParent.Left;
+                int parentHeight = rectParent.Bottom - rectParent.Top;
 
-                int centreParentX = Convert.ToInt32(screenWidth / 2) - (widthParent / 2);
-                int centreParentY = Convert.ToInt32(screenHeight / 2) - (heightParent / 2);
+                int centreParentX = Convert.ToInt32(screenWidth / 2) - (parentWidth / 2);
+                int centreParentY = Convert.ToInt32(screenHeight / 2) - (parentHeight / 2);
 
-                point.X = centreParentX + (widthParent / offset);
-                point.Y = centreParentY + (heightParent / offset);
+                point.X = centreParentX + (parentWidth / offset);
+                point.Y = centreParentY + (parentHeight / offset);
             }
             return point;
         }
