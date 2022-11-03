@@ -152,13 +152,13 @@ namespace RevitTimasBIMTools.CutOpening
 
                 try
                 {
-                    if (instanse is RoofBase roof && roof.IsValidObject)
-                    {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.Level, StructuralType.NonStructural);
-                    }
                     if (instanse is Wall wall && wall.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(model.Origin, wallOpenning, wall, StructuralType.NonStructural);
+                    }
+                    if (instanse is RoofBase roof && roof.IsValidObject)
+                    {
+                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.Level, StructuralType.NonStructural);
                     }
                     if (instanse is Floor floor && floor.IsValidObject)
                     {
