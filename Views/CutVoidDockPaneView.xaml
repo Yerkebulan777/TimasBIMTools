@@ -9,7 +9,7 @@
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Class="RevitTimasBIMTools.Views.CutVoidDockPaneView" 
     d:Height="Auto" d:Width="300" mc:Ignorable="d"
-    MinHeight="150" MinWidth="300"
+    MinHeight="300" MinWidth="300"
     Background="WhiteSmoke">
 
     <Page.Resources>
