@@ -1,39 +1,39 @@
-﻿using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security;
-using System.Windows;
 
 namespace RevitTimasBIMTools.Services
 {
-
-    [SuppressUnmanagedCodeSecurity]
     public static class WindowExtesion
     {
-        public static System.Windows.Point GetRevitWindowLocationPoint(this UIApplication uiapp, double offset = 3)
+        public static Tuple<int, int> GetActiveViewLocation(this UIApplication uiapp, int offset = 300)
         {
-            System.Windows.Point point = new();
+            Tuple<int, int> point = null;
             IntPtr revitHandle = uiapp.MainWindowHandle;
             if (revitHandle != IntPtr.Zero)
             {
                 UIDocument uidoc = uiapp.ActiveUIDocument;
                 IList<UIView> uiViewsWithActiveView = uidoc.GetOpenUIViews();
                 UIView activeUIView = uiViewsWithActiveView.FirstOrDefault();
-                Autodesk.Revit.DB.Rectangle rectParent = activeUIView.GetWindowRectangle();
+                //Autodesk.Revit.DB.Rectangle windowRect = uiapp.MainWindowExtents;
+                //Autodesk.Revit.DB.Rectangle drawingRect = uiapp.DrawingAreaExtents;
 
-                double screenWidth = SystemParameters.FullPrimaryScreenWidth;
-                double screenHeight = SystemParameters.FullPrimaryScreenHeight;
+                //int parentWidth = viewRect.Right - viewRect.Left;
+                //int parentHeight = viewRect.Bottom - viewRect.Top;
 
-                int parentWidth = rectParent.Right - rectParent.Left;
-                int parentHeight = rectParent.Bottom - rectParent.Top;
+                Rectangle viewRect = activeUIView.GetWindowRectangle();
 
-                int centreParentX = Convert.ToInt32(screenWidth / 2) - (parentWidth / 2);
-                int centreParentY = Convert.ToInt32(screenHeight / 2) - (parentHeight / 2);
+                int diagonal = 500;
+                int scale = diagonal / offset;
+                int ptX = viewRect.Right * 1 / scale;
+                int ptY = viewRect.Bottom * 1 / scale;
 
-                point.X = centreParentX + (parentWidth / offset);
-                point.Y = centreParentY + (parentHeight / offset);
+                point = Tuple.Create(ptX, ptY);
+
             }
+
             return point;
         }
     }
