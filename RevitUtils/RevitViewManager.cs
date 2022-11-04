@@ -4,11 +4,8 @@ using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Windows;
-using System.Windows.Forms;
 using Color = Autodesk.Revit.DB.Color;
 
 
@@ -262,46 +259,13 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void ShowDialogBox(UIApplication uiapp)
+        public static void ShowDialogBox(UIApplication uiapp, Window window)
         {
             Tuple<int, int> point = uiapp.SetActiveViewLocation();
-            Window window = new DialogBox()
-            {
-                WindowStartupLocation = WindowStartupLocation.Manual,
-                Left = point.Item1,
-                Top = point.Item2,
-            };
+            window.WindowStartupLocation = WindowStartupLocation.Manual;
+            window.Left = point.Item1;
+            window.Top = point.Item2;
             window.Show();
-
-
-            //TaskDialogCommonButtons buttons = TaskDialogCommonButtons.Ok | TaskDialogCommonButtons.Cancel;
-            //TaskDialog taskDialog = new("SmartBIMTools")
-            //{
-            //    Id = "Customer DialogId",
-            //    MainContent = promptInfo,
-            //    CommonButtons = buttons,
-            //    DefaultButton = TaskDialogResult.Ok,
-            //};
-
-            //await Task.Delay(1000);
-            //TaskDialogResult result = taskDialog.Show();
-            //process = Process.GetProcessesByName("SmartBIMTools").FirstOrDefault();
-            //IntPtr handle = process.MainWindowHandle;
-            //if (handle != IntPtr.Zero)
-            //{
-
-            //    WindowExtesion.MoveWindow(handle, pntX, pntY, 500, 300, true);
-            //}
-            //if (TaskDialogResult.Cancel == result)
-            //{
-            //    dialogResult = false;
-            //    taskDialog.Dispose();
-            //}
-            //else if (TaskDialogResult.Ok == result)
-            //{
-            //    dialogResult = true;
-            //    taskDialog.Dispose();
-            //}
         }
 
 
