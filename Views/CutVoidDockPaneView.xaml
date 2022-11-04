@@ -277,27 +277,6 @@
                         </Button>
                     </WrapPanel>
 
-                    <WrapPanel Name="OkCanselPanel" Orientation="Horizontal" Style="{StaticResource VisibleAnimation}"
-                               Visibility="{Binding  Path=DialogResult, Converter={StaticResource NullToVis}}">
-                        
-                        <Button Name="ApplyCmd" Height="25" Width="75" Margin="5" IsDefault="True"
-                                IsEnabled ="{Binding ElementName=OkCanselPanel, Path=IsVisible}"
-                                Command="{Binding Path=ChoiseExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
-                                CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}"
-                                Click="ApplyCmd_Click" >
-                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
-                        </Button>
-
-                        <Button Name="CancelCmd"  Height="25" Width="75" Margin="5" IsCancel="True" 
-                                IsEnabled ="{Binding ElementName=OkCanselPanel, Path=IsVisible}"
-                                Command="{Binding Path=ChoiseExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
-                                CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}"
-                                Click="CancelCmd_Click" >
-                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
-                        </Button>
-
-                    </WrapPanel>
-
                 </DockPanel>
             </Border>
 

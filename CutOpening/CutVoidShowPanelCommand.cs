@@ -29,7 +29,6 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public Result Execute(UIApplication uiapp, ref string message)
         {
-
             try
             {
                 DockablePane pane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);

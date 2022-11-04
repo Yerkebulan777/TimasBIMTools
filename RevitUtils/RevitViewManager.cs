@@ -262,14 +262,14 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void ShowDialogBox(UIDocument uidoc, string promptInfo)
+        public static void ShowDialogBox(UIApplication uiapp)
         {
-            Window window = new()
+            System.Windows.Point point = uiapp.GetRevitWindowLocationPoint();
+            Window window = new DialogBox()
             {
-                Content = new DialogBox(),
-                ClipToBounds = true,
-                Title = promptInfo,
                 WindowStartupLocation = WindowStartupLocation.Manual,
+                Left = point.X,
+                Top = point.Y,
             };
             window.Show();
 
