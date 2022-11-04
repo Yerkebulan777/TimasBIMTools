@@ -49,13 +49,23 @@ namespace RevitTimasBIMTools.Views
 
         private void ApplyCmd_Click(object sender, RoutedEventArgs e)
         {
-
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                DataContextHandler.DialogResult = true;
+                externalEvent.Dispose();
+                Close();
+            });
         }
 
 
         private void CancelCmd_Click(object sender, RoutedEventArgs e)
         {
-
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                DataContextHandler.DialogResult = false;
+                externalEvent.Dispose();
+                Close();
+            });
         }
 
     }
