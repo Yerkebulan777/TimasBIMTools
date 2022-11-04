@@ -264,7 +264,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static void ShowDialogBox(UIApplication uiapp)
         {
-            Tuple<int, int> point = uiapp.GetActiveViewLocation();
+            Tuple<int, int> point = uiapp.SetActiveViewLocation();
             Window window = new DialogBox()
             {
                 WindowStartupLocation = WindowStartupLocation.Manual,
