@@ -245,7 +245,7 @@
     <Compile Include="RevitUtils\RevitWPFViewer.cs" />
     <Compile Include="RevitUtils\ViewModelExtension.cs" />
     <Compile Include="Services\MutexServise.cs" />
-    <Compile Include="Services\NativeWindowMethod.cs" />
+    <Compile Include="Services\WindowExtesion.cs" />
     <Compile Include="Services\Timer.cs" />
     <Compile Include="ViewConverters\ElementNameConverter.cs" />
     <Compile Include="ViewConverters\NullVisibilityConverter.cs" />

@@ -290,7 +290,7 @@ namespace RevitTimasBIMTools.RevitUtils
             //if (handle != IntPtr.Zero)
             //{
 
-            //    NativeWindowMethod.MoveWindow(handle, pntX, pntY, 500, 300, true);
+            //    WindowExtesion.MoveWindow(handle, pntX, pntY, 500, 300, true);
             //}
             //if (TaskDialogResult.Cancel == result)
             //{
