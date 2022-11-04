@@ -3,11 +3,19 @@ using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace RevitTimasBIMTools.Services
 {
     public static class WindowExtesion
     {
+        [DllImport("user32.dll")]
+        internal static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+
+
         public static Tuple<int, int> SetActiveViewLocation(this UIApplication uiapp, int offset = 150)
         {
             Tuple<int, int> point = null;
