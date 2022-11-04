@@ -28,8 +28,8 @@ namespace RevitTimasBIMTools.Services
                 double diagonal = Math.Sqrt(Math.Pow(viewXLen, 2) + Math.Pow(viewYLen, 2));
                 double scale = Math.Round(1 / (diagonal / offset), 5);
 
-                int ptX = Convert.ToInt16(viewRect.Right - (viewRect.Right * scale));
-                int ptY = Convert.ToInt16(viewRect.Bottom - (viewRect.Bottom * scale));
+                int ptX = Convert.ToInt16(viewRect.Right - (viewXLen * scale));
+                int ptY = Convert.ToInt16(viewRect.Bottom - (viewYLen * scale));
 
                 point = Tuple.Create(ptX, ptY);
             }
