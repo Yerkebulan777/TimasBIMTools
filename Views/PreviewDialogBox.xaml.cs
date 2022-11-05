@@ -9,13 +9,13 @@ using System.Windows.Threading;
 namespace RevitTimasBIMTools.Views
 {
     /// <summary>
-    /// Логика взаимодействия для DialogBox.xaml
+    /// Логика взаимодействия для PreviewDialogBox.xaml
     /// </summary>
-    public partial class DialogBox : Window
+    public partial class PreviewDialogBox : Window
     {
         private readonly CutVoidDataViewModel DataContextHandler;
         private static readonly ExternalEvent externalEvent = CutVoidDataViewModel.RevitExternalEvent;
-        public DialogBox(CutVoidDataViewModel viewModel)
+        public PreviewDialogBox(CutVoidDataViewModel viewModel)
         {
             InitializeComponent();
             Loaded += DialogBox_Loaded;

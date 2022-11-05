@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.CutOpening;
+using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
@@ -14,6 +15,7 @@ namespace RevitTimasBIMTools.Core
         {
             ServiceCollection services = new();
 
+            _ = services.AddSingleton<UIApplication>();
             _ = services.AddSingleton<APIEventHandler>();
             _ = services.AddSingleton<SmartToolHelper>();
             _ = services.AddSingleton<CutVoidDataViewModel>();
@@ -24,7 +26,8 @@ namespace RevitTimasBIMTools.Core
 
             _ = services.AddTransient<CutVoidCollisionManager>();
             _ = services.AddTransient<RevitPurginqManager>();
-            _ = services.AddTransient<DialogBox>();
+            _ = services.AddTransient<PreviewControlModel>();
+            _ = services.AddTransient<PreviewDialogBox>();
             
             return services.BuildServiceProvider();
         }

@@ -733,8 +733,8 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             if (SetSectionBoxModelView(app.ActiveUIDocument, model, view3d, patternId))
                             {
-                                DialogBox dialodBox = SmartToolApp.ServiceProvider.GetRequiredService<DialogBox>();
-                                RevitViewManager.ShowDialogBox(app, dialodBox);
+                                PreviewControlModel control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
+                                control.ShowPreviewControl(view3d);
                             }
                         }
                     }

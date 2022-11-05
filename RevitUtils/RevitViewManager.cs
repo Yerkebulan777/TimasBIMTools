@@ -1,11 +1,13 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using Color = Autodesk.Revit.DB.Color;
 
 
@@ -14,7 +16,7 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitViewManager
     {
-        //ContentControl content = new PreviewControl(document, view3d.Id);
+        //ContentControl content = new PreviewControl(document, View3d.Id);
 
         #region Get3dView
         public static View3D CreateNew3DView(UIDocument uidoc, string viewName)
@@ -200,7 +202,7 @@ namespace RevitTimasBIMTools.RevitUtils
             OverrideGraphicSettings graphics = new();
             if (!view.AreGraphicsOverridesAllowed())
             {
-                Logger.Error($"Graphic overrides are not alowed for the '{view.Name}' view3d");
+                Logger.Error($"Graphic overrides are not alowed for the '{view.Name}' View3d");
             }
             else
             {
@@ -256,16 +258,6 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
 
-        }
-
-
-        public static void ShowDialogBox(UIApplication uiapp, Window window)
-        {
-            Tuple<int, int> point = uiapp.SetActiveViewLocation();
-            window.WindowStartupLocation = WindowStartupLocation.Manual;
-            window.Left = point.Item1;
-            window.Top = point.Item2;
-            window.Show();
         }
 
 

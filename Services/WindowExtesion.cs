@@ -15,8 +15,7 @@ namespace RevitTimasBIMTools.Services
         [DllImport("user32.dll")]
         private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 
-
-        public static Tuple<int, int> SetActiveViewLocation(this UIApplication uiapp, int offset = 150)
+        public static Tuple<int, int> SetActiveViewLocation(this UIApplication uiapp, int offset = 300)
         {
             Tuple<int, int> point = null;
             IntPtr revitHandle = uiapp.MainWindowHandle;
@@ -25,8 +24,6 @@ namespace RevitTimasBIMTools.Services
                 UIDocument uidoc = uiapp.ActiveUIDocument;
                 IList<UIView> uiViewsWithActiveView = uidoc.GetOpenUIViews();
                 UIView activeUIView = uiViewsWithActiveView.FirstOrDefault();
-                //Autodesk.Revit.DB.Rectangle windowRect = uiapp.MainWindowExtents;
-                //Autodesk.Revit.DB.Rectangle drawingRect = uiapp.DrawingAreaExtents;
 
                 Rectangle viewRect = activeUIView.GetWindowRectangle();
 

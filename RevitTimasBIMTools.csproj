@@ -206,6 +206,7 @@
     <Compile Include="Core\ContainerConfig.cs" />
     <Compile Include="Core\RevitEventWrapper.cs" />
     <Compile Include="Core\SmartToolApp.cs" />
+    <Compile Include="RevitModel\PreviewControlModel.cs" />
     <Compile Include="RevitUtils\CutVoidExtention.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
     <Compile Include="RevitUtils\CacheDataRepository.cs" />
@@ -253,8 +254,8 @@
     <Compile Include="Views\CutVoidDockPaneView.xaml.cs">
       <DependentUpon>CutVoidDockPaneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\DialogBox.xaml.cs">
-      <DependentUpon>DialogBox.xaml</DependentUpon>
+    <Compile Include="Views\PreviewDialogBox.xaml.cs">
+      <DependentUpon>PreviewDialogBox.xaml</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -285,7 +286,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\DialogBox.xaml">
+    <Page Include="Views\PreviewDialogBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
