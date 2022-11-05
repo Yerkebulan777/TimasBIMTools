@@ -52,7 +52,6 @@ namespace RevitTimasBIMTools.Views
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
                 DataContextHandler.DialogResult = true;
-                externalEvent.Dispose();
                 Close();
             });
         }
@@ -63,7 +62,6 @@ namespace RevitTimasBIMTools.Views
             Dispatcher.CurrentDispatcher.Invoke(() =>
             {
                 DataContextHandler.DialogResult = false;
-                externalEvent.Dispose();
                 Close();
             });
         }
