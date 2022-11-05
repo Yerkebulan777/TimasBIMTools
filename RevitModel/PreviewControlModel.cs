@@ -25,6 +25,7 @@ namespace RevitTimasBIMTools.RevitModel
             PreviewControl = new PreviewControl(doc, view3d.Id);
             _ = window.GridControl.Children.Add(PreviewControl);
             PreviewControl.Loaded += PreviewControlLoad;
+
             window.ShowInTaskbar = true;
             window.Left = point.Item1;
             window.Top = point.Item2;
