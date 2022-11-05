@@ -170,7 +170,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 try
                 {
                     uiview.ZoomAndCenterRectangle(box.Min, box.Max);
-                    uiview.Zoom(0.85);
+                    uiview.ZoomToFit();
                 }
                 catch (Exception ex)
                 {

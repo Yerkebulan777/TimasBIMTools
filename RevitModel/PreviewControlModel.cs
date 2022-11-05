@@ -25,6 +25,7 @@ namespace RevitTimasBIMTools.RevitModel
             PreviewControl = new PreviewControl(doc, view3d.Id);
             _ = window.GridControl.Children.Add(PreviewControl);
             PreviewControl.Loaded += PreviewControlLoad;
+            window.ShowInTaskbar = true;
             window.Left = point.Item1;
             window.Top = point.Item2;
             window.Show();
@@ -33,9 +34,11 @@ namespace RevitTimasBIMTools.RevitModel
 
         private void PreviewControlLoad(object sender, RoutedEventArgs e)
         {
-            PreviewControl.Loaded -= PreviewControlLoad;
-            PreviewControl.UIView.ZoomToFit();
-            _ = window.Activate();
+            if (window.Activate())
+            {
+                PreviewControl.UIView.ZoomToFit();
+                PreviewControl.Loaded -= PreviewControlLoad;
+            }
         }
     }
 }

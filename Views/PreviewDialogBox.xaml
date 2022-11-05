@@ -8,19 +8,24 @@
       ShowInTaskbar="True"
       SizeToContent="WidthAndHeight"
       Background="White" Topmost="True"
-      Title="Dialog Box" Height="450" Width="300">
+      Title="Preview dialog control" Height="500" Width="500">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="300"/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
 
-        <Grid Name="GridControl" Grid.Row="0"
-              HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Grid Name="GridControl" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
+
         </Grid>
 
-        <StackPanel Name="OkCanselPanel" Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Name="OkCanselPanel" Grid.Row="1" Grid.Column="1" Orientation="Horizontal" 
+                    HorizontalAlignment="Right"  VerticalAlignment="Center" Margin="5">
 
             <Button Name="ApplyCmd" Height="25" Width="75" Margin="5" IsDefault="True"
                     Command="{Binding Path=ChoiseExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"

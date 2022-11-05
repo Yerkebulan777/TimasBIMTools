@@ -15,7 +15,7 @@ namespace RevitTimasBIMTools.Services
         [DllImport("user32.dll")]
         private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 
-        public static Tuple<int, int> SetActiveViewLocation(this UIApplication uiapp, int offset = 300)
+        public static Tuple<int, int> SetActiveViewLocation(this UIApplication uiapp, int offset = 500)
         {
             Tuple<int, int> point = null;
             IntPtr revitHandle = uiapp.MainWindowHandle;
