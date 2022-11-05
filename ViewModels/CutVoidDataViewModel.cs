@@ -567,6 +567,7 @@ namespace RevitTimasBIMTools.ViewModels
                             dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                            dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
                         }
                     }
                 }

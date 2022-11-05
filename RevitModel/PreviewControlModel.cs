@@ -21,7 +21,7 @@ namespace RevitTimasBIMTools.RevitModel
         public void ShowPreviewControl(UIApplication uiapp, View3D view3d)
         {
             Document doc = uiapp.ActiveUIDocument.Document;
-            Tuple<int, int> point = uiapp.SetActiveViewLocation();
+            Tuple<int, int> point = uiapp.SetActiveViewLocation(window);
             PreviewControl = new PreviewControl(doc, view3d.Id);
             _ = window.GridControl.Children.Add(PreviewControl);
             PreviewControl.Loaded += PreviewControlLoad;

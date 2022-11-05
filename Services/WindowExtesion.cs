@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
 
 namespace RevitTimasBIMTools.Services
 {
@@ -15,7 +18,7 @@ namespace RevitTimasBIMTools.Services
         [DllImport("user32.dll")]
         private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 
-        public static Tuple<int, int> SetActiveViewLocation(this UIApplication uiapp, int offset = 500)
+        public static Tuple<int, int> SetActiveViewLocation(this UIApplication uiapp, UIElement element, int offset = 150)
         {
             Tuple<int, int> point = null;
             IntPtr revitHandle = uiapp.MainWindowHandle;
@@ -27,18 +30,38 @@ namespace RevitTimasBIMTools.Services
 
                 Rectangle viewRect = activeUIView.GetWindowRectangle();
 
-                int viewXLen = viewRect.Right - viewRect.Left;
-                int viewYLen = viewRect.Bottom - viewRect.Top;
+                Size size = GetElementPixelSize(element);
 
-                double diagonal = Math.Sqrt(Math.Pow(viewXLen, 2) + Math.Pow(viewYLen, 2));
-                double scale = Math.Round(1 / (diagonal / offset), 5);
-
-                int ptX = Convert.ToInt16(viewRect.Right - (viewXLen * scale));
-                int ptY = Convert.ToInt16(viewRect.Bottom - (viewYLen * scale));
+                int ptX = Convert.ToInt16(viewRect.Right - (size.Width / 2) - offset);
+                int ptY = Convert.ToInt16(viewRect.Bottom - (size.Height / 2) - offset);
 
                 point = Tuple.Create(ptX, ptY);
             }
             return point;
         }
+
+
+        public static Size GetElementPixelSize(UIElement element)
+        {
+            Matrix transformToDevice;
+            PresentationSource source = PresentationSource.FromVisual(element);
+            if (source != null)
+            {
+                transformToDevice = source.CompositionTarget.TransformToDevice;
+            }
+            else
+            {
+                using HwndSource sourceHwnd = new(new HwndSourceParameters());
+                transformToDevice = sourceHwnd.CompositionTarget.TransformToDevice;
+            }
+
+            if (element.DesiredSize == new Size())
+            {
+                element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            }
+
+            return (Size)transformToDevice.Transform((Vector)element.DesiredSize);
+        }
+
     }
 }

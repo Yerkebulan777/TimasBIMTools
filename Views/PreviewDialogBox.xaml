@@ -15,16 +15,12 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="3*"/>
-        </Grid.ColumnDefinitions>
 
-        <Grid Name="GridControl" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
+        <Grid Name="GridControl" Grid.Row="0" Margin="5">
 
         </Grid>
 
-        <StackPanel Name="OkCanselPanel" Grid.Row="1" Grid.Column="1" Orientation="Horizontal" 
+        <StackPanel Name="OkCanselPanel" Grid.Row="1" Orientation="Horizontal" 
                     HorizontalAlignment="Right"  VerticalAlignment="Center" Margin="5">
 
             <Button Name="ApplyCmd" Height="25" Width="75" Margin="5" IsDefault="True"
