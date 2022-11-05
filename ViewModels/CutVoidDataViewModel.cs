@@ -732,7 +732,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                         {
-                            if (SetSectionBoxModelView(app.ActiveUIDocument, model, view3d, patternId))
+                            if (SetSectionBoxView(app.ActiveUIDocument, model, view3d, patternId))
                             {
                                 PreviewControlModel control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
                                 control.ShowPreviewControl(app, view3d);
@@ -776,7 +776,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        public bool SetSectionBoxModelView(UIDocument uidoc, ElementModel model, View3D view3d, ElementId patternId)
+        public bool SetSectionBoxView(UIDocument uidoc, ElementModel model, View3D view3d, ElementId patternId)
         {
             RevitViewManager.SetCustomColorInView(uidoc, view3d, patternId, model.Instanse);
             return RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d);
