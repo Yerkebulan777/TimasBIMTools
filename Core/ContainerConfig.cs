@@ -15,7 +15,6 @@ namespace RevitTimasBIMTools.Core
         {
             ServiceCollection services = new();
 
-            _ = services.AddSingleton<UIApplication>();
             _ = services.AddSingleton<APIEventHandler>();
             _ = services.AddSingleton<SmartToolHelper>();
             _ = services.AddSingleton<CutVoidDataViewModel>();

@@ -9,22 +9,19 @@ namespace RevitTimasBIMTools.RevitModel
 {
     public sealed class PreviewControlModel
     {
-        private readonly Document doc;
         private readonly PreviewDialogBox window;
-        private readonly UIApplication application;
         private PreviewControl PreviewControl { get; set; }
-        public PreviewControlModel(UIApplication uiapp, PreviewDialogBox frame)
+        public PreviewControlModel(PreviewDialogBox frame)
         {
             window = frame;
-            application = uiapp;
-            doc = application.ActiveUIDocument.Document;
             window.WindowStartupLocation = WindowStartupLocation.Manual;
         }
 
 
-        public void ShowPreviewControl(View3D view3d)
+        public void ShowPreviewControl(UIApplication uiapp, View3D view3d)
         {
-            Tuple<int, int> point = application.SetActiveViewLocation();
+            Document doc = uiapp.ActiveUIDocument.Document;
+            Tuple<int, int> point = uiapp.SetActiveViewLocation();
             PreviewControl = new PreviewControl(doc, view3d.Id);
             _ = window.GridControl.Children.Add(PreviewControl);
             PreviewControl.Loaded += PreviewControlLoad;
@@ -38,7 +35,7 @@ namespace RevitTimasBIMTools.RevitModel
         {
             PreviewControl.Loaded -= PreviewControlLoad;
             PreviewControl.UIView.ZoomToFit();
-            window.Activate();
+            _ = window.Activate();
         }
     }
 }
