@@ -123,7 +123,7 @@ namespace RevitTimasBIMTools.CutOpening
                             interNormal = interNormal.ResetDirectionToPositive();
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
-                            interSolid = interSolid.ScaledSolidByOffset(interBbox, cutOffsetSize);
+                            interSolid = interSolid.ScaledSolidByOffset(centroid, interBbox, cutOffsetSize);
                             ElementModel model = new(elem, level)
                             {
                                 Origin = centroid,
