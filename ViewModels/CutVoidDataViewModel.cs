@@ -49,9 +49,18 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Templory
+
         private Document doc { get; set; }
         private View3D view3d { get; set; }
         private ElementId patternId { get; set; }
+        private ElementModel currentModel { get; set; }
+
+        private bool? dialogResult = false;
+        public bool? DialogResult
+        {
+            get => dialogResult;
+            set => SetProperty(ref dialogResult, value);
+        }
 
         #endregion
 
@@ -708,66 +717,30 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region ShowExecuteCommand
 
-        private bool? dialogResult = false;
-        public bool? DialogResult
-        {
-            get => dialogResult;
-            set => SetProperty(ref dialogResult, value);
-        }
-
-
         public ICommand ShowExecuteCommand { get; private set; }
         private async Task ShowHandelCommandAsync()
         {
-            if (DataViewCollection?.IsEmpty == false)
-            {
-                object item = DataViewCollection.GetItemAt(0);
-                DataGrid dataGrid = DockPanelView.dataGridView;
-                DialogResult = await RevitTask.RunAsync(app =>
-                {
-                    dataGrid.SelectedItem = item;
-                    dataGrid.ScrollIntoView(item);
-                    doc = app.ActiveUIDocument.Document;
-                    if (item is ElementModel model && model.IsSelected)
-                    {
-                        if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-                        {
-                            if (SetSectionBoxView(app.ActiveUIDocument, model, view3d, patternId))
-                            {
-                                PreviewControlModel control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
-                                control.ShowPreviewControl(app, view3d);
-                            }
-                        }
-                    }
-                    return dialogResult;
-                });
-            }
-        }
-
-
-        public ICommand OkCanselCommand { get; private set; }
-        private async Task OkCanselHandelCommandAsync()
-        {
-            if (DataViewCollection?.IsEmpty == false)
+            if (!DataViewCollection.IsEmpty)
             {
                 object item = DataViewCollection.GetItemAt(0);
                 DataGrid dataGrid = DockPanelView.dataGridView;
                 await RevitTask.RunAsync(app =>
                 {
+                    DialogResult = null;
                     dataGrid.SelectedItem = item;
                     dataGrid.ScrollIntoView(item);
                     doc = app.ActiveUIDocument.Document;
-                    if (item is ElementModel model && model.IsSelected)
+                    UIDocument uidoc = app.ActiveUIDocument;
+                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                        if (item is ElementModel model && model.IsSelected)
                         {
-                            if (dialogResult.Value && ElementModelData.Remove(model))
+                            if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
                             {
-                                collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
-                            }
-                            else
-                            {
-                                model.IsSelected = false;
+                                RevitViewManager.SetCustomColorInView(uidoc, view3d, patternId, model.Instanse);
+                                PreviewControlModel control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
+                                control.ShowPreviewControl(app, view3d);
+                                currentModel = model;
                             }
                         }
                     }
@@ -775,11 +748,33 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
+        #endregion
 
-        public bool SetSectionBoxView(UIDocument uidoc, ElementModel model, View3D view3d, ElementId patternId)
+
+        #region OkCanselCommand
+
+        public ICommand OkCanselCommand { get; private set; }
+        private async Task OkCanselHandelCommandAsync()
         {
-            RevitViewManager.SetCustomColorInView(uidoc, view3d, patternId, model.Instanse);
-            return RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d);
+            if (currentModel is not null)
+            {
+                await RevitTask.RunAsync(app =>
+                {
+                    if (dialogResult.HasValue)
+                    {
+                        currentModel.IsSelected = false;
+                        doc = app.ActiveUIDocument.Document;
+                        if (dialogResult.Value  && ElementModelData.Remove(currentModel))
+                        {
+                            collisionManager.CreateOpening(doc, currentModel, wallOpenning, floorOpenning);
+                        }
+                        else
+                        {
+                            DataViewCollection.Refresh();
+                        }
+                    }
+                });
+            }
         }
 
         #endregion
