@@ -43,8 +43,8 @@ namespace RevitTimasBIMTools.ViewModels
         {
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
             RefreshDataCommand = new AsyncRelayCommand(RefreshActiveDataHandler);
-            VerifyExecuteCommand = new AsyncRelayCommand(VerifyHandelCommandAsync);
-            ChoiseExecuteCommand = new AsyncRelayCommand(ChoiseHandelCommandAsync);
+            ShowExecuteCommand = new AsyncRelayCommand(ShowHandelCommandAsync);
+            OkCanselCommand = new AsyncRelayCommand(OkCanselHandelCommandAsync);
         }
 
 
@@ -716,8 +716,8 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        public ICommand VerifyExecuteCommand { get; private set; }
-        private async Task VerifyHandelCommandAsync()
+        public ICommand ShowExecuteCommand { get; private set; }
+        private async Task ShowHandelCommandAsync()
         {
             if (DataViewCollection?.IsEmpty == false)
             {
@@ -745,8 +745,8 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        public ICommand ChoiseExecuteCommand { get; private set; }
-        private async Task ChoiseHandelCommandAsync()
+        public ICommand OkCanselCommand { get; private set; }
+        private async Task OkCanselHandelCommandAsync()
         {
             if (DataViewCollection?.IsEmpty == false)
             {

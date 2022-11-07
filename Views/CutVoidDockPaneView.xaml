@@ -20,7 +20,6 @@
         </ResourceDictionary>
     </Page.Resources>
 
-
     <!-- GridMain -->
     <Border BorderThickness="2.5" BorderBrush="Gray">
         <Grid Name="PageMainGrid" >
@@ -271,7 +270,7 @@
                                 Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
                         <Button Name="CutVoidCmd" Height="30" Width="75" Margin="5"
                                 IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                                Command="{Binding Path=VerifyExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                                Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                                 CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}" >
                             <Label FontFamily="Segoe MDL2 Assets" Content="&#59538;" Foreground="DarkBlue"  FontSize="15" />
                         </Button>

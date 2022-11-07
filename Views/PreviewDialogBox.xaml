@@ -1,12 +1,15 @@
 ﻿<Window x:Class="RevitTimasBIMTools.Views.PreviewDialogBox"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
-      mc:Ignorable="d"
-      Background="White" Topmost="True"
-      Title="Preview dialog control" Height="350" Width="350" ResizeMode="NoResize">
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        d:DataContext="{d:DesignInstance Type=vm:CutVoidDataViewModel}"
+        xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
+        xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
+        mc:Ignorable="d" 
+        Background="WhiteSmoke"
+        WindowStyle="None"  Topmost="True"
+        Title="Preview dialog control" Height="350" Width="350" >
 
     <Grid>
         <Grid.RowDefinitions>
@@ -14,22 +17,21 @@
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
 
-        <Grid Name="GridControl" Grid.Row="0" Margin="5">
-
+        <Grid Name="GridControl" Grid.Row="0" Margin="5" >
         </Grid>
 
         <StackPanel Name="OkCanselPanel" Grid.Row="1" Orientation="Horizontal" 
                     HorizontalAlignment="Right"  VerticalAlignment="Center" Margin="5">
 
             <Button Name="ApplyCmd" Height="25" Width="75" Margin="5" IsDefault="True"
-                    Command="{Binding Path=ChoiseExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                    Command="{Binding Path=OkCanselCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                     CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}" 
                     Click="ApplyCmd_Click">
                 <Label FontFamily="Segoe MDL2 Assets" Content="&#59643;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
             </Button>
 
             <Button Name="CancelCmd"  Height="25" Width="75" Margin="5" IsCancel="True"
-                    Command="{Binding Path=ChoiseExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
+                    Command="{Binding Path=OkCanselCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
                     CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}"
                     Click="CancelCmd_Click">
                 <Label FontFamily="Segoe MDL2 Assets" Content="&#59153;" FontSize="13" Foreground="DarkBlue" FontWeight="Heavy"/>
