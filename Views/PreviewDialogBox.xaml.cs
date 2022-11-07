@@ -19,6 +19,7 @@ namespace RevitTimasBIMTools.Views
         {
             InitializeComponent();
             Loaded += DialogBox_Loaded;
+            WindowStyle = WindowStyle.None;
             DataContext = DataContextHandler = viewModel;
             DataContextHandler = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         }

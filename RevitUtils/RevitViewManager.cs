@@ -206,7 +206,6 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             else
             {
-
                 graphics = graphics.SetSurfaceForegroundPatternVisible(true);
                 graphics = graphics.SetSurfaceBackgroundPatternVisible(true);
                 graphics = graphics.SetSurfaceForegroundPatternColor(color);
@@ -233,7 +232,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void SetCategoryTransparency(Document doc, View3D view, Category category, int transparency = 0, bool halftone = false)
+        public static void SetCategoryTransparency(Document doc, View3D view, Category category, int transparency = 15, bool halftone = false)
         {
             ElementId catId = category.Id;
             if (view.IsCategoryOverridable(catId))
