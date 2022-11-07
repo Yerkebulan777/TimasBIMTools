@@ -764,7 +764,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         currentModel.IsSelected = false;
                         doc = app.ActiveUIDocument.Document;
-                        if (dialogResult.Value  && ElementModelData.Remove(currentModel))
+                        if (dialogResult.Value && ElementModelData.Remove(currentModel))
                         {
                             collisionManager.CreateOpening(doc, currentModel, wallOpenning, floorOpenning);
                         }
