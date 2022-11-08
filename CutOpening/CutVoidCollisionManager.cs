@@ -27,7 +27,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private readonly Transform identity = Transform.Identity;
         private readonly SolidCurveIntersectionOptions intersectOptions = new();
-        private readonly double thresholdAngle = Math.Floor(Math.Cos(45 * Math.PI / 180));
+        private readonly double threshold = Math.Round(Math.Cos(Math.PI / 4), 5);
 
         #endregion
 
@@ -126,15 +126,14 @@ namespace RevitTimasBIMTools.CutOpening
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
                             interSolid = interSolid.ScaledSolidByOffset(centroid, interBbox, cutOffsetSize);
 
-                            double angleX = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisX));
-                            double angleY = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisY));
-                            double angleZ = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisZ));
-                            string parallel = $"Is parallel => {GeometryExtension.IsParallel(interNormal, hostNormal)}";
-                            string vertical = string.Format("Angel {0:0.000}", interNormal.GetAngleByNormal(hostNormal));
-                            string infoX = string.Format(" X={0:0.000}", angleX);
-                            string infoY = string.Format(" Y={0:0.000}", angleY);
-                            string infoZ = string.Format(" Z={0:0.000}", angleZ);
-                            string info = "Project => " + parallel + vertical + infoX + infoY + infoZ;
+                            //string infoX = string.Format(" X={0:0.000}", interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisX).ConvertRadiansToDegrees());
+                            //string infoY = string.Format(" Y={0:0.000}", interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisY).ConvertRadiansToDegrees());
+                            //string horizont = string.Format(" Horizont {0:0.000}", interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisZ).ConvertRadiansToDegrees());
+                            string horizont = string.Format(" Horizont {0:0.000}", interNormal.GetHorizontAngleByNormal(hostNormal).ConvertRadiansToDegrees());
+                            string vertical = string.Format(" Vertical {0:0.000}", interNormal.GetVerticalAngleByNormal().ConvertRadiansToDegrees());
+                            //string parallel = $"Is parallel => {GeometryExtension.IsParallel(interNormal, hostNormal)}";
+
+                            string info = "Project => " + vertical + horizont;
 
                             ElementModel model = new(elem, level)
                             {
@@ -218,9 +217,10 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        private bool IsValidParallel(XYZ hostNormal, XYZ direction)
+        private bool IsValidParallel(XYZ hostNormal, XYZ instNormal)
         {
-            return !direction.IsAlmostEqualTo(XYZ.Zero) && Math.Abs(hostNormal.DotProduct(direction)) > thresholdAngle;
+            // The dot product of the angle must be greater than 45 degrees = > threshold
+            return Math.Abs(hostNormal.DotProduct(instNormal)) > threshold;
         }
 
 

@@ -308,7 +308,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static double GetHorizontAngleRadiansByNormal(this XYZ normal)
+        public static double GetHorizontAngleByNormal(this XYZ normal)
         {
             return Math.Atan(normal.X / normal.Y);
         }
@@ -316,17 +316,28 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static double GetVerticalAngleByNormal(this XYZ normal)
         {
-            return Math.Acos(normal.DotProduct(XYZ.BasisZ)) - (Math.PI / 2);
+            return Math.Abs(Math.Acos(normal.DotProduct(XYZ.BasisZ)) - (Math.PI / 2));
         }
 
 
-        public static double GetAngleByNormal(this XYZ direction, XYZ basis)
+        public static double GetHorizontAngleByNormal(this XYZ direction, XYZ normal)
         {
-            return Math.Acos(direction.DotProduct(basis)) - (Math.PI / 2);
+            double angle = Math.Round(Math.Abs(direction.AngleOnPlaneTo(normal, XYZ.BasisX)), 5);
+            if (angle != Math.Round(Math.PI) && angle != Math.Round(Math.PI / 2))
+            {
+                double right = Math.PI / 2;
+                double mitre = right / 2;
+                if (angle > mitre)
+                {
+                    angle -= right;
+                }
+                return angle;
+            }
+            return 0;
         }
 
 
-        public static double ConvertRadiansToDegrees(double radians, int digit = 3)
+        public static double ConvertRadiansToDegrees(this double radians, int digit = 3)
         {
             return Math.Round(180 / Math.PI * radians, digit);
         }
