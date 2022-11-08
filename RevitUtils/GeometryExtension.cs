@@ -314,9 +314,15 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static double GetVerticalAngleRadiansByNormal(this XYZ normal)
+        public static double GetVerticalAngleByNormal(this XYZ normal)
         {
             return Math.Acos(normal.DotProduct(XYZ.BasisZ)) - (Math.PI / 2);
+        }
+
+
+        public static double GetAngleByNormal(this XYZ direction, XYZ basis)
+        {
+            return Math.Acos(direction.DotProduct(basis)) - (Math.PI / 2);
         }
 
 

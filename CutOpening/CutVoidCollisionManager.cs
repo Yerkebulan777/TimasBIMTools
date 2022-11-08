@@ -118,15 +118,6 @@ namespace RevitTimasBIMTools.CutOpening
                         interSolid = hostSolid.GetIntersectionSolid(elem, global, options);
                         if (interSolid != null)
                         {
-                            double angleX = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisX));
-                            double angleY = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisY));
-                            double angleZ = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisZ));
-                            string parallel = $"Is parallel Z => {GeometryExtension.IsParallel(interNormal, XYZ.BasisZ)}";
-                            string infoX = string.Format(" X={0:0.00}", angleX);
-                            string infoY = string.Format(" Y={0:0.00}", angleY);
-                            string infoZ = string.Format(" Z={0:0.00}", angleZ);
-                            string info = "Project => " + parallel + infoX + infoY + infoZ;
-
                             centroid = interSolid.ComputeCentroid();
                             interBbox = interSolid.GetBoundingBox();
                             hostNormal = hostNormal.ResetDirectionToPositive();
@@ -134,6 +125,17 @@ namespace RevitTimasBIMTools.CutOpening
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
                             interSolid = interSolid.ScaledSolidByOffset(centroid, interBbox, cutOffsetSize);
+
+                            double angleX = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisX));
+                            double angleY = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisY));
+                            double angleZ = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisZ));
+                            string parallel = $"Is parallel => {GeometryExtension.IsParallel(interNormal, hostNormal)}";
+                            string vertical = string.Format("Angel {0:0.000}", interNormal.GetAngleByNormal(hostNormal));
+                            string infoX = string.Format(" X={0:0.000}", angleX);
+                            string infoY = string.Format(" Y={0:0.000}", angleY);
+                            string infoZ = string.Format(" Z={0:0.000}", angleZ);
+                            string info = "Project => " + parallel + vertical + infoX + infoY + infoZ;
+
                             ElementModel model = new(elem, level)
                             {
                                 Origin = centroid,
