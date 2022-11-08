@@ -121,9 +121,14 @@ namespace RevitTimasBIMTools.CutOpening
                             double angleX = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisX));
                             double angleY = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisY));
                             double angleZ = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisZ));
-                            
+                            string infoX = string.Format(" X={0:0.00}", angleX);
+                            string infoY = string.Format(" Y={0:0.00}", angleY);
+                            string infoZ = string.Format(" Z={0:0.00}", angleZ);
+                            string info = "Angle project => " + infoX + infoY + infoZ;
+
                             centroid = interSolid.ComputeCentroid();
                             interBbox = interSolid.GetBoundingBox();
+                            hostNormal = hostNormal.ResetDirectionToPositive();
                             interNormal = interNormal.ResetDirectionToPositive();
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
@@ -137,7 +142,7 @@ namespace RevitTimasBIMTools.CutOpening
                             double height = tupleSize.Item1;
                             double widht = tupleSize.Item2;
                             model.SetDescription(height, widht);
-                            model.Description = $"Angle project to X={angleX} Y={angleY} Z={angleZ}";
+                            model.Description = info;
                             yield return model;
                         }
                     }
@@ -146,9 +151,9 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        double CalculateSideSize(double angleRadiance, double hostDeph, double offset)
+        private double CalculateSideSize(double angleRadiance, double hostDeph, double offset)
         {
-            return Math.Tan(angleRadiance) * hostDeph + (offset * 2);
+            return (Math.Tan(angleRadiance) * hostDeph) + (offset * 2);
         }
 
 
@@ -178,8 +183,8 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                     if (opening != null)
                     {
-                        _ = opening.get_Parameter(definition).Set(model.Width + offset * 2);
-                        _ = opening.get_Parameter(definition).Set(model.Height + offset * 2);
+                        _ = opening.get_Parameter(definition).Set(model.Width + (offset * 2));
+                        _ = opening.get_Parameter(definition).Set(model.Height + (offset * 2));
                     }
                 }
                 catch (Exception ex)
