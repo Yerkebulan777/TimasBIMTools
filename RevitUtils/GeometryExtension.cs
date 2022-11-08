@@ -12,7 +12,6 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal static class GeometryExtension
     {
-
         public static Outline GetOutLine(this BoundingBoxXYZ bbox)
         {
             Transform transform = bbox.Transform;
@@ -177,7 +176,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     //IList<ModelCurveArray> curves = new List<ModelCurveArray>();
                     //foreach (CurveLoop loop in curveloops)
                     //{
-                    //    CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, direction));
+                    //    CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, normal));
                     //    if (!array.IsEmpty)
                     //    {
                     //        curves.Add(doc.Create.NewModelCurveArray(array, sketch));
@@ -281,7 +280,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static Solid CreateRectangularPrism(XYZ center, double d1, double d2, double d3)
+        public static Solid CreateRectangularPrism(double d1, double d2, double d3)
         {
             List<Curve> profile = new();
             XYZ profile00 = new(-d1 / 2, -d2 / 2, -d3 / 2);
@@ -296,46 +295,32 @@ namespace RevitTimasBIMTools.RevitUtils
 
             CurveLoop curveLoop = CurveLoop.Create(profile);
 
-            SolidOptions options = new(
-                ElementId.InvalidElementId,
-                ElementId.InvalidElementId);
+            SolidOptions options = new(ElementId.InvalidElementId, ElementId.InvalidElementId);
 
             return GeometryCreationUtilities.CreateExtrusionGeometry(new[] { curveLoop }, XYZ.BasisZ, d3, options);
         }
 
 
-        public static XYZ ResetDirectionToPositive(this XYZ direction)
+        public static XYZ ResetDirectionToPositive(this XYZ normal)
         {
-            double radians = XYZ.BasisX.AngleOnPlaneTo(direction, XYZ.BasisZ);
-            return radians < Math.PI ? direction : direction.Negate();
+            double radians = XYZ.BasisX.AngleOnPlaneTo(normal, XYZ.BasisZ);
+            return radians < Math.PI ? normal : normal.Negate();
         }
 
 
-        public static double GetHorizontAngleRadiansByNormal(this XYZ direction)
+        public static double GetHorizontAngleRadiansByNormal(this XYZ normal)
         {
-            return Math.Atan(direction.X / direction.Y);
+            return Math.Atan(normal.X / normal.Y);
         }
 
 
-        public static double GetVerticalAngleRadiansByNormal(this XYZ direction)
+        public static double GetVerticalAngleRadiansByNormal(this XYZ normal)
         {
-            return Math.Acos(direction.DotProduct(XYZ.BasisZ)) - (Math.PI / 2);
+            return Math.Acos(normal.DotProduct(XYZ.BasisZ)) - (Math.PI / 2);
         }
 
 
-        public static double GetInternalAngleByDegrees(this double degrees)
-        {
-            return UnitUtils.ConvertToInternalUnits(degrees, DisplayUnitType.DUT_DECIMAL_DEGREES);
-        }
-
-
-        public static double GetInternalAngleByRadians(this double degrees)
-        {
-            return UnitUtils.ConvertToInternalUnits(degrees, DisplayUnitType.DUT_RADIANS);
-        }
-
-
-        private static double ConvertRadiansToDegrees(double radians, int digit = 5)
+        public static double ConvertRadiansToDegrees(double radians, int digit = 3)
         {
             return Math.Round(180 / Math.PI * radians, digit);
         }

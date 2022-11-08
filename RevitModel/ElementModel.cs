@@ -21,10 +21,11 @@ namespace RevitTimasBIMTools.RevitModel
             }
         }
 
+
         public string LevelName { get; private set; }
         public string SymbolName { get; private set; }
         public string FamilyName { get; private set; }
-        public string Description { get; private set; }
+        public string Description { get; internal set; }
         public double Height { get; private set; }
         public double Width { get; private set; }
         public XYZ Origin { get; internal set; }

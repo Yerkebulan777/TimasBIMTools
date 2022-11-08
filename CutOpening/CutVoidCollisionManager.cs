@@ -118,6 +118,10 @@ namespace RevitTimasBIMTools.CutOpening
                         interSolid = hostSolid.GetIntersectionSolid(elem, global, options);
                         if (interSolid != null)
                         {
+                            double angleX = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisX));
+                            double angleY = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisY));
+                            double angleZ = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisZ));
+                            
                             centroid = interSolid.ComputeCentroid();
                             interBbox = interSolid.GetBoundingBox();
                             interNormal = interNormal.ResetDirectionToPositive();
@@ -130,8 +134,10 @@ namespace RevitTimasBIMTools.CutOpening
                                 Intersection = interSolid,
                             };
 
-                            double height = tupleSize.Item1, widht = tupleSize.Item2;
+                            double height = tupleSize.Item1;
+                            double widht = tupleSize.Item2;
                             model.SetDescription(height, widht);
+                            model.Description = $"Angle project to X={angleX} Y={angleY} Z={angleZ}";
                             yield return model;
                         }
                     }
@@ -140,11 +146,17 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
+        double CalculateSideSize(double angleRadiance, double hostDeph, double offset)
+        {
+            return Math.Tan(angleRadiance) * hostDeph + (offset * 2);
+        }
+
+
         public void CreateOpening(Document doc, ElementModel model, FamilySymbol wallOpenning, FamilySymbol floorOpenning, Definition definition = null, double offset = 0)
         {
             FamilyInstance opening = null;
-            using Transaction trans = new(doc);
-            TransactionStatus status = trans.Start("Create opening");
+            using Transaction trans = new(doc, "Create opening");
+            TransactionStatus status = trans.Start();
             if (status == TransactionStatus.Started)
             {
                 model.Intersection.CreateDirectShape(doc);
