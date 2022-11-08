@@ -4,9 +4,9 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using Document = Autodesk.Revit.DB.Document;
-using Line = Autodesk.Revit.DB.Line;
 using Options = Autodesk.Revit.DB.Options;
-
+using Plane = Autodesk.Revit.DB.Plane;
+using Line = Autodesk.Revit.DB.Line;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -176,7 +176,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     //IList<ModelCurveArray> curves = new List<ModelCurveArray>();
                     //foreach (CurveLoop loop in curveloops)
                     //{
-                    //    CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, normal));
+                    //    CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, hostNormal));
                     //    if (!array.IsEmpty)
                     //    {
                     //        curves.Add(doc.Create.NewModelCurveArray(array, sketch));
@@ -320,17 +320,18 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static double GetHorizontAngleByNormal(this XYZ direction, XYZ normal)
+        public static double GetHorizontAngleByHostNormal(this XYZ hostNormal, XYZ direction)
         {
-            double angle = 0;
-            angle += Math.Abs(direction.AngleOnPlaneTo(normal, XYZ.BasisX));
-            angle += Math.Abs(direction.AngleOnPlaneTo(normal, XYZ.BasisY));
-            //double right = Math.PI / 2;
-            //double mitre = right / 2;
-            //if (angle > mitre)
-            //{
-            //    angle -= right;
-            //}
+            double angle = Math.Abs(direction.AngleOnPlaneTo(hostNormal, XYZ.BasisZ));
+            XYZ vector = new(Math.Cos(angle), Math.Sin(angle), 0);
+            if (hostNormal.IsAlmostEqualTo(XYZ.BasisX))
+            {
+                angle = vector.AngleTo(XYZ.BasisX);
+            }
+            else
+            {
+                angle = vector.AngleTo(XYZ.BasisY);
+            }
             return angle;
         }
 
