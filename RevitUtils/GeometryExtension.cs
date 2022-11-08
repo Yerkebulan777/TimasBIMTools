@@ -326,5 +326,10 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
+        public static bool IsParallel(XYZ direction, XYZ normal)
+        {
+            return direction.CrossProduct(normal).IsZeroLength();
+        }
+
     }
 }

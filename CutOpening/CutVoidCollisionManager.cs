@@ -121,10 +121,11 @@ namespace RevitTimasBIMTools.CutOpening
                             double angleX = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisX));
                             double angleY = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisY));
                             double angleZ = GeometryExtension.ConvertRadiansToDegrees(interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisZ));
+                            string parallel = $"Is parallel Z => {GeometryExtension.IsParallel(interNormal, XYZ.BasisZ)}";
                             string infoX = string.Format(" X={0:0.00}", angleX);
                             string infoY = string.Format(" Y={0:0.00}", angleY);
                             string infoZ = string.Format(" Z={0:0.00}", angleZ);
-                            string info = "Angle project => " + infoX + infoY + infoZ;
+                            string info = "Project => " + parallel + infoX + infoY + infoZ;
 
                             centroid = interSolid.ComputeCentroid();
                             interBbox = interSolid.GetBoundingBox();
