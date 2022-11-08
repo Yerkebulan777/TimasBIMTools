@@ -4,9 +4,9 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using Document = Autodesk.Revit.DB.Document;
+using Line = Autodesk.Revit.DB.Line;
 using Options = Autodesk.Revit.DB.Options;
 using Plane = Autodesk.Revit.DB.Plane;
-using Line = Autodesk.Revit.DB.Line;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -322,15 +322,11 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static double GetHorizontAngleByHostNormal(this XYZ hostNormal, XYZ direction)
         {
+            XYZ negate = hostNormal.Negate();
             double angle = Math.Abs(direction.AngleOnPlaneTo(hostNormal, XYZ.BasisZ));
-            XYZ vector = new(Math.Cos(angle), Math.Sin(angle), 0);
-            if (hostNormal.IsAlmostEqualTo(XYZ.BasisX))
+            if (!hostNormal.IsAlmostEqualTo(XYZ.BasisX) || !negate.IsAlmostEqualTo(XYZ.BasisX))
             {
-                angle = vector.AngleTo(XYZ.BasisX);
-            }
-            else
-            {
-                angle = vector.AngleTo(XYZ.BasisY);
+                angle = Math.Abs(Math.Sin(angle));
             }
             return angle;
         }
