@@ -322,7 +322,9 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static double GetHorizontAngleByNormal(this XYZ direction, XYZ normal)
         {
-            double angle = Math.Abs(direction.AngleOnPlaneTo(normal, XYZ.BasisX));
+            double angle = 0;
+            angle += Math.Abs(direction.AngleOnPlaneTo(normal, XYZ.BasisX));
+            angle += Math.Abs(direction.AngleOnPlaneTo(normal, XYZ.BasisY));
             //double right = Math.PI / 2;
             //double mitre = right / 2;
             //if (angle > mitre)
