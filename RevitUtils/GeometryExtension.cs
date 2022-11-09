@@ -12,6 +12,11 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal static class GeometryExtension
     {
+        private const double demic = Math.PI;
+        private const double right = Math.PI / 2;
+        private const double mitre = Math.PI / 4;
+
+
         public static Outline GetOutLine(this BoundingBoxXYZ bbox)
         {
             Transform transform = bbox.Transform;
@@ -301,10 +306,10 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static XYZ ResetDirectionToPositive(this XYZ normal)
+        public static XYZ ReduceDirection(this XYZ normal)
         {
-            double radians = XYZ.BasisX.AngleOnPlaneTo(normal, XYZ.BasisZ);
-            return radians < Math.PI ? normal : normal.Negate();
+            double radians = XYZ.Zero.AngleOnPlaneTo(normal, XYZ.BasisZ);
+            return radians > Math.PI ? normal : normal.Negate();
         }
 
 
@@ -320,15 +325,19 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static double GetHorizontAngleByHostNormal(this XYZ hostNormal, XYZ direction)
+        public static double GetHorizontAngleByHostNormal(this XYZ hostNormal, XYZ instNormal)
         {
-            XYZ negate = hostNormal.Negate();
-            double angle = Math.Abs(direction.AngleOnPlaneTo(hostNormal, XYZ.BasisZ));
-            if (!hostNormal.IsAlmostEqualTo(XYZ.BasisX) || !negate.IsAlmostEqualTo(XYZ.BasisX))
-            {
-                angle = Math.Abs(Math.Sin(angle));
-            }
-            return angle;
+            XYZ cross = hostNormal.CrossProduct(instNormal);
+            //hostNormal = hostNormal.DotProduct(instNormal) > 0 ? hostNormal : hostNormal.Negate();
+            hostNormal = cross.IsAlmostEqualTo(XYZ.BasisZ, 0.5) ? hostNormal : hostNormal.Negate();
+            //hostNormal = hostNormal.IsAlmostEqualTo(XYZ.BasisX, right) ? hostNormal : hostNormal.Negate();
+            //hostNormal = hostNormal.IsAlmostEqualTo(XYZ.BasisY, right) ? hostNormal : hostNormal.Negate();
+            //instNormal = instNormal.IsAlmostEqualTo(XYZ.BasisX, right) ? instNormal : instNormal.Negate();
+            //instNormal = instNormal.IsAlmostEqualTo(XYZ.BasisY, right) ? instNormal : instNormal.Negate();
+            //angle = angle > demic && reset ? angle - demic : angle;
+            //angle = angle > right && reset ? angle - right : angle;
+            //angle = angle > mitre && reset ? angle - mitre : angle;
+            return hostNormal.AngleOnPlaneTo(instNormal, XYZ.BasisZ); 
         }
 
 
