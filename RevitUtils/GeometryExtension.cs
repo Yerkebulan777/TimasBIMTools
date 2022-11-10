@@ -335,6 +335,8 @@ namespace RevitTimasBIMTools.RevitUtils
                 angle = angle > Math.PI ? (Math.PI * 2) - angle : angle;
                 //angle = angle == squaredPI ? 0 : angle;
                 //angle = angle == roundedPI ? 0 : angle;
+
+                /// Comment
             }
             return angle;
         }
