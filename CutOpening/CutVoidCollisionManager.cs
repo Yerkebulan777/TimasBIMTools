@@ -105,6 +105,7 @@ namespace RevitTimasBIMTools.CutOpening
             hostNormal = host.GetHostElementNormal();
             hostSolid = host.GetSolidByVolume(identity, options);
             Level level = doc.GetElement(host.LevelId) as Level;
+            // ElementIntersectsElementFilter можно попоробоювать поменять
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).OfCategoryId(category.Id).WherePasses(intersectFilter);
@@ -124,6 +125,7 @@ namespace RevitTimasBIMTools.CutOpening
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
                             interSolid = interSolid.ScaledSolidByOffset(centroid, interBbox, cutOffsetSize);
 
+                            // создать метод для "Angle: " + vertical + horizont...
                             string horizont = string.Format(" Horizont {0:0.00}", hostNormal.GetHorizontAngleBetween(interNormal).ConvertRadiansToDegrees());
                             string vertical = string.Format(" Vertical {0:0.00}", interNormal.GetVerticalAngleByNormal().ConvertRadiansToDegrees());
 
@@ -392,24 +394,7 @@ namespace RevitTimasBIMTools.CutOpening
         #endregion
 
 
-        /// Алгоритм проверки семейств отверстия
-        /*
-        * Проверить семейство что это реальное отверстие
-        * Найти все семейства и определить пересекается ли оно с чем либо (по краю)
-        * Если не пересекается проверить есть ли по центру елемент если нет то удалить
-        * Если пересекается то удалить
-        */
 
-
-        /// Общий алгоритм проверки пользователем елементов
-        /*
-         * Объединения елементов в одной точке в один большой bbox если они пересекаются
-         * Объединения проема если пересекаются bbox или находятся очень близко
-         * Создать новое семейство проема с возможностью изменения размеров => CutOffset сохраняется
-         * Реализовать автосинхронизацию при окончание выполнение или изменения проекта
-         * Кнопки = (показать/создать/остановить)
-         * Необходимо использовать Dispose()
-         */
 
 
         [STAThread]
