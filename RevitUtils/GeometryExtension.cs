@@ -330,7 +330,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 double directAngle = Math.Atan2(direction.Y, direction.X);
                 angle = Math.Abs(Math.Round(normalAngle - directAngle, 7));
                 angle = angle > Math.PI ? (Math.PI * 2) - angle : angle;
-                angle = angle > Math.PI / 2 ? Math.PI - angle : angle;
+                angle = angle > (Math.PI / 2) ? Math.PI - angle : angle;
             }
             return angle;
         }

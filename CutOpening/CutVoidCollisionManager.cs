@@ -127,7 +127,7 @@ namespace RevitTimasBIMTools.CutOpening
                             string horizont = string.Format(" Horizont {0:0.00}", hostNormal.GetHorizontAngleBetween(interNormal).ConvertRadiansToDegrees());
                             string vertical = string.Format(" Vertical {0:0.00}", interNormal.GetVerticalAngleByNormal().ConvertRadiansToDegrees());
 
-                            string info = "Project => " + vertical + horizont;
+                            string info = "Angle: " + vertical + horizont;
 
                             ElementModel model = new(elem, level)
                             {
@@ -138,7 +138,7 @@ namespace RevitTimasBIMTools.CutOpening
                             double height = tupleSize.Item1;
                             double widht = tupleSize.Item2;
                             model.SetDescription(height, widht);
-                            model.Description = info;
+                            model.Description += info;
                             yield return model;
                         }
                     }
