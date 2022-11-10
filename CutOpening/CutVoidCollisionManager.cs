@@ -120,18 +120,12 @@ namespace RevitTimasBIMTools.CutOpening
                         {
                             centroid = interSolid.ComputeCentroid();
                             interBbox = interSolid.GetBoundingBox();
-                            //hostNormal = hostNormal.ReduceDirection();
-                            //interNormal = interNormal.ReduceDirection();
                             sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
                             interSolid = interSolid.ScaledSolidByOffset(centroid, interBbox, cutOffsetSize);
 
-                            //string infoX = string.Format(" X={0:0.000}", interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisX).ConvertRadiansToDegrees());
-                            //string infoY = string.Format(" Y={0:0.000}", interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisY).ConvertRadiansToDegrees());
-                            //string horizont = string.Format(" Horizont {0:0.000}", interNormal.AngleOnPlaneTo(hostNormal, XYZ.BasisZ).ConvertRadiansToDegrees());
-                            string horizont = string.Format(" Horizont {0:0.000}", hostNormal.GetHorizontAngleByHostNormal(interNormal).ConvertRadiansToDegrees());
+                            string horizont = string.Format(" Horizont {0:0.000}", hostNormal.GetHorizontAngleBetween(interNormal).ConvertRadiansToDegrees());
                             string vertical = string.Format(" Vertical {0:0.000}", interNormal.GetVerticalAngleByNormal().ConvertRadiansToDegrees());
-                            //string parallel = $"Is parallel => {GeometryExtension.IsParallel(interNormal, hostNormal)}";
 
                             string info = "Project => " + vertical + horizont;
 

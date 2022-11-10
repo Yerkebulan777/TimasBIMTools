@@ -12,9 +12,8 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal static class GeometryExtension
     {
-        private const double demic = Math.PI;
-        private const double right = Math.PI / 2;
-        private const double mitre = Math.PI / 4;
+        private readonly static double roundedPI = Math.Round(Math.PI, 5);
+        private readonly static double squaredPI = Math.Round(Math.PI *2 , 5);
 
 
         public static Outline GetOutLine(this BoundingBoxXYZ bbox)
@@ -181,7 +180,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     //IList<ModelCurveArray> curves = new List<ModelCurveArray>();
                     //foreach (CurveLoop loop in curveloops)
                     //{
-                    //    CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, hostNormal));
+                    //    CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, direction));
                     //    if (!array.IsEmpty)
                     //    {
                     //        curves.Add(doc.Create.NewModelCurveArray(array, sketch));
@@ -309,7 +308,7 @@ namespace RevitTimasBIMTools.RevitUtils
         public static XYZ ReduceDirection(this XYZ normal)
         {
             double radians = XYZ.Zero.AngleOnPlaneTo(normal, XYZ.BasisZ);
-            return radians > Math.PI ? normal : normal.Negate();
+            return radians > roundedPI ? normal : normal.Negate();
         }
 
 
@@ -325,31 +324,32 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static double GetHorizontAngleByHostNormal(this XYZ hostNormal, XYZ instNormal)
+        public static double GetHorizontAngleBetween(this XYZ normal, XYZ direction)
         {
-            XYZ cross = hostNormal.CrossProduct(instNormal);
-            //hostNormal = hostNormal.DotProduct(instNormal) > 0 ? hostNormal : hostNormal.Negate();
-            hostNormal = cross.IsAlmostEqualTo(XYZ.BasisZ, 0.5) ? hostNormal : hostNormal.Negate();
-            //hostNormal = hostNormal.IsAlmostEqualTo(XYZ.BasisX, right) ? hostNormal : hostNormal.Negate();
-            //hostNormal = hostNormal.IsAlmostEqualTo(XYZ.BasisY, right) ? hostNormal : hostNormal.Negate();
-            //instNormal = instNormal.IsAlmostEqualTo(XYZ.BasisX, right) ? instNormal : instNormal.Negate();
-            //instNormal = instNormal.IsAlmostEqualTo(XYZ.BasisY, right) ? instNormal : instNormal.Negate();
-            //angle = angle > demic && reset ? angle - demic : angle;
-            //angle = angle > right && reset ? angle - right : angle;
-            //angle = angle > mitre && reset ? angle - mitre : angle;
-            return hostNormal.AngleOnPlaneTo(instNormal, XYZ.BasisZ); 
+            double angle = 0;
+            if (!IsParallel(direction, normal))
+            {
+                double normalAngle = Math.Atan2(normal.Y, normal.X);
+                double directAngle = Math.Atan2(direction.Y, direction.X);
+                angle = Math.Round(Math.Abs(directAngle - normalAngle), 5);
+                angle = angle > squaredPI ? squaredPI - angle : angle;
+                angle = angle > roundedPI ? roundedPI - angle : angle;
+                //angle = angle == squaredPI ? 0 : angle;
+                //angle = angle == roundedPI ? 0 : angle;
+            }
+            return angle;
+        }
+
+
+        public static bool IsParallel(XYZ normal, XYZ direction)
+        {
+            return normal.CrossProduct(direction).IsZeroLength();
         }
 
 
         public static double ConvertRadiansToDegrees(this double radians, int digit = 3)
         {
             return Math.Round(180 / Math.PI * radians, digit);
-        }
-
-
-        public static bool IsParallel(XYZ direction, XYZ normal)
-        {
-            return direction.CrossProduct(normal).IsZeroLength();
         }
 
     }
