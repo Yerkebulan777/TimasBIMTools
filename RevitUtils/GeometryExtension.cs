@@ -96,19 +96,22 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 if (obj is Solid solid && solid != null && solid.Faces.Size > 0)
                 {
-                    if (solid.Volume > tolerance)
+                    if (result == null && solid.Volume > tolerance)
                     {
-                        if (null == result)
-                        {
-                            result = solid;
-                        }
+                        result = solid;
+                    }
+                    else
+                    {
                         try
                         {
-                            result = BooleanOperationsUtils.ExecuteBooleanOperation(result, solid, unionType);
+                            solid = BooleanOperationsUtils.ExecuteBooleanOperation(result, solid, unionType);
                         }
-                        catch
+                        finally
                         {
-                            continue;
+                            if (solid != null && solid.Volume > tolerance)
+                            {
+                                result = solid;
+                            }
                         }
                     }
                 }
