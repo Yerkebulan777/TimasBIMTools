@@ -12,8 +12,6 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal static class GeometryExtension
     {
-        private const double squaredPI = Math.PI * 2;
-        private const double rightAngle = Math.PI / 2;
 
         public static Outline GetOutLine(this BoundingBoxXYZ bbox)
         {
@@ -330,13 +328,9 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 double normalAngle = Math.Atan2(normal.Y, normal.X);
                 double directAngle = Math.Atan2(direction.Y, direction.X);
-                angle = Math.Abs(normalAngle - directAngle);
-                angle = angle > Math.PI / 2 ? Math.PI - angle : angle;
+                angle = Math.Abs(Math.Round(normalAngle - directAngle, 7));
                 angle = angle > Math.PI ? (Math.PI * 2) - angle : angle;
-                //angle = angle == squaredPI ? 0 : angle;
-                //angle = angle == roundedPI ? 0 : angle;
-
-                /// Comment
+                angle = angle > Math.PI / 2 ? Math.PI - angle : angle;
             }
             return angle;
         }

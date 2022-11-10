@@ -124,8 +124,8 @@ namespace RevitTimasBIMTools.CutOpening
                             tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
                             interSolid = interSolid.ScaledSolidByOffset(centroid, interBbox, cutOffsetSize);
 
-                            string horizont = string.Format(" Horizont {0:0.000}", hostNormal.GetHorizontAngleBetween(interNormal).ConvertRadiansToDegrees());
-                            string vertical = string.Format(" Vertical {0:0.000}", interNormal.GetVerticalAngleByNormal().ConvertRadiansToDegrees());
+                            string horizont = string.Format(" Horizont {0:0.00}", hostNormal.GetHorizontAngleBetween(interNormal).ConvertRadiansToDegrees());
+                            string vertical = string.Format(" Vertical {0:0.00}", interNormal.GetVerticalAngleByNormal().ConvertRadiansToDegrees());
 
                             string info = "Project => " + vertical + horizont;
 
