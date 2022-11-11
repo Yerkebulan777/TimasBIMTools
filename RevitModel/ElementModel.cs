@@ -1,27 +1,28 @@
 ﻿using Autodesk.Revit.DB;
 using CommunityToolkit.Mvvm.ComponentModel;
-using RevitTimasBIMTools.RevitUtils;
 using System;
 
 namespace RevitTimasBIMTools.RevitModel
 {
     public sealed class ElementModel : ObservableObject
     {
-        public readonly Level HostLevel;
         public readonly Element Instanse;
-        public readonly string SymbolName;
-        public readonly string FamilyName;
-        public readonly string LevelName;
+        public readonly Level IntersectionLevel;
+        public string LevelName { get; private set; }
+        public string SymbolName { get; private set; }
+        public string FamilyName { get; private set; }
+
+
         public ElementModel(Element elem, Level level)
         {
-            ElementType etype = elem.Document.GetElement(elem.GetTypeId()) as ElementType;
-            if (elem.IsValidObject && etype.IsValidObject)
+            Element etype = elem.Document.GetElement(elem.GetTypeId());
+            if (etype.IsValidObject && etype is ElementType elementType)
             {
                 Instanse = elem;
-                HostLevel = level;
                 LevelName = level.Name;
-                SymbolName = etype.Name;
-                FamilyName = etype.FamilyName;
+                IntersectionLevel = level;
+                SymbolName = elementType.Name;
+                FamilyName = elementType.FamilyName;
             }
         }
 
@@ -29,9 +30,6 @@ namespace RevitTimasBIMTools.RevitModel
         public XYZ Origin { get; internal set; }
         public XYZ Direction { get; internal set; }
         public XYZ HostNormal { get; internal set; }
-        public Line IntersectionLine { get; internal set; }
-        public Solid IntersectionSolid { get; internal set; }
-        public BoundingBoxXYZ IntersectionBox { get; internal set; }
         public string Description { get; internal set; }
 
         public double Height { get; internal set; }

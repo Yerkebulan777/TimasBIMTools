@@ -192,11 +192,6 @@
                           Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
                 <DataGrid Name="dataGridView" IsSynchronizedWithCurrentItem="True" AutoGenerateColumns="False"
                           ItemsSource="{Binding Path=DataViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
-                    <DataGrid.RowStyle>
-                        <Style TargetType="{x:Type DataGridRow}">
-                            <EventSetter Event="MouseDoubleClick" Handler="DataGrid_MouseDoubleClick"/>
-                        </Style>
-                    </DataGrid.RowStyle>
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Switch" Width="30" CellStyle="{StaticResource SingleClickEditStyle}" >
                             <DataGridTemplateColumn.HeaderTemplate>
@@ -224,14 +219,6 @@
                         </DataGridTextColumn>
                         
                         <DataGridTextColumn Width="150" Header="Family Name" Binding="{Binding FamilyName, Mode=OneWay}">
-                            <DataGridTextColumn.EditingElementStyle>
-                                <Style TargetType="TextBox">
-                                    <Setter Property="IsReadOnly" Value="true"/>
-                                </Style>
-                            </DataGridTextColumn.EditingElementStyle>
-                        </DataGridTextColumn>
-
-                        <DataGridTextColumn Width="100" Header="Level Name" Binding="{Binding LevelName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>

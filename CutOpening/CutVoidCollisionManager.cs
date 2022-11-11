@@ -112,8 +112,8 @@ namespace RevitTimasBIMTools.CutOpening
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(out intersectionBbox);
-                intersectionLine = GetIntersectionLine(elem, hostSolid, centroid, out direction);
-                if (hostNormal.IsValidParallel(direction, threshold))
+                intersectionLine = GetIntersectionLine(elem, in hostSolid, in centroid, out direction);
+                if (hostNormal.IsValidParallel(in direction, threshold))
                 {
                     intersectionSolid = hostSolid.GetIntersectionSolid(elem, global, options);
                     intersectionBbox = intersectionSolid.GetBoundingBox();
@@ -124,9 +124,6 @@ namespace RevitTimasBIMTools.CutOpening
                         Origin = centroid,
                         Direction = direction,
                         HostNormal = hostNormal,
-                        IntersectionBox = intersectionBbox,
-                        IntersectionLine = intersectionLine,
-                        IntersectionSolid = intersectionSolid,
                     };
 
                     if (GetSectionSize(doc, ref model))
@@ -169,7 +166,7 @@ namespace RevitTimasBIMTools.CutOpening
                 horizont = CalculateSideSize(horizont, hostDeph).ConvertToDegrees();
                 vertical = CalculateSideSize(vertical, hostDeph).ConvertToDegrees();
                 string msgHorizont = string.Format(" Horizont {0}", horizont);
-                string msgVertical = string.Format(" Vertical {1}", vertical);
+                string msgVertical = string.Format(" Vertical {0}", vertical);
                 model.Description += "Opening size: " + msgHorizont + msgVertical;
             }
         }
@@ -188,22 +185,21 @@ namespace RevitTimasBIMTools.CutOpening
             TransactionStatus status = trans.Start();
             if (status == TransactionStatus.Started)
             {
-                model.IntersectionSolid.CreateDirectShape(doc);
                 Element instanse = model.Instanse;
 
                 try
                 {
                     if (instanse is Wall wall && wall.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, wallOpenning, model.HostLevel, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(model.Origin, wallOpenning, model.IntersectionLevel, StructuralType.NonStructural);
                     }
                     if (instanse is RoofBase roof && roof.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.IntersectionLevel, StructuralType.NonStructural);
                     }
                     if (instanse is Floor floor && floor.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.IntersectionLevel, StructuralType.NonStructural);
                     }
                     if (opening != null)
                     {
@@ -242,7 +238,7 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        private Line GetIntersectionLine(in Element elem, in Solid solid, in XYZ centroid, out XYZ direction)
+        private Line GetIntersectionLine(Element elem, in Solid solid, in XYZ centroid, out XYZ direction)
         {
             direction = XYZ.Zero;
             if (elem.Location is LocationCurve curve)
