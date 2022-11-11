@@ -26,14 +26,13 @@ namespace RevitTimasBIMTools.RevitModel
             }
         }
 
-
         public XYZ Origin { get; internal set; }
         public XYZ Direction { get; internal set; }
         public XYZ HostNormal { get; internal set; }
         public string Description { get; internal set; }
 
-        public double Height { get; internal set; }
-        public double Width { get; internal set; }
+        public double Height { get; set; }
+        public double Width { get; set; }
 
 
         private bool selected = false;
@@ -44,20 +43,12 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        public bool SetSizeDescription()
+        public void SetSizeDescription()
         {
-            if (Width > 0 && Height > 0)
-            {
-                IsSelected = true;
-                int w = (int)Math.Round(Width * 304.8);
-                int h = (int)Math.Round(Height * 304.8);
-                Description = $"{w}x{h}(h)";
-            }
-            return IsSelected;
+            int w = Convert.ToInt16(Width * 304.8);
+            int h = Convert.ToInt16(Height * 304.8);
+            Description = $"{w}x{h}(h)";
         }
-
-
-
 
 
         public override string ToString()

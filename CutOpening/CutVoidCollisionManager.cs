@@ -5,7 +5,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Windows.Shapes;
+using System.Globalization;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -128,7 +128,10 @@ namespace RevitTimasBIMTools.CutOpening
 
                     if (GetSectionSize(doc, ref model))
                     {
-                        CalculateOpeningSize(ref model, intersectionLine);
+                        model.SetSizeDescription();
+                        Logger.Log("Width:" + model.Width.ToString());
+                        Logger.Log("Height:" + model.Height.ToString());
+                        //CalculateOpeningSize(ref model, intersectionLine);
                         //intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffsetSize);
                         yield return model;
                     }
@@ -143,15 +146,15 @@ namespace RevitTimasBIMTools.CutOpening
             BoundingBoxUV size = intersectionSolid.GetCountour(doc, plane, sketchPlan, cutOffsetSize);
             if (direction.IsAlmostEqualTo(XYZ.BasisX))
             {
-                model.Width = Math.Abs(size.Max.U - size.Min.U);
-                model.Height = Math.Abs(size.Max.V - size.Min.V);
+                model.Width = Math.Floor(size.Max.U - size.Min.U);
+                model.Height = Math.Floor(size.Max.V - size.Min.V);
             }
             else
             {
-                model.Width = Math.Abs(size.Max.V - size.Min.V);
-                model.Height = Math.Abs(size.Max.U - size.Min.U);
+                model.Width = Math.Floor(size.Max.V - size.Min.V);
+                model.Height = Math.Floor(size.Max.U - size.Min.U);
             }
-            return model.SetSizeDescription();
+            return true;
         }
 
 
@@ -160,21 +163,22 @@ namespace RevitTimasBIMTools.CutOpening
             if (!model.HostNormal.IsParallel(model.Direction))
             {
                 XYZ vector = line.GetEndPoint(1) - line.GetEndPoint(0);
-                double hostDeph = Math.Abs(model.HostNormal.DotProduct(vector));
+                double hostDeph = Math.Floor(Math.Abs(model.HostNormal.DotProduct(vector)));
                 double horizont = model.HostNormal.GetHorizontAngleBetween(model.Direction);
                 double vertical = model.HostNormal.GetVerticalAngleBetween(model.Direction);
-                horizont = CalculateSideSize(horizont, hostDeph).ConvertToDegrees();
-                vertical = CalculateSideSize(vertical, hostDeph).ConvertToDegrees();
-                string msgHorizont = string.Format(" Horizont {0}", horizont);
-                string msgVertical = string.Format(" Vertical {0}", vertical);
-                model.Description += "Opening size: " + msgHorizont + msgVertical;
+                horizont = CalculateSideSize(model.Width, horizont, hostDeph).ConvertToDegrees();
+                vertical = CalculateSideSize(model.Height, vertical, hostDeph).ConvertToDegrees();
+                string msgHorizont = string.Format(" Horizont {0}", horizont.ToString("F2", CultureInfo.InvariantCulture));
+                string msgVertical = string.Format(" Vertical {0}", vertical.ToString("F2", CultureInfo.InvariantCulture));
+                model.Description += " Deph: " + Math.Floor(hostDeph * 304.8).ToString("F2", CultureInfo.InvariantCulture);
+                model.Description += " Size: " + msgHorizont + msgVertical;
             }
         }
 
 
-        private double CalculateSideSize(double angle, double hostDeph)
+        private double CalculateSideSize(double sideSize, double angle, double hostDeph)
         {
-            return Math.Tan(angle) * hostDeph;
+            return Math.Floor(sideSize + Math.Tan(angle) * hostDeph);
         }
 
 
