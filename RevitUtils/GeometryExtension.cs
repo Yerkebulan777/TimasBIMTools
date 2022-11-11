@@ -20,7 +20,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static XYZ GetMiddlePointByBoundingBox(this Element element, ref BoundingBoxXYZ bbox)
+        public static XYZ GetMiddlePointByBoundingBox(this Element element, out BoundingBoxXYZ bbox)
         {
             bbox = element.get_BoundingBox(null);
             return (bbox.Min + bbox.Max) * 0.5;
@@ -281,6 +281,13 @@ namespace RevitTimasBIMTools.RevitUtils
             SolidOptions options = new(ElementId.InvalidElementId, ElementId.InvalidElementId);
 
             return GeometryCreationUtilities.CreateExtrusionGeometry(new[] { curveLoop }, XYZ.BasisZ, d3, options);
+        }
+
+
+        /// <summary> The dot product of the angle must be greater than cos angle = > cosin /// </summary>
+        public static bool IsValidParallel(this XYZ normal, in XYZ direction, in double cosin)
+        {
+            return Math.Abs(normal.DotProduct(direction)) > cosin;
         }
 
 

@@ -54,15 +54,15 @@ namespace RevitTimasBIMTools.CutOpening
         private SketchPlane sketchPlan;
         private Plane plane;
 
-        private Line interLine = null;
+        private Line intersectionLine = null;
         private XYZ centroid = null;
         private Solid hostSolid = null;
-        private Solid interSolid = null;
+        private Solid intersectionSolid = null;
         private XYZ hostNormal = XYZ.BasisZ;
         private XYZ direction = XYZ.BasisZ;
         private Transform transform = null;
         private BoundingBoxXYZ hostBbox = null;
-        private BoundingBoxXYZ interBbox = null;
+        private BoundingBoxXYZ intersectionBbox = null;
 
         #endregion
 
@@ -110,29 +110,28 @@ namespace RevitTimasBIMTools.CutOpening
             collector = new FilteredElementCollector(doc).OfCategoryId(category.Id).WherePasses(intersectFilter);
             foreach (Element elem in collector)
             {
-                centroid = elem.GetMiddlePointByBoundingBox(ref interBbox);
-                interLine = GetIntersectionLine(elem, hostSolid, centroid, out direction);
-                if (IsValidParallel(hostNormal, direction))
+                centroid = elem.GetMiddlePointByBoundingBox(out intersectionBbox);
+                intersectionLine = GetIntersectionLine(elem, hostSolid, centroid, out direction);
+                if (hostNormal.IsValidParallel(direction, threshold))
                 {
-                    interSolid = hostSolid.GetIntersectionSolid(elem, global, options);
-                    interBbox = interSolid.GetBoundingBox();
-                    centroid = interSolid.ComputeCentroid();
+                    intersectionSolid = hostSolid.GetIntersectionSolid(elem, global, options);
+                    intersectionBbox = intersectionSolid.GetBoundingBox();
+                    centroid = intersectionSolid.ComputeCentroid();
 
                     ElementModel model = new(elem, level)
                     {
                         Origin = centroid,
                         Direction = direction,
                         HostNormal = hostNormal,
-                        IntersectionBox = interBbox,
-                        IntersectionLine = interLine,
-                        IntersectionSolid = interSolid,
+                        IntersectionBox = intersectionBbox,
+                        IntersectionLine = intersectionLine,
+                        IntersectionSolid = intersectionSolid,
                     };
-
 
                     if (GetSectionSize(doc, ref model))
                     {
 
-                        interSolid = interSolid.ScaledSolidByOffset(centroid, interBbox, cutOffsetSize);
+                        intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffsetSize);
 
                         // создать метод для "Angle: " + vertical + horizont...
                         string horizont = string.Format(" Horizont {0:0.00}", hostNormal.GetHorizontAngleBetween(direction).ConvertRadiansToDegrees());
@@ -150,7 +149,7 @@ namespace RevitTimasBIMTools.CutOpening
         private bool GetSectionSize(Document doc, ref ElementModel model)
         {
             sketchPlan = CreateSketchPlaneByNormal(doc, direction, centroid);
-            BoundingBoxUV size = interSolid.GetCountour(doc, plane, sketchPlan, cutOffsetSize);
+            BoundingBoxUV size = intersectionSolid.GetCountour(doc, plane, sketchPlan, cutOffsetSize);
             if (direction.IsAlmostEqualTo(XYZ.BasisX))
             {
                 model.Width = Math.Abs(size.Max.U - size.Min.U);
@@ -165,8 +164,6 @@ namespace RevitTimasBIMTools.CutOpening
             //return !hostNormal.IsParallel(direction);
             return model.SetSizeDescription();
         }
-
-
 
 
         public void CreateOpening(Document doc, ElementModel model, FamilySymbol wallOpenning, FamilySymbol floorOpenning, Definition definition = null, double offset = 0)
@@ -230,35 +227,28 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        private bool IsValidParallel(XYZ hostNormal, XYZ instNormal)
-        {
-            // The dot product of the angle must be greater than 45 degrees = > threshold
-            return Math.Abs(hostNormal.DotProduct(instNormal)) > threshold;
-        }
-
-
-        private Line GetIntersectionLine(Element elem, Solid solid, in XYZ centroid, out XYZ direction)
+        private Line GetIntersectionLine(in Element elem, in Solid solid, in XYZ centroid, out XYZ direction)
         {
             direction = XYZ.Zero;
-            if (elem is FamilyInstance instance)
+            if (elem.Location is LocationCurve curve)
+            {
+                intersectionLine = curve.Curve as Line;
+                direction = intersectionLine.Direction.Normalize();
+            }
+            else if (elem is FamilyInstance instance)
             {
                 transform = instance.GetTransform();
                 direction = transform.BasisX.Normalize();
                 XYZ strPnt = centroid - (direction * maxSideSize);
                 XYZ endPnt = centroid + (direction * maxSideSize);
-                interLine = Line.CreateBound(strPnt, endPnt);
+                intersectionLine = Line.CreateBound(strPnt, endPnt);
             }
-            else if (elem.Location is LocationCurve curve)
-            {
-                interLine = curve.Curve as Line;
-                direction = interLine.Direction.Normalize();
-            }
-            SolidCurveIntersection curves = solid.IntersectWithCurve(interLine, intersectOptions);
+            SolidCurveIntersection curves = solid.IntersectWithCurve(intersectionLine, intersectOptions);
             if (curves != null && 0 < curves.SegmentCount)
             {
-                interLine = curves.GetCurveSegment(0) as Line;
+                intersectionLine = curves.GetCurveSegment(0) as Line;
             }
-            return interLine;
+            return intersectionLine;
         }
 
 
@@ -418,7 +408,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             transform?.Dispose();
             hostSolid?.Dispose();
-            interSolid?.Dispose();
+            intersectionSolid?.Dispose();
             searchDocument?.Dispose();
             searchTransform?.Dispose();
         }
