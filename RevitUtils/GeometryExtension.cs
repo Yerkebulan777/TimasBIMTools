@@ -326,20 +326,16 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static double GetHorizontAngleBetween(this XYZ normal, XYZ direction)
         {
-            double angle = 0;
-            if (!IsParallel(direction, normal))
-            {
-                double normalAngle = Math.Atan2(normal.Y, normal.X);
-                double directAngle = Math.Atan2(direction.Y, direction.X);
-                angle = Math.Abs(Math.Round(normalAngle - directAngle, 7));
-                angle = angle > Math.PI ? (Math.PI * 2) - angle : angle;
-                angle = angle > (Math.PI / 2) ? Math.PI - angle : angle;
-            }
+            double normalAngle = Math.Atan2(normal.Y, normal.X);
+            double directAngle = Math.Atan2(direction.Y, direction.X);
+            double angle = Math.Abs(Math.Round(normalAngle - directAngle, 5));
+            angle = angle > Math.PI ? (Math.PI * 2) - angle : angle;
+            angle = angle > (Math.PI / 2) ? Math.PI - angle : angle;
             return angle;
         }
 
 
-        public static bool IsParallel(XYZ normal, XYZ direction)
+        public static bool IsParallel(this XYZ normal, XYZ direction)
         {
             return normal.CrossProduct(direction).IsZeroLength();
         }

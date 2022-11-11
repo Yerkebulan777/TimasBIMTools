@@ -117,36 +117,54 @@ namespace RevitTimasBIMTools.CutOpening
                     if (IsValidParallel(hostNormal, interNormal))
                     {
                         interSolid = hostSolid.GetIntersectionSolid(elem, global, options);
-                        if (interSolid != null)
+                        interBbox = interSolid.GetBoundingBox();
+                        centroid = interSolid.ComputeCentroid();
+                        ElementModel model = new(elem)
                         {
-                            centroid = interSolid.ComputeCentroid();
-                            interBbox = interSolid.GetBoundingBox();
-                            sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
-                            tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
-                            interSolid = interSolid.ScaledSolidByOffset(centroid, interBbox, cutOffsetSize);
+                            Origin = centroid,
+                            Direction = interNormal,
+                            IntersectionSolid = interSolid,
+                            IntersectionBox = interBbox,
+                            LevelName = level.Name,
+                            HostLevel = level
+                        };
 
-                            // создать метод для "Angle: " + vertical + horizont...
-                            string horizont = string.Format(" Horizont {0:0.00}", hostNormal.GetHorizontAngleBetween(interNormal).ConvertRadiansToDegrees());
-                            string vertical = string.Format(" Vertical {0:0.00}", interNormal.GetVerticalAngleByNormal().ConvertRadiansToDegrees());
 
-                            string info = "Angle: " + vertical + horizont;
+                        sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
+                        tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
+                        interSolid = interSolid.ScaledSolidByOffset(centroid, interBbox, cutOffsetSize);
 
-                            ElementModel model = new(elem, level)
-                            {
-                                Origin = centroid,
-                                Intersection = interSolid,
-                            };
+                        // создать метод для "Angle: " + vertical + horizont...
+                        string horizont = string.Format(" Horizont {0:0.00}", hostNormal.GetHorizontAngleBetween(interNormal).ConvertRadiansToDegrees());
+                        string vertical = string.Format(" Vertical {0:0.00}", interNormal.GetVerticalAngleByNormal().ConvertRadiansToDegrees());
 
-                            double height = tupleSize.Item1;
-                            double widht = tupleSize.Item2;
-                            model.SetDescription(height, widht);
-                            model.Description += info;
-                            yield return model;
-                        }
+                        string info = "Angle: " + vertical + horizont;
+
+
+
+                        double height = tupleSize.Item1;
+                        double widht = tupleSize.Item2;
+                        model.SetSizeDescription(height, widht);
+                        model.Description += info;
+                        yield return model;
+
                     }
                 }
             }
         }
+
+
+        //private Tuple<double, double> CalculateOpenningSize(Document doc, XYZ normal, XYZ direction, XYZ centroid)
+        //{
+        //    _ = (height: 0, widht: 0);
+        //    sketchPlan = CreateSketchPlaneByNormal(doc, direction, centroid);
+        //    _ = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
+        //    if (!normal.IsParallel(direction))
+        //    {
+
+        //    }
+
+        //}
 
 
         private double CalculateSideSize(double angleRadiance, double hostDeph, double offset)
@@ -162,22 +180,22 @@ namespace RevitTimasBIMTools.CutOpening
             TransactionStatus status = trans.Start();
             if (status == TransactionStatus.Started)
             {
-                model.Intersection.CreateDirectShape(doc);
+                model.IntersectionSolid.CreateDirectShape(doc);
                 Element instanse = model.Instanse;
 
                 try
                 {
                     if (instanse is Wall wall && wall.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, wallOpenning, wall, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(model.Origin, wallOpenning, model.HostLevel, StructuralType.NonStructural);
                     }
                     if (instanse is RoofBase roof && roof.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.Level, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
                     }
                     if (instanse is Floor floor && floor.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.Level, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
                     }
                     if (opening != null)
                     {
@@ -204,7 +222,7 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ normal, View view)
+        //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ direction, View view)
         //{
         //    Outline outline = new(bbox.Min -= offsetPnt, bbox.Max += offsetPnt);
         //    collector = new FilteredElementCollector(doc, view.Id).Excluding(idsExclude);
@@ -300,11 +318,11 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        //private bool GetFamilyInstanceReferencePlane(FamilyInstance fi, out XYZ origin, out XYZ normal)
+        //private bool GetFamilyInstanceReferencePlane(FamilyInstance fi, out XYZ origin, out XYZ direction)
         //{
         //    bool flag = false;
         //    origin = XYZ.Zero;
-        //    normal = XYZ.Zero;
+        //    direction = XYZ.Zero;
 
         //    Reference reference = fi.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
         //    reference = SearchInstance != null ? reference.CreateLinkReference(SearchInstance) : reference;
@@ -320,7 +338,7 @@ namespace RevitTimasBIMTools.CutOpening
         //            if (null != sketchPlan)
         //            {
         //                Plane plan = sketchPlan.GetPlane();
-        //                normal = plan.Normal;
+        //                direction = plan.Normal;
         //                origin = plan.Origin;
         //                flag = true;
         //            }
