@@ -59,21 +59,7 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        private void CalculateOpeningSize()
-        {
-            if (!HostNormal.IsParallel(Direction))
-            {
-                double horizont = HostNormal.GetHorizontAngleBetween(Direction);
-                double vertical =  Direction.GetVerticalAngleByNormal();
 
-            }
-        }
-
-
-        private double CalculateSideSize(double angleRadiance, double hostDeph, double offset)
-        {
-            return (Math.Tan(angleRadiance) * hostDeph) + (offset * 2);
-        }
 
 
         public override string ToString()

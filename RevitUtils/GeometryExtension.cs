@@ -304,13 +304,15 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static double GetVerticalAngleByNormal(this XYZ normal)
+        public static double GetVerticalAngleBetween(this XYZ normal, in XYZ direction)
         {
-            return Math.Abs(Math.Acos(normal.DotProduct(XYZ.BasisZ)) - (Math.PI / 2));
+            double normalAngle = normal.DotProduct(XYZ.BasisZ);
+            double directAngle = direction.DotProduct(XYZ.BasisZ);
+            return Math.Abs(Math.Acos(Math.Round(normalAngle - directAngle, 5)));
         }
 
 
-        public static double GetHorizontAngleBetween(this XYZ normal, XYZ direction)
+        public static double GetHorizontAngleBetween(this XYZ normal, in XYZ direction)
         {
             double normalAngle = Math.Atan2(normal.Y, normal.X);
             double directAngle = Math.Atan2(direction.Y, direction.X);
@@ -321,13 +323,13 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static bool IsParallel(this XYZ normal, XYZ direction)
+        public static bool IsParallel(this XYZ normal, in XYZ direction)
         {
             return normal.CrossProduct(direction).IsZeroLength();
         }
 
 
-        public static double ConvertRadiansToDegrees(this double radians, int digit = 3)
+        public static double ConvertToDegrees(this double radians, int digit = 3)
         {
             return Math.Round(180 / Math.PI * radians, digit);
         }

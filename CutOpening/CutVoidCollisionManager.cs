@@ -5,10 +5,11 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Windows.Shapes;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
-
+using Material = Autodesk.Revit.DB.Material;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -75,7 +76,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public IDictionary<string, Material> GetStructureCoreMaterialData(Document doc)
         {
-            return ElementTypeIdData?.GetStructureCoreMaterialData(doc);
+            return ElementTypeIdData.GetStructureCoreMaterialData(doc);
         }
 
 
@@ -130,15 +131,8 @@ namespace RevitTimasBIMTools.CutOpening
 
                     if (GetSectionSize(doc, ref model))
                     {
-
-                        intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffsetSize);
-
-                        // создать метод для "Angle: " + vertical + horizont...
-                        string horizont = string.Format(" Horizont {0:0.00}", hostNormal.GetHorizontAngleBetween(direction).ConvertRadiansToDegrees());
-                        string vertical = string.Format(" Vertical {0:0.00}", direction.GetVerticalAngleByNormal().ConvertRadiansToDegrees());
-
-                        string info = "Angle: " + vertical + horizont;
-                        model.Description += info;
+                        CalculateOpeningSize(ref model, intersectionLine);
+                        //intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffsetSize);
                         yield return model;
                     }
                 }
@@ -154,15 +148,36 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 model.Width = Math.Abs(size.Max.U - size.Min.U);
                 model.Height = Math.Abs(size.Max.V - size.Min.V);
-                _ = model.SetSizeDescription();
             }
             else
             {
                 model.Width = Math.Abs(size.Max.V - size.Min.V);
                 model.Height = Math.Abs(size.Max.U - size.Min.U);
             }
-            //return !hostNormal.IsParallel(direction);
             return model.SetSizeDescription();
+        }
+
+
+        private void CalculateOpeningSize(ref ElementModel model, in Line line)
+        {
+            if (!model.HostNormal.IsParallel(model.Direction))
+            {
+                XYZ vector = line.GetEndPoint(1) - line.GetEndPoint(0);
+                double hostDeph = Math.Abs(model.HostNormal.DotProduct(vector));
+                double horizont = model.HostNormal.GetHorizontAngleBetween(model.Direction);
+                double vertical = model.HostNormal.GetVerticalAngleBetween(model.Direction);
+                horizont = CalculateSideSize(horizont, hostDeph).ConvertToDegrees();
+                vertical = CalculateSideSize(vertical, hostDeph).ConvertToDegrees();
+                string msgHorizont = string.Format(" Horizont {0}", horizont);
+                string msgVertical = string.Format(" Vertical {1}", vertical);
+                model.Description += "Opening size: " + msgHorizont + msgVertical;
+            }
+        }
+
+
+        private double CalculateSideSize(double angle, double hostDeph)
+        {
+            return Math.Tan(angle) * hostDeph;
         }
 
 
