@@ -153,39 +153,18 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static Tuple<double, double> GetCountours(this Solid solid, Document doc, Plane plane, SketchPlane sketch, double offset = 0)
+        public static BoundingBoxUV GetCountour(this Solid solid, Document doc, Plane plane, SketchPlane sketch, double offset = 0)
         {
-            double hight = 0;
-            double widht = 0;
+            BoundingBoxUV result = null;
             XYZ direction = plane.Normal;
-            using (Transaction tx = new(doc, "GetCountours"))
+            using (Transaction tx = new(doc, "GetCountour"))
             {
                 TransactionStatus status = tx.Start();
                 try
                 {
                     Face face = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
                     IList<CurveLoop> curveloops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), direction);
-
-                    BoundingBoxUV bb = face.GetBoundingBox();
-                    if (direction.IsAlmostEqualTo(XYZ.BasisX))
-                    {
-                        hight = Math.Abs(bb.Max.V - bb.Min.V);
-                        widht = Math.Abs(bb.Max.U - bb.Min.U);
-                    }
-                    else
-                    {
-                        hight = Math.Abs(bb.Max.U - bb.Min.U);
-                        widht = Math.Abs(bb.Max.V - bb.Min.V);
-                    }
-                    //IList<ModelCurveArray> curves = new List<ModelCurveArray>();
-                    //foreach (CurveLoop loop in curveloops)
-                    //{
-                    //    CurveArray array = ConvertLoopToArray(CurveLoop.CreateViaOffset(loop, offset, direction));
-                    //    if (!array.IsEmpty)
-                    //    {
-                    //        curves.Add(doc.Create.NewModelCurveArray(array, sketch));
-                    //    }
-                    //}
+                    result = face.GetBoundingBox();
                     status = tx.Commit();
                 }
                 catch (Exception ex)
@@ -197,7 +176,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-            return Tuple.Create(hight, widht);
+            return result;
         }
 
 

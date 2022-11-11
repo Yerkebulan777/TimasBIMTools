@@ -51,16 +51,15 @@ namespace RevitTimasBIMTools.CutOpening
         #region Fields
 
         private FilteredElementCollector collector;
-        private Tuple<double, double> tupleSize;
         private SketchPlane sketchPlan;
         private Plane plane;
 
-        private Line line = null;
+        private Line interLine = null;
         private XYZ centroid = null;
         private Solid hostSolid = null;
         private Solid interSolid = null;
         private XYZ hostNormal = XYZ.BasisZ;
-        private XYZ interNormal = XYZ.BasisZ;
+        private XYZ direction = XYZ.BasisZ;
         private Transform transform = null;
         private BoundingBoxXYZ hostBbox = null;
         private BoundingBoxXYZ interBbox = null;
@@ -112,65 +111,62 @@ namespace RevitTimasBIMTools.CutOpening
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(ref interBbox);
-                if (IsValidIntersection(elem, hostSolid, centroid, minSideSize, out interNormal))
+                interLine = GetIntersectionLine(elem, hostSolid, centroid, out direction);
+                if (IsValidParallel(hostNormal, direction))
                 {
-                    if (IsValidParallel(hostNormal, interNormal))
+                    interSolid = hostSolid.GetIntersectionSolid(elem, global, options);
+                    interBbox = interSolid.GetBoundingBox();
+                    centroid = interSolid.ComputeCentroid();
+
+                    ElementModel model = new(elem, level)
                     {
-                        interSolid = hostSolid.GetIntersectionSolid(elem, global, options);
-                        interBbox = interSolid.GetBoundingBox();
-                        centroid = interSolid.ComputeCentroid();
-                        ElementModel model = new(elem)
-                        {
-                            Origin = centroid,
-                            Direction = interNormal,
-                            IntersectionSolid = interSolid,
-                            IntersectionBox = interBbox,
-                            LevelName = level.Name,
-                            HostLevel = level
-                        };
+                        Origin = centroid,
+                        Direction = direction,
+                        HostNormal = hostNormal,
+                        IntersectionBox = interBbox,
+                        IntersectionLine = interLine,
+                        IntersectionSolid = interSolid,
+                    };
 
 
-                        sketchPlan = CreateSketchPlaneByNormal(doc, interNormal, centroid);
-                        tupleSize = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
+                    if (GetSectionSize(doc, ref model))
+                    {
+
                         interSolid = interSolid.ScaledSolidByOffset(centroid, interBbox, cutOffsetSize);
 
                         // создать метод для "Angle: " + vertical + horizont...
-                        string horizont = string.Format(" Horizont {0:0.00}", hostNormal.GetHorizontAngleBetween(interNormal).ConvertRadiansToDegrees());
-                        string vertical = string.Format(" Vertical {0:0.00}", interNormal.GetVerticalAngleByNormal().ConvertRadiansToDegrees());
+                        string horizont = string.Format(" Horizont {0:0.00}", hostNormal.GetHorizontAngleBetween(direction).ConvertRadiansToDegrees());
+                        string vertical = string.Format(" Vertical {0:0.00}", direction.GetVerticalAngleByNormal().ConvertRadiansToDegrees());
 
                         string info = "Angle: " + vertical + horizont;
-
-
-
-                        double height = tupleSize.Item1;
-                        double widht = tupleSize.Item2;
-                        model.SetSizeDescription(height, widht);
                         model.Description += info;
                         yield return model;
-
                     }
                 }
             }
         }
 
 
-        //private Tuple<double, double> CalculateOpenningSize(Document doc, XYZ normal, XYZ direction, XYZ centroid)
-        //{
-        //    _ = (height: 0, widht: 0);
-        //    sketchPlan = CreateSketchPlaneByNormal(doc, direction, centroid);
-        //    _ = interSolid.GetCountours(doc, plane, sketchPlan, cutOffsetSize);
-        //    if (!normal.IsParallel(direction))
-        //    {
-
-        //    }
-
-        //}
-
-
-        private double CalculateSideSize(double angleRadiance, double hostDeph, double offset)
+        private bool GetSectionSize(Document doc, ref ElementModel model)
         {
-            return (Math.Tan(angleRadiance) * hostDeph) + (offset * 2);
+            sketchPlan = CreateSketchPlaneByNormal(doc, direction, centroid);
+            BoundingBoxUV size = interSolid.GetCountour(doc, plane, sketchPlan, cutOffsetSize);
+            if (direction.IsAlmostEqualTo(XYZ.BasisX))
+            {
+                model.Width = Math.Abs(size.Max.U - size.Min.U);
+                model.Height = Math.Abs(size.Max.V - size.Min.V);
+                _ = model.SetSizeDescription();
+            }
+            else
+            {
+                model.Width = Math.Abs(size.Max.V - size.Min.V);
+                model.Height = Math.Abs(size.Max.U - size.Min.U);
+            }
+            //return !hostNormal.IsParallel(direction);
+            return model.SetSizeDescription();
         }
+
+
 
 
         public void CreateOpening(Document doc, ElementModel model, FamilySymbol wallOpenning, FamilySymbol floorOpenning, Definition definition = null, double offset = 0)
@@ -215,6 +211,9 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
+
+
+
         //private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)
         //{
         //    Solid intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
@@ -238,29 +237,28 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool IsValidIntersection(Element elem, Solid solid, XYZ centroid, double tolerance, out XYZ normal)
+        private Line GetIntersectionLine(Element elem, Solid solid, in XYZ centroid, out XYZ direction)
         {
-            double length = 0;
-            normal = XYZ.Zero;
+            direction = XYZ.Zero;
             if (elem is FamilyInstance instance)
             {
                 transform = instance.GetTransform();
-                normal = transform.BasisX.Normalize();
-                XYZ strPnt = centroid - (normal * maxSideSize);
-                XYZ endPnt = centroid + (normal * maxSideSize);
-                line = Line.CreateBound(strPnt, endPnt);
+                direction = transform.BasisX.Normalize();
+                XYZ strPnt = centroid - (direction * maxSideSize);
+                XYZ endPnt = centroid + (direction * maxSideSize);
+                interLine = Line.CreateBound(strPnt, endPnt);
             }
             else if (elem.Location is LocationCurve curve)
             {
-                line = curve.Curve as Line;
-                normal = line.Direction.Normalize();
+                interLine = curve.Curve as Line;
+                direction = interLine.Direction.Normalize();
             }
-            SolidCurveIntersection curves = solid.IntersectWithCurve(line, intersectOptions);
+            SolidCurveIntersection curves = solid.IntersectWithCurve(interLine, intersectOptions);
             if (curves != null && 0 < curves.SegmentCount)
             {
-                length = curves.GetCurveSegment(0).Length;
+                interLine = curves.GetCurveSegment(0) as Line;
             }
-            return length > tolerance;
+            return interLine;
         }
 
 
@@ -361,7 +359,7 @@ namespace RevitTimasBIMTools.CutOpening
         //    return Math.Acos((trace - 1) / 2.0);
         //}
 
-        //private void GetSectionSize(Element floor)
+        //private void УxtractSectionSize(Element floor)
         //{
         //    hight = 0; widht = 0;
         //    int catIdInt = floor.Category.Id.IntegerValue;
