@@ -53,7 +53,6 @@ namespace RevitTimasBIMTools.CutOpening
         #region Fields
 
         private FilteredElementCollector collector;
-        private Plane plane;
 
         private Line intersectionLine = null;
         private XYZ centroid = null;

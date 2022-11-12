@@ -67,7 +67,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static Solid GetSolidByVolume(this Element element, Transform global, Options options, double tolerance = 0.5)
+        public static Solid GetSolidByVolume(this Element element, in Transform global, in Options options, double tolerance = 0.5)
         {
             Solid result = null;
             GeometryElement geomElem = element.get_Geometry(options);
@@ -87,7 +87,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static Solid GetUnionSolidByVolume(this Element elem, Transform global, Options options, double tolerance = 0.5)
+        public static Solid GetUnionSolidByVolume(this Element elem, in Transform global, in Options options, double tolerance = 0.5)
         {
             Solid result = null;
             GeometryElement geomElement = elem.get_Geometry(options);
@@ -191,7 +191,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static Solid ScaledSolidByOffset(this Solid solid, XYZ centroid, BoundingBoxXYZ bbox, double offset, int factor = 3)
+        public static Solid ScaledSolidByOffset(this Solid solid, in XYZ centroid, in BoundingBoxXYZ bbox, double offset, int factor = 3)
         {
             XYZ minPnt = bbox.Min;
             XYZ maxPnt = bbox.Max;
@@ -247,7 +247,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void CreateDirectShape(this Solid solid, Document doc, BuiltInCategory builtIn = BuiltInCategory.OST_GenericModel)
+        public static void CreateDirectShape(this Solid solid, in Document doc, BuiltInCategory builtIn = BuiltInCategory.OST_GenericModel)
         {
             try
             {
@@ -263,38 +263,10 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static Solid CreateRectangularPrism(double d1, double d2, double d3)
-        {
-            List<Curve> profile = new();
-            XYZ profile00 = new(-d1 / 2, -d2 / 2, -d3 / 2);
-            XYZ profile01 = new(-d1 / 2, d2 / 2, -d3 / 2);
-            XYZ profile11 = new(d1 / 2, d2 / 2, -d3 / 2);
-            XYZ profile10 = new(d1 / 2, -d2 / 2, -d3 / 2);
-
-            profile.Add(Line.CreateBound(profile00, profile01));
-            profile.Add(Line.CreateBound(profile01, profile11));
-            profile.Add(Line.CreateBound(profile11, profile10));
-            profile.Add(Line.CreateBound(profile10, profile00));
-
-            CurveLoop curveLoop = CurveLoop.Create(profile);
-
-            SolidOptions options = new(ElementId.InvalidElementId, ElementId.InvalidElementId);
-
-            return GeometryCreationUtilities.CreateExtrusionGeometry(new[] { curveLoop }, XYZ.BasisZ, d3, options);
-        }
-
-
         /// <summary> The dot product of the angle must be greater than cos angle = > cosin /// </summary>
         public static bool IsValidParallel(this XYZ normal, in XYZ direction, in double cosin)
         {
             return Math.Abs(normal.DotProduct(direction)) > cosin;
-        }
-
-
-        public static XYZ ReduceDirection(this XYZ normal)
-        {
-            double radians = XYZ.Zero.AngleOnPlaneTo(normal, XYZ.BasisZ);
-            return radians > Math.PI ? normal : normal.Negate();
         }
 
 
