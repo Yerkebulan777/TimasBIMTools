@@ -53,7 +53,6 @@ namespace RevitTimasBIMTools.CutOpening
         #region Fields
 
         private FilteredElementCollector collector;
-        private SketchPlane sketchPlan;
         private Plane plane;
 
         private Line intersectionLine = null;
@@ -143,7 +142,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private bool GetSectionSize(Document doc, ref ElementModel model)
         {
-            sketchPlan = CreateSketchPlaneByNormal(doc, direction, centroid, out plane);
+            var sketchPlan = CreateSketchPlaneByNormal(doc, direction, centroid, out plane);
             BoundingBoxUV size = intersectionSolid.GetCountour(doc, plane, sketchPlan, cutOffsetSize);
             if (direction.IsAlmostEqualTo(XYZ.BasisX))
             {
