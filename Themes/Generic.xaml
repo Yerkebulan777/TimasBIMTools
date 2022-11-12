@@ -58,10 +58,8 @@
         <Setter Property="BorderThickness" Value="0.5" />
         <Setter Property="ColumnHeaderHeight" Value="30"/>
         <Setter Property="AutoGenerateColumns" Value="False"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="IsSynchronizedWithCurrentItem" Value="True" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
