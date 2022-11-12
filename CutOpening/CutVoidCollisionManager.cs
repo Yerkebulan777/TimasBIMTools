@@ -54,12 +54,14 @@ namespace RevitTimasBIMTools.CutOpening
 
         private FilteredElementCollector collector;
 
-        private Line intersectionLine = null;
         private XYZ centroid = null;
+
         private Solid hostSolid = null;
-        private Solid intersectionSolid = null;
-        private XYZ hostNormal = XYZ.BasisZ;
         private XYZ direction = XYZ.BasisZ;
+        private XYZ hostNormal = XYZ.BasisZ;
+        private Line intersectionLine = null;
+        private Solid intersectionSolid = null;
+
         private Transform transform = null;
         private BoundingBoxXYZ hostBbox = null;
         private BoundingBoxXYZ intersectionBbox = null;
@@ -128,7 +130,6 @@ namespace RevitTimasBIMTools.CutOpening
                     if (GetSectionSize(doc, ref model))
                     {
                         model.SetSizeDescription();
-
                         //CalculateOpeningSize(ref model, intersectionLine);
                         //intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffsetSize);
                         yield return model;
@@ -220,9 +221,6 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
         }
-
-
-
 
 
         //private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)
@@ -387,9 +385,6 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
         #endregion
-
-
-
 
 
         [STAThread]

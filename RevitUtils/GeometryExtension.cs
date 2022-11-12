@@ -153,7 +153,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxUV GetCountour(this Solid solid, in Document doc, in XYZ direction, in XYZ centroid)
+        public static BoundingBoxUV GetCountour(this Solid solid, Document doc, in XYZ direction, in XYZ centroid)
         {
             BoundingBoxUV result = null;
             using (Transaction tx = new(doc, "GetCountour"))
@@ -247,7 +247,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void CreateDirectShape(this Solid solid, in Document doc, BuiltInCategory builtIn = BuiltInCategory.OST_GenericModel)
+        public static void CreateDirectShape(this Solid solid, Document doc, BuiltInCategory builtIn = BuiltInCategory.OST_GenericModel)
         {
             try
             {
@@ -264,7 +264,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         /// <summary> The dot product of the angle must be greater than cos angle = > cosin /// </summary>
-        public static bool IsValidParallel(this XYZ normal, in XYZ direction, in double cosin)
+        public static bool IsValidParallel(this XYZ normal, in XYZ direction, double cosin)
         {
             return Math.Abs(normal.DotProduct(direction)) > cosin;
         }
