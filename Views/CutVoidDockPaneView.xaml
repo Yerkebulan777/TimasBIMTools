@@ -196,7 +196,8 @@
                         <DataGridTemplateColumn Header="Switch" Width="30" CellStyle="{StaticResource SingleClickEditStyle}" >
                             <DataGridTemplateColumn.HeaderTemplate>
                                 <DataTemplate>
-                                    <CheckBox Name="CheckSelectAll" IsChecked="{Binding DataContext.IsAllSelectChecked, RelativeSource={RelativeSource AncestorType=DataGrid}}">
+                                    <CheckBox Name="CheckSelectAll" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                              IsChecked="{Binding DataContext.IsAllSelectChecked, RelativeSource={RelativeSource AncestorType=DataGrid}}">
                                         <CheckBox.LayoutTransform>
                                             <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>
                                         </CheckBox.LayoutTransform>
@@ -205,11 +206,20 @@
                             </DataGridTemplateColumn.HeaderTemplate>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Click="CheckBox_Click" />
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              Click="CheckBox_Click" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        
+
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Show" Click="DatagridRowButton_Click" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
                         <DataGridTextColumn Width="150" Header="Symbol Name" Binding="{Binding SymbolName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
@@ -226,7 +236,7 @@
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Width="100" Header="Description" Binding="{Binding Description, Mode=OneWay}">
+                        <DataGridTextColumn Width="Auto" Header="Description" Binding="{Binding Description, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>

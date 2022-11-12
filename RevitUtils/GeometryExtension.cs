@@ -153,10 +153,10 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxUV GetSectionBounding(this Solid solid, Document doc, in XYZ direction, in XYZ centroid)
+        public static BoundingBoxUV GetSectionBound(this Solid solid, Document doc, in XYZ direction, in XYZ centroid)
         {
             BoundingBoxUV result = null;
-            using (Transaction tx = new(doc, "GetSectionBounding"))
+            using (Transaction tx = new(doc, "GetSectionBound"))
             {
                 TransactionStatus status = tx.Start();
                 try

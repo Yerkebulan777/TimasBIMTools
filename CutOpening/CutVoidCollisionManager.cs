@@ -129,7 +129,7 @@ namespace RevitTimasBIMTools.CutOpening
                     if (GetSectionSize(doc, ref model))
                     {
                         model.SetSizeDescription();
-                        //CalculateOpeningSize(ref model, intersectionLine);
+                        CalculateOpeningSize(ref model, intersectionLine);
                         //intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffsetSize);
                         yield return model;
                     }
@@ -140,7 +140,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private bool GetSectionSize(Document doc, ref ElementModel model)
         {
-            BoundingBoxUV size = intersectionSolid.GetSectionBounding(doc, in direction, in centroid);
+            BoundingBoxUV size = intersectionSolid.GetSectionBound(doc, in direction, in centroid);
             if (direction.IsAlmostEqualTo(XYZ.BasisX))
             {
                 model.Width = Math.Round(size.Max.U - size.Min.U, 5);

@@ -4,7 +4,6 @@ using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Threading;
 
 
@@ -63,9 +62,9 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void DatagridRowButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (sender is DataGridRow row && row.DataContext is ElementModel model)
+            if (sender is Button btn && btn.DataContext is ElementModel model)
             {
                 if (model != null && model.Instanse.IsValidObject)
                 {
@@ -81,24 +80,6 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void ApplyCmd_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            Dispatcher.CurrentDispatcher.Invoke(() =>
-            {
-                DataContextHandler.DialogResult = true;
-            });
-        }
-
-
-        private void CancelCmd_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            Dispatcher.CurrentDispatcher.Invoke(() =>
-            {
-                DataContextHandler.DialogResult = false;
-            });
-        }
-
-
         public void Dispose()
         {
             if (!Disposed)
@@ -107,6 +88,7 @@ namespace RevitTimasBIMTools.Views
                 DataContextHandler?.Dispose();
             }
         }
+
 
     }
 }
