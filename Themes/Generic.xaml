@@ -53,27 +53,25 @@
     </Style>
 
     <!--DataGrid-->
-    <Style TargetType="{x:Type DataGrid}">
+    <Style TargetType="{x:Type DataGrid}" x:Key="DataGridStandart">
         <Setter Property="RowHeight" Value="25"/>
-        <Setter Property="ColumnHeaderHeight" Value="30"/>
         <Setter Property="BorderThickness" Value="0.5" />
-        <Setter Property="CanUserAddRows" Value="False" />
-        <Setter Property="CanUserDeleteRows" Value="False"/>
+        <Setter Property="ColumnHeaderHeight" Value="30"/>
         <Setter Property="AutoGenerateColumns" Value="False"/>
-        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
+        <Setter Property="IsSynchronizedWithCurrentItem" Value="True" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
         <Setter Property="ScrollViewer.PanningMode" Value="Both" />
-        <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="AutoGenerateColumns" Value="False" />
-        <Setter Property="CanUserReorderColumns" Value="False" />
+        <Setter Property="CanUserReorderColumns" Value="True" />
         <Setter Property="CanUserResizeColumns" Value="True" />
         <Setter Property="CanUserResizeRows" Value="True" />
+        <Setter Property="CanUserDeleteRows" Value="True"/>
+        <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="SelectionMode" Value="Single" />
         <Style.Triggers>
             <Trigger Property="IsGrouping" Value="true">
