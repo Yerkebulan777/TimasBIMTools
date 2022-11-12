@@ -173,18 +173,18 @@
 
             <!-- Filter Control -->
             <WrapPanel Grid.Row="2" Style="{StaticResource VisibleAnimation}" 
-                    Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="10" 
+                    Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="10,5" 
                     Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
 
-                <ComboBox Name="ComboLevelFilter" Height="21" Width="125" Margin="5" 
+                <ComboBox Name="ComboLevelFilter" Height="23" Width="120" Margin="5" 
                     ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                     SelectedValue="{Binding Path=LevelTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
 
-                <ComboBox Name="ComboSymbolFilter" Height="21" Width="125" Margin="5" 
+                <ComboBox Name="ComboSymbolFilter" Height="23" Width="120" Margin="5" 
                     ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                     SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
 
-                <Button Name="Refresh" Content="Refresh" Height="21" Width="65" Margin="5"
+                <Button Name="Refresh" Content="Refresh" Height="23" Width="60" Margin="5"
                         Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
 
             </WrapPanel>
