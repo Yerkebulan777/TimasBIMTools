@@ -54,7 +54,7 @@
 
     <!--DataGrid-->
     <Style TargetType="{x:Type DataGrid}" x:Key="DataGridStandart">
-        <Setter Property="RowHeight" Value="25"/>
+        <Setter Property="RowHeight" Value="30"/>
         <Setter Property="BorderThickness" Value="0.5" />
         <Setter Property="ColumnHeaderHeight" Value="30"/>
         <Setter Property="AutoGenerateColumns" Value="False"/>
