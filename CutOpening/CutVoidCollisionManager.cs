@@ -10,6 +10,7 @@ using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
 using Material = Autodesk.Revit.DB.Material;
+using Plane = Autodesk.Revit.DB.Plane;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -142,7 +143,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private bool GetSectionSize(Document doc, ref ElementModel model)
         {
-            sketchPlan = CreateSketchPlaneByNormal(doc, direction, centroid);
+            sketchPlan = CreateSketchPlaneByNormal(doc, direction, centroid, out plane);
             BoundingBoxUV size = intersectionSolid.GetCountour(doc, plane, sketchPlan, cutOffsetSize);
             if (direction.IsAlmostEqualTo(XYZ.BasisX))
             {
@@ -267,8 +268,9 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private SketchPlane CreateSketchPlaneByNormal(Document doc, XYZ normal, XYZ point)
+        private SketchPlane CreateSketchPlaneByNormal(Document doc, XYZ normal, XYZ point, out Plane plane)
         {
+            plane = null;
             SketchPlane result = null;
             using Transaction transaction = new(doc, "CreateSketchPlane");
             TransactionStatus status = transaction.Start();
