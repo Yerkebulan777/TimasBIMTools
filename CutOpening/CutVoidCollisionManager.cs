@@ -141,8 +141,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private bool GetSectionSize(Document doc, ref ElementModel model)
         {
-            SketchPlane sketchPlan = CreateSketchPlaneByNormal(doc, in direction, in centroid, out plane);
-            BoundingBoxUV size = intersectionSolid.GetCountour(doc, plane, sketchPlan, cutOffsetSize);
+            BoundingBoxUV size = intersectionSolid.GetCountour(doc, in direction, in centroid);
             if (direction.IsAlmostEqualTo(XYZ.BasisX))
             {
                 model.Width = Math.Floor(size.Max.U - size.Min.U);
@@ -267,32 +266,6 @@ namespace RevitTimasBIMTools.CutOpening
             return intersectionLine;
         }
 
-
-        private SketchPlane CreateSketchPlaneByNormal(Document doc, in XYZ normal, in XYZ point, out Plane plane)
-        {
-            plane = null;
-            SketchPlane result = null;
-            using Transaction transaction = new(doc, "CreateSketchPlane");
-            TransactionStatus status = transaction.Start();
-            if (status == TransactionStatus.Started)
-            {
-                try
-                {
-                    plane = Plane.CreateByNormalAndOrigin(normal, point);
-                    result = SketchPlane.Create(doc, plane);
-                    status = transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex.Message);
-                    if (!transaction.HasEnded())
-                    {
-                        status = transaction.RollBack();
-                    }
-                }
-            }
-            return result;
-        }
 
 
         #region Other methods

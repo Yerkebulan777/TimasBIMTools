@@ -120,7 +120,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static Solid GetIntersectionSolid(this Solid source, Element elem, Transform global, Options options, double tolerance = 0)
+        public static Solid GetIntersectionSolid(this Solid source, in Element elem, in Transform global, in Options options, double tolerance = 0)
         {
             Solid result = null;
             GeometryElement geomElement = elem.get_Geometry(options);
@@ -153,15 +153,15 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxUV GetCountour(this Solid solid, Document doc, Plane plane, SketchPlane sketch, double offset = 0)
+        public static BoundingBoxUV GetCountour(this Solid solid, in Document doc, in XYZ direction, in XYZ centroid)
         {
             BoundingBoxUV result = null;
-            XYZ direction = plane.Normal;
             using (Transaction tx = new(doc, "GetCountour"))
             {
                 TransactionStatus status = tx.Start();
                 try
                 {
+                    Plane plane = Plane.CreateByNormalAndOrigin(direction, centroid);
                     Face face = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
                     IList<CurveLoop> curveloops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), direction);
                     result = face.GetBoundingBox();
