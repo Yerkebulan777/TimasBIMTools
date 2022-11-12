@@ -129,8 +129,7 @@ namespace RevitTimasBIMTools.CutOpening
                     if (GetSectionSize(doc, ref model))
                     {
                         model.SetSizeDescription();
-                        Logger.Log("Width:" + model.Width.ToString());
-                        Logger.Log("Height:" + model.Height.ToString());
+
                         //CalculateOpeningSize(ref model, intersectionLine);
                         //intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffsetSize);
                         yield return model;
@@ -142,7 +141,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private bool GetSectionSize(Document doc, ref ElementModel model)
         {
-            SketchPlane sketchPlan = CreateSketchPlaneByNormal(doc, direction, centroid, out plane);
+            SketchPlane sketchPlan = CreateSketchPlaneByNormal(doc, in direction, in centroid, out plane);
             BoundingBoxUV size = intersectionSolid.GetCountour(doc, plane, sketchPlan, cutOffsetSize);
             if (direction.IsAlmostEqualTo(XYZ.BasisX))
             {
@@ -154,6 +153,8 @@ namespace RevitTimasBIMTools.CutOpening
                 model.Width = Math.Floor(size.Max.V - size.Min.V);
                 model.Height = Math.Floor(size.Max.U - size.Min.U);
             }
+            Logger.Log("Width:" + model.Width.ToString());
+            Logger.Log("Height:" + model.Height.ToString());
             return true;
         }
 
@@ -267,7 +268,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private SketchPlane CreateSketchPlaneByNormal(Document doc, XYZ normal, XYZ point, out Plane plane)
+        private SketchPlane CreateSketchPlaneByNormal(Document doc, in XYZ normal, in XYZ point, out Plane plane)
         {
             plane = null;
             SketchPlane result = null;
