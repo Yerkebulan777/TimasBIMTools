@@ -162,7 +162,7 @@ namespace RevitTimasBIMTools.CutOpening
             if (!model.HostNormal.IsParallel(model.Direction))
             {
                 XYZ vector = line.GetEndPoint(1) - line.GetEndPoint(0);
-                double hostDeph = Math.Floor(Math.Abs(model.HostNormal.DotProduct(vector)));
+                double hostDeph = Math.Abs(model.HostNormal.DotProduct(vector));
                 double horizont = model.HostNormal.GetHorizontAngleBetween(model.Direction);
                 double vertical = model.HostNormal.GetVerticalAngleBetween(model.Direction);
                 horizont = CalculateSideSize(model.Width, horizont, hostDeph).ConvertToDegrees();
@@ -177,7 +177,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private double CalculateSideSize(double sideSize, double angle, double hostDeph)
         {
-            return Math.Floor(sideSize + Math.Tan(angle) * hostDeph);
+            return Math.Round((sideSize + Math.Tan(angle) * hostDeph), 5);
         }
 
 
