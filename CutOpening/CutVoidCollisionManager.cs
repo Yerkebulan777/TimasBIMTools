@@ -142,7 +142,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private bool GetSectionSize(Document doc, ref ElementModel model)
         {
-            var sketchPlan = CreateSketchPlaneByNormal(doc, direction, centroid, out plane);
+            SketchPlane sketchPlan = CreateSketchPlaneByNormal(doc, direction, centroid, out plane);
             BoundingBoxUV size = intersectionSolid.GetCountour(doc, plane, sketchPlan, cutOffsetSize);
             if (direction.IsAlmostEqualTo(XYZ.BasisX))
             {
