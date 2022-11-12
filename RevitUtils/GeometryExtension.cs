@@ -267,9 +267,14 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static double GetVerticalAngleBetween(this XYZ normal, in XYZ direction)
         {
-            double normalAngle = normal.DotProduct(XYZ.BasisZ);
-            double directAngle = direction.DotProduct(XYZ.BasisZ);
-            return Math.Abs(Math.Acos(Math.Round(normalAngle - directAngle, 5)));
+            //double normalAngle = normal.DotProduct(XYZ.BasisZ);
+            //double directAngle = direction.DotProduct(XYZ.BasisZ);
+            //return Math.Abs(Math.Acos(Math.Round(normalAngle - directAngle, 5)));
+            double deltaX = normal.X - direction.X;
+            double deltaY = normal.Y - direction.X;
+            double deltaZ = normal.Z - direction.X;
+            return Math.Atan2(deltaY, deltaX);
+            //return Math.Asin(deltaZ / Math.Sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ));
         }
 
 
@@ -277,7 +282,7 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             double normalAngle = Math.Atan2(normal.Y, normal.X);
             double directAngle = Math.Atan2(direction.Y, direction.X);
-            double angle = Math.Abs(Math.Round(normalAngle - directAngle, 5));
+            double angle = Math.Round(Math.Abs(normalAngle - directAngle), 5);
             angle = angle > Math.PI ? (Math.PI * 2) - angle : angle;
             angle = angle > (Math.PI / 2) ? Math.PI - angle : angle;
             return angle;

@@ -43,7 +43,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
             RefreshDataCommand = new AsyncRelayCommand(RefreshActiveDataHandler);
-            ShowExecuteCommand = new AsyncRelayCommand(ShowHandelCommandAsync);
+            ShowCollisionCommand = new AsyncRelayCommand(ShowHandelCommandAsync);
             OkCanselCommand = new AsyncRelayCommand(OkCanselHandelCommandAsync);
         }
 
@@ -715,9 +715,9 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region ShowExecuteCommand
+        #region ShowCollisionCommand
 
-        public ICommand ShowExecuteCommand { get; private set; }
+        public ICommand ShowCollisionCommand { get; private set; }
         private async Task ShowHandelCommandAsync()
         {
             if (!DataViewCollection.IsEmpty)

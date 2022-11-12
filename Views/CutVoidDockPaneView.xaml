@@ -184,6 +184,9 @@
                     ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                     SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
 
+                <Button Name="Refresh" Content="Refresh" Height="21" Width="65" Margin="5"
+                        Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
+
             </WrapPanel>
 
 
@@ -215,12 +218,12 @@
                         <DataGridTemplateColumn>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="Show" Click="DatagridRowButton_Click" />
+                                    <Button Content="Show" Height="20" Width="50"  Click="DatagridRowButton_Click" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTextColumn Width="150" Header="Symbol Name" Binding="{Binding SymbolName, Mode=OneWay}">
+                        <DataGridTextColumn Width="125" Header="Symbol Name" Binding="{Binding SymbolName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
@@ -228,7 +231,7 @@
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
                         
-                        <DataGridTextColumn Width="150" Header="Family Name" Binding="{Binding FamilyName, Mode=OneWay}">
+                        <DataGridTextColumn Width="125" Header="Family Name" Binding="{Binding FamilyName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
@@ -257,8 +260,7 @@
                                 Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
                         <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
                                 IsEnabled="{Binding Path=IsOptionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                                Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
-                                CommandParameter="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}}" >
+                                Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" >
                             <Label FontFamily="Segoe MDL2 Assets" Content="&#59165;" Foreground="DarkBlue"  FontSize="15" />
                         </Button>
                     </WrapPanel>
@@ -267,8 +269,7 @@
                                 Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
                         <Button Name="CutVoidCmd" Height="30" Width="75" Margin="5"
                                 IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                                Command="{Binding Path=ShowExecuteCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"
-                                CommandParameter="{Binding Path=IsFocused, RelativeSource={RelativeSource Self}}" >
+                                Command="{Binding Path=ShowCollisionCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" >
                             <Label FontFamily="Segoe MDL2 Assets" Content="&#59538;" Foreground="DarkBlue"  FontSize="15" />
                         </Button>
                     </WrapPanel>
