@@ -124,18 +124,18 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             Solid result = null;
             GeometryElement geomElement = elem.get_Geometry(options);
-            BooleanOperationsType unionType = BooleanOperationsType.Union;
-            BooleanOperationsType interType = BooleanOperationsType.Intersect;
+            BooleanOperationsType union = BooleanOperationsType.Union;
+            BooleanOperationsType intersect = BooleanOperationsType.Intersect;
             foreach (GeometryObject obj in geomElement.GetTransformed(global))
             {
                 if (obj is Solid solid && solid != null && solid.Faces.Size > 0)
                 {
                     try
                     {
-                        solid = BooleanOperationsUtils.ExecuteBooleanOperation(source, solid, interType);
-                        if (result != null && solid != null && solid.Faces.Size > 0)
+                        solid = BooleanOperationsUtils.ExecuteBooleanOperation(source, solid, intersect);
+                        if (result != null && solid != null && solid.Volume > 0)
                         {
-                            solid = BooleanOperationsUtils.ExecuteBooleanOperation(result, solid, unionType);
+                            solid = BooleanOperationsUtils.ExecuteBooleanOperation(result, solid, union);
                         }
                     }
                     finally
@@ -153,10 +153,10 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxUV GetCountour(this Solid solid, Document doc, in XYZ direction, in XYZ centroid)
+        public static BoundingBoxUV GetSectionBounding(this Solid solid, Document doc, in XYZ direction, in XYZ centroid)
         {
             BoundingBoxUV result = null;
-            using (Transaction tx = new(doc, "GetCountour"))
+            using (Transaction tx = new(doc, "GetSectionBounding"))
             {
                 TransactionStatus status = tx.Start();
                 try
@@ -169,25 +169,14 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex.ToString());
                     if (!tx.HasEnded())
                     {
                         status = tx.RollBack();
+                        Logger.Error(ex.ToString());
                     }
                 }
             }
             return result;
-        }
-
-
-        public static CurveArray ConvertLoopToArray(CurveLoop loop)
-        {
-            CurveArray a = new();
-            foreach (Curve c in loop)
-            {
-                a.Append(c);
-            }
-            return a;
         }
 
 
@@ -264,7 +253,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         /// <summary> The dot product of the angle must be greater than cos angle = > cosin /// </summary>
-        public static bool IsValidParallel(this XYZ normal, in XYZ direction, double cosin)
+        public static bool IsValidParallel(this XYZ normal, XYZ direction, double cosin)
         {
             return Math.Abs(normal.DotProduct(direction)) > cosin;
         }

@@ -10,7 +10,6 @@ using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
 using Material = Autodesk.Revit.DB.Material;
-using Plane = Autodesk.Revit.DB.Plane;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -113,8 +112,8 @@ namespace RevitTimasBIMTools.CutOpening
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(out intersectionBbox);
-                intersectionLine = GetIntersectionLine(elem, in hostSolid, in centroid, out direction);
-                if (hostNormal.IsValidParallel(in direction, threshold))
+                intersectionLine = GetIntersectionLine(elem, hostSolid, centroid, out direction);
+                if (hostNormal.IsValidParallel(direction, threshold))
                 {
                     intersectionSolid = hostSolid.GetIntersectionSolid(elem, global, options);
                     intersectionBbox = intersectionSolid.GetBoundingBox();
@@ -141,16 +140,16 @@ namespace RevitTimasBIMTools.CutOpening
 
         private bool GetSectionSize(Document doc, ref ElementModel model)
         {
-            BoundingBoxUV size = intersectionSolid.GetCountour(doc, in direction, in centroid);
+            BoundingBoxUV size = intersectionSolid.GetSectionBounding(doc, in direction, in centroid);
             if (direction.IsAlmostEqualTo(XYZ.BasisX))
             {
-                model.Width = Math.Floor(size.Max.U - size.Min.U);
-                model.Height = Math.Floor(size.Max.V - size.Min.V);
+                model.Width = Math.Round(size.Max.U - size.Min.U, 5);
+                model.Height = Math.Round(size.Max.V - size.Min.V, 5);
             }
             else
             {
-                model.Width = Math.Floor(size.Max.V - size.Min.V);
-                model.Height = Math.Floor(size.Max.U - size.Min.U);
+                model.Width = Math.Round(size.Max.V - size.Min.V, 5);
+                model.Height = Math.Round(size.Max.U - size.Min.U, 5);
             }
             Logger.Log("Width:" + model.Width.ToString());
             Logger.Log("Height:" + model.Height.ToString());
@@ -262,7 +261,6 @@ namespace RevitTimasBIMTools.CutOpening
             }
             return intersectionLine;
         }
-
 
 
         #region Other methods
@@ -385,6 +383,7 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
         #endregion
+
 
 
         [STAThread]
