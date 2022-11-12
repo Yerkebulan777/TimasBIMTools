@@ -169,7 +169,7 @@ namespace RevitTimasBIMTools.CutOpening
                 vertical = CalculateSideSize(model.Height, vertical, hostDeph).ConvertToDegrees();
                 string msgHorizont = string.Format(" Horizont {0}", horizont.ToString("F2", CultureInfo.InvariantCulture));
                 string msgVertical = string.Format(" Vertical {0}", vertical.ToString("F2", CultureInfo.InvariantCulture));
-                model.Description += " Deph: " + Math.Floor(hostDeph * 304.8).ToString("F2", CultureInfo.InvariantCulture);
+                model.Description += " Deph: " + Math.Round(hostDeph * 304.8, MidpointRounding.AwayFromZero).ToString();
                 model.Description += " Size: " + msgHorizont + msgVertical;
             }
         }
@@ -177,7 +177,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private double CalculateSideSize(double sideSize, double angle, double hostDeph)
         {
-            return Math.Round((sideSize + Math.Tan(angle) * hostDeph), 5);
+            return Math.Round((sideSize + Math.Tan(angle) * hostDeph), 7);
         }
 
 
