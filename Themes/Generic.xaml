@@ -52,7 +52,7 @@
         <Setter Property="Height" Value="23" />
     </Style>
 
-    <!--DataGrid-->
+    <!--DataGridStandart-->
     <Style TargetType="{x:Type DataGrid}" x:Key="DataGridStandart">
         <Setter Property="RowHeight" Value="30"/>
         <Setter Property="BorderThickness" Value="0.5" />

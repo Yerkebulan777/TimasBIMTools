@@ -196,6 +196,7 @@
                 <DataGrid Name="dataGridView" Style="{DynamicResource DataGridStandart}"
                           ItemsSource="{Binding Path=DataViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <DataGrid.Columns>
+                        
                         <DataGridTemplateColumn Header="Switch" Width="30" CellStyle="{StaticResource SingleClickEditStyle}" >
                             <DataGridTemplateColumn.HeaderTemplate>
                                 <DataTemplate>
@@ -215,15 +216,15 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTemplateColumn>
+                        <DataGridTemplateColumn Width="60">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="Show" Height="20" Width="50"  Click="DatagridRowButton_Click" />
+                                    <Button Content="Show" Height="25" Width="55" Click="DatagridRowButton_Click" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTextColumn Width="125" Header="Symbol Name" Binding="{Binding SymbolName, Mode=OneWay}">
+                        <DataGridTextColumn Width="120" Header="Symbol Name" Binding="{Binding SymbolName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
@@ -231,7 +232,7 @@
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
                         
-                        <DataGridTextColumn Width="125" Header="Family Name" Binding="{Binding FamilyName, Mode=OneWay}">
+                        <DataGridTextColumn Width="120" Header="Family Name" Binding="{Binding FamilyName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
