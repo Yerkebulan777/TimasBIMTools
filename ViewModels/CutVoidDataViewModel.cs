@@ -799,13 +799,12 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (!DataViewCollection.IsEmpty)
             {
-                DataViewCollection.MoveCurrentToLast();
+                DataViewCollection.Refresh();
                 object item = DataViewCollection.GetItemAt(0);
+                DockPanelView.DataGridView.SelectedItem = item;
                 if (item is ElementModel model)
                 {
                     currentModel = model;
-                    DataViewCollection.EditItem(item);
-                    DataViewCollection.CommitEdit();
                 }
             }
         }
