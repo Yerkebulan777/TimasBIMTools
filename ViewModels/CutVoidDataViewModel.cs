@@ -20,7 +20,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
-using DataGrid = System.Windows.Controls.DataGrid;
 using Document = Autodesk.Revit.DB.Document;
 using Parameter = Autodesk.Revit.DB.Parameter;
 
@@ -50,14 +49,11 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Templory
 
-        private IList<ElementId> currentIds = null;
-
-        private bool ValidDataCollection = false;
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
-        private ElementModel currentModel { get; set; } = null;
-        
+        private ElementModel current { get; set; } = null;
+
         private bool? dialogResult = false;
         public bool? DialogResult
         {
@@ -501,9 +497,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => isSelected;
             set
             {
-                if (SetProperty(ref isSelected, value) && dataView != null)
+                if (SetProperty(ref isSelected, value))
                 {
-                    if (ValidDataCollection && value.HasValue)
+                    if (dataView != null && value.HasValue)
                     {
                         bool booleanValue = value.Value;
                         foreach (ElementModel model in dataView)
@@ -525,8 +521,8 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref collection, value) && collection != null)
                 {
                     DataViewCollection = CollectionViewSource.GetDefaultView(collection) as ListCollectionView;
-                    GetUniqueSymbolNameList(collection);
-                    GetUniqueLevelNameList(collection);
+                    UniqueLevelNames = new SortedSet<string>(collection.Select(m => m.LevelName).Append(string.Empty)).ToList();
+                    UniqueSymbolNames = new SortedSet<string>(collection.Select(m => m.SymbolName).Append(string.Empty)).ToList();
                 }
             }
         }
@@ -538,10 +534,9 @@ namespace RevitTimasBIMTools.ViewModels
             get => dataView;
             set
             {
-                if (SetProperty(ref dataView, value) && value != null)
+                if (SetProperty(ref dataView, value))
                 {
-                    ValidDataCollection = !dataView.IsEmpty;
-                    if (ValidDataCollection)
+                    if (dataView != null && !dataView.IsEmpty)
                     {
                         using (dataView.DeferRefresh())
                         {
@@ -552,6 +547,7 @@ namespace RevitTimasBIMTools.ViewModels
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
+                            current = dataView.GetItemAt(0) as ElementModel;
                         }
                     }
                     else
@@ -602,49 +598,43 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void ShowPlanViewAsync()
         {
-            if (ValidDataCollection)
+            await RevitTask.RunAsync(app =>
             {
-                await RevitTask.RunAsync(app =>
+                doc = app.ActiveUIDocument.Document;
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    doc = app.ActiveUIDocument.Document;
-                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                    if (current is ElementModel model)
                     {
-                        if (DataViewCollection.GetItemAt(0) is ElementModel model)
-                        {
-                            ViewPlan view = RevitViewManager.CreatePlan(doc, model.HostLevel);
-                            RevitViewManager.ShowView(app.ActiveUIDocument, view);
-                        }
+                        ViewPlan view = RevitViewManager.CreatePlan(doc, model.HostLevel);
+                        RevitViewManager.ShowView(app.ActiveUIDocument, view);
                     }
-                });
-            }
+                }
+            });
         }
 
 
         private async void ZoomInPlanViewAsync()
         {
-            if (ValidDataCollection)
+            await RevitTask.RunAsync(app =>
             {
-                await RevitTask.RunAsync(app =>
+                doc = app.ActiveUIDocument.Document;
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    doc = app.ActiveUIDocument.Document;
-                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                    List<ElementId> ids = new(dataView.Count);
+                    if (current is ElementModel model)
                     {
-                        if (DataViewCollection.GetItemAt(0) is ElementModel model)
+                        ElementId levelId = model.HostLevel.Id;
+                        foreach (ElementModel mdl in dataView)
                         {
-                            currentIds = new List<ElementId>(dataView.Count);
-                            ElementId levelId = model.HostLevel.Id;
-                            foreach (ElementModel mdl in dataView)
+                            if (levelId.Equals(mdl.HostLevel.Id))
                             {
-                                if (levelId.Equals(mdl.HostLevel.Id))
-                                {
-                                    currentIds.Add(mdl.Instanse.Id);
-                                }
+                                ids.Add(mdl.Instanse.Id);
                             }
-                            RevitViewManager.ShowElements(app.ActiveUIDocument, currentIds);
                         }
+                        RevitViewManager.ShowElements(app.ActiveUIDocument, ids);
                     }
-                });
-            }
+                }
+            });
         }
 
 
@@ -671,17 +661,6 @@ namespace RevitTimasBIMTools.ViewModels
             || (model.LevelName.Contains(LevelTextFilter) && model.SymbolName.Contains(SymbolTextFilter))
             || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(model.SymbolName))
             || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(model.LevelName)));
-        }
-
-
-        private void GetUniqueLevelNameList(IList<ElementModel> collection)
-        {
-            UniqueLevelNames = new SortedSet<string>(collection.Select(m => m.LevelName).Append(string.Empty)).ToList();
-        }
-
-        private void GetUniqueSymbolNameList(IList<ElementModel> collection)
-        {
-            UniqueSymbolNames = new SortedSet<string>(collection.Select(m => m.SymbolName).Append(string.Empty)).ToList();
         }
 
         #endregion
@@ -721,6 +700,7 @@ namespace RevitTimasBIMTools.ViewModels
             else
             {
                 IsAllSelectChecked = false;
+                current = null;
             }
         }
         #endregion
@@ -749,33 +729,25 @@ namespace RevitTimasBIMTools.ViewModels
         public ICommand ShowCollisionCommand { get; private set; }
         private async Task ShowHandelCommandAsync()
         {
-            if (ValidDataCollection)
+            await RevitTask.RunAsync(app =>
             {
-                object item = DataViewCollection.GetItemAt(0);
-                DataGrid dataGrid = DockPanelView.dataGridView;
-                await RevitTask.RunAsync(app =>
+                DialogResult = null;
+                doc = app.ActiveUIDocument.Document;
+                UIDocument uidoc = app.ActiveUIDocument;
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    DialogResult = null;
-                    dataGrid.SelectedItem = item;
-                    dataGrid.ScrollIntoView(item);
-                    doc = app.ActiveUIDocument.Document;
-                    UIDocument uidoc = app.ActiveUIDocument;
-                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                    if (current is ElementModel model && model.IsSelected)
                     {
-                        if (item is ElementModel model && model.IsSelected)
+                        if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
                         {
-                            if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
-                            {
-                                patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
-                                RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
-                                PreviewControlModel control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
-                                control.ShowPreviewControl(app, view3d);
-                                currentModel = model;
-                            }
+                            patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
+                            RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
+                            PreviewControlModel control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
+                            control.ShowPreviewControl(app, view3d);
                         }
                     }
-                });
-            }
+                }
+            });
         }
 
         #endregion
@@ -786,21 +758,24 @@ namespace RevitTimasBIMTools.ViewModels
         public ICommand OkCanselCommand { get; private set; }
         private async Task OkCanselHandelCommandAsync()
         {
-            if (currentModel is not null)
+            if (dialogResult.HasValue)
             {
                 await RevitTask.RunAsync(app =>
                 {
-                    if (dialogResult.HasValue)
+                    doc = app.ActiveUIDocument.Document;
+                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        currentModel.IsSelected = false;
-                        doc = app.ActiveUIDocument.Document;
-                        if (dialogResult.Value && ElementModelData.Remove(currentModel))
+                        if (current is ElementModel model && model.IsSelected)
                         {
-                            collisionManager.CreateOpening(doc, currentModel, wallOpenning, floorOpenning);
-                        }
-                        else
-                        {
-                            DataViewCollection.Refresh();
+                            if (dialogResult.Value && ElementModelData.Remove(current))
+                            {
+                                collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
+                            }
+                            else
+                            {
+                                current.IsSelected = false;
+                                DataViewCollection.Refresh();
+                            }
                         }
                     }
                 });
