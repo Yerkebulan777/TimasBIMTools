@@ -76,7 +76,7 @@ namespace RevitTimasBIMTools.Views
 
         private void CheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            Dispatcher.CurrentDispatcher.Invoke(DataContextHandler.VerifyAllSelectedData);
+            Dispatcher.CurrentDispatcher.Invoke(DataContextHandler.VerifySelectedData);
         }
 
 

@@ -500,13 +500,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region DataGrid
 
-        private bool? isSelected = false;
+        private bool? allSelected = false;
         public bool? IsAllSelectChecked
         {
-            get => isSelected;
+            get => allSelected;
             set
             {
-                if (SetProperty(ref isSelected, value))
+                if (SetProperty(ref allSelected, value))
                 {
                     if (dataView != null && value.HasValue)
                     {
@@ -548,7 +548,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (!dataView.IsEmpty)
                     {
                         SortDataViewCollection();
-                        VerifyAllSelectedData();
+                        VerifySelectedData();
                     }
                     else
                     {
@@ -574,7 +574,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal void VerifyAllSelectedData()
+        internal void VerifySelectedData()
         {
             if (dataView.IsInUse && !dataView.IsEmpty)
             {
