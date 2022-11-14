@@ -53,9 +53,8 @@ namespace RevitTimasBIMTools.ViewModels
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
         private ElementModel currentModel { get; set; } = null;
+        private PreviewControlModel control { get; set; }  = null;
 
-
-        private PreviewControlModel control = null;
         private bool? dialogResult = false;
         public bool? DialogResult
         {
