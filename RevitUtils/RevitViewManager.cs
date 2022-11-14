@@ -1,11 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using log4net.Core;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using Color = Autodesk.Revit.DB.Color;
 
 
@@ -126,16 +124,19 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
-        private void CreatePlan(Document doc, Level level)
+        private ViewPlan CreatePlan(Document doc, Level level)
         {
             using Transaction tx = new(doc);
-            string name = "New" + level.Name;
             TransactionStatus status = tx.Start("Create Floor Plan");
             ViewFamilyType vft = new FilteredElementCollector(doc)
                 .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
-                .FirstOrDefault<ViewFamilyType>(x => ViewFamily.StructuralPlan == x.ViewFamily);
+                .FirstOrDefault(x => ViewFamily.StructuralPlan == x.ViewFamily);
             ViewPlan floorPlan = ViewPlan.Create(doc, vft.Id, level.Id);
+            floorPlan.Discipline = ViewDiscipline.Coordination;
+            floorPlan.DisplayStyle = DisplayStyle.Realistic;
+            floorPlan.DetailLevel = ViewDetailLevel.Fine;
             status = tx.Commit();
+            return floorPlan;
         }
 
 
