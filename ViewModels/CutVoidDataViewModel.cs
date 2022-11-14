@@ -748,7 +748,7 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
                             RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
-                            control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
+                            control ??= SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
                             control.ShowPreviewControl(app, view3d);
                         }
                     }
