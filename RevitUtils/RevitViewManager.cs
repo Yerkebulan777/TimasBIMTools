@@ -120,6 +120,7 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             if (view is not null)
             {
+                uidoc.RequestViewChange(view);
                 DisplayStyle style = DisplayStyle.Realistic;
                 ViewDetailLevel level = ViewDetailLevel.Fine;
                 ViewDiscipline discipline = ViewDiscipline.Coordination;
@@ -128,7 +129,6 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     if (uv.ViewId.Equals(view.Id))
                     {
-                        uidoc.RequestViewChange(view);
                         uidoc.RefreshActiveView();
                         uv.ZoomToFit();
                         break;
@@ -162,20 +162,26 @@ namespace RevitTimasBIMTools.RevitUtils
         public static bool SetCustomSectionBox(UIDocument uidoc, XYZ centroid, View3D view3d)
         {
             bool result = false;
-            uidoc.RequestViewChange(view3d);
-            if (uidoc.ActiveView.Id.Equals(view3d.Id))
+            if (view3d != null && view3d.IsValidObject)
             {
                 using Transaction tx = new(uidoc.Document);
                 BoundingBoxXYZ bbox = GetBoundingBox(centroid);
                 TransactionStatus status = tx.Start("SetSectionBox");
                 if (status == TransactionStatus.Started)
                 {
-                    ZoomElementInView(uidoc, view3d, bbox);
-                    view3d.SetSectionBox(bbox);
-                    status = tx.Commit();
-                    result = true;
+                    try
+                    {
+                        ZoomElementInView(uidoc, view3d, bbox);
+                        view3d.SetSectionBox(bbox);
+                        status = tx.Commit();
+                        result = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        status = tx.RollBack();
+                        Logger.Error(ex.Message);
+                    }
                 }
-                uidoc.RefreshActiveView();
             }
             return result;
         }

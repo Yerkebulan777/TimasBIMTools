@@ -64,10 +64,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref dialogResult, value))
                 {
-                    if (dialogResult.Value)
-                    {
-                        control = null;
-                    }
+                    control = null;
                 }
             }
         }
@@ -550,16 +547,8 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (!dataView.IsEmpty)
                     {
-                        using (dataView.DeferRefresh())
-                        {
-                            dataView.SortDescriptions.Clear();
-                            dataView.GroupDescriptions.Clear();
-                            dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.IsSelected)));
-                            dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
-                            dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
-                            dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
-                            dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
-                        }
+                        SortDataViewCollection();
+                        VerifyAllSelectedData();
                     }
                     else
                     {
@@ -571,13 +560,28 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        private void SortDataViewCollection()
+        {
+            using (dataView.DeferRefresh())
+            {
+                dataView.SortDescriptions.Clear();
+                dataView.GroupDescriptions.Clear();
+                dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.IsSelected)));
+                dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
+                dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
+                dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
+            }
+        }
+
+
         internal void VerifyAllSelectedData()
         {
-            if (DataViewCollection.IsInUse && !DataViewCollection.IsEmpty)
+            if (dataView.IsInUse && !dataView.IsEmpty)
             {
-                current = DataViewCollection.GetItemAt(0) as ElementModel;
-                IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
-                ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
+                current = dataView.GetItemAt(0) as ElementModel;
+                IEnumerable<ElementModel> items = dataView.OfType<ElementModel>();
+                ElementModel firstItem = dataView.OfType<ElementModel>().FirstOrDefault();
                 IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem.IsSelected : null;
             }
         }
@@ -597,7 +601,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     DataViewCollection.Filter = FilterModelCollection;
                     DataViewCollection.Refresh();
-                    VerifyAllSelectedData();
                     ShowPlanViewAsync();
                 }
             }
@@ -614,11 +617,11 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     DataViewCollection.Filter = FilterModelCollection;
                     DataViewCollection.Refresh();
-                    VerifyAllSelectedData();
                     ZoomPlanViewAsync();
                 }
             }
         }
+
 
         private async void ShowPlanViewAsync()
         {
