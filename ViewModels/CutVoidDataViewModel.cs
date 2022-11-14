@@ -49,11 +49,10 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Templory
-
-        private Document doc { get; set; }
-        private View3D view3d { get; set; }
-        private ElementId patternId { get; set; }
-        private ElementModel currentModel { get; set; }
+        private Document doc { get; set; } = null;
+        private View3D view3d { get; set; } = null;
+        private ElementId patternId { get; set; } = null;
+        private ElementModel currentModel { get; set; } = null;
 
         private bool? dialogResult = false;
         public bool? DialogResult
@@ -61,7 +60,6 @@ namespace RevitTimasBIMTools.ViewModels
             get => dialogResult;
             set => SetProperty(ref dialogResult, value);
         }
-
         #endregion
 
 
@@ -683,7 +681,7 @@ namespace RevitTimasBIMTools.ViewModels
         private async Task RefreshActiveDataHandler()
         {
             IsDataRefresh = false;
-            Show3DViewAsync(view3d);
+            ShowPlanViewAsync(view3d);
             if (document != null && material != null && category != null)
             {
                 await Task.Delay(1000).ContinueWith(_ =>
@@ -695,7 +693,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void Show3DViewAsync(View3D view3d)
+        private async void ShowPlanViewAsync(View3D view3d)
         {
             await RevitTask.RunAsync(app =>
             {
@@ -704,7 +702,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (manualResetEvent.WaitOne())
                     {
-                        patternId = RevitViewManager.GetSolidFillPatternId(doc);
+                        patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
                         RevitViewManager.Show3DView(app.ActiveUIDocument, view3d);
                         _ = manualResetEvent.Set();
                     }
@@ -766,7 +764,7 @@ namespace RevitTimasBIMTools.ViewModels
                         doc = app.ActiveUIDocument.Document;
                         if (dialogResult.Value && ElementModelData.Remove(currentModel))
                         {
-                            collisionManager.CreateOpening(doc,  currentModel, wallOpenning, floorOpenning);
+                            collisionManager.CreateOpening(doc, currentModel, wallOpenning, floorOpenning);
                         }
                         else
                         {

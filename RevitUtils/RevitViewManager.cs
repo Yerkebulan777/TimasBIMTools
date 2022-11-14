@@ -124,6 +124,8 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
+
+        #region CreatePlan
         private ViewPlan CreatePlan(Document doc, Level level)
         {
             using Transaction tx = new(doc);
@@ -138,8 +140,10 @@ namespace RevitTimasBIMTools.RevitUtils
             status = tx.Commit();
             return floorPlan;
         }
+        #endregion
 
 
+        #region SetCustomSectionBox
         public static bool SetCustomSectionBox(UIDocument uidoc, XYZ centroid, View3D view3d)
         {
             bool result = false;
@@ -162,7 +166,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxXYZ GetBoundingBox(XYZ centroid, double factor = 3)
+        private static BoundingBoxXYZ GetBoundingBox(XYZ centroid, double factor = 3)
         {
             BoundingBoxXYZ bbox = new();
             XYZ vector = new(factor, factor, factor);
@@ -172,7 +176,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void ZoomElementInView(UIDocument uidoc, View3D view3d, BoundingBoxXYZ box)
+        private static void ZoomElementInView(UIDocument uidoc, View3D view3d, BoundingBoxXYZ box)
         {
             UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view3d.Id));
             if (uiview != null)
@@ -180,7 +184,6 @@ namespace RevitTimasBIMTools.RevitUtils
                 try
                 {
                     uiview.ZoomAndCenterRectangle(box.Min, box.Max);
-                    uiview.ZoomToFit();
                 }
                 catch (Exception ex)
                 {
@@ -188,6 +191,8 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
         }
+        #endregion
+
 
 
         public static ElementId GetSolidFillPatternId(Document doc)
@@ -206,9 +211,9 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void SetCustomColorInView(UIDocument uidoc, View3D view, ElementId solidFillId, Element elem, byte blue = 128, byte red = 128, byte green = 128)
+        public static void SetCustomColorInView(UIDocument uidoc, View3D view, ElementId solidFillId, Element elem, Color color = null)
         {
-            Color color = new(red, green, blue);
+            color ??= new(255, 0, 0);
             OverrideGraphicSettings graphics = new();
             if (!view.AreGraphicsOverridesAllowed())
             {
@@ -232,10 +237,10 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(exc.Message);
                     if (!tx.HasEnded())
                     {
                         status = tx.RollBack();
+                        Logger.Error(exc.Message);
                     }
                 }
             }
