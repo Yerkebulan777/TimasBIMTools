@@ -110,8 +110,8 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             if (elems.Any())
             {
-                uidoc.ShowElements(elems);
                 uidoc.Selection.Dispose();
+                uidoc.ShowElements(elems);
             }
         }
 
