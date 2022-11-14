@@ -584,7 +584,7 @@ namespace RevitTimasBIMTools.ViewModels
                 object item = dataView.GetItemAt(0);
                 if (item is ElementModel model)
                 {
-                    dataView.EditItem(item);
+                    dataView.MoveCurrentTo(item);
                     currentModel = model;
                 }
             }
@@ -799,13 +799,13 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (!DataViewCollection.IsEmpty)
             {
-                DataViewCollection.Refresh();
                 DataViewCollection.MoveCurrentToLast();
                 object item = DataViewCollection.GetItemAt(0);
                 if (item is ElementModel model)
                 {
-                    DataViewCollection.EditItem(item);
                     currentModel = model;
+                    DataViewCollection.EditItem(item);
+                    DataViewCollection.CommitEdit();
                 }
             }
         }
