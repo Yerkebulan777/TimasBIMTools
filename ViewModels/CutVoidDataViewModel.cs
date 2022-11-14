@@ -53,13 +53,21 @@ namespace RevitTimasBIMTools.ViewModels
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
         private ElementModel current { get; set; } = null;
+        PreviewControlModel control { get; set; } = null;
 
         private bool? dialogResult = false;
         public bool? DialogResult
         {
             get => dialogResult;
-            set => SetProperty(ref dialogResult, value);
+            set
+            {
+                if (SetProperty(ref dialogResult, value))
+                {
+                    control = null;
+                }
+            }
         }
+
         #endregion
 
 
@@ -740,7 +748,7 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
                             RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
-                            PreviewControlModel control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
+                            control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
                             control.ShowPreviewControl(app, view3d);
                         }
                     }
