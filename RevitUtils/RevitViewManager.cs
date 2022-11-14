@@ -110,6 +110,7 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             uidoc.Selection.SetElementIds(elems);
             uidoc.ShowElements(elems);
+            uidoc.Selection.Dispose();
         }
 
         #endregion
@@ -129,7 +130,6 @@ namespace RevitTimasBIMTools.RevitUtils
                 {
                     if (uv.ViewId.Equals(view.Id))
                     {
-                        uidoc.RefreshActiveView();
                         uv.ZoomToFit();
                         break;
                     }
