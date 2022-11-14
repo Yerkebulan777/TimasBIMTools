@@ -110,7 +110,7 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
-        #region Show3DView
+        #region ShowView
         public static void ShowView(UIDocument uidoc, in View view)
         {
             if (view is not null)
@@ -125,8 +125,6 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
         #endregion
-
-
 
 
         #region CreatePlan
