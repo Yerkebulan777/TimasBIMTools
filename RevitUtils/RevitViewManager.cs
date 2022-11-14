@@ -59,7 +59,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     DisplayStyle style = DisplayStyle.Realistic;
                     ViewDetailLevel level = ViewDetailLevel.Fine;
                     ViewDiscipline discipline = ViewDiscipline.Coordination;
-                    SetView3DSettings(doc, view3d, discipline, style, level);
+                    SetViewSettings(doc, view3d, discipline, style, level);
                     return view3d;
                 }
             }
@@ -71,16 +71,19 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region SetView3DSettings
 
-        public static void SetView3DSettings(Document doc, View3D view, ViewDiscipline discipline, DisplayStyle style, ViewDetailLevel level)
+        public static void SetViewSettings(Document doc, View view, ViewDiscipline discipline, DisplayStyle style, ViewDetailLevel level)
         {
-            using Transaction t = new(doc, "SetView3DSettings");
-            TransactionStatus status = t.Start();
+            using Transaction t = new(doc);
+            TransactionStatus status = t.Start("SetViewSettings");
             if (status == TransactionStatus.Started)
             {
                 try
                 {
+                    if (view is View3D view3D)
+                    {
+                        view3D.IsSectionBoxActive = false;
+                    }
                     view.ViewTemplateId = ElementId.InvalidElementId;
-                    view.IsSectionBoxActive = false;
                     view.Discipline = discipline;
                     view.DisplayStyle = style;
                     view.DetailLevel = level;
@@ -108,20 +111,21 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region Show3DView
-        public static void Show3DView(UIDocument uidoc, View3D view3d)
+        public static void ShowView(UIDocument uidoc, in View view)
         {
-            if (view3d is not null)
+            if (view is not null)
             {
-                uidoc.RequestViewChange(view3d);
+                uidoc.RequestViewChange(view);
                 DisplayStyle style = DisplayStyle.Realistic;
                 ViewDetailLevel level = ViewDetailLevel.Fine;
                 ViewDiscipline discipline = ViewDiscipline.Coordination;
-                SetView3DSettings(uidoc.Document, view3d, discipline, style, level);
+                SetViewSettings(uidoc.Document, view, discipline, style, level);
                 uidoc.RefreshActiveView();
             }
         }
 
         #endregion
+
 
 
 
@@ -194,7 +198,7 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
-
+        #region SetCustomColor
         public static ElementId GetSolidFillPatternId(Document doc)
         {
             ElementId solidFillPatternId = null;
@@ -211,7 +215,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static void SetCustomColorInView(UIDocument uidoc, View3D view, ElementId solidFillId, Element elem, Color color = null)
+        public static void SetCustomColor(UIDocument uidoc, View3D view, ElementId solidFillId, Element elem, Color color = null)
         {
             color ??= new(255, 0, 0);
             OverrideGraphicSettings graphics = new();
@@ -246,7 +250,10 @@ namespace RevitTimasBIMTools.RevitUtils
             }
         }
 
+        #endregion
 
+
+        #region SetCategoryTransparency
         public static void SetCategoryTransparency(Document doc, View3D view, Category category, int transparency = 15, bool halftone = false)
         {
             ElementId catId = category.Id;
@@ -273,6 +280,8 @@ namespace RevitTimasBIMTools.RevitUtils
             }
 
         }
+
+        #endregion
 
     }
 }

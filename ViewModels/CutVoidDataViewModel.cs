@@ -700,12 +700,8 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    if (manualResetEvent.WaitOne())
-                    {
-                        patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
-                        RevitViewManager.Show3DView(app.ActiveUIDocument, view3d);
-                        _ = manualResetEvent.Set();
-                    }
+                    patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
+                    RevitViewManager.ShowView(app.ActiveUIDocument, view3d);
                 }
             });
         }
@@ -735,7 +731,7 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
                             {
-                                RevitViewManager.SetCustomColorInView(uidoc, view3d, patternId, model.Instanse);
+                                RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
                                 PreviewControlModel control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
                                 control.ShowPreviewControl(app, view3d);
                                 currentModel = model;
