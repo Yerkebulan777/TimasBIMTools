@@ -508,10 +508,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref allSelected, value))
                 {
-                    if (dataView != null && value.HasValue)
+                    if (viewData != null && value.HasValue)
                     {
                         bool booleanValue = value.Value;
-                        foreach (ElementModel model in dataView)
+                        foreach (ElementModel model in viewData)
                         {
                             model.IsSelected = booleanValue;
                         }
@@ -521,31 +521,31 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private ObservableCollection<ElementModel> collection = null;
+        private ObservableCollection<ElementModel> modelData = null;
         public ObservableCollection<ElementModel> ElementModelData
         {
-            get => collection;
+            get => modelData;
             set
             {
-                if (SetProperty(ref collection, value) && collection != null)
+                if (SetProperty(ref modelData, value) && modelData != null)
                 {
-                    DataViewCollection = CollectionViewSource.GetDefaultView(collection) as ListCollectionView;
-                    UniqueLevelNames = new SortedSet<string>(collection.Select(m => m.LevelName).Append(string.Empty)).ToList();
-                    UniqueSymbolNames = new SortedSet<string>(collection.Select(m => m.SymbolName).Append(string.Empty)).ToList();
+                    ListViewData = CollectionViewSource.GetDefaultView(modelData) as ListCollectionView;
+                    UniqueLevelNames = new SortedSet<string>(modelData.Select(m => m.LevelName).Append(string.Empty)).ToList();
+                    UniqueSymbolNames = new SortedSet<string>(modelData.Select(m => m.SymbolName).Append(string.Empty)).ToList();
                 }
             }
         }
 
 
-        private ListCollectionView dataView = null;
-        public ListCollectionView DataViewCollection
+        private ListCollectionView viewData = null;
+        public ListCollectionView ListViewData
         {
-            get => dataView;
+            get => viewData;
             set
             {
-                if (SetProperty(ref dataView, value))
+                if (SetProperty(ref viewData, value))
                 {
-                    if (!dataView.IsEmpty)
+                    if (!viewData.IsEmpty)
                     {
                         SortDataViewCollection();
                         VerifySelectedData();
@@ -561,29 +561,29 @@ namespace RevitTimasBIMTools.ViewModels
 
         private void SortDataViewCollection()
         {
-            using (dataView.DeferRefresh())
+            using (viewData.DeferRefresh())
             {
-                dataView.SortDescriptions.Clear();
-                dataView.GroupDescriptions.Clear();
-                dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.IsSelected)));
-                dataView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
-                dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
-                dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
-                dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
+                viewData.SortDescriptions.Clear();
+                viewData.GroupDescriptions.Clear();
+                viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.IsSelected)));
+                viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
+                viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
+                viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
             }
         }
 
 
         internal void VerifySelectedData()
         {
-            if (dataView.IsInUse && !dataView.IsEmpty)
+            if (viewData.IsInUse && !viewData.IsEmpty)
             {
-                object item = dataView.GetItemAt(0);
+                object item = viewData.GetItemAt(0);
                 if (item is ElementModel model)
                 {
                     currentModel = model;
-                    dataView.MoveCurrentTo(item);
-                    IEnumerable<ElementModel> items = dataView.OfType<ElementModel>();
+                    viewData.MoveCurrentTo(item);
+                    IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
                     IsAllSelectChecked = items.All(x => x.IsSelected == model.IsSelected) ? model.IsSelected : null;
                 }
             }
@@ -602,8 +602,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref levelText, value))
                 {
-                    DataViewCollection.Filter = FilterModelCollection;
-                    DataViewCollection.Refresh();
+                    ListViewData.Filter = FilterModelCollection;
+                    ListViewData.Refresh();
                     ShowPlanViewAsync();
                 }
             }
@@ -618,8 +618,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref symbolText, value))
                 {
-                    DataViewCollection.Filter = FilterModelCollection;
-                    DataViewCollection.Refresh();
+                    ListViewData.Filter = FilterModelCollection;
+                    ListViewData.Refresh();
                     ZoomPlanViewAsync();
                 }
             }
@@ -650,11 +650,11 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    List<ElementId> ids = new(dataView.Count);
+                    List<ElementId> ids = new(viewData.Count);
                     if (currentModel is ElementModel model)
                     {
                         ElementId levelId = model.HostLevel.Id;
-                        foreach (ElementModel mdl in dataView)
+                        foreach (ElementModel mdl in viewData)
                         {
                             if (levelId.Equals(mdl.HostLevel.Id))
                             {
@@ -700,7 +700,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         //private void ResetCurrentContext()
         //{
-        //    context = DataViewCollection?.SourceCollection as SynchronizationContext;
+        //    context = ListViewData?.SourceCollection as SynchronizationContext;
         //    if (context != null && SynchronizationContext.Current != context)
         //    {
         //        try
@@ -796,10 +796,10 @@ namespace RevitTimasBIMTools.ViewModels
 
         private void SelectCurrentModel()
         {
-            if (!DataViewCollection.IsEmpty)
+            if (!ListViewData.IsEmpty)
             {
-                DataViewCollection.Refresh();
-                object item = DataViewCollection.GetItemAt(0);
+                ListViewData.Refresh();
+                object item = ListViewData.GetItemAt(0);
                 DockPanelView.DataGridView.SelectedItem = item;
                 if (item is ElementModel model)
                 {
