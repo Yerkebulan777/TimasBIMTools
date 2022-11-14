@@ -184,9 +184,6 @@
                     ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                     SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
 
-                <Button Name="Refresh" Content="Refresh" Height="23" Width="60" Margin="5"
-                        Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}"/>
-
             </WrapPanel>
 
 
@@ -253,28 +250,23 @@
 
 
             <!-- ButtonPanel -->
-            <Border Grid.Row="4" Background="Silver" >
+            <Border Grid.Row="4" Background="Silver"  Style="{StaticResource VisibleAnimation}" 
+                    Visibility="{Binding  Path=IsStarted, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
                 
                 <DockPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" >
 
-                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
-                                Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
-                        <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
-                                IsEnabled="{Binding Path=IsOptionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                                Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" >
-                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59165;" Foreground="DarkBlue"  FontSize="15" />
-                        </Button>
-                    </WrapPanel>
+                    <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
+                            IsEnabled="{Binding Path=IsOptionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                            Command="{Binding Path=RefreshDataCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" >
+                        <Label FontFamily="Segoe MDL2 Assets" Content="&#59165;" Foreground="DarkBlue"  FontSize="15" />
+                    </Button>
 
-                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center" Style="{StaticResource VisibleAnimation}"
-                                Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
-                        <Button Name="CutVoidCmd" Height="30" Width="75" Margin="5"
-                                IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                                Command="{Binding Path=ShowCollisionCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" >
-                            <Label FontFamily="Segoe MDL2 Assets" Content="&#59538;" Foreground="DarkBlue"  FontSize="15" />
-                        </Button>
-                    </WrapPanel>
-
+                    <Button Name="CutVoidCmd" Height="30" Width="75" Margin="5"
+                            IsEnabled="{Binding Path=IsDataRefresh, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                            Command="{Binding Path=ShowCollisionCommand, Mode=OneTime, UpdateSourceTrigger=Explicit}" >
+                        <Label FontFamily="Segoe MDL2 Assets" Content="&#59538;" Foreground="DarkBlue"  FontSize="15" />
+                    </Button>
+                        
                 </DockPanel>
             </Border>
 

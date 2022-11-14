@@ -107,6 +107,12 @@ namespace RevitTimasBIMTools.RevitUtils
             uidoc.ShowElements(elem);
         }
 
+        public static void ShowElements(UIDocument uidoc, IList<ElementId> elems)
+        {
+            uidoc.Selection.SetElementIds(elems);
+            uidoc.ShowElements(elems);
+        }
+
         #endregion
 
 

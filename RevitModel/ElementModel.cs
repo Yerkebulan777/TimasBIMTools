@@ -6,12 +6,11 @@ namespace RevitTimasBIMTools.RevitModel
 {
     public sealed class ElementModel : ObservableObject
     {
+        public readonly Level HostLevel;
         public readonly Element Instanse;
-        public readonly Level IntersectionLevel;
         public string LevelName { get; private set; }
         public string SymbolName { get; private set; }
         public string FamilyName { get; private set; }
-
 
         public ElementModel(Element elem, Level level)
         {
@@ -19,12 +18,13 @@ namespace RevitTimasBIMTools.RevitModel
             if (etype.IsValidObject && etype is ElementType elementType)
             {
                 Instanse = elem;
+                HostLevel = level;
                 LevelName = level.Name;
-                IntersectionLevel = level;
                 SymbolName = elementType.Name;
                 FamilyName = elementType.FamilyName;
             }
         }
+
 
         public XYZ Origin { get; internal set; }
         public XYZ Direction { get; internal set; }

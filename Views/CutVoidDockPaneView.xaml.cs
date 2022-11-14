@@ -68,7 +68,7 @@ namespace RevitTimasBIMTools.Views
             {
                 if (model != null && model.Instanse.IsValidObject)
                 {
-                    DataContextHandler.GetElementInViewByIntId(model.Instanse.Id);
+                    DataContextHandler.GetElementInView(model.Instanse);
                 }
             }
         }
