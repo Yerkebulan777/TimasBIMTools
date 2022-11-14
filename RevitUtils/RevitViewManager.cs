@@ -1,13 +1,11 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using RevitTimasBIMTools.RevitModel;
+using log4net.Core;
 using RevitTimasBIMTools.Services;
-using RevitTimasBIMTools.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
+using System.Security.Cryptography;
 using Color = Autodesk.Revit.DB.Color;
 
 
@@ -128,6 +126,17 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
+        private void CreatePlan(Document doc, Level level)
+        {
+            using Transaction tx = new(doc);
+            string name = "New" + level.Name;
+            TransactionStatus status = tx.Start("Create Floor Plan");
+            ViewFamilyType vft = new FilteredElementCollector(doc)
+                .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
+                .FirstOrDefault<ViewFamilyType>(x => ViewFamily.StructuralPlan == x.ViewFamily);
+            ViewPlan floorPlan = ViewPlan.Create(doc, vft.Id, level.Id);
+            status = tx.Commit();
+        }
 
 
         public static bool SetCustomSectionBox(UIDocument uidoc, XYZ centroid, View3D view3d)
