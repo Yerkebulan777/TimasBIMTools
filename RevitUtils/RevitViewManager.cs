@@ -148,7 +148,7 @@ namespace RevitTimasBIMTools.RevitUtils
             TransactionStatus status = tx.Start("CreateFloorPlan");
             ViewFamilyType vft = new FilteredElementCollector(doc)
                 .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
-                .FirstOrDefault(x => ViewFamily.AreaPlan == x.ViewFamily);
+                .FirstOrDefault(x => ViewFamily.FloorPlan == x.ViewFamily);
             ViewPlan floorPlan = ViewPlan.Create(doc, vft.Id, level.Id);
             floorPlan.Discipline = ViewDiscipline.Coordination;
             floorPlan.DisplayStyle = DisplayStyle.Realistic;
