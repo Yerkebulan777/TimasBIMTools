@@ -573,6 +573,7 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
+
         internal void VerifyAllSelectedData()
         {
             if (dataView.IsInUse && !dataView.IsEmpty && !dataView.NeedsRefresh)
