@@ -695,15 +695,20 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void ShowPlanViewAsync(View3D view3d)
         {
-            await RevitTask.RunAsync(app =>
+            if (!DataViewCollection.IsEmpty)
             {
-                doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                object item = DataViewCollection.GetItemAt(0);
+                DataGrid dataGrid = DockPanelView.dataGridView;
+                await RevitTask.RunAsync(app =>
                 {
-                    patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
-                    RevitViewManager.ShowView(app.ActiveUIDocument, view3d);
-                }
-            });
+                    doc = app.ActiveUIDocument.Document;
+                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                    {
+                        patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
+                        RevitViewManager.ShowView(app.ActiveUIDocument, view3d);
+                    }
+                });
+            }
         }
 
         #endregion

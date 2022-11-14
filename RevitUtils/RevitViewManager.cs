@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,8 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitViewManager
     {
-        //ContentControl content = new PreviewControl(document, View3d.Id);
 
-        #region Get3dView
+        #region GetCreate3dView
         public static View3D CreateNew3DView(UIDocument uidoc, string viewName)
         {
             bool flag = false;
@@ -115,12 +115,20 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             if (view is not null)
             {
-                uidoc.RequestViewChange(view);
                 DisplayStyle style = DisplayStyle.Realistic;
                 ViewDetailLevel level = ViewDetailLevel.Fine;
                 ViewDiscipline discipline = ViewDiscipline.Coordination;
                 SetViewSettings(uidoc.Document, view, discipline, style, level);
-                uidoc.RefreshActiveView();
+                foreach (UIView uv in uidoc.GetOpenUIViews())
+                {
+                    if (uv.ViewId.Equals(view.Id))
+                    {
+                        uidoc.RequestViewChange(view);
+                        uidoc.RefreshActiveView();
+                        uv.ZoomToFit();
+                        break;
+                    }
+                }
             }
         }
 
@@ -128,13 +136,13 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region CreatePlan
-        private ViewPlan CreatePlan(Document doc, Level level)
+        public static ViewPlan CreatePlan(Document doc, Level level)
         {
             using Transaction tx = new(doc);
-            TransactionStatus status = tx.Start("Create Floor Plan");
+            TransactionStatus status = tx.Start("CreateFloorPlan");
             ViewFamilyType vft = new FilteredElementCollector(doc)
                 .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
-                .FirstOrDefault(x => ViewFamily.StructuralPlan == x.ViewFamily);
+                .FirstOrDefault(x => ViewFamily.AreaPlan == x.ViewFamily);
             ViewPlan floorPlan = ViewPlan.Create(doc, vft.Id, level.Id);
             floorPlan.Discipline = ViewDiscipline.Coordination;
             floorPlan.DisplayStyle = DisplayStyle.Realistic;
