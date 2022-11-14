@@ -53,8 +53,9 @@ namespace RevitTimasBIMTools.ViewModels
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
         private ElementModel current { get; set; } = null;
-        PreviewControlModel control { get; set; } = null;
 
+
+        private PreviewControlModel control = null;
         private bool? dialogResult = false;
         public bool? DialogResult
         {
@@ -63,7 +64,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref dialogResult, value))
                 {
-                    control = null;
+                    if (dialogResult.Value)
+                    {
+                        control = null;
+                    }
                 }
             }
         }
@@ -760,7 +764,6 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region OkCanselCommand
-
         public ICommand OkCanselCommand { get; private set; }
         private async Task OkCanselHandelCommandAsync()
         {
