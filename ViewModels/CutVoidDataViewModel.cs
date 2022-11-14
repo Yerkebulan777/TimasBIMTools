@@ -559,7 +559,6 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-
         private void SortDataViewCollection()
         {
             using (dataView.DeferRefresh())
@@ -573,7 +572,6 @@ namespace RevitTimasBIMTools.ViewModels
                 dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
             }
         }
-
 
         internal void VerifyAllSelectedData()
         {
