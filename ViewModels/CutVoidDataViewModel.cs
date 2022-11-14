@@ -602,7 +602,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref levelText, value))
                 {
                     DataViewList.Filter = FilterModelCollection;
-                    DataViewList.Refresh();
+                    RefreshAndResetCurrentModel();
                     ShowPlanViewAsync();
                 }
             }
@@ -618,8 +618,25 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref symbolText, value))
                 {
                     DataViewList.Filter = FilterModelCollection;
-                    DataViewList.Refresh();
+                    RefreshAndResetCurrentModel();
                     ZoomPlanViewAsync();
+                }
+            }
+        }
+
+
+        private void RefreshAndResetCurrentModel()
+        {
+            if (!DataViewList.IsEmpty)
+            {
+                DialogResult = null;
+                DataViewList.Refresh();
+                object item = DataViewList.GetItemAt(0);
+                //DockPanelView.DataGridView.CurrentCell = 
+                DockPanelView.DataGridView.SelectedItem = item;
+                if (item is ElementModel model)
+                {
+                    currentModel = model;
                 }
             }
         }
@@ -742,7 +759,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                SelectAndResetCurrentModel();
+                RefreshAndResetCurrentModel();
                 doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
@@ -792,21 +809,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void SelectAndResetCurrentModel()
-        {
-            if (!DataViewList.IsEmpty)
-            {
-                DialogResult = null;
-                DataViewList.Refresh();
-                object item = DataViewList.GetItemAt(0);
-                //DockPanelView.DataGridView.CurrentCell = 
-                DockPanelView.DataGridView.SelectedItem = item;
-                if (item is ElementModel model)
-                {
-                    currentModel = model;
-                }
-            }
-        }
+
 
         #endregion
 
