@@ -108,8 +108,11 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static void ShowElements(UIDocument uidoc, IList<ElementId> elems)
         {
-            uidoc.ShowElements(elems);
-            uidoc.Selection.Dispose();
+            if (elems.Any())
+            {
+                uidoc.ShowElements(elems);
+                uidoc.Selection.Dispose();
+            }
         }
 
         #endregion
