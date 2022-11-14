@@ -548,7 +548,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref dataView, value))
                 {
-                    if (dataView != null && !dataView.IsEmpty)
+                    if (!dataView.IsEmpty)
                     {
                         using (dataView.DeferRefresh())
                         {
@@ -563,7 +563,8 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                     else
                     {
-                        VerifyAllSelectedData();
+                        IsAllSelectChecked = false;
+                        current = null;
                     }
                 }
             }
@@ -578,11 +579,6 @@ namespace RevitTimasBIMTools.ViewModels
                 IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
                 ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
                 IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem.IsSelected : null;
-            }
-            else
-            {
-                IsAllSelectChecked = false;
-                current = null;
             }
         }
 
