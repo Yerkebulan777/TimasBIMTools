@@ -781,6 +781,11 @@ namespace RevitTimasBIMTools.ViewModels
                             {
                                 current.IsSelected = false;
                                 DataViewCollection.Refresh();
+                                object item = DataViewCollection.GetItemAt(0);
+                                if (item != null && item is ElementModel elementModel)
+                                {
+                                    current = elementModel;
+                                }
                             }
                         }
                     }
