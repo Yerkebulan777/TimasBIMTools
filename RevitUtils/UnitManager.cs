@@ -14,7 +14,7 @@ namespace RevitTimasBIMTools.RevitUtils
             BU_Angle, // angleRadians, radian (rad)
             BU_Mass, // mass, kilogram (kg)
             BU_Time, // time, second (s)
-            BU_Electric_Current, // electric current, ampere (A)
+            BU_Electric_Current, // electric currentModel, ampere (A)
             BU_Temperature, // temperature, kelvin (K)
             BU_Luminous_Intensity, // luminous intensity, candela (cd)
             BU_Solid_Angle, // solid angleRadians, steradian (sr)

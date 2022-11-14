@@ -52,7 +52,7 @@ namespace RevitTimasBIMTools.ViewModels
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
-        private ElementModel current { get; set; } = null;
+        private ElementModel currentModel { get; set; } = null;
 
 
         private PreviewControlModel control = null;
@@ -553,7 +553,7 @@ namespace RevitTimasBIMTools.ViewModels
                     else
                     {
                         IsAllSelectChecked = false;
-                        current = null;
+                        currentModel = null;
                     }
                 }
             }
@@ -580,7 +580,12 @@ namespace RevitTimasBIMTools.ViewModels
                 IEnumerable<ElementModel> items = dataView.OfType<ElementModel>();
                 ElementModel firstItem = dataView.OfType<ElementModel>().FirstOrDefault();
                 IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem.IsSelected : null;
-                current = dataView.GetItemAt(0) as ElementModel;
+                object item = dataView.GetItemAt(0);
+                if (item is ElementModel model)
+                {
+                    dataView.EditItem(item);
+                    currentModel = model;
+                }
             }
         }
 
@@ -628,7 +633,7 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    if (current is ElementModel model)
+                    if (currentModel is ElementModel model)
                     {
                         ViewPlan view = RevitViewManager.CreatePlan(doc, model.HostLevel);
                         RevitViewManager.ShowView(app.ActiveUIDocument, view);
@@ -646,7 +651,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     List<ElementId> ids = new(dataView.Count);
-                    if (current is ElementModel model)
+                    if (currentModel is ElementModel model)
                     {
                         ElementId levelId = model.HostLevel.Id;
                         foreach (ElementModel mdl in dataView)
@@ -743,7 +748,7 @@ namespace RevitTimasBIMTools.ViewModels
                 UIDocument uidoc = app.ActiveUIDocument;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    if (current is ElementModel model && model.IsSelected && control == null)
+                    if (currentModel is ElementModel model && model.IsSelected && control == null)
                     {
                         if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
                         {
@@ -771,25 +776,36 @@ namespace RevitTimasBIMTools.ViewModels
                     doc = app.ActiveUIDocument.Document;
                     if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        if (current is ElementModel model && model.IsSelected)
+                        if (currentModel is ElementModel model && model.IsSelected)
                         {
-                            if (dialogResult.Value && ElementModelData.Remove(current))
+                            if (dialogResult.Value && ElementModelData.Remove(currentModel))
                             {
                                 collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
                             }
                             else
                             {
-                                current.IsSelected = false;
-                                DataViewCollection.Refresh();
-                                object item = DataViewCollection.GetItemAt(0);
-                                if (item != null && item is ElementModel elementModel)
-                                {
-                                    current = elementModel;
-                                }
+                                currentModel.IsSelected = false;
                             }
+                            SelectCurrentModel();
                         }
                     }
                 });
+            }
+        }
+
+
+        private void SelectCurrentModel()
+        {
+            if (!DataViewCollection.IsEmpty)
+            {
+                DataViewCollection.Refresh();
+                DataViewCollection.MoveCurrentToLast();
+                object item = DataViewCollection.GetItemAt(0);
+                if (item is ElementModel model)
+                {
+                    DataViewCollection.EditItem(item);
+                    currentModel = model;
+                }
             }
         }
 
