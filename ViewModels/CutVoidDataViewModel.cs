@@ -50,13 +50,14 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Templory
 
+        private IList<ElementId> currentIds = null;
+
         private bool ValidDataCollection = false;
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
         private ElementModel currentModel { get; set; } = null;
-        private IList<ElementId> elemIds { get; set; } = null;
-
+        
         private bool? dialogResult = false;
         public bool? DialogResult
         {
@@ -505,10 +506,8 @@ namespace RevitTimasBIMTools.ViewModels
                     if (ValidDataCollection && value.HasValue)
                     {
                         bool booleanValue = value.Value;
-                        elemIds = new List<ElementId>(dataView.Count);
                         foreach (ElementModel model in dataView)
                         {
-                            elemIds.Add(model.Instanse.Id);
                             model.IsSelected = booleanValue;
                         }
                     }
@@ -632,16 +631,16 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (DataViewCollection.GetItemAt(0) is ElementModel model)
                         {
-                            elemIds = new List<ElementId>(dataView.Count);
+                            currentIds = new List<ElementId>(dataView.Count);
                             ElementId levelId = model.HostLevel.Id;
                             foreach (ElementModel mdl in dataView)
                             {
                                 if (levelId.Equals(mdl.HostLevel.Id))
                                 {
-                                    elemIds.Add(mdl.Instanse.Id);
+                                    currentIds.Add(mdl.Instanse.Id);
                                 }
                             }
-                            RevitViewManager.ShowElements(app.ActiveUIDocument, elemIds);
+                            RevitViewManager.ShowElements(app.ActiveUIDocument, currentIds);
                         }
                     }
                 });
@@ -677,12 +676,12 @@ namespace RevitTimasBIMTools.ViewModels
 
         private void GetUniqueLevelNameList(IList<ElementModel> collection)
         {
-            UniqueLevelNames = new SortedSet<string>(collection.Select(c => c.LevelName).Append(string.Empty)).ToList();
+            UniqueLevelNames = new SortedSet<string>(collection.Select(m => m.LevelName).Append(string.Empty)).ToList();
         }
 
         private void GetUniqueSymbolNameList(IList<ElementModel> collection)
         {
-            UniqueSymbolNames = new SortedSet<string>(collection.Select(c => c.SymbolName).Append(string.Empty)).ToList();
+            UniqueSymbolNames = new SortedSet<string>(collection.Select(m => m.SymbolName).Append(string.Empty)).ToList();
         }
 
         #endregion
