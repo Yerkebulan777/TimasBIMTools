@@ -742,8 +742,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                DialogResult = null;
-                DataViewList.Refresh();
+                SelectAndResetCurrentModel();
                 doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
@@ -786,7 +785,6 @@ namespace RevitTimasBIMTools.ViewModels
                             {
                                 currentModel.IsSelected = false;
                             }
-                            SelectCurrentModel();
                         }
                     }
                 });
@@ -794,12 +792,14 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void SelectCurrentModel()
+        private void SelectAndResetCurrentModel()
         {
             if (!DataViewList.IsEmpty)
             {
+                DialogResult = null;
                 DataViewList.Refresh();
                 object item = DataViewList.GetItemAt(0);
+                //DockPanelView.DataGridView.CurrentCell = 
                 DockPanelView.DataGridView.SelectedItem = item;
                 if (item is ElementModel model)
                 {
