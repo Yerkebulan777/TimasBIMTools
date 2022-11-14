@@ -43,11 +43,16 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        public void SetSizeDescription()
+        public bool SetSizeDescription()
         {
-            int w = Convert.ToInt16(Width * 304.8);
-            int h = Convert.ToInt16(Height * 304.8);
-            Description = $"{w}x{h}(h)";
+            if (Width != 0 && Height != 0)
+            {
+                int w = Convert.ToInt16(Width * 304.8);
+                int h = Convert.ToInt16(Height * 304.8);
+                Description = $"{w}x{h}(h)";
+                return true;
+            }
+            return false;
         }
 
 

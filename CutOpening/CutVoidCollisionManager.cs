@@ -5,7 +5,6 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -126,9 +125,8 @@ namespace RevitTimasBIMTools.CutOpening
                         HostNormal = hostNormal,
                     };
 
-                    if (GetSectionSize(doc, ref model))
+                    if (GetSectionSize(doc, ref model, direction, centroid))
                     {
-                        model.SetSizeDescription();
                         CalculateOpeningSize(ref model, intersectionLine);
                         //intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffsetSize);
                         yield return model;
@@ -138,10 +136,35 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool GetSectionSize(Document doc, ref ElementModel model)
+        private Line GetIntersectionLine(Element elem, in Solid solid, in XYZ centroid, out XYZ direction)
+        {
+            direction = XYZ.Zero;
+            if (elem.Location is LocationCurve curve)
+            {
+                intersectionLine = curve.Curve as Line;
+                direction = intersectionLine.Direction.Normalize();
+            }
+            else if (elem is FamilyInstance instance)
+            {
+                transform = instance.GetTransform();
+                direction = transform.BasisX.Normalize();
+                XYZ strPnt = centroid - (direction * maxSideSize);
+                XYZ endPnt = centroid + (direction * maxSideSize);
+                intersectionLine = Line.CreateBound(strPnt, endPnt);
+            }
+            SolidCurveIntersection curves = solid.IntersectWithCurve(intersectionLine, intersectOptions);
+            if (curves != null && 0 < curves.SegmentCount)
+            {
+                intersectionLine = curves.GetCurveSegment(0) as Line;
+            }
+            return intersectionLine;
+        }
+
+
+        private bool GetSectionSize(Document doc, ref ElementModel model, in XYZ direction, in XYZ centroid)
         {
             BoundingBoxUV size = intersectionSolid.GetSectionBound(doc, in direction, in centroid);
-            if (direction.IsAlmostEqualTo(XYZ.BasisX))
+            if (direction.IsAlmostEqualTo(XYZ.BasisX, 0.5))
             {
                 model.Width = Math.Round(size.Max.U - size.Min.U, 5);
                 model.Height = Math.Round(size.Max.V - size.Min.V, 5);
@@ -151,9 +174,7 @@ namespace RevitTimasBIMTools.CutOpening
                 model.Width = Math.Round(size.Max.V - size.Min.V, 5);
                 model.Height = Math.Round(size.Max.U - size.Min.U, 5);
             }
-            Logger.Log("Width:" + model.Width.ToString());
-            Logger.Log("Height:" + model.Height.ToString());
-            return true;
+            return model.SetSizeDescription();
         }
 
 
@@ -163,21 +184,17 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 XYZ vector = line.GetEndPoint(1) - line.GetEndPoint(0);
                 double hostDeph = Math.Abs(model.HostNormal.DotProduct(vector));
-                double horizont = model.HostNormal.GetHorizontAngleBetween(model.Direction);
-                double vertical = model.HostNormal.GetVerticalAngleBetween(model.Direction);
-                horizont = CalculateSideSize(model.Width, horizont, hostDeph).ConvertToDegrees();
-                vertical = CalculateSideSize(model.Height, vertical, hostDeph).ConvertToDegrees();
-                string msgHorizont = string.Format(" Horizont {0}", horizont.ToString("F2", CultureInfo.InvariantCulture));
-                string msgVertical = string.Format(" Vertical {0}", vertical.ToString("F2", CultureInfo.InvariantCulture));
-                model.Description += " Deph: " + Math.Round(hostDeph * 304.8, MidpointRounding.AwayFromZero).ToString();
-                model.Description += " Size: " + msgHorizont + msgVertical;
+                model.HostNormal.GetAngleBetween(direction, out double horizont, out double vertical);
+                model.Height += CalculateSideSize(hostDeph, vertical);
+                model.Width += CalculateSideSize(hostDeph, horizont);
             }
         }
 
 
-        private double CalculateSideSize(double sideSize, double angle, double hostDeph)
+        private double CalculateSideSize(double hostDeph, in double angle)
         {
-            return Math.Round((sideSize + Math.Tan(angle) * hostDeph), 7);
+            hostDeph = Math.Round(hostDeph * 304.8, MidpointRounding.AwayFromZero) / 304.8;
+            return Math.Round(Math.Tan(angle * hostDeph), 5);
         }
 
 
@@ -222,13 +239,6 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        //private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)
-        //{
-        //    Solid intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
-        //    return intersection.Volume > 0;
-        //}
-
-
         //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ direction, View view)
         //{
         //    Outline outline = new(bbox.Min -= offsetPnt, bbox.Max += offsetPnt);
@@ -238,32 +248,16 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        private Line GetIntersectionLine(Element elem, in Solid solid, in XYZ centroid, out XYZ direction)
-        {
-            direction = XYZ.Zero;
-            if (elem.Location is LocationCurve curve)
-            {
-                intersectionLine = curve.Curve as Line;
-                direction = intersectionLine.Direction.Normalize();
-            }
-            else if (elem is FamilyInstance instance)
-            {
-                transform = instance.GetTransform();
-                direction = transform.BasisX.Normalize();
-                XYZ strPnt = centroid - (direction * maxSideSize);
-                XYZ endPnt = centroid + (direction * maxSideSize);
-                intersectionLine = Line.CreateBound(strPnt, endPnt);
-            }
-            SolidCurveIntersection curves = solid.IntersectWithCurve(intersectionLine, intersectOptions);
-            if (curves != null && 0 < curves.SegmentCount)
-            {
-                intersectionLine = curves.GetCurveSegment(0) as Line;
-            }
-            return intersectionLine;
-        }
-
-
         #region Other methods
+
+
+        //private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)
+        //{
+        //    Solid intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
+        //    return intersection.Volume > 0;
+        //}
+
+
 
         //private double GetLengthValueBySimilarParameterName(Instance floor, string paramName)
         //{
@@ -383,7 +377,6 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
         #endregion
-
 
 
         [STAThread]

@@ -259,33 +259,27 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static double GetHorizontAngleByNormal(this XYZ normal)
+        public static double GetHorizontAngle(this XYZ normal)
         {
             return Math.Atan(normal.X / normal.Y);
         }
 
 
-        public static double GetVerticalAngleBetween(this XYZ normal, in XYZ direction)
+        public static void GetAngleBetween(this XYZ normal, in XYZ vector, out double horizont, out double vertical)
         {
-            //double normalAngle = normal.DotProduct(XYZ.BasisZ);
-            //double directAngle = direction.DotProduct(XYZ.BasisZ);
-            //return Math.Abs(Math.Acos(Math.Round(normalAngle - directAngle, 5)));
-            double deltaX = normal.X - direction.X;
-            double deltaY = normal.Y - direction.X;
-            double deltaZ = normal.Z - direction.X;
-            return Math.Atan2(deltaY, deltaX);
-            //return Math.Asin(deltaZ / Math.Sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ));
+            double sin = (normal.X * vector.Y) - (vector.X * normal.Y);
+            double cos = (normal.X * vector.X) + (normal.Y * vector.Y);
+            vertical = NormaliseAngle(Math.Asin(normal.Z - vector.Z));
+            horizont = NormaliseAngle(Math.Atan2(sin, cos));
         }
 
 
-        public static double GetHorizontAngleBetween(this XYZ normal, in XYZ direction)
+        private static double NormaliseAngle(double angle)
         {
-            double normalAngle = Math.Atan2(normal.Y, normal.X);
-            double directAngle = Math.Atan2(direction.Y, direction.X);
-            double angle = Math.Round(Math.Abs(normalAngle - directAngle), 5);
+            angle = Math.Abs(angle);
             angle = angle > Math.PI ? (Math.PI * 2) - angle : angle;
             angle = angle > (Math.PI / 2) ? Math.PI - angle : angle;
-            return angle;
+            return Math.Abs(angle);
         }
 
 
