@@ -191,7 +191,7 @@
             <ScrollViewer Grid.Row="3"  Style="{StaticResource VisibleAnimation}" 
                           Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
                 <DataGrid Name="DataGridView" Style="{DynamicResource DataGridStandart}"
-                          ItemsSource="{Binding Path=DataViewCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                          ItemsSource="{Binding Path=ListViewData, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                     <DataGrid.Columns>
                         
                         <DataGridTemplateColumn Header="Switch" Width="30" CellStyle="{StaticResource SingleClickEditStyle}" >
