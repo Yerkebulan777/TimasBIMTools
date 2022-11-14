@@ -547,7 +547,6 @@ namespace RevitTimasBIMTools.ViewModels
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
                             dataView.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
-                            current = dataView.GetItemAt(0) as ElementModel;
                         }
                     }
                     else
@@ -555,6 +554,23 @@ namespace RevitTimasBIMTools.ViewModels
                         VerifyAllSelectedData();
                     }
                 }
+            }
+        }
+
+
+        internal void VerifyAllSelectedData()
+        {
+            if (DataViewCollection.IsInUse && !DataViewCollection.IsEmpty)
+            {
+                current = DataViewCollection.GetItemAt(0) as ElementModel;
+                IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
+                ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
+                IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem.IsSelected : null;
+            }
+            else
+            {
+                IsAllSelectChecked = false;
+                current = null;
             }
         }
 
@@ -591,7 +607,7 @@ namespace RevitTimasBIMTools.ViewModels
                     DataViewCollection.Filter = FilterModelCollection;
                     DataViewCollection.Refresh();
                     VerifyAllSelectedData();
-                    ZoomInPlanViewAsync();
+                    ZoomPlanViewAsync();
                 }
             }
         }
@@ -613,7 +629,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void ZoomInPlanViewAsync()
+        private async void ZoomPlanViewAsync()
         {
             await RevitTask.RunAsync(app =>
             {
@@ -685,24 +701,6 @@ namespace RevitTimasBIMTools.ViewModels
         //    }
         //}
 
-        #endregion
-
-
-        #region VerifyAllSelectedData
-        internal void VerifyAllSelectedData()
-        {
-            if (DataViewCollection.IsInUse && !DataViewCollection.IsEmpty)
-            {
-                IEnumerable<ElementModel> items = DataViewCollection.OfType<ElementModel>();
-                ElementModel firstItem = DataViewCollection.OfType<ElementModel>().FirstOrDefault();
-                IsAllSelectChecked = items.All(x => x.IsSelected == firstItem.IsSelected) ? firstItem.IsSelected : null;
-            }
-            else
-            {
-                IsAllSelectChecked = false;
-                current = null;
-            }
-        }
         #endregion
 
 
