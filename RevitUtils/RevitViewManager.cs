@@ -7,7 +7,6 @@ using System.Linq;
 using Color = Autodesk.Revit.DB.Color;
 
 
-
 namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitViewManager

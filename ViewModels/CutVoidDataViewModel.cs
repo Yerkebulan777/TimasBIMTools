@@ -578,14 +578,13 @@ namespace RevitTimasBIMTools.ViewModels
             if (viewData.IsInUse && !viewData.IsEmpty)
             {
                 object item = viewData.GetItemAt(0);
-                if (item is ElementModel model)
+                if (item is ElementModel model && viewData.MoveCurrentTo(item))
                 {
-                    currentModel = model;
-                    _ = viewData.MoveCurrentTo(item);
-                    DockPanelView.DataGridView.SelectedItem = item;
-                    //DockPanelView.DataGridView.CurrentCell = 
                     IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
                     IsAllSelectChecked = items.All(x => x.IsSelected == model.IsSelected) ? model.IsSelected : null;
+                    DockPanelView.DataGridView.SelectedItem = item;
+                    //DockPanelView.DataGridView.CurrentCell =
+                    currentModel = model;
                 }
             }
         }
@@ -628,7 +627,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => levelText;
             set
             {
-                if (SetProperty(ref levelText, value))
+                if (SetProperty(ref levelText, value) && !string.IsNullOrEmpty(levelText))
                 {
                     DataViewList.Filter = FilterModelCollection;
                     RefreshDataViewCollection();
@@ -643,7 +642,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => symbolText;
             set
             {
-                if (SetProperty(ref symbolText, value))
+                if (SetProperty(ref symbolText, value) && !string.IsNullOrEmpty(symbolText))
                 {
                     DataViewList.Filter = FilterModelCollection;
                     RefreshDataViewCollection();
@@ -670,11 +669,11 @@ namespace RevitTimasBIMTools.ViewModels
 
         private bool FilterModelCollection(object obj)
         {
-            return obj is ElementModel model
+            return obj is not null && obj is ElementModel model
             && ((string.IsNullOrEmpty(LevelTextFilter) && string.IsNullOrEmpty(SymbolTextFilter))
-            || (model.LevelName.Contains(LevelTextFilter) && model.SymbolName.Contains(SymbolTextFilter))
-            || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(model.SymbolName))
-            || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(model.LevelName)));
+            || (model.LevelName.Equals(LevelTextFilter) && model.SymbolName.Equals(SymbolTextFilter))
+            || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(SymbolTextFilter))
+            || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(SymbolTextFilter)));
         }
 
         #endregion
