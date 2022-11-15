@@ -472,15 +472,15 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal async void GetElementInView(Element elem)
+        internal async void ShowElementModelView(ElementModel model)
         {
             await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    System.Windows.Clipboard.SetText(elem.Id.ToString());
-                    RevitViewManager.ShowElement(app.ActiveUIDocument, elem);
+                    System.Windows.Clipboard.SetText(model.Instanse.Id.ToString());
+                    RevitViewManager.ShowModel(app.ActiveUIDocument, model);
                 }
             });
         }
@@ -683,24 +683,24 @@ namespace RevitTimasBIMTools.ViewModels
             IsDataRefresh = false;
             await RevitTask.RunAsync(app =>
             {
+                bool result = false;
                 doc = app.ActiveUIDocument.Document;
                 if (document != null && material != null && category != null)
                 {
-                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                    result = docUniqueId.Equals(doc.ProjectInformation.UniqueId);
+                    if (result && current is ElementModel model && model.IsValidModel())
                     {
-                        if (current is ElementModel model && model.IsValidModel())
-                        {
-                            ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
-                            RevitViewManager.ShowView(app.ActiveUIDocument, view);
-                        }
+                        ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
+                        result = RevitViewManager.ActivateView(app.ActiveUIDocument, view);
                     }
                 }
-            }).ContinueWith(_ =>
+                return result;
+            }).ContinueWith(task =>
             {
-                IsOptionEnabled = false;
-                IsDataRefresh = true;
+                bool result = task.Result;
+                IsOptionEnabled = !result;
+                IsDataRefresh = result;
             }, taskContext);
-
         }
 
         #endregion

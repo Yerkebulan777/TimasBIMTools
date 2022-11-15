@@ -217,7 +217,7 @@
                         <DataGridTemplateColumn Width="60">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="Show" Height="25" Width="55" Click="DatagridRowButton_Click" />
+                                    <Button Content="Show" Height="25" Width="55" Click="ShowModelButton_Click" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

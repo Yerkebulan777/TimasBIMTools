@@ -62,13 +62,13 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private void DatagridRowButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void ShowModelButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is ElementModel model)
             {
                 if (model != null && model.Instanse.IsValidObject)
                 {
-                    DataContextHandler.GetElementInView(model.Instanse);
+                    DataContextHandler.ShowElementModelView(model);
                 }
             }
         }

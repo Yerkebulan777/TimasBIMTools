@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
@@ -159,10 +160,14 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region ShowElement
-        public static void ShowElement(UIDocument uidoc, Element elem)
+        public static void ShowModel(UIDocument uidoc, ElementModel model)
         {
-            uidoc.Selection.SetElementIds(new List<ElementId> { elem.Id });
-            uidoc.ShowElements(elem);
+            ViewPlan view = GetPlanView(uidoc, model.HostLevel);
+            if (view != null && ActivateView(uidoc, view))
+            {
+                uidoc.ShowElements(model.Instanse);
+                uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
+            }
         }
 
         public static void ShowElements(UIDocument uidoc, IList<ElementId> elems)
@@ -179,10 +184,11 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region ShowView
 
-        public static void ShowView(UIDocument uidoc, in View view)
+        public static bool ActivateView(UIDocument uidoc, in View view)
         {
             ElementId activeId = uidoc.ActiveGraphicalView.Id;
-            if (view != null && activeId != view.Id)
+            bool result = activeId != view.Id;
+            if (view != null && result)
             {
                 uidoc.RequestViewChange(view);
                 DisplayStyle style = DisplayStyle.Realistic;
@@ -196,10 +202,12 @@ namespace RevitTimasBIMTools.RevitUtils
                     {
                         uv.ZoomAndCenterRectangle(box.Min, box.Max);
                         uv.ZoomToFit();
+                        result = true;
                         break;
                     }
                 }
             }
+            return result;
         }
 
         #endregion
