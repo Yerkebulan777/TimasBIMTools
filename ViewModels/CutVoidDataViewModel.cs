@@ -31,7 +31,6 @@ namespace RevitTimasBIMTools.ViewModels
         public CutVoidDockPaneView DockPanelView { get; set; }
         private static SynchronizationContext context { get; set; }
         public static ExternalEvent RevitExternalEvent { get; set; }
-        private static AutoResetEvent resetEvent { get; set; } = new(true);
 
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
