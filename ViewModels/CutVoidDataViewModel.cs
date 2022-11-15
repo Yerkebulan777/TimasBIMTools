@@ -627,7 +627,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => levelText;
             set
             {
-                if (SetProperty(ref levelText, value) && !string.IsNullOrEmpty(levelText))
+                if (SetProperty(ref levelText, value))
                 {
                     DataViewList.Filter = FilterModelCollection;
                     RefreshDataViewCollection();
@@ -642,7 +642,7 @@ namespace RevitTimasBIMTools.ViewModels
             get => symbolText;
             set
             {
-                if (SetProperty(ref symbolText, value) && !string.IsNullOrEmpty(symbolText))
+                if (SetProperty(ref symbolText, value))
                 {
                     DataViewList.Filter = FilterModelCollection;
                     RefreshDataViewCollection();
