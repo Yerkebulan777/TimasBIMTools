@@ -480,7 +480,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     System.Windows.Clipboard.SetText(model.Instanse.Id.ToString());
-                    RevitViewManager.ShowModel(app.ActiveUIDocument, model);
+                    RevitViewManager.ShowModelInPlanView(app.ActiveUIDocument, model);
                 }
             });
         }

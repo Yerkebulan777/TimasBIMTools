@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Color = Autodesk.Revit.DB.Color;
-
+using Level = Autodesk.Revit.DB.Level;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -82,7 +82,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     {
                         DisplayStyle style = DisplayStyle.Realistic;
                         ViewDetailLevel detail = ViewDetailLevel.Fine;
-                        ViewDiscipline discipline = ViewDiscipline.Coordination;
+                        ViewDiscipline discipline = ViewDiscipline.Mechanical;
                         SetViewSettings(doc, plan, discipline, style, detail);
                         return plan;
                     }
@@ -160,15 +160,41 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region ShowElement
-        public static void ShowModel(UIDocument uidoc, ElementModel model)
+        public static void ShowModelInPlanView(UIDocument uidoc, ElementModel model)
         {
-            ViewPlan view = GetPlanView(uidoc, model.HostLevel);
-            if (view != null && ActivateView(uidoc, view))
+            ViewPlan viewPlan = GetPlanView(uidoc, model.HostLevel);
+            if (viewPlan != null && ActivateView(uidoc, viewPlan))
             {
-                ZoomElementInView(uidoc, view, GetBoundingBox(model.Origin));
+                Document doc = viewPlan.Document;
+
+                BoundingBoxXYZ viewBbox = GetBoundingBox(model.Origin);
+                double midElev = model.Origin.Z;
+                double minElev = viewBbox.Min.Z;
+                double maxElev = viewBbox.Max.Z;
+                
+                PlanViewRange viewRange = viewPlan.GetViewRange();
+
+                Level catLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.CutPlane)) as Level;
+                Level topLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.TopClipPlane)) as Level;
+                Level bottomLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.BottomClipPlane)) as Level;
+
+                viewRange.SetOffset(PlanViewPlane.CutPlane, midElev - catLevel.Elevation);
+                viewRange.SetOffset(PlanViewPlane.TopClipPlane, maxElev - topLevel.Elevation);
+                viewRange.SetOffset(PlanViewPlane.BottomClipPlane, minElev - bottomLevel.Elevation);
+
+                viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, minElev - bottomLevel.Elevation);
+
+                using (Transaction trx = new(doc, "SetViewRange"))
+                {
+                    _ = trx.Start();
+                    viewPlan.SetViewRange(viewRange);
+                    _ = trx.Commit();
+                }
+                uidoc.ShowElements(model.Instanse);
                 uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
             }
         }
+
 
         public static void ShowElements(UIDocument uidoc, IList<ElementId> elems)
         {
