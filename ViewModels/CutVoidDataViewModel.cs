@@ -53,7 +53,7 @@ namespace RevitTimasBIMTools.ViewModels
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
         private ElementModel currentModel { get; set; } = null;
-        private PreviewControlModel control { get; set; }  = null;
+        private PreviewControlModel control { get; set; } = null;
 
         private bool? dialogResult = false;
         public bool? DialogResult
@@ -547,7 +547,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (!viewData.IsEmpty)
                     {
                         SortDataViewCollection();
-                        VerifySelectedData();
+                        VerifySelectDataViewCollection();
                     }
                     else
                     {
@@ -573,7 +573,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal void VerifySelectedData()
+        internal void VerifySelectDataViewCollection()
         {
             if (viewData.IsInUse && !viewData.IsEmpty)
             {
@@ -581,66 +581,26 @@ namespace RevitTimasBIMTools.ViewModels
                 if (item is ElementModel model)
                 {
                     currentModel = model;
-                    viewData.MoveCurrentTo(item);
+                    _ = viewData.MoveCurrentTo(item);
+                    DockPanelView.DataGridView.SelectedItem = item;
+                    //DockPanelView.DataGridView.CurrentCell = 
                     IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
                     IsAllSelectChecked = items.All(x => x.IsSelected == model.IsSelected) ? model.IsSelected : null;
                 }
             }
         }
 
-        #endregion
 
-
-        #region DataFilter
-
-        private string levelText;
-        public string LevelTextFilter
+        private void RefreshDataViewCollection()
         {
-            get => levelText;
-            set
-            {
-                if (SetProperty(ref levelText, value))
-                {
-                    DataViewList.Filter = FilterModelCollection;
-                    RefreshAndResetCurrentModel();
-                    ShowPlanViewAsync();
-                }
-            }
-        }
-
-
-        private string symbolText;
-        public string SymbolTextFilter
-        {
-            get => symbolText;
-            set
-            {
-                if (SetProperty(ref symbolText, value))
-                {
-                    DataViewList.Filter = FilterModelCollection;
-                    RefreshAndResetCurrentModel();
-                    ZoomPlanViewAsync();
-                }
-            }
-        }
-
-
-        private void RefreshAndResetCurrentModel()
-        {
-            if (!DataViewList.IsEmpty)
+            if (DataViewList.NeedsRefresh)
             {
                 DialogResult = null;
                 DataViewList.Refresh();
-                object item = DataViewList.GetItemAt(0);
-                //DockPanelView.DataGridView.CurrentCell = 
-                DockPanelView.DataGridView.SelectedItem = item;
-                if (item is ElementModel model)
-                {
-                    currentModel = model;
-                }
+                ShowPlanViewAsync();
+                ZoomPlanViewAsync();
             }
         }
-
 
         private async void ShowPlanViewAsync()
         {
@@ -658,29 +618,38 @@ namespace RevitTimasBIMTools.ViewModels
             });
         }
 
+        #endregion
 
-        private async void ZoomPlanViewAsync()
+
+        #region DataFilter
+
+        private string levelText;
+        public string LevelTextFilter
         {
-            await RevitTask.RunAsync(app =>
+            get => levelText;
+            set
             {
-                doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                if (SetProperty(ref levelText, value))
                 {
-                    List<ElementId> ids = new(viewData.Count);
-                    if (currentModel is ElementModel model)
-                    {
-                        ElementId levelId = model.HostLevel.Id;
-                        foreach (ElementModel mdl in viewData)
-                        {
-                            if (levelId.Equals(mdl.HostLevel.Id))
-                            {
-                                ids.Add(mdl.Instanse.Id);
-                            }
-                        }
-                        RevitViewManager.ShowElements(app.ActiveUIDocument, ids);
-                    }
+                    DataViewList.Filter = FilterModelCollection;
+                    RefreshDataViewCollection();
                 }
-            });
+            }
+        }
+
+
+        private string symbolText;
+        public string SymbolTextFilter
+        {
+            get => symbolText;
+            set
+            {
+                if (SetProperty(ref symbolText, value))
+                {
+                    DataViewList.Filter = FilterModelCollection;
+                    RefreshDataViewCollection();
+                }
+            }
         }
 
 
@@ -759,7 +728,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                RefreshAndResetCurrentModel();
+                RefreshDataViewCollection();
                 doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
@@ -789,6 +758,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 await RevitTask.RunAsync(app =>
                 {
+                    RefreshDataViewCollection();
                     doc = app.ActiveUIDocument.Document;
                     if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
@@ -807,7 +777,6 @@ namespace RevitTimasBIMTools.ViewModels
                 });
             }
         }
-
 
 
 

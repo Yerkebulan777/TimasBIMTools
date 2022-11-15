@@ -128,10 +128,12 @@ namespace RevitTimasBIMTools.RevitUtils
                 ViewDetailLevel level = ViewDetailLevel.Fine;
                 ViewDiscipline discipline = ViewDiscipline.Coordination;
                 SetViewSettings(uidoc.Document, view, discipline, style, level);
+                BoundingBoxXYZ box = view.get_BoundingBox(null);
                 foreach (UIView uv in uidoc.GetOpenUIViews())
                 {
                     if (uv.ViewId.Equals(view.Id))
                     {
+                        uv.ZoomAndCenterRectangle(box.Min, box.Max);
                         uv.ZoomToFit();
                         break;
                     }
