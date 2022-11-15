@@ -69,7 +69,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region GetCreatePlanView
 
-        public static ViewPlan GetPlanView(UIDocument uidoc, Level level, string prefix = "Preview: ")
+        public static ViewPlan GetPlanView(UIDocument uidoc, Level level, string prefix = "Preview")
         {
             Document doc = uidoc.Document;
             string viewName = prefix + level.Name.Trim();
@@ -110,6 +110,7 @@ namespace RevitTimasBIMTools.RevitUtils
         public static ViewPlan CreatePlanView(Document doc, Level level, string name)
         {
             using Transaction tx = new(doc);
+            Logger.Log("ViewPlan name: " + name);
             TransactionStatus status = tx.Start("CreateFloorPlan");
             ViewFamilyType vft = new FilteredElementCollector(doc)
                 .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()

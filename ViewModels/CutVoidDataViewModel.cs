@@ -30,8 +30,8 @@ namespace RevitTimasBIMTools.ViewModels
         public CutVoidDockPaneView DockPanelView { get; set; }
         private static SynchronizationContext context { get; set; }
         public static ExternalEvent RevitExternalEvent { get; set; }
+        private static AutoResetEvent resetEvent { get; set; } = new(true);
 
-        private static readonly AutoResetEvent manualResetEvent = new(true);
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
@@ -551,12 +551,13 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                     else
                     {
-                        IsAllSelectChecked = false;
                         currentModel = null;
+                        IsAllSelectChecked = false;
                     }
                 }
             }
         }
+
 
         private void SortDataViewCollection()
         {
@@ -575,15 +576,17 @@ namespace RevitTimasBIMTools.ViewModels
 
         internal void VerifySelectDataViewCollection()
         {
-            if (viewData.IsInUse && !viewData.IsEmpty)
+            if (viewData != null && !viewData.IsEmpty)
             {
                 object item = viewData.GetItemAt(0);
                 if (item is ElementModel model && viewData.MoveCurrentTo(item))
                 {
                     IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
                     IsAllSelectChecked = items.All(x => x.IsSelected == model.IsSelected) ? model.IsSelected : null;
-                    DockPanelView.DataGridView.SelectedItem = item;
-                    //DockPanelView.DataGridView.CurrentCell =
+                    System.Windows.Controls.DataGrid datagrid = DockPanelView.DataGridView;
+                    datagrid.CurrentCell = datagrid.SelectedCells.FirstOrDefault();
+                    datagrid.ScrollIntoView(item);
+                    datagrid.SelectedItem = item;
                     currentModel = model;
                 }
             }
@@ -592,24 +595,29 @@ namespace RevitTimasBIMTools.ViewModels
 
         private void RefreshDataViewCollection()
         {
-            if (DataViewList.NeedsRefresh)
+            if (resetEvent.WaitOne())
             {
-                DialogResult = null;
-                DataViewList.Refresh();
-                ShowPlanViewAsync();
+                if (viewData != null)
+                {
+                    viewData.Refresh();
+                    ShowPlanViewAsync();
+                    dialogResult = null;
+                }
+                _ = resetEvent.Set();
             }
         }
+
 
         private async void ShowPlanViewAsync()
         {
             await RevitTask.RunAsync(app =>
             {
-                doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                if (currentModel is ElementModel model)
                 {
-                    if (currentModel is ElementModel model)
+                    doc = app.ActiveUIDocument.Document;
+                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        View view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
+                        ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
                         RevitViewManager.ShowView(app.ActiveUIDocument, view);
                     }
                 }
@@ -706,6 +714,7 @@ namespace RevitTimasBIMTools.ViewModels
         private async Task RefreshActiveDataHandler()
         {
             IsDataRefresh = false;
+            RefreshDataViewCollection();
             if (document != null && material != null && category != null)
             {
                 await Task.Delay(1000).ContinueWith(_ =>
