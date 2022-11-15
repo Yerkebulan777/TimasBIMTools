@@ -165,7 +165,7 @@ namespace RevitTimasBIMTools.RevitUtils
             ViewPlan view = GetPlanView(uidoc, model.HostLevel);
             if (view != null && ActivateView(uidoc, view))
             {
-                uidoc.ShowElements(model.Instanse);
+                ZoomElementInView(uidoc, view, GetBoundingBox(model.Origin));
                 uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
             }
         }
@@ -252,20 +252,10 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        private static void ZoomElementInView(UIDocument uidoc, View3D view3d, BoundingBoxXYZ box)
+        private static void ZoomElementInView(UIDocument uidoc, View view, BoundingBoxXYZ box)
         {
-            UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view3d.Id));
-            if (uiview != null)
-            {
-                try
-                {
-                    uiview.ZoomAndCenterRectangle(box.Min, box.Max);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex.Message);
-                }
-            }
+            UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view.Id));
+            uiview?.ZoomAndCenterRectangle(box.Min, box.Max);
         }
         #endregion
 
