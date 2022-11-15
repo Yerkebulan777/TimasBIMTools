@@ -43,6 +43,12 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
+        public bool IsValidModel()
+        {
+            return Instanse != null && Instanse.IsValidObject && IsSelected;
+        }
+
+
         public bool SetSizeDescription()
         {
             if (Width != 0 && Height != 0)

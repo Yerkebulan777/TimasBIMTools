@@ -23,6 +23,7 @@ using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
 using Parameter = Autodesk.Revit.DB.Parameter;
 
+
 namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutVoidDataViewModel : ObservableObject
@@ -52,7 +53,7 @@ namespace RevitTimasBIMTools.ViewModels
         private Document doc { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
-        private ElementModel currentModel { get; set; } = null;
+        private ElementModel current { get; set; } = null;
         private PreviewControlModel control { get; set; } = null;
 
         private bool? dialogResult = false;
@@ -544,14 +545,14 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref viewData, value))
                 {
-                    if (!viewData.IsEmpty)
+                    if (viewData != null && !viewData.IsEmpty)
                     {
                         SortDataViewCollection();
                         VerifySelectDataViewCollection();
                     }
                     else
                     {
-                        currentModel = null;
+                        current = null;
                         IsAllSelectChecked = false;
                     }
                 }
@@ -587,7 +588,7 @@ namespace RevitTimasBIMTools.ViewModels
                     datagrid.CurrentCell = datagrid.SelectedCells.FirstOrDefault();
                     datagrid.ScrollIntoView(item);
                     datagrid.SelectedItem = item;
-                    currentModel = model;
+                    current = model;
                 }
             }
         }
@@ -612,10 +613,10 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                if (currentModel is ElementModel model)
+                doc = app.ActiveUIDocument.Document;
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    doc = app.ActiveUIDocument.Document;
-                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                    if (current is ElementModel model && model.IsValidModel())
                     {
                         ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
                         RevitViewManager.ShowView(app.ActiveUIDocument, view);
@@ -738,9 +739,9 @@ namespace RevitTimasBIMTools.ViewModels
                 RefreshDataViewCollection();
                 doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId) && control == null)
                 {
-                    if (currentModel is ElementModel model && model.IsSelected && control == null)
+                    if (current is ElementModel model && model.IsValidModel())
                     {
                         if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
                         {
@@ -769,15 +770,15 @@ namespace RevitTimasBIMTools.ViewModels
                     doc = app.ActiveUIDocument.Document;
                     if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        if (currentModel is ElementModel model && model.IsSelected)
+                        if (current is ElementModel model && model.IsValidModel())
                         {
-                            if (dialogResult.Value && ElementModelData.Remove(currentModel))
+                            if (dialogResult.Value && ElementModelData.Remove(current))
                             {
                                 collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
                             }
                             else
                             {
-                                currentModel.IsSelected = false;
+                                current.IsSelected = false;
                             }
                         }
                     }

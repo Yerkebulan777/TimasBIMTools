@@ -14,7 +14,7 @@ namespace RevitTimasBIMTools.RevitUtils
             // Get the project location handle 
             ProjectLocation projectLocation = document.ActiveProjectLocation;
 
-            // Show the information of currentModel project location
+            // Show the information of current project location
             XYZ origin = new XYZ(0, 0, 0);
             ProjectPosition position = projectLocation.GetProjectPosition(origin);
             if (null == position)
