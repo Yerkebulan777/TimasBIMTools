@@ -14,7 +14,7 @@ namespace RevitTimasBIMTools.RevitUtils
     {
 
         #region GetCreate3dView
-        public static View3D CreateNew3DView(UIDocument uidoc, string viewName)
+        public static View3D Create3DView(UIDocument uidoc, string viewName)
         {
             bool flag = false;
             View3D view3d = null;
@@ -22,7 +22,7 @@ namespace RevitTimasBIMTools.RevitUtils
             ViewFamilyType vft = new FilteredElementCollector(doc)
             .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
             .FirstOrDefault(q => q.ViewFamily == ViewFamily.ThreeDimensional);
-            using (Transaction t = new(doc, "CreateNew3DView"))
+            using (Transaction t = new(doc, "Create3DView"))
             {
                 TransactionStatus status = t.Start();
                 if (status == TransactionStatus.Started)
@@ -48,7 +48,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static View3D Get3dView(UIDocument uidoc, string viewName = "Isometric3DView")
+        public static View3D Get3dView(UIDocument uidoc, string viewName = "Preview3DView")
         {
             Document doc = uidoc.Document;
             foreach (View3D view3d in new FilteredElementCollector(doc).OfClass(typeof(View3D)))
@@ -56,21 +56,80 @@ namespace RevitTimasBIMTools.RevitUtils
                 if (!view3d.IsTemplate && view3d.Name.Equals(viewName))
                 {
                     DisplayStyle style = DisplayStyle.Realistic;
-                    ViewDetailLevel level = ViewDetailLevel.Fine;
+                    ViewDetailLevel detail = ViewDetailLevel.Fine;
                     ViewDiscipline discipline = ViewDiscipline.Coordination;
-                    SetViewSettings(doc, view3d, discipline, style, level);
+                    SetViewSettings(doc, view3d, discipline, style, detail);
                     return view3d;
                 }
             }
-            return CreateNew3DView(uidoc, viewName);
+            return Create3DView(uidoc, viewName);
         }
 
         #endregion
 
 
-        #region SetView3DSettings
+        #region GetCreatePlanView
 
-        public static void SetViewSettings(Document doc, View view, ViewDiscipline discipline, DisplayStyle style, ViewDetailLevel level)
+        public static ViewPlan GetPlanView(UIDocument uidoc, Level level, string prefix = "Preview: ")
+        {
+            Document doc = uidoc.Document;
+            string viewName = prefix + level.Name.Trim();
+            foreach (ViewPlan plan in new FilteredElementCollector(doc).OfClass(typeof(ViewPlan)))
+            {
+                if (!plan.IsTemplate && plan.Name.StartsWith(prefix))
+                {
+                    if (level.Id.Equals(plan.GenLevel.Id))
+                    {
+                        DisplayStyle style = DisplayStyle.Realistic;
+                        ViewDetailLevel detail = ViewDetailLevel.Fine;
+                        ViewDiscipline discipline = ViewDiscipline.Coordination;
+                        SetViewSettings(doc, plan, discipline, style, detail);
+                        return plan;
+                    }
+                    else if (uidoc.ActiveGraphicalView.Id != plan.Id)
+                    {
+                        using Transaction tx = new(doc);
+                        TransactionStatus status = tx.Start("DeletePlan");
+                        if (status == TransactionStatus.Started)
+                        {
+                            try
+                            {
+                                status = doc.Delete(plan.Id).Any() ? tx.Commit() : tx.RollBack();
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Error(ex.Message);
+                            }
+                        }
+                    }
+                }
+            }
+            return CreatePlanView(doc, level, viewName);
+        }
+
+
+        public static ViewPlan CreatePlanView(Document doc, Level level, string name)
+        {
+            using Transaction tx = new(doc);
+            TransactionStatus status = tx.Start("CreateFloorPlan");
+            ViewFamilyType vft = new FilteredElementCollector(doc)
+                .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
+                .FirstOrDefault(x => ViewFamily.FloorPlan == x.ViewFamily);
+            ViewPlan floorPlan = ViewPlan.Create(doc, vft.Id, level.Id);
+            floorPlan.Discipline = ViewDiscipline.Coordination;
+            floorPlan.DisplayStyle = DisplayStyle.Realistic;
+            floorPlan.DetailLevel = ViewDetailLevel.Fine;
+            floorPlan.Name = name;
+            status = tx.Commit();
+            return floorPlan;
+        }
+
+        #endregion
+
+
+        #region SetViewSettings
+
+        public static void SetViewSettings(Document doc, View view, ViewDiscipline discipline, DisplayStyle style, ViewDetailLevel detail)
         {
             using Transaction t = new(doc);
             TransactionStatus status = t.Start("SetViewSettings");
@@ -85,7 +144,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     view.ViewTemplateId = ElementId.InvalidElementId;
                     view.Discipline = discipline;
                     view.DisplayStyle = style;
-                    view.DetailLevel = level;
+                    view.DetailLevel = detail;
                     status = t.Commit();
                 }
                 catch (Exception ex)
@@ -119,6 +178,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region ShowView
+
         public static void ShowView(UIDocument uidoc, in View view)
         {
             if (view is not null)
@@ -141,24 +201,6 @@ namespace RevitTimasBIMTools.RevitUtils
             }
         }
 
-        #endregion
-
-
-        #region CreatePlan
-        public static ViewPlan CreatePlan(Document doc, Level level)
-        {
-            using Transaction tx = new(doc);
-            TransactionStatus status = tx.Start("CreateFloorPlan");
-            ViewFamilyType vft = new FilteredElementCollector(doc)
-                .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
-                .FirstOrDefault(x => ViewFamily.FloorPlan == x.ViewFamily);
-            ViewPlan floorPlan = ViewPlan.Create(doc, vft.Id, level.Id);
-            floorPlan.Discipline = ViewDiscipline.Coordination;
-            floorPlan.DisplayStyle = DisplayStyle.Realistic;
-            floorPlan.DetailLevel = ViewDetailLevel.Fine;
-            status = tx.Commit();
-            return floorPlan;
-        }
         #endregion
 
 
@@ -219,6 +261,37 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
+        #region SetCategoryTransparency
+        public static void SetCategoryTransparency(Document doc, View3D view, Category category, int transparency = 15, bool halftone = false)
+        {
+            ElementId catId = category.Id;
+            if (view.IsCategoryOverridable(catId))
+            {
+                OverrideGraphicSettings graphics = new();
+                graphics = graphics.SetHalftone(halftone);
+                graphics = graphics.SetSurfaceTransparency(transparency);
+                using Transaction tx = new(doc, "Override Categories");
+                TransactionStatus status = tx.Start();
+                try
+                {
+                    view.SetCategoryOverrides(catId, graphics);
+                    status = tx.Commit();
+                }
+                catch (Exception exc)
+                {
+                    Logger.Error(exc.Message);
+                    if (!tx.HasEnded())
+                    {
+                        status = tx.RollBack();
+                    }
+                }
+            }
+
+        }
+
+        #endregion
+
+
         #region SetCustomColor
         public static ElementId GetSolidFillPatternId(Document doc)
         {
@@ -269,37 +342,6 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-        }
-
-        #endregion
-
-
-        #region SetCategoryTransparency
-        public static void SetCategoryTransparency(Document doc, View3D view, Category category, int transparency = 15, bool halftone = false)
-        {
-            ElementId catId = category.Id;
-            if (view.IsCategoryOverridable(catId))
-            {
-                OverrideGraphicSettings graphics = new();
-                graphics = graphics.SetHalftone(halftone);
-                graphics = graphics.SetSurfaceTransparency(transparency);
-                using Transaction tx = new(doc, "Override Categories");
-                TransactionStatus status = tx.Start();
-                try
-                {
-                    view.SetCategoryOverrides(catId, graphics);
-                    status = tx.Commit();
-                }
-                catch (Exception exc)
-                {
-                    Logger.Error(exc.Message);
-                    if (!tx.HasEnded())
-                    {
-                        status = tx.RollBack();
-                    }
-                }
-            }
-
         }
 
         #endregion

@@ -598,7 +598,6 @@ namespace RevitTimasBIMTools.ViewModels
                 DialogResult = null;
                 DataViewList.Refresh();
                 ShowPlanViewAsync();
-                ZoomPlanViewAsync();
             }
         }
 
@@ -606,12 +605,13 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
+
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     if (currentModel is ElementModel model)
                     {
-                        ViewPlan view = RevitViewManager.CreatePlan(doc, model.HostLevel);
+                        View view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
                         RevitViewManager.ShowView(app.ActiveUIDocument, view);
                     }
                 }
