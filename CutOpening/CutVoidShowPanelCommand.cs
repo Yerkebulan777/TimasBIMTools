@@ -3,12 +3,9 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Threading;
 
 namespace RevitTimasBIMTools.CutOpening
@@ -60,7 +57,7 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet catSet)
         {
-            return RevitFilterManager.GetElementsOfCategory(uiapp.ActiveUIDocument.Document, typeof(Wall), BuiltInCategory.OST_Walls, true).Any();
+            return uiapp.ActiveUIDocument.Document.IsModifiable;
         }
 
 
