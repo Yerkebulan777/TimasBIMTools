@@ -160,37 +160,27 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region ShowElement
-        public static void ShowModelInPlanView(UIDocument uidoc, ElementModel model)
+        public static void ShowModelInPlanView(UIDocument uidoc, ElementModel model, double elevate = 1500 / 304.8)
         {
             ViewPlan viewPlan = GetPlanView(uidoc, model.HostLevel);
-            if (viewPlan != null && ActivateView(uidoc, viewPlan))
+            if (viewPlan != null && ActivateView(uidoc, viewPlan, ViewDiscipline.Mechanical))
             {
                 Document doc = viewPlan.Document;
 
-                BoundingBoxXYZ viewBbox = GetBoundingBox(model.Origin);
-                double midElev = model.Origin.Z;
-                double minElev = viewBbox.Min.Z;
-                double maxElev = viewBbox.Max.Z;
-                
-                PlanViewRange viewRange = viewPlan.GetViewRange();
-
-                Level catLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.CutPlane)) as Level;
-                Level topLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.TopClipPlane)) as Level;
-                Level bottomLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.BottomClipPlane)) as Level;
-
-                viewRange.SetOffset(PlanViewPlane.CutPlane, midElev - catLevel.Elevation);
-                viewRange.SetOffset(PlanViewPlane.TopClipPlane, maxElev - topLevel.Elevation);
-                viewRange.SetOffset(PlanViewPlane.BottomClipPlane, minElev - bottomLevel.Elevation);
-
-                viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, minElev - bottomLevel.Elevation);
-
                 using (Transaction trx = new(doc, "SetViewRange"))
                 {
-                    _ = trx.Start();
+                    PlanViewRange viewRange = viewPlan.GetViewRange();
+
+                    viewRange.SetOffset(PlanViewPlane.CutPlane, elevate);
+                    viewRange.SetOffset(PlanViewPlane.TopClipPlane, elevate);
+                    viewRange.SetOffset(PlanViewPlane.BottomClipPlane, -elevate);
+                    viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, -elevate);
+
+                    TransactionStatus status = trx.Start();
                     viewPlan.SetViewRange(viewRange);
-                    _ = trx.Commit();
+                    status = trx.Commit();
                 }
-                uidoc.ShowElements(model.Instanse);
+                uidoc.RefreshActiveView();
                 uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
             }
         }
@@ -210,16 +200,15 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region ShowView
 
-        public static bool ActivateView(UIDocument uidoc, in View view)
+        public static bool ActivateView(UIDocument uidoc, in View view, ViewDiscipline discipline)
         {
             ElementId activeId = uidoc.ActiveGraphicalView.Id;
             bool result = activeId != view.Id;
             if (view != null && result)
             {
                 uidoc.RequestViewChange(view);
-                DisplayStyle style = DisplayStyle.Realistic;
                 ViewDetailLevel detail = ViewDetailLevel.Fine;
-                ViewDiscipline discipline = ViewDiscipline.Coordination;
+                DisplayStyle style = DisplayStyle.ShadingWithEdges;
                 SetViewSettings(uidoc.Document, view, discipline, style, detail);
                 BoundingBoxXYZ box = view.get_BoundingBox(null);
                 foreach (UIView uv in uidoc.GetOpenUIViews())

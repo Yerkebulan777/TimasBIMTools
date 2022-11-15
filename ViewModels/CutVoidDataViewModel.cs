@@ -691,7 +691,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (result && current is ElementModel model && model.IsValidModel())
                     {
                         ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
-                        result = RevitViewManager.ActivateView(app.ActiveUIDocument, view);
+                        result = RevitViewManager.ActivateView(app.ActiveUIDocument, view, ViewDiscipline.Mechanical);
                     }
                 }
                 return result;
