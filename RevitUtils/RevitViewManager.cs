@@ -181,13 +181,14 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static void ShowView(UIDocument uidoc, in View view)
         {
-            if (view is not null)
+            ElementId activeId = uidoc.ActiveGraphicalView.Id;
+            if (view != null && activeId != view.Id)
             {
                 uidoc.RequestViewChange(view);
                 DisplayStyle style = DisplayStyle.Realistic;
-                ViewDetailLevel level = ViewDetailLevel.Fine;
+                ViewDetailLevel detail = ViewDetailLevel.Fine;
                 ViewDiscipline discipline = ViewDiscipline.Coordination;
-                SetViewSettings(uidoc.Document, view, discipline, style, level);
+                SetViewSettings(uidoc.Document, view, discipline, style, detail);
                 BoundingBoxXYZ box = view.get_BoundingBox(null);
                 foreach (UIView uv in uidoc.GetOpenUIViews())
                 {

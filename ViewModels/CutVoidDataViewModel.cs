@@ -739,9 +739,9 @@ namespace RevitTimasBIMTools.ViewModels
                 RefreshDataViewCollection();
                 doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId) && control == null)
+                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    if (current is ElementModel model && model.IsValidModel())
+                    if (control == null && current is ElementModel model && model.IsValidModel())
                     {
                         if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
                         {
@@ -785,8 +785,6 @@ namespace RevitTimasBIMTools.ViewModels
                 });
             }
         }
-
-
 
         #endregion
 
