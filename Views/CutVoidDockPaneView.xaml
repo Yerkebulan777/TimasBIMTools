@@ -199,7 +199,7 @@
                             <DataGridTemplateColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <CheckBox Name="CheckSelectAll" VerticalAlignment="Center" HorizontalAlignment="Center" 
-                                              IsChecked="{Binding DataContext.IsAllSelectChecked, RelativeSource={RelativeSource AncestorType=DataGrid}}">
+                                              IsChecked="{Binding DataContext.AllSelectChecked, RelativeSource={RelativeSource AncestorType=DataGrid}}">
                                         <CheckBox.LayoutTransform>
                                             <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>
                                         </CheckBox.LayoutTransform>

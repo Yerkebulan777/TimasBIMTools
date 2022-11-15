@@ -501,7 +501,7 @@ namespace RevitTimasBIMTools.ViewModels
         #region DataGrid
 
         private bool? allSelected = false;
-        public bool? IsAllSelectChecked
+        public bool? AllSelectChecked
         {
             get => allSelected;
             set
@@ -510,7 +510,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (viewData != null && value.HasValue)
                     {
-                        bool booleanValue = value.Value;
+                        bool booleanValue = allSelected.Value;
                         foreach (ElementModel model in viewData)
                         {
                             model.IsSelected = booleanValue;
@@ -553,7 +553,7 @@ namespace RevitTimasBIMTools.ViewModels
                     else
                     {
                         current = null;
-                        IsAllSelectChecked = false;
+                        AllSelectChecked = false;
                     }
                 }
             }
@@ -583,7 +583,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (item is ElementModel model && viewData.MoveCurrentTo(item))
                 {
                     IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
-                    IsAllSelectChecked = items.All(x => x.IsSelected == model.IsSelected) ? model.IsSelected : null;
+                    AllSelectChecked = items.All(x => x.IsSelected == model.IsSelected) ? model.IsSelected : null;
                     System.Windows.Controls.DataGrid datagrid = DockPanelView.DataGridView;
                     datagrid.CurrentCell = datagrid.SelectedCells.FirstOrDefault();
                     datagrid.ScrollIntoView(item);
@@ -591,38 +591,6 @@ namespace RevitTimasBIMTools.ViewModels
                     current = model;
                 }
             }
-        }
-
-
-        private void RefreshDataViewCollection()
-        {
-            if (resetEvent.WaitOne())
-            {
-                if (viewData != null)
-                {
-                    viewData.Refresh();
-                    ShowPlanViewAsync();
-                    dialogResult = null;
-                }
-                _ = resetEvent.Set();
-            }
-        }
-
-
-        private async void ShowPlanViewAsync()
-        {
-            await RevitTask.RunAsync(app =>
-            {
-                doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    if (current is ElementModel model && model.IsValidModel())
-                    {
-                        ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
-                        RevitViewManager.ShowView(app.ActiveUIDocument, view);
-                    }
-                }
-            });
         }
 
         #endregion
@@ -639,7 +607,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref levelText, value))
                 {
                     DataViewList.Filter = FilterModelCollection;
-                    RefreshDataViewCollection();
                 }
             }
         }
@@ -654,7 +621,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref symbolText, value))
                 {
                     DataViewList.Filter = FilterModelCollection;
-                    RefreshDataViewCollection();
                 }
             }
         }
@@ -714,16 +680,28 @@ namespace RevitTimasBIMTools.ViewModels
         public ICommand RefreshDataCommand { get; private set; }
         private async Task RefreshActiveDataHandler()
         {
+            viewData?.Refresh();
             IsDataRefresh = false;
-            RefreshDataViewCollection();
-            if (document != null && material != null && category != null)
+            await RevitTask.RunAsync(app =>
             {
-                await Task.Delay(1000).ContinueWith(_ =>
+                doc = app.ActiveUIDocument.Document;
+                if (document != null && material != null && category != null)
                 {
-                    IsOptionEnabled = false;
-                    IsDataRefresh = true;
-                }, taskContext);
-            }
+                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                    {
+                        if (current is ElementModel model && model.IsValidModel())
+                        {
+                            ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
+                            RevitViewManager.ShowView(app.ActiveUIDocument, view);
+                        }
+                    }
+                }
+            }).ContinueWith(_ =>
+            {
+                IsOptionEnabled = false;
+                IsDataRefresh = true;
+            }, taskContext);
+
         }
 
         #endregion
@@ -736,7 +714,6 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                RefreshDataViewCollection();
                 doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
@@ -749,6 +726,7 @@ namespace RevitTimasBIMTools.ViewModels
                             RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
                             control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
                             control.ShowPreviewControl(app, view3d);
+                            dialogResult = null;
                         }
                     }
                 }
@@ -759,6 +737,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region OkCanselCommand
+
         public ICommand OkCanselCommand { get; private set; }
         private async Task OkCanselHandelCommandAsync()
         {
@@ -766,7 +745,6 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 await RevitTask.RunAsync(app =>
                 {
-                    RefreshDataViewCollection();
                     doc = app.ActiveUIDocument.Document;
                     if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
