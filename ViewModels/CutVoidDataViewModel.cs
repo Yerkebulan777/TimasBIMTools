@@ -673,7 +673,7 @@ namespace RevitTimasBIMTools.ViewModels
             && ((string.IsNullOrEmpty(LevelTextFilter) && string.IsNullOrEmpty(SymbolTextFilter))
             || (model.LevelName.Equals(LevelTextFilter) && model.SymbolName.Equals(SymbolTextFilter))
             || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(SymbolTextFilter))
-            || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(SymbolTextFilter)));
+            || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(LevelTextFilter)));
         }
 
         #endregion
