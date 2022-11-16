@@ -37,7 +37,6 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-
         [STAThread]
         internal void RaiseExternalEvent()
         {

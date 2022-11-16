@@ -180,14 +180,16 @@ namespace RevitTimasBIMTools.CutOpening
 
         private void CalculateOpeningSize(ref ElementModel model, in Line line)
         {
-            _ = Math.Min(model.Width, model.Height);
-            if (!model.HostNormal.IsParallel(model.Direction))
+            if (Math.Min(model.Width, model.Height) > minSideSize)
             {
-                XYZ vector = line.GetEndPoint(1) - line.GetEndPoint(0);
-                double hostDeph = Math.Abs(model.HostNormal.DotProduct(vector));
-                model.HostNormal.GetAngleBetween(direction, out double horizont, out double vertical);
-                model.Height += CalculateSideSize(hostDeph, vertical);
-                model.Width += CalculateSideSize(hostDeph, horizont);
+                if (!model.HostNormal.IsParallel(model.Direction))
+                {
+                    XYZ vector = line.GetEndPoint(1) - line.GetEndPoint(0);
+                    double hostDeph = Math.Abs(model.HostNormal.DotProduct(vector));
+                    model.HostNormal.GetAngleBetween(direction, out double horizont, out double vertical);
+                    model.Height += CalculateSideSize(hostDeph, vertical);
+                    model.Width += CalculateSideSize(hostDeph, horizont);
+                }
             }
         }
 

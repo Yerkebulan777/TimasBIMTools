@@ -283,7 +283,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        private static BoundingBoxXYZ CreateBoundingBox(ViewPlan viewPlan, Element element, XYZ centroid, double offset = 5)
+        private static BoundingBoxXYZ CreateBoundingBox(ViewPlan viewPlan, Element element, XYZ centroid, double offset = 7)
         {
             BoundingBoxXYZ bbox = element.get_BoundingBox(viewPlan);
             if (bbox != null && bbox.Enabled)

@@ -713,10 +713,16 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
+                dialogResult = null;
+                DataViewList?.Refresh();
                 doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
+                    if (current is ElementModel mdl)
+                    {
+                        Logger.Log($"Info: Name {mdl.SymbolName} IsSelected {mdl.IsSelected}");
+                    }
                     if (control == null && current is ElementModel model && model.IsValidModel())
                     {
                         if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
@@ -725,7 +731,6 @@ namespace RevitTimasBIMTools.ViewModels
                             RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
                             control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
                             control.ShowPreviewControl(app, view3d);
-                            dialogResult = null;
                         }
                     }
                 }
@@ -756,6 +761,7 @@ namespace RevitTimasBIMTools.ViewModels
                             else
                             {
                                 current.IsSelected = false;
+
                             }
                         }
                     }
