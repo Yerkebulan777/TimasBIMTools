@@ -167,7 +167,7 @@ namespace RevitTimasBIMTools.RevitUtils
             if (viewPlan != null && ActivateView(uidoc, viewPlan, ViewDiscipline.Mechanical))
             {
                 Document doc = viewPlan.Document;
-                
+
                 using (Transaction trx = new(doc, "SetViewRange"))
                 {
                     PlanViewRange viewRange = viewPlan.GetViewRange();
@@ -183,8 +183,8 @@ namespace RevitTimasBIMTools.RevitUtils
                     viewPlan.SetViewRange(viewRange);
                     status = trx.Commit();
                 }
-                
-                ZoomElementInView(uidoc, viewPlan, model.Instanse.get_BoundingBox(viewPlan));
+
+                ZoomElementInView(uidoc, viewPlan, CreateBoundingBox(viewPlan, model.Instanse, model.Origin));
                 uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                 uidoc.RefreshActiveView();
             }
@@ -204,7 +204,6 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region ShowView
-
         public static bool ActivateView(UIDocument uidoc, in View view, ViewDiscipline discipline)
         {
             ElementId activeId = uidoc.ActiveGraphicalView.Id;
@@ -227,7 +226,6 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             return result;
         }
-
         #endregion
 
 
@@ -254,7 +252,7 @@ namespace RevitTimasBIMTools.RevitUtils
             if (view3d != null && view3d.IsValidObject)
             {
                 using Transaction tx = new(uidoc.Document);
-                BoundingBoxXYZ bbox = GetBoundingBox(centroid);
+                BoundingBoxXYZ bbox = CreateBoundingBox(centroid);
                 TransactionStatus status = tx.Start("SetSectionBox");
                 if (status == TransactionStatus.Started)
                 {
@@ -276,12 +274,31 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        private static BoundingBoxXYZ GetBoundingBox(XYZ centroid, double factor = 3)
+        private static BoundingBoxXYZ CreateBoundingBox(XYZ centroid, double offset = 3)
         {
             BoundingBoxXYZ bbox = new();
-            XYZ vector = new(factor, factor, factor);
+            XYZ vector = new(offset, offset, offset);
             bbox.Min = centroid - vector;
             bbox.Max = centroid + vector;
+            bbox.Enabled = true;
+            return bbox;
+        }
+
+
+        private static BoundingBoxXYZ CreateBoundingBox(ViewPlan viewPlan, Element element, XYZ centroid, double offset = 5)
+        {
+            BoundingBoxXYZ bbox = element.get_BoundingBox(viewPlan);
+            if (bbox != null && bbox.Enabled)
+            {
+                bbox.Min = new XYZ(centroid.X - offset, centroid.Y - offset, bbox.Min.Z);
+                bbox.Max = new XYZ(centroid.X + offset, centroid.Y + offset, bbox.Max.Z);
+            }
+            else
+            {
+                bbox = CreateBoundingBox(centroid, offset);
+                bbox.Min = new XYZ(bbox.Min.X, bbox.Min.Y, viewPlan.Origin.Z);
+                bbox.Max = new XYZ(bbox.Max.X, bbox.Max.Y, viewPlan.Origin.Z);
+            }
             return bbox;
         }
 
