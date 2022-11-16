@@ -184,8 +184,8 @@ namespace RevitTimasBIMTools.RevitUtils
                     status = trx.Commit();
                 }
 
-                ZoomElementInView(uidoc, viewPlan, CreateBoundingBox(viewPlan, model.Instanse, model.Origin));
                 uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
+                ZoomElementInView(uidoc, viewPlan, CreateBoundingBox(viewPlan, model.Instanse, model.Origin));
                 uidoc.RefreshActiveView();
             }
         }
