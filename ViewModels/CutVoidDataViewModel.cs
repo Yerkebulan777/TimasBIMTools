@@ -715,10 +715,12 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 dialogResult = null;
                 DataViewList?.Refresh();
+                
                 doc = app.ActiveUIDocument.Document;
                 UIDocument uidoc = app.ActiveUIDocument;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
+                    var current = viewData.GetItemAt(0);
                     if (current is ElementModel mdl)
                     {
                         Logger.Log($"Info: Name {mdl.SymbolName} IsSelected {mdl.IsSelected}");
@@ -761,7 +763,6 @@ namespace RevitTimasBIMTools.ViewModels
                             else
                             {
                                 current.IsSelected = false;
-
                             }
                         }
                     }
