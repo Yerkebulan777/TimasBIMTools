@@ -8,6 +8,7 @@ using System.Linq;
 using Color = Autodesk.Revit.DB.Color;
 using Level = Autodesk.Revit.DB.Level;
 
+
 namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitViewManager
@@ -160,28 +161,32 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region ShowElement
-        public static void ShowModelInPlanView(UIDocument uidoc, ElementModel model, double elevate = 1500 / 304.8)
+        public static void ShowModelInPlanView(UIDocument uidoc, ElementModel model, double cutElevat = 1200 / 304.8)
         {
             ViewPlan viewPlan = GetPlanView(uidoc, model.HostLevel);
             if (viewPlan != null && ActivateView(uidoc, viewPlan, ViewDiscipline.Mechanical))
             {
                 Document doc = viewPlan.Document;
-
+                
                 using (Transaction trx = new(doc, "SetViewRange"))
                 {
                     PlanViewRange viewRange = viewPlan.GetViewRange();
 
-                    viewRange.SetOffset(PlanViewPlane.CutPlane, elevate);
-                    viewRange.SetOffset(PlanViewPlane.TopClipPlane, elevate);
-                    viewRange.SetOffset(PlanViewPlane.BottomClipPlane, -elevate);
-                    viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, -elevate);
+                    double offsetElevat = cutElevat / 2;
+
+                    viewRange.SetOffset(PlanViewPlane.CutPlane, cutElevat);
+                    viewRange.SetOffset(PlanViewPlane.TopClipPlane, offsetElevat);
+                    viewRange.SetOffset(PlanViewPlane.BottomClipPlane, -offsetElevat);
+                    viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, -offsetElevat);
 
                     TransactionStatus status = trx.Start();
                     viewPlan.SetViewRange(viewRange);
                     status = trx.Commit();
                 }
-                uidoc.RefreshActiveView();
+                
+                ZoomElementInView(uidoc, viewPlan, model.Instanse.get_BoundingBox(viewPlan));
                 uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
+                uidoc.RefreshActiveView();
             }
         }
 
@@ -203,19 +208,17 @@ namespace RevitTimasBIMTools.RevitUtils
         public static bool ActivateView(UIDocument uidoc, in View view, ViewDiscipline discipline)
         {
             ElementId activeId = uidoc.ActiveGraphicalView.Id;
-            bool result = activeId != view.Id;
-            if (view != null && result)
+            bool result = activeId == view.Id;
+            if (view.IsValidObject && !result)
             {
                 uidoc.RequestViewChange(view);
-                ViewDetailLevel detail = ViewDetailLevel.Fine;
+                ViewDetailLevel detail = ViewDetailLevel.Medium;
                 DisplayStyle style = DisplayStyle.ShadingWithEdges;
                 SetViewSettings(uidoc.Document, view, discipline, style, detail);
-                BoundingBoxXYZ box = view.get_BoundingBox(null);
                 foreach (UIView uv in uidoc.GetOpenUIViews())
                 {
                     if (uv.ViewId.Equals(view.Id))
                     {
-                        uv.ZoomAndCenterRectangle(box.Min, box.Max);
                         uv.ZoomToFit();
                         result = true;
                         break;
@@ -225,6 +228,15 @@ namespace RevitTimasBIMTools.RevitUtils
             return result;
         }
 
+        #endregion
+
+
+        #region ZoomElementInView
+        private static void ZoomElementInView(UIDocument uidoc, View view, BoundingBoxXYZ box)
+        {
+            UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view.Id));
+            uiview?.ZoomAndCenterRectangle(box.Min, box.Max);
+        }
         #endregion
 
 
@@ -266,12 +278,6 @@ namespace RevitTimasBIMTools.RevitUtils
             return bbox;
         }
 
-
-        private static void ZoomElementInView(UIDocument uidoc, View view, BoundingBoxXYZ box)
-        {
-            UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view.Id));
-            uiview?.ZoomAndCenterRectangle(box.Min, box.Max);
-        }
         #endregion
 
 
@@ -359,6 +365,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
         #endregion
+
 
     }
 }
