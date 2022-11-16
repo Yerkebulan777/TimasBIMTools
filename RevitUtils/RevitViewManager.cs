@@ -235,7 +235,14 @@ namespace RevitTimasBIMTools.RevitUtils
         private static void ZoomElementInView(UIDocument uidoc, View view, BoundingBoxXYZ box)
         {
             UIView uiview = uidoc.GetOpenUIViews().Cast<UIView>().FirstOrDefault(v => v.ViewId.Equals(view.Id));
-            uiview?.ZoomAndCenterRectangle(box.Min, box.Max);
+            if (box != null && box.Enabled)
+            {
+                uiview?.ZoomAndCenterRectangle(box.Min, box.Max);
+            }
+            else
+            {
+                uiview?.ZoomToFit();
+            }
         }
         #endregion
 

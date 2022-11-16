@@ -57,7 +57,8 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet catSet)
         {
-            return uiapp.ActiveUIDocument.ActiveGraphicalView.ViewType == ViewType.ThreeD;
+            ViewType vtype = uiapp.ActiveUIDocument.ActiveGraphicalView.ViewType;
+            return vtype is ViewType.FloorPlan or ViewType.ThreeD or ViewType.Section;
         }
 
 
