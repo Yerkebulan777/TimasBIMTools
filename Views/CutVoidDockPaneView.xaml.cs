@@ -15,6 +15,7 @@ namespace RevitTimasBIMTools.Views
         private bool Disposed { get; set; } = false;
         private readonly CutVoidDataViewModel DataContextHandler;
         private static readonly ExternalEvent externalEvent = CutVoidDataViewModel.RevitExternalEvent;
+
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
         {
             InitializeComponent();

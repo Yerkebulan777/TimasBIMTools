@@ -167,12 +167,10 @@ namespace RevitTimasBIMTools.RevitUtils
             if (viewPlan != null && ActivateView(uidoc, viewPlan, ViewDiscipline.Mechanical))
             {
                 Document doc = viewPlan.Document;
-
+                double offsetElevat = cutElevat / 2;
                 using (Transaction trx = new(doc, "SetViewRange"))
                 {
                     PlanViewRange viewRange = viewPlan.GetViewRange();
-
-                    double offsetElevat = cutElevat / 2;
 
                     viewRange.SetOffset(PlanViewPlane.CutPlane, cutElevat);
                     viewRange.SetOffset(PlanViewPlane.TopClipPlane, offsetElevat);

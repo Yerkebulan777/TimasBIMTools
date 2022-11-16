@@ -5,7 +5,6 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Windows.Media.Media3D;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -181,7 +180,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private void CalculateOpeningSize(ref ElementModel model, in Line line)
         {
-            double minside = Math.Min(model.Width, model.Height);
+            _ = Math.Min(model.Width, model.Height);
             if (!model.HostNormal.IsParallel(model.Direction))
             {
                 XYZ vector = line.GetEndPoint(1) - line.GetEndPoint(0);
