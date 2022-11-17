@@ -123,11 +123,12 @@ namespace RevitTimasBIMTools.CutOpening
                         Origin = centroid,
                         Direction = direction,
                         HostNormal = hostNormal,
+                        MinSideSize= minSideSize,
                     };
 
-                    if (GetSectionSize(doc, ref model, direction, centroid))
+                    if (IsValidSectionSize(doc, ref model, direction, centroid))
                     {
-                        CalculateOpeningSize(ref model, line, cutOffset);
+                        //CalculateOpeningSize(ref model, line, cutOffset);
                         //intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffset);
                         yield return model;
                     }
@@ -189,7 +190,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool GetSectionSize(Document doc, ref ElementModel model, in XYZ direction, in XYZ centroid)
+        private bool IsValidSectionSize(Document doc, ref ElementModel model, in XYZ direction, in XYZ centroid)
         {
             BoundingBoxUV size = intersectionSolid.GetSectionBound(doc, in direction, in centroid);
             if (direction.IsAlmostEqualTo(XYZ.BasisX, 0.5))
@@ -202,7 +203,7 @@ namespace RevitTimasBIMTools.CutOpening
                 model.Width = Math.Round(size.Max.V - size.Min.V, 5);
                 model.Height = Math.Round(size.Max.U - size.Min.U, 5);
             }
-            return model.SetSizeDescription();
+            return model.SetValidSizeDescription();
         }
 
 
