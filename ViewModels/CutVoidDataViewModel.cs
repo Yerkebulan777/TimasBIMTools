@@ -672,23 +672,23 @@ namespace RevitTimasBIMTools.ViewModels
         private async Task RefreshActiveDataHandler()
         {
             IsDataRefresh = false;
-            await Task.Delay(1000).ContinueWith(_ =>
+            if (document != null && material != null && category != null)
             {
-                if (document != null && material != null && category != null)
+                bool result = await IsValidActivePlanView();
+                await Task.Delay(1000).ContinueWith(_ =>
                 {
-                    bool result = IsValidActivePlanView();
                     IsOptionEnabled = !result;
                     IsDataRefresh = result;
-                }
-            }, taskContext);
+                }, taskContext);
+            }
         }
 
 
-        private bool IsValidActivePlanView()
+        private async Task<bool> IsValidActivePlanView()
         {
-            bool result = false;
-            _ = RevitTask.RunAsync(app =>
+            return await RevitTask.RunAsync(app =>
             {
+                bool result = false;
                 ViewDataCollection?.Refresh();
                 doc = app.ActiveUIDocument.Document;
                 currentItem = ViewDataCollection?.GetItemAt(0);
@@ -705,8 +705,8 @@ namespace RevitTimasBIMTools.ViewModels
                         result = RevitViewManager.ActivateView(app.ActiveUIDocument, view, ViewDiscipline.Mechanical);
                     }
                 }
+                return result;
             });
-            return result;
         }
 
         #endregion
