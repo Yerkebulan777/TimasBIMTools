@@ -676,7 +676,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (document != null && material != null && category != null)
                 {
-                    bool result = IsActivatePlanView();
+                    bool result = IsValidActivePlanView();
                     IsOptionEnabled = !result;
                     IsDataRefresh = result;
                 }
@@ -684,7 +684,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool IsActivatePlanView()
+        private bool IsValidActivePlanView()
         {
             bool result = false;
             _ = RevitTask.RunAsync(app =>
