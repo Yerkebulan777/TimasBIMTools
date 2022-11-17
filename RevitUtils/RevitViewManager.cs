@@ -122,8 +122,8 @@ namespace RevitTimasBIMTools.RevitUtils
                 .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
                 .FirstOrDefault(x => ViewFamily.FloorPlan == x.ViewFamily);
             ViewPlan floorPlan = ViewPlan.Create(doc, vft.Id, level.Id);
+            floorPlan.DisplayStyle = DisplayStyle.ShadingWithEdges;
             floorPlan.Discipline = ViewDiscipline.Coordination;
-            floorPlan.DisplayStyle = DisplayStyle.Realistic;
             floorPlan.DetailLevel = ViewDetailLevel.Fine;
             floorPlan.Name = name;
             status = tx.Commit();
@@ -165,30 +165,42 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region ShowElement
-        public static void ShowModelInPlanView(UIDocument uidoc, ElementModel model, double cutElevat = 1200 / 304.8)
+        public static void ShowModelInPlanView(UIDocument uidoc, ElementModel model)
         {
             ViewPlan viewPlan = GetPlanView(uidoc, model.HostLevel);
             if (viewPlan != null && ActivateView(uidoc, viewPlan, ViewDiscipline.Mechanical))
             {
-                Document doc = viewPlan.Document;
-                double offsetElevat = cutElevat / 2;
-                using (Transaction trx = new(doc, "SetViewRange"))
+                try
                 {
+                    Document doc = viewPlan.Document;
                     PlanViewRange viewRange = viewPlan.GetViewRange();
 
-                    viewRange.SetOffset(PlanViewPlane.CutPlane, cutElevat);
-                    viewRange.SetOffset(PlanViewPlane.TopClipPlane, offsetElevat);
-                    viewRange.SetOffset(PlanViewPlane.BottomClipPlane, -offsetElevat);
-                    viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, -offsetElevat);
+                    Element top = doc.GetElement(viewPlan.get_Parameter(BuiltInParameter.VIEW_UNDERLAY_TOP_ID).AsElementId());
+                    Element bot = doc.GetElement(viewPlan.get_Parameter(BuiltInParameter.VIEW_UNDERLAY_BOTTOM_ID).AsElementId());
 
-                    TransactionStatus status = trx.Start();
-                    viewPlan.SetViewRange(viewRange);
-                    status = trx.Commit();
+                    if (top is Level topLevel && bot is Level botLevel)
+                    {
+                        using Transaction trx = new(doc, "SetViewRange");
+
+                        double elevation = topLevel.Elevation - botLevel.Elevation;
+                        double offset = Math.Round(elevation * 0.3 * 304.8) / 304.8;
+
+                        viewRange.SetOffset(PlanViewPlane.CutPlane, offset);
+                        viewRange.SetOffset(PlanViewPlane.TopClipPlane, offset);
+                        viewRange.SetOffset(PlanViewPlane.BottomClipPlane, -offset);
+                        viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, -offset);
+                        _ = trx.Start();
+                        viewPlan.SetViewRange(viewRange);
+                        _ = trx.Commit();
+                    }
                 }
-
-                uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
-                ZoomElementInView(uidoc, viewPlan, CreateBoundingBox(viewPlan, model.Instanse, model.Origin));
-                uidoc.RefreshActiveView();
+                finally
+                {
+                    BoundingBoxXYZ bbox = CreateBoundingBox(viewPlan, model.Instanse, model.Origin);
+                    uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
+                    ZoomElementInView(uidoc, viewPlan, bbox);
+                    uidoc.RefreshActiveView();
+                }
             }
         }
 

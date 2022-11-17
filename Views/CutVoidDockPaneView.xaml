@@ -193,6 +193,17 @@
                           Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
                 <DataGrid Name="DataGridView" Style="{DynamicResource DataGridStandart}"
                           ItemsSource="{Binding Path=ViewDataCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DataContext.IsSelect, Mode=OneWay, RelativeSource={RelativeSource AncestorType=DataGrid}}" >
+                                    <Setter Property="Background" Value="Red" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
+
                     <DataGrid.Columns>
                         
                         <DataGridTemplateColumn Header="Switch" Width="30" CellStyle="{StaticResource SingleClickEditStyle}" >
@@ -208,7 +219,7 @@
                             </DataGridTemplateColumn.HeaderTemplate>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    <CheckBox Name="IsSelect" IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               Click="CheckBox_Click" VerticalAlignment="Center" HorizontalAlignment="Center" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
