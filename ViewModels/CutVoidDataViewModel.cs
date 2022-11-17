@@ -485,9 +485,6 @@ namespace RevitTimasBIMTools.ViewModels
             }).RunSynchronously(taskContext);
         }
 
-
-
-
         #endregion
 
 
@@ -522,6 +519,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref modelData, value) && modelData != null)
                 {
+                    Logger.Log("Model counts: " + modelData.Count.ToString());
                     ViewDataCollection = CollectionViewSource.GetDefaultView(modelData) as ListCollectionView;
                     UniqueLevelNames = new SortedSet<string>(modelData.Select(m => m.LevelName).Append(string.Empty)).ToList();
                     UniqueSymbolNames = new SortedSet<string>(modelData.Select(m => m.SymbolName).Append(string.Empty)).ToList();
@@ -542,6 +540,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         SortDataViewCollection();
                         VerifySelectDataViewCollection();
+                        Logger.Log("Item counts: " + viewData.Count.ToString());
                     }
                     else
                     {
@@ -691,16 +690,20 @@ namespace RevitTimasBIMTools.ViewModels
                 bool result = false;
                 ViewDataCollection?.Refresh();
                 doc = app.ActiveUIDocument.Document;
-                currentItem = ViewDataCollection?.GetItemAt(0);
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
-                    if (currentItem is ElementModel model && model.IsValidModel())
+                    if (ViewDataCollection?.IsEmpty == false)
                     {
-                        ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
-                        result = RevitViewManager.ActivateView(app.ActiveUIDocument, view, ViewDiscipline.Mechanical);
+                        currentItem = ViewDataCollection.GetItemAt(0);
+                        if (currentItem is ElementModel model)
+                        {
+                            ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
+                            result = RevitViewManager.ActivateView(app.ActiveUIDocument, view, ViewDiscipline.Mechanical);
+                        }
                     }
-                    else if (RevitFilterManager.GetValidLevels(doc).FirstOrDefault() is Level level)
+                    else
                     {
+                        Level level = RevitFilterManager.GetValidLevels(doc).FirstOrDefault();
                         ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, level);
                         result = RevitViewManager.ActivateView(app.ActiveUIDocument, view, ViewDiscipline.Mechanical);
                     }

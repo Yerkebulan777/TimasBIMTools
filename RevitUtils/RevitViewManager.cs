@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Color = Autodesk.Revit.DB.Color;
 using Level = Autodesk.Revit.DB.Level;
-
+using View = Autodesk.Revit.DB.View;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
@@ -73,6 +73,10 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static ViewPlan GetPlanView(UIDocument uidoc, Level level, string prefix = "Preview")
         {
+            if (level == null)
+            {
+                return null;
+            }
             Document doc = uidoc.Document;
             string viewName = prefix + level.Name.Trim();
             foreach (ViewPlan plan in new FilteredElementCollector(doc).OfClass(typeof(ViewPlan)))
@@ -205,8 +209,8 @@ namespace RevitTimasBIMTools.RevitUtils
         public static bool ActivateView(UIDocument uidoc, in View view, ViewDiscipline discipline)
         {
             ElementId activeId = uidoc.ActiveGraphicalView.Id;
-            bool result = activeId == view.Id;
-            if (view.IsValidObject && !result)
+            bool result = view != null && activeId == view.Id;
+            if (view != null && view.IsValidObject && !result)
             {
                 uidoc.RequestViewChange(view);
                 ViewDetailLevel detail = ViewDetailLevel.Medium;

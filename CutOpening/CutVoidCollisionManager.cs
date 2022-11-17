@@ -209,7 +209,6 @@ namespace RevitTimasBIMTools.CutOpening
             if (status == TransactionStatus.Started)
             {
                 Element instanse = model.Instanse;
-
                 try
                 {
                     if (instanse is Wall wall && wall.IsValidObject)
