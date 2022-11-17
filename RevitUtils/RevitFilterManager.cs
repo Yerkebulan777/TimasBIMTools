@@ -300,34 +300,20 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Level filter
 
-        public static IDictionary<double, Level> GetValidLevels(Document doc)
+        public static IEnumerable<Level> GetValidLevels(Document doc)
         {
-            IDictionary<double, Level> result = new SortedDictionary<double, Level>();
-            ICollection<ElementId> wallIds = GetElementsOfCategory(doc, typeof(Wall), BuiltInCategory.OST_Walls).ToElementIds();
-            ICollection<ElementId> floorIds = GetElementsOfCategory(doc, typeof(Floor), BuiltInCategory.OST_Floors).ToElementIds();
-            FilteredElementCollector collector = new(doc);
-            bool isValid = wallIds.Any() && floorIds.Any();
-            foreach (Level level in collector.OfClass(typeof(Level)))
+            List<ElementId> validIds = new();
+            validIds.AddRange(GetElementsOfCategory(doc, typeof(Wall), BuiltInCategory.OST_Walls).ToElementIds());
+            validIds.AddRange(GetElementsOfCategory(doc, typeof(Floor), BuiltInCategory.OST_Floors).ToElementIds());
+            foreach (Level level in new FilteredElementCollector(doc).OfClass(typeof(Level)))
             {
-                if (isValid)
+                using ElementLevelFilter levelFilter = new(level.Id);
+                FilteredElementCollector collector = new(doc, validIds);
+                if (collector.WherePasses(levelFilter).Any())
                 {
-                    ElementLevelFilter levelFilter = new(level.Id);
-                    collector = new FilteredElementCollector(doc, wallIds);
-                    if (collector.WherePasses(levelFilter).Any())
-                    {
-                        collector = new FilteredElementCollector(doc, floorIds);
-                        if (collector.WherePasses(levelFilter).Any())
-                        {
-                            result[level.ProjectElevation] = level;
-                        }
-                    }
-                }
-                else
-                {
-                    result[level.ProjectElevation] = level;
+                    yield return level;
                 }
             }
-            return result;
         }
 
         #endregion

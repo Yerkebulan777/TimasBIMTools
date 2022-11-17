@@ -676,7 +676,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (document != null && material != null && category != null)
                 {
-                    bool result = ActivatePlanView();
+                    bool result = IsActivatePlanView();
                     IsOptionEnabled = !result;
                     IsDataRefresh = result;
                 }
@@ -684,13 +684,14 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool ActivatePlanView()
+        private bool IsActivatePlanView()
         {
             bool result = false;
             RevitTask.RunAsync(app =>
             {
                 ViewDataCollection?.Refresh();
                 doc = app.ActiveUIDocument.Document;
+                result = ViewDataCollection == null;
                 currentItem = ViewDataCollection?.GetItemAt(0);
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
@@ -700,7 +701,7 @@ namespace RevitTimasBIMTools.ViewModels
                         result = RevitViewManager.ActivateView(app.ActiveUIDocument, view, ViewDiscipline.Mechanical);
                     }
                 }
-            }).RunSynchronously(taskContext);
+            });
             return result;
         }
 
