@@ -252,13 +252,6 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        /// <summary> The dot product of the angle must be greater than cos angle = > cosin /// </summary>
-        public static bool IsValidParallel(this XYZ normal, XYZ direction, double cosin)
-        {
-            return Math.Abs(normal.DotProduct(direction)) > cosin;
-        }
-
-
         public static double GetHorizontAngle(this XYZ normal)
         {
             return Math.Atan(normal.X / normal.Y);

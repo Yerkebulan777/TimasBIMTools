@@ -87,7 +87,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     {
                         DisplayStyle style = DisplayStyle.Realistic;
                         ViewDetailLevel detail = ViewDetailLevel.Fine;
-                        ViewDiscipline discipline = ViewDiscipline.Mechanical;
+                        ViewDiscipline discipline = ViewDiscipline.Coordination;
                         SetViewSettings(doc, plan, discipline, style, detail);
                         return plan;
                     }

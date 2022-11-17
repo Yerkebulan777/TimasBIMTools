@@ -38,10 +38,6 @@ namespace RevitTimasBIMTools.CutOpening
         private Transform searchTransform { get; set; } = null;
         private IDictionary<int, ElementId> ElementTypeIdData { get; set; } = null;
 
-        private readonly double minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
-        private readonly double maxSideSize = Convert.ToDouble(Properties.Settings.Default.MaxSideSizeInMm / footToMm);
-        private readonly double cutOffsetSize = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
-
         //private readonly string widthParamName = "ширина";
         //private readonly string heightParamName = "высота";
 
@@ -50,6 +46,9 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Fields
 
+        private double cutOffset;
+        private double minSideSize;
+
         private FilteredElementCollector collector;
 
         private XYZ centroid = null;
@@ -57,10 +56,10 @@ namespace RevitTimasBIMTools.CutOpening
         private Solid hostSolid = null;
         private XYZ direction = XYZ.BasisZ;
         private XYZ hostNormal = XYZ.BasisZ;
-        private Line intersectionLine = null;
+        private Line line = null;
         private Solid intersectionSolid = null;
 
-        private Transform transform = null;
+
         private BoundingBoxXYZ hostBbox = null;
         private BoundingBoxXYZ intersectionBbox = null;
 
@@ -83,6 +82,8 @@ namespace RevitTimasBIMTools.CutOpening
         {
             Transform global = document.Transform;
             IList<ElementModel> output = new List<ElementModel>(50);
+            minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
+            cutOffset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
             IEnumerable<Element> enclosures = ElementTypeIdData?.GetInstancesByTypeIdDataAndMaterial(doc, material);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             TransactionStatus status = transGroup.Start();
@@ -111,8 +112,7 @@ namespace RevitTimasBIMTools.CutOpening
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(out intersectionBbox);
-                intersectionLine = GetIntersectionLine(elem, hostSolid, centroid, out direction);
-                if (hostNormal.IsValidParallel(direction, threshold))
+                if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, threshold, out direction, out line))
                 {
                     intersectionSolid = hostSolid.GetIntersectionSolid(elem, global, options);
                     intersectionBbox = intersectionSolid.GetBoundingBox();
@@ -127,8 +127,8 @@ namespace RevitTimasBIMTools.CutOpening
 
                     if (GetSectionSize(doc, ref model, direction, centroid))
                     {
-                        CalculateOpeningSize(ref model, intersectionLine);
-                        //intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffsetSize);
+                        CalculateOpeningSize(ref model, line, cutOffset);
+                        //intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffset);
                         yield return model;
                     }
                 }
@@ -136,28 +136,56 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private Line GetIntersectionLine(Element elem, in Solid solid, in XYZ centroid, out XYZ direction)
+        private bool IsIntersectionValid(Element elem, in Solid solid, in XYZ normal, in XYZ centroid, in double threshold, out XYZ direction, out Line line)
         {
+            line = null;
+            bool result = false;
             direction = XYZ.Zero;
             if (elem.Location is LocationCurve curve)
             {
-                intersectionLine = curve.Curve as Line;
-                direction = intersectionLine.Direction.Normalize();
+                line = curve.Curve as Line;
+                direction = line.Direction.Normalize();
+                IsIntersectionValid(solid, ref line);
+                result = true;
             }
             else if (elem is FamilyInstance instance)
             {
-                transform = instance.GetTransform();
-                direction = transform.BasisX.Normalize();
-                XYZ strPnt = centroid - (direction * maxSideSize);
-                XYZ endPnt = centroid + (direction * maxSideSize);
-                intersectionLine = Line.CreateBound(strPnt, endPnt);
+                Transform transform = instance.GetTransform();
+                if (normal.IsAlmostEqualTo(transform.BasisX.Normalize(), threshold))
+                {
+                    direction = transform.BasisX.Normalize();
+                    line = CreateLine(direction, centroid);
+                    IsIntersectionValid(solid, ref line);
+                    result = true;
+                }
+                if (normal.IsAlmostEqualTo(transform.BasisY.Normalize(), threshold))
+                {
+                    direction = transform.BasisY.Normalize();
+                    line = CreateLine(direction, centroid);
+                    IsIntersectionValid(solid, ref line);
+                    result = true;
+                }
             }
-            SolidCurveIntersection curves = solid.IntersectWithCurve(intersectionLine, intersectOptions);
+            return result;
+        }
+
+
+        Line CreateLine(XYZ direction, XYZ centroid)
+        {
+            XYZ strPnt = centroid - (direction * 3);
+            XYZ endPnt = centroid + (direction * 3);
+            return Line.CreateBound(strPnt, endPnt);
+        }
+
+
+        void IsIntersectionValid(in Solid solid, ref Line line)
+        {
+            SolidCurveIntersection curves = solid.IntersectWithCurve(this.line, intersectOptions);
             if (curves != null && 0 < curves.SegmentCount)
             {
-                intersectionLine = curves.GetCurveSegment(0) as Line;
+                line = curves.GetCurveSegment(0) as Line;
             }
-            return intersectionLine;
+
         }
 
 
@@ -178,17 +206,17 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private void CalculateOpeningSize(ref ElementModel model, in Line line)
+        private void CalculateOpeningSize(ref ElementModel model, in Line line, double offset)
         {
             if (Math.Min(model.Width, model.Height) > minSideSize)
             {
                 if (!model.HostNormal.IsParallel(model.Direction))
                 {
                     XYZ vector = line.GetEndPoint(1) - line.GetEndPoint(0);
-                    double hostDeph = Math.Abs(model.HostNormal.DotProduct(vector));
                     model.HostNormal.GetAngleBetween(direction, out double horizont, out double vertical);
-                    model.Height += CalculateSideSize(hostDeph, vertical);
-                    model.Width += CalculateSideSize(hostDeph, horizont);
+                    double hostDeph = Math.Abs(model.HostNormal.DotProduct(vector));
+                    model.Height += offset + CalculateSideSize(hostDeph, vertical);
+                    model.Width += offset + CalculateSideSize(hostDeph, horizont);
                 }
             }
         }
@@ -255,8 +283,8 @@ namespace RevitTimasBIMTools.CutOpening
 
         //private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)
         //{
-        //    Solid intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
-        //    return intersection.Volume > 0;
+        //    Solid line = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
+        //    return line.Volume > 0;
         //}
 
 
@@ -384,7 +412,6 @@ namespace RevitTimasBIMTools.CutOpening
         [STAThread]
         public void Dispose()
         {
-            transform?.Dispose();
             hostSolid?.Dispose();
             intersectionSolid?.Dispose();
             searchDocument?.Dispose();
