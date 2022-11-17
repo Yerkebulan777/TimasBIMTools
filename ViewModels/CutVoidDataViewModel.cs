@@ -307,7 +307,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref maxSize, value))
                 {
-                    Properties.Settings.Default.MaxSideSizeInMm = minSize;
+                    Properties.Settings.Default.MaxSideSizeInMm = maxSize;
                     Properties.Settings.Default.Save();
                 }
             }
@@ -322,7 +322,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref cutOffset, value))
                 {
-                    Properties.Settings.Default.CutOffsetInMm = minSize;
+                    Properties.Settings.Default.CutOffsetInMm = cutOffset;
                     Properties.Settings.Default.Save();
                 }
             }
