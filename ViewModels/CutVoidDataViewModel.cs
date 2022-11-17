@@ -482,7 +482,7 @@ namespace RevitTimasBIMTools.ViewModels
                     System.Windows.Clipboard.SetText(model.Instanse.Id.ToString());
                     RevitViewManager.ShowModelInPlanView(app.ActiveUIDocument, model);
                 }
-            }).RunSynchronously(taskContext);
+            });
         }
 
         #endregion
