@@ -687,17 +687,21 @@ namespace RevitTimasBIMTools.ViewModels
         private bool IsActivatePlanView()
         {
             bool result = false;
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(app =>
             {
                 ViewDataCollection?.Refresh();
                 doc = app.ActiveUIDocument.Document;
-                result = ViewDataCollection == null;
                 currentItem = ViewDataCollection?.GetItemAt(0);
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     if (currentItem is ElementModel model && model.IsValidModel())
                     {
                         ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
+                        result = RevitViewManager.ActivateView(app.ActiveUIDocument, view, ViewDiscipline.Mechanical);
+                    }
+                    else if (RevitFilterManager.GetValidLevels(doc).FirstOrDefault() is Level level)
+                    {
+                        ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, level);
                         result = RevitViewManager.ActivateView(app.ActiveUIDocument, view, ViewDiscipline.Mechanical);
                     }
                 }
