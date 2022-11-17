@@ -82,8 +82,8 @@ namespace RevitTimasBIMTools.CutOpening
         {
             Transform global = document.Transform;
             IList<ElementModel> output = new List<ElementModel>(50);
-            minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
             cutOffset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
+            minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
             IEnumerable<Element> enclosures = ElementTypeIdData?.GetInstancesByTypeIdDataAndMaterial(doc, material);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             TransactionStatus status = transGroup.Start();
