@@ -123,7 +123,7 @@ namespace RevitTimasBIMTools.CutOpening
                         Origin = centroid,
                         Direction = direction,
                         HostNormal = hostNormal,
-                        MinSideSize= minSideSize,
+                        MinSideSize = minSideSize,
                     };
 
                     if (IsValidSectionSize(doc, ref model, direction, centroid))
@@ -171,7 +171,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        Line CreateLine(XYZ direction, XYZ centroid)
+        private Line CreateLine(XYZ direction, XYZ centroid)
         {
             XYZ strPnt = centroid - (direction * 3);
             XYZ endPnt = centroid + (direction * 3);
@@ -179,7 +179,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        void IsIntersectionValid(in Solid solid, ref Line line)
+        private void IsIntersectionValid(in Solid solid, ref Line line)
         {
             SolidCurveIntersection curves = solid.IntersectWithCurve(this.line, intersectOptions);
             if (curves != null && 0 < curves.SegmentCount)
