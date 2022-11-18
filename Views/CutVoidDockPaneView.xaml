@@ -196,8 +196,8 @@
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding DataContext.IsSelect, Mode=OneWay, RelativeSource={RelativeSource AncestorType=DataGrid}}" >
-                                    <Setter Property="Background" Value="Red" />
+                                <DataTrigger Binding="{Binding IsSelected}" Value="true">
+                                    <Setter Property="Background" Value="Green"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
