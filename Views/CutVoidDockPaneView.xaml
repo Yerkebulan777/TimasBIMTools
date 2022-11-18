@@ -6,7 +6,6 @@
     d:DataContext="{d:DesignInstance Type=vm:CutVoidDataViewModel}"
     xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
-    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Class="RevitTimasBIMTools.Views.CutVoidDockPaneView" 
     d:Height="Auto" d:Width="300" mc:Ignorable="d"
     MinHeight="300" MinWidth="300"

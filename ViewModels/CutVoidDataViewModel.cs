@@ -41,7 +41,7 @@ namespace RevitTimasBIMTools.ViewModels
         public CutVoidDataViewModel(APIEventHandler eventHandler)
         {
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
-            RefreshDataCommand = new AsyncRelayCommand(RefreshActiveDataHandler);
+            RefreshDataCommand = new RelayCommand(RefreshActiveDataHandler);
             ShowCollisionCommand = new AsyncRelayCommand(ShowHandelCommandAsync);
             OkCanselCommand = new AsyncRelayCommand(OkCanselHandelCommandAsync);
         }
@@ -51,6 +51,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private object currentItem = null;
         private Document doc { get; set; } = null;
+        private Level level { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
         private PreviewControlModel control { get; set; } = null;
@@ -136,7 +137,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref document, value) && document != null)
                 {
-                    _ = RefreshActiveDataHandler();
+                    RefreshActiveDataHandler();
                 }
             }
         }
@@ -150,7 +151,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref material, value) && material != null)
                 {
-                    _ = RefreshActiveDataHandler();
+                    RefreshActiveDataHandler();
                 }
             }
         }
@@ -164,7 +165,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref category, value) && category != null)
                 {
-                    _ = RefreshActiveDataHandler();
+                    RefreshActiveDataHandler();
                 }
             }
         }
@@ -485,6 +486,14 @@ namespace RevitTimasBIMTools.ViewModels
             });
         }
 
+
+        void ActivatePlanView(UIDocument uidoc, Level level)
+        {
+            //level = level ?? RevitFilterManager.GetValidLevels(doc).FirstOrDefault();
+            ViewPlan view = RevitViewManager.GetPlanView(uidoc, level);
+            RevitViewManager.ActivateView(uidoc, view, ViewDiscipline.Mechanical);
+        }
+
         #endregion
 
 
@@ -538,9 +547,8 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (viewData != null && !viewData.IsEmpty)
                     {
-                        SortDataViewCollection();
+                        ReviewDataViewCollection();
                         VerifySelectDataViewCollection();
-                        Logger.Log("Item counts: " + viewData.Count.ToString());
                     }
                     else
                     {
@@ -551,7 +559,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void SortDataViewCollection()
+        private void ReviewDataViewCollection()
         {
             using (viewData.DeferRefresh())
             {
@@ -575,10 +583,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
                     AllSelectChecked = items.All(x => x.IsSelected == model.IsSelected) ? model.IsSelected : null;
-                    System.Windows.Controls.DataGrid datagrid = DockPanelView.DataGridView;
-                    datagrid.CurrentCell = datagrid.SelectedCells.FirstOrDefault();
-                    datagrid.ScrollIntoView(currentItem);
-                    datagrid.SelectedItem = currentItem;
                 }
             }
         }
@@ -668,50 +672,19 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region RefreshDataCommand
         public ICommand RefreshDataCommand { get; private set; }
-        private async Task RefreshActiveDataHandler()
+        private void RefreshActiveDataHandler()
         {
             IsDataRefresh = false;
             if (document != null && material != null && category != null)
             {
-                bool result = await IsValidActivePlanView();
-                await Task.Delay(1000).ContinueWith(_ =>
+                Task task = Task.WhenAll();
+                task.ContinueWith(_ =>
                 {
-                    IsOptionEnabled = !result;
-                    IsDataRefresh = result;
+                    IsOptionEnabled = false;
+                    IsDataRefresh = true;
                 }, taskContext);
             }
         }
-
-
-        private async Task<bool> IsValidActivePlanView()
-        {
-            return await RevitTask.RunAsync(app =>
-            {
-                bool result = false;
-                ViewDataCollection?.Refresh();
-                doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-                {
-                    if (ViewDataCollection?.IsEmpty == false)
-                    {
-                        currentItem = ViewDataCollection.GetItemAt(0);
-                        if (currentItem is ElementModel model)
-                        {
-                            ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, model.HostLevel);
-                            result = RevitViewManager.ActivateView(app.ActiveUIDocument, view, ViewDiscipline.Mechanical);
-                        }
-                    }
-                    else
-                    {
-                        Level level = RevitFilterManager.GetValidLevels(doc).FirstOrDefault();
-                        ViewPlan view = RevitViewManager.GetPlanView(app.ActiveUIDocument, level);
-                        result = RevitViewManager.ActivateView(app.ActiveUIDocument, view, ViewDiscipline.Mechanical);
-                    }
-                }
-                return result;
-            });
-        }
-
         #endregion
 
 

@@ -152,20 +152,23 @@ namespace RevitTimasBIMTools.CutOpening
             else if (elem is FamilyInstance instance)
             {
                 Transform transform = instance.GetTransform();
-                if (normal.IsAlmostEqualTo(transform.BasisX.Normalize(), threshold))
+
+                if (normal.IsAlmostEqualTo(transform.BasisX, threshold))
                 {
                     direction = transform.BasisX.Normalize();
                     line = CreateLine(direction, centroid);
                     IsIntersectionValid(solid, ref line);
                     result = true;
                 }
-                if (normal.IsAlmostEqualTo(transform.BasisY.Normalize(), threshold))
+
+                if (normal.IsAlmostEqualTo(transform.BasisY, threshold))
                 {
                     direction = transform.BasisY.Normalize();
                     line = CreateLine(direction, centroid);
                     IsIntersectionValid(solid, ref line);
                     result = true;
                 }
+
             }
             return result;
         }
@@ -186,7 +189,6 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 line = curves.GetCurveSegment(0) as Line;
             }
-
         }
 
 
