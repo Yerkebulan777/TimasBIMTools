@@ -97,29 +97,6 @@ namespace RevitTimasBIMTools.Services
         }
 
 
-        public static void Error(int intId, string text)
-        {
-            mainlogger?.Error(text);
-            string intro = "Error: ";
-            Debug.WriteLine($"\n{intro}\t{text}");
-            System.Windows.Clipboard.SetText(intId.ToString());
-            TaskDialog dlg = new(caption)
-            {
-                MainContent = text,
-                MainInstruction = intro,
-                MainIcon = TaskDialogIcon.TaskDialogIconInformation
-            };
-            try
-            {
-                _ = dlg.Show();
-            }
-            catch (Exception exc)
-            {
-                Debug.WriteLine(exc.Message);
-            }
-        }
-
-
         public static void Warning(string text)
         {
             mainlogger?.Warn(text);

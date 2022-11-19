@@ -81,32 +81,9 @@ namespace RevitTimasBIMTools.RevitUtils
             string viewName = prefix + level.Name.Trim();
             foreach (ViewPlan plan in new FilteredElementCollector(doc).OfClass(typeof(ViewPlan)))
             {
-                if (!plan.IsTemplate && plan.Name.StartsWith(prefix))
+                if (!plan.IsTemplate && level.Id.Equals(plan.GenLevel.Id))
                 {
-                    if (level.Id.Equals(plan.GenLevel.Id))
-                    {
-                        DisplayStyle style = DisplayStyle.Realistic;
-                        ViewDetailLevel detail = ViewDetailLevel.Fine;
-                        ViewDiscipline discipline = ViewDiscipline.Coordination;
-                        SetViewSettings(doc, plan, discipline, style, detail);
-                        return plan;
-                    }
-                    else if (uidoc.ActiveGraphicalView.Id != plan.Id)
-                    {
-                        using Transaction tx = new(doc);
-                        TransactionStatus status = tx.Start("DeletePlan");
-                        if (status == TransactionStatus.Started)
-                        {
-                            try
-                            {
-                                status = doc.Delete(plan.Id).Any() ? tx.Commit() : tx.RollBack();
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.Error(ex.Message);
-                            }
-                        }
-                    }
+                    return plan;
                 }
             }
             return CreatePlanView(doc, level, viewName);
@@ -143,14 +120,14 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 try
                 {
-                    if (view is View3D view3D)
-                    {
-                        view3D.IsSectionBoxActive = false;
-                    }
                     view.ViewTemplateId = ElementId.InvalidElementId;
                     view.Discipline = discipline;
                     view.DisplayStyle = style;
                     view.DetailLevel = detail;
+                    if (view is View3D view3D)
+                    {
+                        view3D.IsSectionBoxActive = false;
+                    }
                     status = t.Commit();
                 }
                 catch (Exception ex)
@@ -225,16 +202,29 @@ namespace RevitTimasBIMTools.RevitUtils
             ElementId activeId = uidoc.ActiveGraphicalView.Id;
             if (view != null && activeId != view.Id)
             {
+                uidoc.Selection.Dispose();
                 uidoc.RequestViewChange(view);
                 ViewDetailLevel detail = ViewDetailLevel.Medium;
                 DisplayStyle style = DisplayStyle.ShadingWithEdges;
                 SetViewSettings(uidoc.Document, view, discipline, style, detail);
                 foreach (UIView uv in uidoc.GetOpenUIViews())
                 {
-                    if (uv.ViewId.Equals(view.Id))
+                    ElementId vid = uv.ViewId;
+                    if (vid == view.Id)
                     {
                         uv.ZoomToFit();
-                        break;
+                    }
+                    else if (activeId != vid)
+                    {
+                        try
+                        {
+                            uv.Close();
+                            uv.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error(ex.Message);
+                        }
                     }
                 }
             }
