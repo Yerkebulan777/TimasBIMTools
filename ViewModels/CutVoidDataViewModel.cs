@@ -29,7 +29,6 @@ namespace RevitTimasBIMTools.ViewModels
     public sealed class CutVoidDataViewModel : ObservableObject
     {
         public CutVoidDockPaneView DockPanelView { get; set; }
-        private static SynchronizationContext context { get; set; }
         public static ExternalEvent RevitExternalEvent { get; set; }
 
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
