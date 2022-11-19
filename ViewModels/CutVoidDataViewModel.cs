@@ -18,7 +18,6 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
@@ -597,7 +596,10 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref levelText, value))
                 {
                     ViewDataCollection.Filter = FilterModelCollection;
-                    ActivatePlanViewByLevel();
+                    if (!string.IsNullOrEmpty(levelText))
+                    {
+                        ActivatePlanViewByLevel();
+                    }
                 }
             }
         }
@@ -612,7 +614,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref symbolText, value))
                 {
                     ViewDataCollection.Filter = FilterModelCollection;
-                    ActivatePlanViewByLevel();
                 }
             }
         }
@@ -645,10 +646,9 @@ namespace RevitTimasBIMTools.ViewModels
 
         private void ActivatePlanViewByLevel()
         {
-            ItemCollection collection = DockPanelView.DataGridView.Items;
-            if (collection != null && collection.IsEmpty == false)
+            if (viewData != null && !viewData.IsEmpty)
             {
-                currentItem = collection.GetItemAt(0);
+                currentItem = viewData.GetItemAt(0);
                 if (currentItem is ElementModel model)
                 {
                     Task task = RevitTask.RunAsync(app =>

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
-    public static class CutVoidExtention
+    public static class BIMToolExtention
     {
 
         public static IDictionary<string, Material> GetStructureCoreMaterialData(this IDictionary<int, ElementId> sourceTypeIds, Document doc)
