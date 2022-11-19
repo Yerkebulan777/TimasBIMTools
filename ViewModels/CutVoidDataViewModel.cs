@@ -562,9 +562,8 @@ namespace RevitTimasBIMTools.ViewModels
                     viewData.GroupDescriptions.Clear();
                     viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.IsSelected)));
                     viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
-                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
                     viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
-                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
+                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.MinSideSize), ListSortDirection.Ascending));
                 }
             }
         }
@@ -579,6 +578,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
                     AllSelectChecked = items.All(x => x.IsSelected == model.IsSelected) ? model.IsSelected : null;
+
                 }
             }
         }
@@ -660,28 +660,6 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
         }
-
-        #endregion
-
-
-        #region ResetCurrentContext
-
-        //private void ResetCurrentContext()
-        //{
-        //    context = ViewDataCollection?.SourceCollection as SynchronizationContext;
-        //    if (context != null && SynchronizationContext.Current != context)
-        //    {
-        //        try
-        //        {
-        //            SynchronizationContext.SetSynchronizationContext(context);
-        //            Logger.ThreadProcessLog("Complited: " + nameof(ResetCurrentContext));
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Logger.Error(nameof(ResetCurrentContext) + ex.Message);
-        //        }
-        //    }
-        //}
 
         #endregion
 

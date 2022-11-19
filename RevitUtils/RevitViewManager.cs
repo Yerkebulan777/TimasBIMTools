@@ -204,7 +204,7 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 uidoc.Selection.Dispose();
                 uidoc.RequestViewChange(view);
-                ViewDetailLevel detail = ViewDetailLevel.Medium;
+                ViewDetailLevel detail = ViewDetailLevel.Fine;
                 DisplayStyle style = DisplayStyle.ShadingWithEdges;
                 SetViewSettings(uidoc.Document, view, discipline, style, detail);
                 foreach (UIView uv in uidoc.GetOpenUIViews())

@@ -52,11 +52,13 @@ namespace RevitTimasBIMTools.RevitModel
 
         public bool SetValidSizeDescription()
         {
-            if (MinSideSize <= Math.Min(Width, Height))
+            double minSize = Math.Min(Width, Height);
+            if (MinSideSize <= minSize)
             {
                 int h = Convert.ToInt16(Height * 304.8);
                 int w = Convert.ToInt16(Width * 304.8);
                 Description = $"{w}x{h}(h)";
+                MinSideSize = minSize;
                 return true;
             }
             return false;
