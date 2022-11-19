@@ -51,7 +51,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private object currentItem = null;
         private Document doc { get; set; } = null;
-        private Level level { get; set; } = null;
+        private Level currentLevel { get; set; } = null;
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
         private PreviewControlModel control { get; set; } = null;
@@ -122,6 +122,14 @@ namespace RevitTimasBIMTools.ViewModels
                     SnoopIntersectionByInputData();
                 }
             }
+        }
+
+
+        private bool activeLevel = false;
+        public bool IsActiveLevel
+        {
+            get => activeLevel;
+            set => SetProperty(ref activeLevel, value);
         }
 
         #endregion
@@ -489,7 +497,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         void ActivatePlanView(UIDocument uidoc, Level level)
         {
-            //level = level ?? RevitFilterManager.GetValidLevels(doc).FirstOrDefault();
+            //currentLevel = currentLevel ?? RevitFilterManager.GetValidLevels(doc).FirstOrDefault();
             ViewPlan view = RevitViewManager.GetPlanView(uidoc, level);
             RevitViewManager.ActivateView(uidoc, view, ViewDiscipline.Mechanical);
         }
@@ -583,6 +591,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
                     AllSelectChecked = items.All(x => x.IsSelected == model.IsSelected) ? model.IsSelected : null;
+                    currentLevel = model.HostLevel;
                 }
             }
         }
@@ -638,11 +647,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         private bool FilterModelCollection(object obj)
         {
-            return obj is not null && obj is ElementModel model
-            && ((string.IsNullOrEmpty(LevelTextFilter) && string.IsNullOrEmpty(SymbolTextFilter))
-            || (model.LevelName.Equals(LevelTextFilter) && model.SymbolName.Equals(SymbolTextFilter))
-            || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(SymbolTextFilter))
-            || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(LevelTextFilter)));
+            if (obj is not null && obj is ElementModel model)
+            {
+                return (model.LevelName.Equals(LevelTextFilter) && model.SymbolName.Equals(SymbolTextFilter))
+                || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(SymbolTextFilter))
+                || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(LevelTextFilter));
+            }
+            return false;
         }
 
         #endregion

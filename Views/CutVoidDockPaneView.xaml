@@ -197,7 +197,7 @@
                         <Style TargetType="DataGridRow">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsSelected}" Value="true">
-                                    <Setter Property="Background" Value="Green"/>
+                                    <Setter Property="Background" Value="AliceBlue"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -248,7 +248,7 @@
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Width="Auto" Header="Description" Binding="{Binding Description, Mode=OneWay}">
+                        <DataGridTextColumn Width="*" Header="Description" Binding="{Binding Description, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>
@@ -257,6 +257,7 @@
                         </DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
+                
             </ScrollViewer>
 
 
