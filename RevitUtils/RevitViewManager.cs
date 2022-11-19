@@ -165,10 +165,10 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region ShowElement
-        public static void ShowModelInPlanView(UIDocument uidoc, ElementModel model)
+        public static void ShowModelInPlanView(UIDocument uidoc, ElementModel model, ViewDiscipline discipline)
         {
             ViewPlan viewPlan = GetPlanView(uidoc, model.HostLevel);
-            if (viewPlan != null && ActivateView(uidoc, viewPlan, ViewDiscipline.Mechanical))
+            if (viewPlan != null)
             {
                 try
                 {
@@ -189,13 +189,15 @@ namespace RevitTimasBIMTools.RevitUtils
                         viewRange.SetOffset(PlanViewPlane.TopClipPlane, offset);
                         viewRange.SetOffset(PlanViewPlane.BottomClipPlane, -offset);
                         viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, -offset);
-                        _ = trx.Start();
+
+                        TransactionStatus status = trx.Start();
                         viewPlan.SetViewRange(viewRange);
-                        _ = trx.Commit();
+                        status = trx.Commit();
                     }
                 }
                 finally
                 {
+                    ActivateView(uidoc, viewPlan, discipline);
                     BoundingBoxXYZ bbox = CreateBoundingBox(viewPlan, model.Instanse, model.Origin);
                     uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                     ZoomElementInView(uidoc, viewPlan, bbox);
@@ -217,12 +219,11 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
-        #region ShowView
-        public static bool ActivateView(UIDocument uidoc, in View view, ViewDiscipline discipline)
+        #region ActivateView
+        public static void ActivateView(UIDocument uidoc, in View view, ViewDiscipline discipline)
         {
             ElementId activeId = uidoc.ActiveGraphicalView.Id;
-            bool result = view != null && activeId == view.Id;
-            if (view != null && view.IsValidObject && !result)
+            if (view != null && activeId != view.Id)
             {
                 uidoc.RequestViewChange(view);
                 ViewDetailLevel detail = ViewDetailLevel.Medium;
@@ -233,12 +234,10 @@ namespace RevitTimasBIMTools.RevitUtils
                     if (uv.ViewId.Equals(view.Id))
                     {
                         uv.ZoomToFit();
-                        result = true;
                         break;
                     }
                 }
             }
-            return result;
         }
         #endregion
 

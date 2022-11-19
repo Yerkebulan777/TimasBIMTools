@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using log4net.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
@@ -21,6 +22,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
+using Level = Autodesk.Revit.DB.Level;
 using Parameter = Autodesk.Revit.DB.Parameter;
 
 
@@ -49,12 +51,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Templory
 
+        private Document doc = null;
         private object currentItem = null;
-        private Document doc { get; set; } = null;
-        private Level currentLevel { get; set; } = null;
+        private PreviewControlModel control = null;
+
+
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
-        private PreviewControlModel control { get; set; } = null;
 
         private bool? dialogResult = false;
         public bool? DialogResult
@@ -111,6 +114,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+
         private bool refresh = false;
         public bool IsDataRefresh
         {
@@ -122,14 +126,6 @@ namespace RevitTimasBIMTools.ViewModels
                     SnoopIntersectionByInputData();
                 }
             }
-        }
-
-
-        private bool activeLevel = false;
-        public bool IsActiveLevel
-        {
-            get => activeLevel;
-            set => SetProperty(ref activeLevel, value);
         }
 
         #endregion
@@ -350,8 +346,8 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
+                    DockPanelView.ActiveDocTitle.Content = doc.Title;
                     collisionManager.InitializeElementTypeIdData(doc);
-                    DockPanelView.ActiveDocTitle.Content = doc.Title.ToUpper();
                     return RevitFilterManager.GetDocumentCollection(doc);
                 }
                 return null;
@@ -481,25 +477,35 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal void ShowElementModelView(ElementModel model)
+        private void ActivatePlanView(Level level)
         {
-            RevitTask.RunAsync(app =>
+            if (level != null && level.IsValidObject)
             {
-                doc = app.ActiveUIDocument.Document;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                Task task = RevitTask.RunAsync(app =>
                 {
-                    System.Windows.Clipboard.SetText(model.Instanse.Id.ToString());
-                    RevitViewManager.ShowModelInPlanView(app.ActiveUIDocument, model);
-                }
-            });
+                    UIDocument uidoc = app.ActiveUIDocument;
+                    ViewPlan view = RevitViewManager.GetPlanView(uidoc, level);
+                    RevitViewManager.ActivateView(uidoc, view, ViewDiscipline.Mechanical);
+                });
+            }
         }
 
 
-        void ActivatePlanView(UIDocument uidoc, Level level)
+        internal void ShowElementModelView(ElementModel model)
         {
-            //currentLevel = currentLevel ?? RevitFilterManager.GetValidLevels(doc).FirstOrDefault();
-            ViewPlan view = RevitViewManager.GetPlanView(uidoc, level);
-            RevitViewManager.ActivateView(uidoc, view, ViewDiscipline.Mechanical);
+            if (model != null && model.Instanse.IsValidObject)
+            {
+                Task task = RevitTask.RunAsync(app =>
+                {
+                    doc = app.ActiveUIDocument.Document;
+                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                    {
+                        UIDocument uidoc = app.ActiveUIDocument;
+                        System.Windows.Clipboard.SetText(model.Instanse.Id.ToString());
+                        RevitViewManager.ShowModelInPlanView(uidoc, model, ViewDiscipline.Mechanical);
+                    }
+                });
+            }
         }
 
         #endregion
@@ -553,15 +559,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref viewData, value))
                 {
-                    if (viewData != null && !viewData.IsEmpty)
-                    {
-                        ReviewDataViewCollection();
-                        VerifySelectDataViewCollection();
-                    }
-                    else
-                    {
-                        AllSelectChecked = false;
-                    }
+                    AllSelectChecked = false;
+                    ReviewDataViewCollection();
+                    VerifySelectDataViewCollection();
                 }
             }
         }
@@ -569,15 +569,18 @@ namespace RevitTimasBIMTools.ViewModels
 
         private void ReviewDataViewCollection()
         {
-            using (viewData.DeferRefresh())
+            if (viewData != null && !viewData.IsEmpty)
             {
-                viewData.SortDescriptions.Clear();
-                viewData.GroupDescriptions.Clear();
-                viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.IsSelected)));
-                viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
-                viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
-                viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
-                viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
+                using (viewData.DeferRefresh())
+                {
+                    viewData.SortDescriptions.Clear();
+                    viewData.GroupDescriptions.Clear();
+                    viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.IsSelected)));
+                    viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
+                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
+                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
+                }
             }
         }
 
@@ -601,6 +604,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region DataFilter
 
+        private Level currentLevel;
+
         private string levelText;
         public string LevelTextFilter
         {
@@ -610,6 +615,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref levelText, value))
                 {
                     ViewDataCollection.Filter = FilterModelCollection;
+                    ActivatePlanView(currentLevel);
                 }
             }
         }
@@ -624,6 +630,7 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref symbolText, value))
                 {
                     ViewDataCollection.Filter = FilterModelCollection;
+                    ActivatePlanView(currentLevel);
                 }
             }
         }
@@ -647,13 +654,10 @@ namespace RevitTimasBIMTools.ViewModels
 
         private bool FilterModelCollection(object obj)
         {
-            if (obj is not null && obj is ElementModel model)
-            {
-                return (model.LevelName.Equals(LevelTextFilter) && model.SymbolName.Equals(SymbolTextFilter))
-                || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(SymbolTextFilter))
-                || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(LevelTextFilter));
-            }
-            return false;
+            return obj is not null && obj is ElementModel model
+            && ((model.LevelName.Equals(LevelTextFilter) && model.SymbolName.Equals(SymbolTextFilter))
+            || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(SymbolTextFilter))
+            || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(LevelTextFilter)));
         }
 
         #endregion
