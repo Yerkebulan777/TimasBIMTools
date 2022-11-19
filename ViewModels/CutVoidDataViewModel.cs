@@ -2,7 +2,6 @@
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using log4net.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
 using RevitTimasBIMTools.Core;
@@ -53,7 +52,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         private Document doc = null;
         private object currentItem = null;
-        private PreviewControlModel control = null;
+        private Level currentLevel = null;
+        private PreviewControlModel control;
 
 
         private View3D view3d { get; set; } = null;
@@ -477,20 +477,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void ActivatePlanView(Level level)
-        {
-            if (level != null && level.IsValidObject)
-            {
-                Task task = RevitTask.RunAsync(app =>
-                {
-                    UIDocument uidoc = app.ActiveUIDocument;
-                    ViewPlan view = RevitViewManager.GetPlanView(uidoc, level);
-                    RevitViewManager.ActivateView(uidoc, view, ViewDiscipline.Mechanical);
-                });
-            }
-        }
-
-
         internal void ShowElementModelView(ElementModel model)
         {
             if (model != null && model.Instanse.IsValidObject)
@@ -562,6 +548,7 @@ namespace RevitTimasBIMTools.ViewModels
                     AllSelectChecked = false;
                     ReviewDataViewCollection();
                     VerifySelectDataViewCollection();
+                    ActivatePlanViewByLevel();
                 }
             }
         }
@@ -599,12 +586,24 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
+
+        private void ActivatePlanViewByLevel()
+        {
+            if (currentLevel != null)
+            {
+                Task task = RevitTask.RunAsync(app =>
+                {
+                    UIDocument uidoc = app.ActiveUIDocument;
+                    ViewPlan view = RevitViewManager.GetPlanView(uidoc, currentLevel);
+                    RevitViewManager.ActivateView(uidoc, view, ViewDiscipline.Mechanical);
+                });
+            }
+        }
+
         #endregion
 
 
         #region DataFilter
-
-        private Level currentLevel;
 
         private string levelText;
         public string LevelTextFilter
@@ -615,7 +614,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref levelText, value))
                 {
                     ViewDataCollection.Filter = FilterModelCollection;
-                    ActivatePlanView(currentLevel);
                 }
             }
         }
@@ -630,7 +628,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref symbolText, value))
                 {
                     ViewDataCollection.Filter = FilterModelCollection;
-                    ActivatePlanView(currentLevel);
                 }
             }
         }
