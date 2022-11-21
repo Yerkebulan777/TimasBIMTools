@@ -67,7 +67,7 @@
             <!-- Options -->
             <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch" 
                       Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}"
-                      Style="{StaticResource VisibleAnimation}" >
+                      Style="{DynamicResource VisibleAnimation}" >
 
                 <ListViewItem>
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
@@ -172,7 +172,7 @@
 
 
             <!-- Filter Control -->
-            <WrapPanel Grid.Row="2" Style="{StaticResource VisibleAnimation}" 
+            <WrapPanel Grid.Row="2" Style="{DynamicResource VisibleAnimation}" 
                     Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="10,5" 
                     Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
 
@@ -180,7 +180,8 @@
                     ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                     SelectedValue="{Binding Path=LevelTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
 
-                <ComboBox Name="ComboSymbolFilter" Height="23" Width="120" Margin="5" 
+                <ComboBox Name="ComboSymbolFilter" Height="23" Width="120" Margin="5"
+                    IsEnabled="{Binding ElementName=ComboLevelFilter, Path=SelectedIndex}"
                     ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                     SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -188,8 +189,10 @@
 
 
             <!-- DataGridView -->
-            <ScrollViewer Grid.Row="3"  Style="{StaticResource VisibleAnimation}" 
+            <ScrollViewer Grid.Row="3" Style="{DynamicResource VisibleAnimation}" 
+                          VerticalScrollBarVisibility="Auto"  HorizontalScrollBarVisibility="Auto"
                           Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
+                
                 <DataGrid Name="DataGridView" Style="{DynamicResource DataGridStandart}"
                           ItemsSource="{Binding Path=ViewDataCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
 
@@ -227,7 +230,7 @@
                         <DataGridTemplateColumn Width="60">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="Show" Click="ShowModelButton_Click" Margin="1.5"/>
+                                    <Button Content="Show" Height="25"  Width="50" Click="ShowModelButton_Click" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -248,7 +251,7 @@
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Width="*" Header="Description" Binding="{Binding Description, Mode=OneWay}">
+                        <DataGridTextColumn Width="120" Header="Description" Binding="{Binding Description, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
                                     <Setter Property="IsReadOnly" Value="true"/>

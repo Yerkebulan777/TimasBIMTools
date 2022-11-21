@@ -54,7 +54,8 @@
 
     <!--DataGridStandart-->
     <Style TargetType="{x:Type DataGrid}" x:Key="DataGridStandart">
-        <Setter Property="RowHeight" Value="30"/>
+        <Setter Property="MinRowHeight" Value="30"/>
+        <Setter Property="MinColumnWidth" Value="30"/>
         <Setter Property="BorderThickness" Value="0.5" />
         <Setter Property="ColumnHeaderHeight" Value="30"/>
         <Setter Property="AutoGenerateColumns" Value="False"/>
@@ -66,16 +67,7 @@
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
         <Setter Property="ScrollViewer.PanningMode" Value="Both" />
         <Setter Property="CanUserReorderColumns" Value="True" />
-        <Setter Property="CanUserResizeColumns" Value="True" />
-        <Setter Property="CanUserResizeRows" Value="True" />
-        <Setter Property="CanUserDeleteRows" Value="True"/>
-        <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="SelectionMode" Value="Single" />
-        <Style.Triggers>
-            <Trigger Property="IsGrouping" Value="true">
-                <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
     
     <!--DataGridCell-->
