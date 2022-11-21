@@ -172,20 +172,19 @@
 
 
             <!-- Filter Control -->
-            <WrapPanel Grid.Row="2" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right" >
+            <WrapPanel Grid.Row="2" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,5" >
 
-                <ComboBox Name="ComboLevelFilter" Height="23" Width="120" Margin="10,5"
+                <ComboBox Name="ComboLevelFilter" Height="23" Width="120" Margin="5"
                     IsEnabled="{Binding Path=IsModelDataFilled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                     ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                     SelectedValue="{Binding Path=LevelTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
 
-                <ComboBox Name="ComboSymbolFilter" Height="23" Width="120" Margin="10,5"
+                <ComboBox Name="ComboSymbolFilter" Height="23" Width="120" Margin="5"
                     IsEnabled="{Binding Path=IsModelDataFilled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
                     ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                     SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
 
             </WrapPanel>
-
 
 
             <!-- DataGridView -->
