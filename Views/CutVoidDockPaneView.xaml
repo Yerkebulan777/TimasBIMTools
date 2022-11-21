@@ -262,10 +262,11 @@
 
 
             <!-- ButtonPanel -->
-            <Border Grid.Row="4" Background="Silver"  Style="{StaticResource VisibleAnimation}" 
-                    Visibility="{Binding  Path=IsStarted, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
+            <Border Grid.Row="4" Background="Silver" >
                 
                 <DockPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" >
+
+                    <TextBlock Name="Info" Height="23" Width="Auto" Margin="5" />
 
                     <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
                             IsEnabled="{Binding Path=IsOptionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"

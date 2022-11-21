@@ -524,7 +524,9 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref modelData, value) && modelData != null)
                 {
-                    Logger.Log("Model counts: " + modelData.Count.ToString());
+                    int count = modelData.Count;
+                    IsOptionEnabled = count == 0;
+                    DockPanelView.Info.Text = "Found items: " + count.ToString();
                     ViewDataCollection = CollectionViewSource.GetDefaultView(modelData) as ListCollectionView;
                     UniqueLevelNames = new SortedSet<string>(modelData.Select(m => m.LevelName).Append(string.Empty)).ToList();
                     UniqueSymbolNames = new SortedSet<string>(modelData.Select(m => m.SymbolName).Append(string.Empty)).ToList();
@@ -670,13 +672,14 @@ namespace RevitTimasBIMTools.ViewModels
             if (document != null && material != null && category != null)
             {
                 Task task = Task.WhenAll();
-                _ = task.ContinueWith(_ =>
+                task = task.ContinueWith(_ =>
                 {
                     IsOptionEnabled = false;
                     IsDataRefresh = true;
                 }, taskContext);
             }
         }
+
         #endregion
 
 
