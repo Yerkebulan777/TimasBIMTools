@@ -172,18 +172,27 @@
 
 
             <!-- Filter Control -->
-            <WrapPanel Grid.Row="2" Style="{DynamicResource VisibleAnimation}" 
-                    Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="10,5" 
-                    Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
+            <WrapPanel Grid.Row="2" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right" >
 
-                <ComboBox Name="ComboLevelFilter" Height="23" Width="120" Margin="5" 
-                    ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                    SelectedValue="{Binding Path=LevelTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
+                <StackPanel Margin="5" Orientation="Horizontal" VerticalAlignment="Center" >
+                    <Label Name="InfoPrefix" Content="Found collision: " Margin="5"/>
+                    <Label Name="InfoCount" Content="{Binding Path=ElementModelData.Count}" Margin="5"/>
+                </StackPanel>
 
-                <ComboBox Name="ComboSymbolFilter" Height="23" Width="120" Margin="5"
-                    IsEnabled="{Binding ElementName=ComboLevelFilter, Path=SelectedIndex}"
-                    ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                    SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
+                <StackPanel Margin="5" >
+
+                    <ComboBox Name="ComboLevelFilter" Height="23" Width="120" Margin="5"
+                        IsEnabled="{Binding Path=IsModelDataFilled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                        ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                        SelectedValue="{Binding Path=LevelTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <ComboBox Name="ComboSymbolFilter" Height="23" Width="120" Margin="5"
+                        IsEnabled="{Binding Path=IsModelDataFilled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                        ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                        SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
+
+                </StackPanel>
+
 
             </WrapPanel>
 
@@ -268,8 +277,6 @@
             <Border Grid.Row="4" Background="Silver" >
                 
                 <DockPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" >
-
-                    <TextBlock Name="Info" Height="23" Width="Auto" Margin="5" />
 
                     <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
                             IsEnabled="{Binding Path=IsOptionEnabled, Mode=OneWay, UpdateSourceTrigger=Explicit}"

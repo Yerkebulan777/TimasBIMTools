@@ -124,6 +124,14 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
+
+        private bool filled;
+        public bool IsModelDataFilled
+        {
+            get => filled;
+            set => SetProperty(ref filled, value);
+        }
+
         #endregion
 
 
@@ -524,9 +532,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref modelData, value) && modelData != null)
                 {
-                    int count = modelData.Count;
-                    IsOptionEnabled = count == 0;
-                    DockPanelView.Info.Text = "Found items: " + count.ToString();
+                    IsModelDataFilled = modelData.Count != 0;
                     ViewDataCollection = CollectionViewSource.GetDefaultView(modelData) as ListCollectionView;
                     UniqueLevelNames = new SortedSet<string>(modelData.Select(m => m.LevelName).Append(string.Empty)).ToList();
                     UniqueSymbolNames = new SortedSet<string>(modelData.Select(m => m.SymbolName).Append(string.Empty)).ToList();
@@ -614,6 +620,10 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref symbolText, value))
                 {
                     ViewDataCollection.Filter = FilterModelCollection;
+                    if (!string.IsNullOrEmpty(symbolText))
+                    {
+                        ActivatePlanViewByLevel();
+                    }
                 }
             }
         }
@@ -637,10 +647,10 @@ namespace RevitTimasBIMTools.ViewModels
 
         private bool FilterModelCollection(object obj)
         {
-            return obj is not null && obj is ElementModel model
-            && ((model.LevelName.Equals(LevelTextFilter) && model.SymbolName.Equals(SymbolTextFilter))
-            || (model.LevelName.Equals(LevelTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(SymbolTextFilter))
-            || (model.SymbolName.Equals(SymbolTextFilter, StringComparison.InvariantCultureIgnoreCase) && string.IsNullOrEmpty(LevelTextFilter)));
+            return !string.IsNullOrEmpty(levelText) && !string.IsNullOrEmpty(symbolText)
+            && obj is not null && obj is ElementModel model
+            && model.SymbolName.Equals(symbolText)
+            && model.LevelName.Equals(levelText);
         }
 
 

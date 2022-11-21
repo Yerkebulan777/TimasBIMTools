@@ -98,7 +98,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
             List<PerformanceAdviserRuleId> performanceAdviserRuleIds = new();
 
-            //Iterating through all PerformanceAdviser rules looking to find that which matches PURGE_GUID
+            //Iterating through all PerformanceAdviser rules looking to filled that which matches PURGE_GUID
             foreach (PerformanceAdviserRuleId performanceAdviserRuleId in PerformanceAdviser.GetPerformanceAdviser().GetAllRuleIds())
             {
                 if (performanceAdviserRuleId.Guid.ToString() == PurgeGuid)
