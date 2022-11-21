@@ -3,6 +3,7 @@ using Autodesk.Revit.DB.IFC;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 using Options = Autodesk.Revit.DB.Options;
@@ -153,30 +154,49 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxUV GetSectionBound(this Solid solid, Document doc, in XYZ direction, in XYZ centroid)
+        public static BoundingBoxUV GetSectionBound(this Solid solid, Document doc, in XYZ direction, in XYZ centroid, out IList<CurveLoop> curveloops)
         {
+            curveloops = null;
             BoundingBoxUV result = null;
-            using (Transaction tx = new(doc, "GetSectionBound"))
+            using (Transaction trx = new(doc, "GetSectionBound"))
             {
-                TransactionStatus status = tx.Start();
+                TransactionStatus status = trx.Start();
                 try
                 {
                     Plane plane = Plane.CreateByNormalAndOrigin(direction.Normalize(), centroid);
                     Face face = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
-                    IList<CurveLoop> curveloops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), direction);
+                    curveloops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), direction);
                     result = face.GetBoundingBox();
-                    status = tx.Commit();
+                    status = trx.Commit();
                 }
                 catch (Exception ex)
                 {
-                    if (!tx.HasEnded())
+                    if (!trx.HasEnded())
                     {
-                        status = tx.RollBack();
+                        status = trx.RollBack();
                         Logger.Error(ex.ToString());
                     }
                 }
             }
             return result;
+        }
+
+
+        public static Solid CreateExtrusionGeometry(this IList<CurveLoop> curveloops, in XYZ normal, in double height, in double offset)
+        {
+            List<CurveLoop> profileLoops = new(5);
+            foreach (CurveLoop loop in curveloops)
+            {
+                if (loop.IsCounterclockwise(normal))
+                {
+                    profileLoops.Add(CurveLoop.CreateViaOffset(loop, offset, normal));
+                }
+                else
+                {
+                    profileLoops.Add(CurveLoop.CreateViaOffset(loop, -offset, normal));
+                }
+            }
+            return GeometryCreationUtilities.CreateExtrusionGeometry(profileLoops, normal, height);
         }
 
 
@@ -193,21 +213,23 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static int GetIntersectingLinkedElementIds(this Solid solid, IList<RevitLinkInstance> links, List<ElementId> ids)
+        public static bool GetIntersectingLinkedElementIds(this Solid solid, IList<RevitLinkInstance> links, out List<ElementId> ids)
         {
-            int count = ids.Count;
+            ids = new List<ElementId>();
+            FilteredElementCollector intersecting;
             foreach (RevitLinkInstance lnk in links)
             {
+                Document doc = lnk.GetLinkDocument();
                 Transform transform = lnk.GetTransform();
                 if (!transform.AlmostEqual(Transform.Identity))
                 {
                     solid = SolidUtils.CreateTransformed(solid, transform.Inverse);
                 }
-                ElementIntersectsSolidFilter filter = new(solid);
-                FilteredElementCollector intersecting = new FilteredElementCollector(lnk.GetLinkDocument()).OfClass(typeof(FamilyInstance)).WherePasses(filter);
+
+                intersecting = new FilteredElementCollector(doc).OfClass(typeof(FamilyInstance)).WherePasses(new ElementIntersectsSolidFilter(solid));
                 ids.AddRange(intersecting.ToElementIds());
             }
-            return ids.Count - count;
+            return ids.Any();
         }
 
 

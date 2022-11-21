@@ -172,7 +172,9 @@
 
 
             <!-- Filter Control -->
-            <WrapPanel Grid.Row="2" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,5" >
+            <WrapPanel Grid.Row="2" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,5"
+                       Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" 
+                       Style="{DynamicResource VisibleAnimation}" >
 
                 <ComboBox Name="ComboLevelFilter" Height="23" Width="120" Margin="5"
                     IsEnabled="{Binding Path=IsModelDataFilled, Mode=OneWay, UpdateSourceTrigger=Explicit}"
@@ -188,9 +190,9 @@
 
 
             <!-- DataGridView -->
-            <ScrollViewer Grid.Row="3" Style="{DynamicResource VisibleAnimation}" 
-                          VerticalScrollBarVisibility="Auto"  HorizontalScrollBarVisibility="Auto"
-                          Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" >
+            <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto"  HorizontalScrollBarVisibility="Auto"
+                          Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" 
+                          Style="{DynamicResource VisibleAnimation}" >
                 
                 <DataGrid Name="DataGridView" Style="{DynamicResource DataGridStandart}"
                           ItemsSource="{Binding Path=ViewDataCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
@@ -269,7 +271,7 @@
                 <DockPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" >
 
                     <WrapPanel VerticalAlignment="Center" Margin="5">
-                        <Label ContentStringFormat="Found collision: {0}" 
+                        <Label ContentStringFormat="Found collision: {0} " FontSize="12" 
                             Content="{Binding Path=ElementModelData.Count, Mode=OneWay}" />
                     </WrapPanel>
 

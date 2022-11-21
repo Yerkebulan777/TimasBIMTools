@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
+using System.Collections.Generic;
 
 namespace RevitTimasBIMTools.RevitModel
 {
@@ -30,13 +31,13 @@ namespace RevitTimasBIMTools.RevitModel
         public XYZ Vector { get; internal set; }
         public XYZ HostNormal { get; internal set; }
         public string Description { get; internal set; }
+        public IList<CurveLoop> CurveLoops { get; internal set; }
 
 
         public double Height { get; internal set; }
         public double Width { get; internal set; }
         public double Depth { get; internal set; }
-
-        public int MinSideSizeValue { get; internal set; }
+        public int MinSizeValue { get; internal set; }
 
 
         private bool selected = false;
@@ -45,7 +46,7 @@ namespace RevitTimasBIMTools.RevitModel
             get => selected;
             set => SetProperty(ref selected, value);
         }
-
+        
 
         public bool IsValidModel()
         {
@@ -53,10 +54,10 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        public bool IsValidSize(int minSize)
+        public bool IsValidSectionSize(int minSize)
         {
-            MinSideSizeValue = Convert.ToInt16(Math.Round(Math.Min(Width, Height) * 304.8));
-            if (minSize <= MinSideSizeValue)
+            MinSizeValue = Convert.ToInt16(Math.Round(Math.Min(Width, Height) * 304.8));
+            if (minSize <= MinSizeValue)
             {
                 Depth = Math.Abs(HostNormal.DotProduct(Vector));
                 int h = Convert.ToInt16(Height * 304.8);

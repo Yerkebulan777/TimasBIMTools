@@ -48,7 +48,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private int minSideSize;
         private double cutOffset;
-        
+
         private FilteredElementCollector collector;
 
         private XYZ centroid = null;
@@ -166,13 +166,11 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
 
-            GetIntersectionVector(solid, ref line, ref vector);
-
-            return !vector.IsAlmostEqualTo(XYZ.Zero);
+            return GetIntersectionVector(solid, ref line, ref vector);
         }
 
 
-        private void GetIntersectionVector(in Solid solid, ref Line line, ref XYZ vector)
+        private bool GetIntersectionVector(in Solid solid, ref Line line, ref XYZ vector)
         {
             if (solid != null && line != null)
             {
@@ -183,6 +181,7 @@ namespace RevitTimasBIMTools.CutOpening
                     vector = line.GetEndPoint(1) - line.GetEndPoint(0);
                 }
             }
+            return !vector.IsAlmostEqualTo(XYZ.Zero);
         }
 
 
@@ -196,7 +195,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private bool IsValidSectionSize(Document doc, ref ElementModel model, in XYZ vector, in XYZ centroid)
         {
-            BoundingBoxUV size = intersectionSolid.GetSectionBound(doc, in vector, in centroid);
+            BoundingBoxUV size = intersectionSolid.GetSectionBound(doc, in vector, in centroid, out IList<CurveLoop> curveloops);
             if (vector.IsAlmostEqualTo(XYZ.BasisX, 0.5))
             {
                 model.Width = Math.Round(size.Max.U - size.Min.U, 5);
@@ -207,11 +206,24 @@ namespace RevitTimasBIMTools.CutOpening
                 model.Width = Math.Round(size.Max.V - size.Min.V, 5);
                 model.Height = Math.Round(size.Max.U - size.Min.U, 5);
             }
-
-            return model.IsValidSize(minSideSize);
+            model.CurveLoops = curveloops;
+            return model.IsValidSectionSize(minSideSize);
         }
 
         #endregion
+
+
+        public void VerifyOpenningSize(Document doc, in ElementModel model, in double offset)
+        {
+            Solid solid = model.CurveLoops.CreateExtrusionGeometry(model.HostNormal, model.Depth, offset);
+            using Transaction trans = new(doc, "Create opening");
+            TransactionStatus status = trans.Start();
+            if (status == TransactionStatus.Started)
+            {
+                solid.CreateDirectShape(doc);
+                status = trans.Commit();
+            }
+        }
 
 
         public void CreateOpening(Document doc, ElementModel model, FamilySymbol wallOpenning, FamilySymbol floorOpenning, Definition definition = null, double offset = 0)
@@ -245,6 +257,7 @@ namespace RevitTimasBIMTools.CutOpening
                 }
                 catch (Exception ex)
                 {
+                    status = trans.RollBack();
                     Logger.Error(ex.Message);
                 }
                 finally
@@ -272,6 +285,13 @@ namespace RevitTimasBIMTools.CutOpening
         {
             return Math.Round(Math.Tan(angle * hostDeph), 5);
         }
+
+
+        //IList<ElementId> GetCollisionInLinks()
+        //{
+
+        //}
+
 
 
         //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ vector, View view)

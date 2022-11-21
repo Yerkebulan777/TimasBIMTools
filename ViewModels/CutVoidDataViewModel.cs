@@ -329,7 +329,7 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-
+        private double offset;
         private int cutOffset = Properties.Settings.Default.CutOffsetInMm;
         public int CutOffsetSize
         {
@@ -340,6 +340,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     Properties.Settings.Default.CutOffsetInMm = cutOffset;
                     Properties.Settings.Default.Save();
+                    offset = cutOffset / 304.8;
                 }
             }
         }
@@ -578,7 +579,7 @@ namespace RevitTimasBIMTools.ViewModels
                     viewData.GroupDescriptions.Clear();
                     viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.IsSelected)));
                     viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
-                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.MinSideSizeValue), ListSortDirection.Ascending));
+                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.MinSizeValue), ListSortDirection.Ascending));
                     viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
                 }
             }
@@ -658,8 +659,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private bool FilterModelCollection(object obj)
         {
-            return !string.IsNullOrEmpty(levelText) && !string.IsNullOrEmpty(symbolText)
-            && obj is not null && obj is ElementModel model
+            return obj is not null && obj is ElementModel model
             && model.SymbolName.Equals(symbolText)
             && model.LevelName.Equals(levelText);
         }
@@ -690,6 +690,7 @@ namespace RevitTimasBIMTools.ViewModels
         private void RefreshActiveDataHandler()
         {
             IsDataRefresh = false;
+            IsModelDataFilled = false;
             if (document != null && material != null && category != null)
             {
                 Task task = Task.WhenAll();
@@ -751,6 +752,7 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             if (dialogResult.Value && ElementModelData.Remove(model))
                             {
+                                collisionManager.VerifyOpenningSize(doc, model, offset);
                                 collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
                             }
                             else

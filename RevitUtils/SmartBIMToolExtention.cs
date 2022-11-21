@@ -1,11 +1,17 @@
 ﻿using Autodesk.Revit.DB;
 using System.Collections.Generic;
-
+using System.Collections.ObjectModel;
 
 namespace RevitTimasBIMTools.RevitUtils
 {
-    public static class BIMToolExtention
+    public static class SmartBIMToolExtention
     {
+
+        public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> source)
+        {
+            return source != null ? new ObservableCollection<T>(source) : new ObservableCollection<T>();
+        }
+
 
         public static IDictionary<string, Material> GetStructureCoreMaterialData(this IDictionary<int, ElementId> sourceTypeIds, Document doc)
         {
