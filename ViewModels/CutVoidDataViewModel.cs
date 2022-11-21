@@ -374,7 +374,10 @@ namespace RevitTimasBIMTools.ViewModels
                     EngineerCategories = null;
                     StructureMaterials = null;
                     ElementModelData = null;
+                    SymbolTextFilter = null;
+                    LevelTextFilter = null;
                     FamilySymbols = null;
+                    currentItem = null;
 
                 }, taskContext);
             }
@@ -532,10 +535,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref modelData, value) && modelData != null)
                 {
-                    IsModelDataFilled = modelData.Count != 0;
                     ViewDataCollection = CollectionViewSource.GetDefaultView(modelData) as ListCollectionView;
                     UniqueLevelNames = new SortedSet<string>(modelData.Select(m => m.LevelName).Append(string.Empty)).ToList();
                     UniqueSymbolNames = new SortedSet<string>(modelData.Select(m => m.SymbolName).Append(string.Empty)).ToList();
+                    IsModelDataFilled = modelData.Count != 0;
                 }
             }
         }
