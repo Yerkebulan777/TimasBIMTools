@@ -77,6 +77,8 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
+        #region Get Collision Data
+
         public IList<ElementModel> GetCollisionByInputData(Document doc, DocumentModel document, Material material, Category category)
         {
             Transform global = document.Transform;
@@ -110,7 +112,7 @@ namespace RevitTimasBIMTools.CutOpening
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(out intersectionBbox);
-                if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, threshold, out vector))
+                if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, out vector))
                 {
                     intersectionSolid = hostSolid.GetIntersectionSolid(elem, global, options);
                     intersectionBbox = intersectionSolid.GetBoundingBox();
@@ -131,8 +133,11 @@ namespace RevitTimasBIMTools.CutOpening
             }
         }
 
+        #endregion
 
-        private bool IsIntersectionValid(Element elem, in Solid solid, in XYZ normal, in XYZ centroid, double threshold, out XYZ vector)
+
+        #region Validate Intersection
+        private bool IsIntersectionValid(Element elem, in Solid solid, in XYZ normal, in XYZ centroid, out XYZ vector)
         {
             Line line = null;
             vector = XYZ.Zero;
@@ -202,6 +207,8 @@ namespace RevitTimasBIMTools.CutOpening
 
             return model.IsValidSize(minSideSize);
         }
+
+        #endregion
 
 
         public void CreateOpening(Document doc, ElementModel model, FamilySymbol wallOpenning, FamilySymbol floorOpenning, Definition definition = null, double offset = 0)
