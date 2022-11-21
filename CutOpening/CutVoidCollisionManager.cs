@@ -54,9 +54,8 @@ namespace RevitTimasBIMTools.CutOpening
         private XYZ centroid = null;
 
         private Solid hostSolid = null;
-        private XYZ direction = XYZ.BasisZ;
+        private XYZ vector = XYZ.BasisZ;
         private XYZ hostNormal = XYZ.BasisZ;
-        private Line line = null;
         private Solid intersectionSolid = null;
 
 
@@ -105,14 +104,13 @@ namespace RevitTimasBIMTools.CutOpening
             hostNormal = host.GetHostElementNormal();
             hostSolid = host.GetSolidByVolume(identity, options);
             Level level = doc.GetElement(host.LevelId) as Level;
-            // ElementIntersectsElementFilter можно попоробоювать поменять
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).OfCategoryId(category.Id).WherePasses(intersectFilter);
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(out intersectionBbox);
-                if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, threshold, out direction, out line))
+                if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, threshold, out vector))
                 {
                     intersectionSolid = hostSolid.GetIntersectionSolid(elem, global, options);
                     intersectionBbox = intersectionSolid.GetBoundingBox();
@@ -120,16 +118,13 @@ namespace RevitTimasBIMTools.CutOpening
 
                     ElementModel model = new(elem, level)
                     {
+                        Vector = vector,
                         Origin = centroid,
-                        Direction = direction,
                         HostNormal = hostNormal,
-                        MinSideSize = minSideSize,
                     };
 
-                    if (IsValidSectionSize(doc, ref model, direction, centroid))
+                    if (IsValidSectionSize(doc, ref model, vector, centroid))
                     {
-                        //CalculateOpeningSize(ref model, line, cutOffset);
-                        //intersectionSolid = intersectionSolid.ScaledSolidByOffset(centroid, intersectionBbox, cutOffset);
                         yield return model;
                     }
                 }
@@ -137,17 +132,17 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool IsIntersectionValid(Element elem, in Solid solid, in XYZ normal, in XYZ centroid, in double threshold, out XYZ direction, out Line line)
+        private bool IsIntersectionValid(Element elem, in Solid solid, in XYZ normal, in XYZ centroid, double threshold, out XYZ vector)
         {
-            line = null;
-            bool result = false;
-            direction = XYZ.Zero;
+            Line line = null;
+            vector = XYZ.Zero;
             if (elem.Location is LocationCurve curve)
             {
                 line = curve.Curve as Line;
-                direction = line.Direction.Normalize();
-                IsIntersectionValid(solid, ref line);
-                result = true;
+                if (normal.IsAlmostEqualTo(line.Direction, threshold))
+                {
+                    vector = line.Direction.Normalize();
+                }
             }
             else if (elem is FamilyInstance instance)
             {
@@ -155,22 +150,31 @@ namespace RevitTimasBIMTools.CutOpening
 
                 if (normal.IsAlmostEqualTo(transform.BasisX, threshold))
                 {
-                    direction = transform.BasisX.Normalize();
-                    line = CreateLine(direction, centroid);
-                    IsIntersectionValid(solid, ref line);
-                    result = true;
+                    vector = transform.BasisX.Normalize();
+                    line = CreateLine(vector, centroid);
                 }
 
                 if (normal.IsAlmostEqualTo(transform.BasisY, threshold))
                 {
-                    direction = transform.BasisY.Normalize();
-                    line = CreateLine(direction, centroid);
-                    IsIntersectionValid(solid, ref line);
-                    result = true;
+                    vector = transform.BasisY.Normalize();
+                    line = CreateLine(vector, centroid);
                 }
-
             }
-            return result;
+
+            GetIntersectionVector(solid, ref line, ref vector);
+
+            return !vector.IsZeroLength();
+        }
+
+
+        private void GetIntersectionVector(in Solid solid, ref Line line, ref XYZ vector)
+        {
+            SolidCurveIntersection curves = solid.IntersectWithCurve(line, intersectOptions);
+            if (curves != null && 0 < curves.SegmentCount)
+            {
+                line = curves.GetCurveSegment(0) as Line;
+                vector = line.GetEndPoint(1) - line.GetEndPoint(0);
+            }
         }
 
 
@@ -182,20 +186,10 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private void IsIntersectionValid(in Solid solid, ref Line line)
+        private bool IsValidSectionSize(Document doc, ref ElementModel model, in XYZ vector, in XYZ centroid)
         {
-            SolidCurveIntersection curves = solid.IntersectWithCurve(this.line, intersectOptions);
-            if (curves != null && 0 < curves.SegmentCount)
-            {
-                line = curves.GetCurveSegment(0) as Line;
-            }
-        }
-
-
-        private bool IsValidSectionSize(Document doc, ref ElementModel model, in XYZ direction, in XYZ centroid)
-        {
-            BoundingBoxUV size = intersectionSolid.GetSectionBound(doc, in direction, in centroid);
-            if (direction.IsAlmostEqualTo(XYZ.BasisX, 0.5))
+            BoundingBoxUV size = intersectionSolid.GetSectionBound(doc, in vector, in centroid);
+            if (vector.IsAlmostEqualTo(XYZ.BasisX, 0.5))
             {
                 model.Width = Math.Round(size.Max.U - size.Min.U, 5);
                 model.Height = Math.Round(size.Max.V - size.Min.V, 5);
@@ -205,30 +199,8 @@ namespace RevitTimasBIMTools.CutOpening
                 model.Width = Math.Round(size.Max.V - size.Min.V, 5);
                 model.Height = Math.Round(size.Max.U - size.Min.U, 5);
             }
-            return model.SetValidSizeDescription();
-        }
 
-
-        private void CalculateOpeningSize(ref ElementModel model, in Line line, double offset)
-        {
-            if (Math.Min(model.Width, model.Height) > minSideSize)
-            {
-                if (!model.HostNormal.IsParallel(model.Direction))
-                {
-                    XYZ vector = line.GetEndPoint(1) - line.GetEndPoint(0);
-                    model.HostNormal.GetAngleBetween(direction, out double horizont, out double vertical);
-                    double hostDeph = Math.Abs(model.HostNormal.DotProduct(vector));
-                    model.Height += offset + CalculateSideSize(hostDeph, vertical);
-                    model.Width += offset + CalculateSideSize(hostDeph, horizont);
-                }
-            }
-        }
-
-
-        private double CalculateSideSize(double hostDeph, in double angle)
-        {
-            hostDeph = Math.Round(hostDeph * 304.8, MidpointRounding.AwayFromZero) / 304.8;
-            return Math.Round(Math.Tan(angle * hostDeph), 5);
+            return model.IsValidSize(minSideSize);
         }
 
 
@@ -256,8 +228,9 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                     if (opening != null)
                     {
-                        _ = opening.get_Parameter(definition).Set(model.Width + (offset * 2));
-                        _ = opening.get_Parameter(definition).Set(model.Height + (offset * 2));
+                        CalculateOpeningSize(ref model, offset, out double width, out double height);
+                        _ = opening.get_Parameter(definition).Set(width);
+                        _ = opening.get_Parameter(definition).Set(height);
                     }
                 }
                 catch (Exception ex)
@@ -272,7 +245,26 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ direction, View view)
+        private void CalculateOpeningSize(ref ElementModel model, double offset, out double width, out double height)
+        {
+            width = model.Width + (offset * 2);
+            height = model.Height + (offset * 2);
+            if (!model.HostNormal.IsParallel(model.Vector))
+            {
+                model.HostNormal.GetAngleBetween(model.Vector, out double horizont, out double vertical);
+                height += CalculateSideSize(model.Depth, vertical);
+                width += CalculateSideSize(model.Depth, horizont);
+            }
+        }
+
+
+        private double CalculateSideSize(in double hostDeph, in double angle)
+        {
+            return Math.Round(Math.Tan(angle * hostDeph), 5);
+        }
+
+
+        //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ vector, View view)
         //{
         //    Outline outline = new(bbox.Min -= offsetPnt, bbox.Max += offsetPnt);
         //    collector = new FilteredElementCollector(doc, view.Id).Excluding(idsExclude);
@@ -318,11 +310,11 @@ namespace RevitTimasBIMTools.CutOpening
         //}
 
 
-        //private bool GetFamilyInstanceReferencePlane(FamilyInstance fi, out XYZ origin, out XYZ direction)
+        //private bool GetFamilyInstanceReferencePlane(FamilyInstance fi, out XYZ origin, out XYZ vector)
         //{
         //    bool flag = false;
         //    origin = XYZ.Zero;
-        //    direction = XYZ.Zero;
+        //    vector = XYZ.Zero;
 
         //    Reference reference = fi.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
         //    reference = SearchInstance != null ? reference.CreateLinkReference(SearchInstance) : reference;
@@ -338,7 +330,7 @@ namespace RevitTimasBIMTools.CutOpening
         //            if (null != sketchPlan)
         //            {
         //                Plane plan = sketchPlan.GetPlane();
-        //                direction = plan.Normal;
+        //                vector = plan.Normal;
         //                origin = plan.Origin;
         //                flag = true;
         //            }

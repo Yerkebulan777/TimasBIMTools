@@ -161,7 +161,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 TransactionStatus status = tx.Start();
                 try
                 {
-                    Plane plane = Plane.CreateByNormalAndOrigin(direction, centroid);
+                    Plane plane = Plane.CreateByNormalAndOrigin(direction.Normalize(), centroid);
                     Face face = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
                     IList<CurveLoop> curveloops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), direction);
                     result = face.GetBoundingBox();

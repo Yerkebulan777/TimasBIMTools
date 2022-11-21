@@ -27,13 +27,14 @@ namespace RevitTimasBIMTools.RevitModel
 
 
         public XYZ Origin { get; internal set; }
-        public XYZ Direction { get; internal set; }
+        public XYZ Vector { get; internal set; }
         public XYZ HostNormal { get; internal set; }
         public string Description { get; internal set; }
-        public double MinSideSize { get; internal set; }
-        public double Height { get; set; }
-        public double Width { get; set; }
 
+
+        public double Height { get; internal set; }
+        public double Width { get; internal set; }
+        public double Depth { get; internal set; }
 
 
         private bool selected = false;
@@ -50,15 +51,14 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        public bool SetValidSizeDescription()
+        public bool IsValidSize(double minSize)
         {
-            double minSize = Math.Min(Width, Height);
-            if (MinSideSize <= minSize)
+            if (minSize <= Math.Min(Width, Height))
             {
+                Depth = Math.Abs(HostNormal.DotProduct(Vector));
                 int h = Convert.ToInt16(Height * 304.8);
                 int w = Convert.ToInt16(Width * 304.8);
                 Description = $"{w}x{h}(h)";
-                MinSideSize = minSize;
                 return true;
             }
             return false;
