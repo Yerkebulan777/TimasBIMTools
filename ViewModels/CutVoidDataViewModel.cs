@@ -16,7 +16,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -671,7 +670,7 @@ namespace RevitTimasBIMTools.ViewModels
             if (document != null && material != null && category != null)
             {
                 Task task = Task.WhenAll();
-                task.ContinueWith(_ =>
+                _ = task.ContinueWith(_ =>
                 {
                     IsOptionEnabled = false;
                     IsDataRefresh = true;

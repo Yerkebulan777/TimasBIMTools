@@ -204,7 +204,7 @@
                     </DataGrid.RowStyle>
 
                     <DataGrid.Columns>
-                        
+
                         <DataGridTemplateColumn Header="Switch" Width="30" CellStyle="{StaticResource SingleClickEditStyle}" >
                             <DataGridTemplateColumn.HeaderTemplate>
                                 <DataTemplate>
@@ -227,7 +227,7 @@
                         <DataGridTemplateColumn Width="60">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="Show" Height="25" Width="55" Click="ShowModelButton_Click" />
+                                    <Button Content="Show" Click="ShowModelButton_Click" Margin="1.5"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
