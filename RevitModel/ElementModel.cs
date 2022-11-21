@@ -36,6 +36,8 @@ namespace RevitTimasBIMTools.RevitModel
         public double Width { get; internal set; }
         public double Depth { get; internal set; }
 
+        public int MinSideSizeValue { get; internal set; }
+
 
         private bool selected = false;
         public bool IsSelected
@@ -51,9 +53,10 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        public bool IsValidSize(double minSize)
+        public bool IsValidSize(int minSize)
         {
-            if (minSize <= Math.Min(Width, Height))
+            MinSideSizeValue = Convert.ToInt16(Math.Round(Math.Min(Width, Height) * 304.8));
+            if (minSize <= MinSideSizeValue)
             {
                 Depth = Math.Abs(HostNormal.DotProduct(Vector));
                 int h = Convert.ToInt16(Height * 304.8);

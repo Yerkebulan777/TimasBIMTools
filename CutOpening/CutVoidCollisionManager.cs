@@ -46,9 +46,9 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Fields
 
+        private int minSideSize;
         private double cutOffset;
-        private double minSideSize;
-
+        
         private FilteredElementCollector collector;
 
         private XYZ centroid = null;
@@ -83,8 +83,8 @@ namespace RevitTimasBIMTools.CutOpening
         {
             Transform global = document.Transform;
             IList<ElementModel> output = new List<ElementModel>(50);
+            minSideSize = Properties.Settings.Default.MinSideSizeInMm;
             cutOffset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
-            minSideSize = Convert.ToDouble(Properties.Settings.Default.MinSideSizeInMm / footToMm);
             IEnumerable<Element> enclosures = ElementTypeIdData?.GetInstancesByTypeIdDataAndMaterial(doc, material);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             TransactionStatus status = transGroup.Start();
