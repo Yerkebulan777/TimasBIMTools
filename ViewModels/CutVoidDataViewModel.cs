@@ -129,7 +129,14 @@ namespace RevitTimasBIMTools.ViewModels
         public bool IsModelDataFilled
         {
             get => filled;
-            set => SetProperty(ref filled, value);
+            set
+            {
+                if (SetProperty(ref filled, value) && !filled)
+                {
+                    UniqueSymbolNames = null;
+                    UniqueLevelNames = null;
+                }
+            }
         }
 
         #endregion
@@ -370,6 +377,7 @@ namespace RevitTimasBIMTools.ViewModels
                     IsStarted = false;
                     IsDataRefresh = false;
                     IsOptionEnabled = false;
+                    IsModelDataFilled = false;
                     DocumentCollection = null;
                     EngineerCategories = null;
                     StructureMaterials = null;

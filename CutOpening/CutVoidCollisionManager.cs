@@ -168,17 +168,20 @@ namespace RevitTimasBIMTools.CutOpening
 
             GetIntersectionVector(solid, ref line, ref vector);
 
-            return !vector.IsZeroLength();
+            return !vector.IsAlmostEqualTo(XYZ.Zero);
         }
 
 
         private void GetIntersectionVector(in Solid solid, ref Line line, ref XYZ vector)
         {
-            SolidCurveIntersection curves = solid.IntersectWithCurve(line, intersectOptions);
-            if (curves != null && 0 < curves.SegmentCount)
+            if (solid != null && line != null)
             {
-                line = curves.GetCurveSegment(0) as Line;
-                vector = line.GetEndPoint(1) - line.GetEndPoint(0);
+                SolidCurveIntersection curves = solid.IntersectWithCurve(line, intersectOptions);
+                if (curves != null && 0 < curves.SegmentCount)
+                {
+                    line = curves.GetCurveSegment(0) as Line;
+                    vector = line.GetEndPoint(1) - line.GetEndPoint(0);
+                }
             }
         }
 
