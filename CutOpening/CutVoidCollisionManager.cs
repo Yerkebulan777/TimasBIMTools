@@ -124,7 +124,15 @@ namespace RevitTimasBIMTools.CutOpening
 
                     curveloops = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
                     double minSize = Math.Min(width, height);
-                    if (minSize >= minSideSize)
+                    if (curveloops == null)
+                    {
+                        StringBuilder builder = new();
+                        builder.AppendLine($"Host element Id: {elem.Id.IntegerValue}");
+                        builder.AppendLine($"Collision element Id: {elem.Id.IntegerValue}");
+                        builder.AppendLine("Analyzer was unable to determine the intersection geometry");
+                        Logger.Error(builder.ToString());
+                    }
+                    else if (minSize >= minSideSize)
                     {
                         ElementModel model = new(elem, level)
                         {
@@ -138,19 +146,7 @@ namespace RevitTimasBIMTools.CutOpening
                         model.SetSizeDescription(minSize * footToMm);
                         yield return model;
                     }
-                    else
-                    {
-                        StringBuilder builder = new();
-                        builder.AppendLine("Attention:\t");
-                        builder.AppendLine($"Normal: {hostNormal}");
-                        builder.AppendLine($"Vector: {vector.Normalize()}");
-                        builder.AppendLine($"Is egual: {hostNormal.IsAlmostEqualTo(vector, threshold)}");
-                        builder.AppendLine($"Min side size: {minSideSize * footToMm}");
-                        builder.AppendLine($"Min element size: {minSize * footToMm}");
-                        builder.AppendLine($"Min element size: {minSize * footToMm}");
-                        builder.AppendLine($"Normal len: {hostNormal.GetLength()}");
-                        Logger.Error(builder.ToString());
-                    }
+
                 }
             }
         }

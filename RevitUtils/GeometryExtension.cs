@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text;
+using System.Windows;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 using Options = Autodesk.Revit.DB.Options;
@@ -175,7 +177,14 @@ namespace RevitTimasBIMTools.RevitUtils
                     if (!trx.HasEnded())
                     {
                         status = trx.RollBack();
-                        Logger.Error(ex.ToString() + normal.ToString());
+                        StringBuilder builder = new();
+                        builder.AppendLine(ex.Message);
+                        builder.AppendLine("Attention:\t");
+                        builder.AppendLine($"Normal: {normal}");
+                        builder.AppendLine($"Centroid: {centroid}");
+                        builder.AppendLine($"Normal length: {normal.GetLength()}");
+                        builder.AppendLine($"Intersection solid volume: {solid.Volume}");
+                        Logger.Error(builder.ToString());
                     }
                 }
             }
