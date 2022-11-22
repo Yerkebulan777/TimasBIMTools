@@ -329,7 +329,7 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-        private double offset;
+        
         private int cutOffset = Properties.Settings.Default.CutOffsetInMm;
         public int CutOffsetSize
         {
@@ -340,7 +340,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     Properties.Settings.Default.CutOffsetInMm = cutOffset;
                     Properties.Settings.Default.Save();
-                    offset = cutOffset / 304.8;
                 }
             }
         }
@@ -714,22 +713,26 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 dialogResult = null;
                 ViewDataCollection?.Refresh();
-                doc = app.ActiveUIDocument.Document;
-                UIDocument uidoc = app.ActiveUIDocument;
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                if (0 < ViewDataCollection?.Count)
                 {
-                    currentItem = viewData.GetItemAt(0);
-                    if (control == null && currentItem is ElementModel model && model.IsValidModel())
+                    doc = app.ActiveUIDocument.Document;
+                    UIDocument uidoc = app.ActiveUIDocument;
+                    currentItem = ViewDataCollection.GetItemAt(0);
+                    if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
+                        if (currentItem is ElementModel model && model.IsValidModel())
                         {
-                            patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
-                            RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
-                            control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
-                            control.ShowPreviewControl(app, view3d);
+                            if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
+                            {
+                                patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
+                                RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
+                                control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
+                                control.ShowPreviewControl(app, view3d);
+                            }
                         }
                     }
                 }
+
             });
         }
 
@@ -752,7 +755,7 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             if (dialogResult.Value && ElementModelData.Remove(model))
                             {
-                                collisionManager.VerifyOpenningSize(doc, model, offset);
+                                collisionManager.VerifyOpenningSize(doc, model);
                                 collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
                             }
                             else

@@ -4,6 +4,7 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 using Options = Autodesk.Revit.DB.Options;
@@ -28,12 +29,12 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static XYZ GetHostElementNormal(this Element elem, double tollerance = 0)
+        public static XYZ GetHostPositiveNormal(this Element elem, double tollerance = 0)
         {
-            XYZ result = XYZ.BasisZ;
+            XYZ resultNormal = XYZ.BasisZ;
             if (elem is Wall wall)
             {
-                result = wall.Orientation.Normalize();
+                resultNormal = wall.Orientation.Normalize();
             }
             else if (elem is HostObject hostObject)
             {
@@ -45,7 +46,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     {
                         try
                         {
-                            XYZ normal = result;
+                            XYZ normal = resultNormal;
                             if (face is PlanarFace planar && planar != null)
                             {
                                 normal = planar.FaceNormal;
@@ -54,7 +55,7 @@ namespace RevitTimasBIMTools.RevitUtils
                             {
                                 BoundingBoxUV box = face.GetBoundingBox();
                                 normal = face.ComputeNormal((box.Max + box.Min) * 0.5);
-                                result = local.OfVector(normal).Normalize();
+                                resultNormal = local.OfVector(normal).Normalize();
                             }
                         }
                         catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
@@ -64,7 +65,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-            return result;
+            return resultNormal.ConvertToPositive();
         }
 
 
@@ -203,17 +204,14 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static Solid CreateExtrusionGeometry(this IList<CurveLoop> curveloops, in XYZ normal, in double height, in double offset)
         {
-            List<CurveLoop> profileLoops = new(3);
+            double half = height / 2;
+            List<CurveLoop> profileLoops = new(5);
             foreach (CurveLoop loop in curveloops)
             {
-                if (loop.IsCounterclockwise(normal))
-                {
-                    profileLoops.Add(CurveLoop.CreateViaOffset(loop, offset, normal));
-                }
-                else
-                {
-                    profileLoops.Add(CurveLoop.CreateViaOffset(loop, -offset, normal));
-                }
+                CurveLoop newloop = CurveLoop.CreateViaOffset(loop, offset, normal);
+                Transform trs = Transform.CreateTranslation(normal * half);
+                newloop.Transform(trs.Inverse);
+                profileLoops.Add(newloop);
             }
             return GeometryCreationUtilities.CreateExtrusionGeometry(profileLoops, normal, height);
         }
@@ -314,6 +312,12 @@ namespace RevitTimasBIMTools.RevitUtils
             angle = angle > Math.PI ? (Math.PI * 2) - angle : angle;
             angle = angle > (Math.PI / 2) ? Math.PI - angle : angle;
             return Math.Abs(angle);
+        }
+
+
+        static XYZ ConvertToPositive(this XYZ vector)
+        {
+            return new XYZ(Math.Abs(vector.X), Math.Abs(vector.Y), Math.Abs(vector.Z));
         }
 
 

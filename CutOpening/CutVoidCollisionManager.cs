@@ -5,6 +5,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -46,8 +47,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Fields
 
-        private int minSideSize;
-        private double cutOffset;
+        private double minSideSize;
 
         private FilteredElementCollector collector;
 
@@ -86,8 +86,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             Transform global = document.Transform;
             IList<ElementModel> output = new List<ElementModel>(50);
-            minSideSize = Properties.Settings.Default.MinSideSizeInMm - 1;
-            cutOffset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
+            minSideSize = Properties.Settings.Default.MinSideSizeInMm / footToMm;
             IEnumerable<Element> enclosures = ElementTypeIdData?.GetInstancesByTypeIdDataAndMaterial(doc, material);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             TransactionStatus status = transGroup.Start();
@@ -105,8 +104,9 @@ namespace RevitTimasBIMTools.CutOpening
 
         private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Element host, Transform global, Category category)
         {
+            int count = 0;
             hostBbox = host.get_BoundingBox(null);
-            hostNormal = host.GetHostElementNormal();
+            hostNormal = host.GetHostPositiveNormal();
             hostSolid = host.GetSolidByVolume(identity, options);
             Level level = doc.GetElement(host.LevelId) as Level;
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
@@ -114,6 +114,7 @@ namespace RevitTimasBIMTools.CutOpening
             collector = new FilteredElementCollector(doc).OfCategoryId(category.Id).WherePasses(intersectFilter);
             foreach (Element elem in collector)
             {
+                count++;
                 centroid = elem.GetMiddlePointByBoundingBox(out intersectBbox);
                 if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, out vector))
                 {
@@ -122,8 +123,8 @@ namespace RevitTimasBIMTools.CutOpening
                     centroid = intersectSolid.ComputeCentroid();
 
                     curveloops = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
-                    int minSize = Convert.ToInt16(Math.Round(Math.Min(width, height) * 304.8));
-                    if (minSize > minSideSize)
+                    double minSize = Math.Min(width, height);
+                    if (minSize >= minSideSize)
                     {
                         ElementModel model = new(elem, level)
                         {
@@ -133,10 +134,22 @@ namespace RevitTimasBIMTools.CutOpening
                             Origin = centroid,
                             Normal = hostNormal,
                             CurveLoops = curveloops,
-                            MinSizeValue = minSize,
                         };
-                        model.SetSizeDescription();
+                        model.SetSizeDescription(minSize * footToMm);
                         yield return model;
+                    }
+                    else
+                    {
+                        StringBuilder builder = new();
+                        builder.AppendLine("Attention:\t");
+                        builder.AppendLine($"Normal: {hostNormal}");
+                        builder.AppendLine($"Vector: {vector.Normalize()}");
+                        builder.AppendLine($"Is egual: {hostNormal.IsAlmostEqualTo(vector, threshold)}");
+                        builder.AppendLine($"Min side size: {minSideSize * footToMm}");
+                        builder.AppendLine($"Min element size: {minSize * footToMm}");
+                        builder.AppendLine($"Min element size: {minSize * footToMm}");
+                        builder.AppendLine($"Normal len: {hostNormal.GetLength()}");
+                        Logger.Error(builder.ToString());
                     }
                 }
             }
@@ -146,6 +159,7 @@ namespace RevitTimasBIMTools.CutOpening
 
 
         #region Validate Intersection
+
         private bool IsIntersectionValid(Element elem, in Solid solid, in XYZ normal, in XYZ centroid, out XYZ vector)
         {
             Line line = null;
@@ -204,8 +218,9 @@ namespace RevitTimasBIMTools.CutOpening
         #endregion
 
 
-        public void VerifyOpenningSize(Document doc, in ElementModel model, in double offset)
+        public void VerifyOpenningSize(Document doc, in ElementModel model)
         {
+            double offset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
             Solid solid = model.CurveLoops.CreateExtrusionGeometry(model.Normal, model.Depth, offset);
             using Transaction trans = new(doc, "Create opening");
             TransactionStatus status = trans.Start();

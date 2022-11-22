@@ -52,9 +52,10 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        public void SetSizeDescription()
+        public void SetSizeDescription(double minSizeInMm)
         {
             Depth = Math.Abs(Normal.DotProduct(Vector));
+            MinSizeValue = Convert.ToInt32(minSizeInMm);
             int h = Convert.ToInt16(Height * 304.8);
             int w = Convert.ToInt16(Width * 304.8);
             Description = $"{w}x{h}(h)";
