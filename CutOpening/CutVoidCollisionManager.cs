@@ -5,8 +5,6 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
-using System.Security.Cryptography;
 using System.Text;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
@@ -123,10 +121,10 @@ namespace RevitTimasBIMTools.CutOpening
                     centroid = intersectSolid.ComputeCentroid();
 
                     curveloops = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
-                    
-                    var verticles = intersectSolid.GetIntersectionVerticles(elem, global, options);
 
+                    List<XYZ> verticles = intersectSolid.GetIntersectionPoints(elem, global, options);
 
+                    verticles = centroid.ProjectPointsOnPlane(doc, hostNormal, verticles);
 
                     if (curveloops != null)
                     {

@@ -155,7 +155,11 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static List<XYZ> GetIntersectionVerticles(this Solid source, in Element elem, in Transform global, in Options options)
+
+
+
+
+        public static List<XYZ> GetIntersectionPoints(this Solid source, in Element elem, in Transform global, in Options options)
         {
             List<XYZ> vertices = new(15);
             GeometryElement geomElement = elem.get_Geometry(options);
@@ -190,6 +194,33 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
             return vertices;
+        }
+
+
+        public static List<XYZ> ProjectPointsOnPlane(this XYZ centroid, Document doc, in XYZ normal, in List<XYZ> points)
+        {
+            List<XYZ> result = new(points.Count);
+            using (Transaction trx = new(doc, "ProjectPointsOnPlane"))
+            {
+                TransactionStatus status = trx.Start();
+                Plane plane = null;
+                try
+                {
+                    plane = Plane.CreateByNormalAndOrigin(normal, centroid);
+                    status = trx.Commit();
+                }
+                finally
+                {
+                    if (plane != null && plane.IsValidObject)
+                    {
+                        for (int i = 0; i < points.Count; i++)
+                        {
+                            result.Add(plane.ProjectOnto(points[i]));
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
 
@@ -238,33 +269,6 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-
-        static List<XYZ> GetProjectedPoints(Document doc, in XYZ normal, in XYZ centroid, in List<XYZ> points)
-        {
-            List<XYZ> result = new(points.Count);
-            using (Transaction trx = new(doc, "GetProjectedPoints"))
-            {
-                TransactionStatus status = trx.Start();
-                Plane plane = null;
-                try
-                {
-                    plane = Plane.CreateByNormalAndOrigin(normal, centroid);
-                    status = trx.Commit();
-                }
-                finally
-                {
-                    if (plane != null && plane.OrientationMatchesParametricOrientation)
-                    {
-                        for (int i = 0; i < points.Count; i++)
-                        {
-                            result.Add(plane.ProjectOnto(points[i]));
-                        }
-                    }
-                }
-            }
-
-            return result;
-        }
 
 
         public static IList<CurveLoop> GetSectionSize(this Solid solid, Document doc, XYZ normal, in XYZ centroid, out double width, out double height)
