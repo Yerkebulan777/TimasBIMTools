@@ -122,7 +122,7 @@ namespace RevitTimasBIMTools.CutOpening
 
                     curveloops = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
 
-                    List<XYZ> verticles = intersectSolid.GetIntersectionPoints(elem, global, options);
+                    List<XYZ> verticles = hostSolid.GetIntersectionPoints(elem, global, options);
 
                     verticles = centroid.ProjectPointsOnPlane(doc, hostNormal, verticles);
 
@@ -217,9 +217,6 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
         #endregion
-
-
-
 
 
         public void VerifyOpenningSize(Document doc, in ElementModel model)
