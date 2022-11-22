@@ -155,7 +155,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxUV GetSectionBound(this Solid solid, Document doc, XYZ normal, in XYZ centroid, out IList<CurveLoop> loops)
+        public static BoundingBoxUV GetSectionBound(this Solid solid, Document doc, in XYZ normal, in XYZ centroid, out IList<CurveLoop> loops)
         {
             loops = null;
             BoundingBoxUV result = null;
@@ -164,7 +164,6 @@ namespace RevitTimasBIMTools.RevitUtils
                 TransactionStatus status = trx.Start();
                 try
                 {
-                    normal = normal.Normalize();
                     Plane plane = Plane.CreateByNormalAndOrigin(normal, centroid);
                     Face face = ExtrusionAnalyzer.Create(solid, plane, normal).GetExtrusionBase();
                     loops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), normal);
