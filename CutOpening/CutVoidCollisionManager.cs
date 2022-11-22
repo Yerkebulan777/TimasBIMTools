@@ -132,10 +132,10 @@ namespace RevitTimasBIMTools.CutOpening
                             Vector = vector,
                             Origin = centroid,
                             Normal = hostNormal,
-                            MinSizeValue = minSize,
                             CurveLoops = curveloops,
+                            MinSizeValue = minSize,
                         };
-
+                        model.SetSizeDescription();
                         yield return model;
                     }
                 }
