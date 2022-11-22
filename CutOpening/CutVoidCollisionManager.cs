@@ -104,7 +104,6 @@ namespace RevitTimasBIMTools.CutOpening
 
         private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Element host, Transform global, Category category)
         {
-            int count = 0;
             hostBbox = host.get_BoundingBox(null);
             hostNormal = host.GetHostPositiveNormal();
             hostSolid = host.GetSolidByVolume(identity, options);
@@ -114,7 +113,6 @@ namespace RevitTimasBIMTools.CutOpening
             collector = new FilteredElementCollector(doc).OfCategoryId(category.Id).WherePasses(intersectFilter);
             foreach (Element elem in collector)
             {
-                count++;
                 centroid = elem.GetMiddlePointByBoundingBox(out intersectBbox);
                 if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, out vector))
                 {
@@ -123,30 +121,33 @@ namespace RevitTimasBIMTools.CutOpening
                     centroid = intersectSolid.ComputeCentroid();
 
                     curveloops = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
-                    double minSize = Math.Min(width, height);
-                    if (curveloops == null)
+                    
+                    if (curveloops != null)
+                    {
+                        double minSize = Math.Min(width, height);
+                        if (minSize >= minSideSize)
+                        {
+                            ElementModel model = new(elem, level)
+                            {
+                                Width = width,
+                                Height = height,
+                                Vector = vector,
+                                Origin = centroid,
+                                Normal = hostNormal,
+                                CurveLoops = curveloops,
+                            };
+                            model.SetSizeDescription(minSize * footToMm);
+                            yield return model;
+                        }
+                    }
+                    else
                     {
                         StringBuilder builder = new();
-                        builder.AppendLine($"Host element Id: {elem.Id.IntegerValue}");
+                        builder.AppendLine($"Host element Id: {host.Id.IntegerValue}");
                         builder.AppendLine($"Collision element Id: {elem.Id.IntegerValue}");
-                        builder.AppendLine("Analyzer was unable to determine the intersection geometry");
+                        builder.AppendLine("Was unable to determine the intersection geometry");
                         Logger.Error(builder.ToString());
                     }
-                    else if (minSize >= minSideSize)
-                    {
-                        ElementModel model = new(elem, level)
-                        {
-                            Width = width,
-                            Height = height,
-                            Vector = vector,
-                            Origin = centroid,
-                            Normal = hostNormal,
-                            CurveLoops = curveloops,
-                        };
-                        model.SetSizeDescription(minSize * footToMm);
-                        yield return model;
-                    }
-
                 }
             }
         }

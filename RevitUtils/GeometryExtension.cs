@@ -172,19 +172,11 @@ namespace RevitTimasBIMTools.RevitUtils
                     result = face.GetBoundingBox();
                     status = trx.Commit();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     if (!trx.HasEnded())
                     {
                         status = trx.RollBack();
-                        StringBuilder builder = new();
-                        builder.AppendLine(ex.Message);
-                        builder.AppendLine("Attention:\t");
-                        builder.AppendLine($"Normal: {normal}");
-                        builder.AppendLine($"Centroid: {centroid}");
-                        builder.AppendLine($"Normal length: {normal.GetLength()}");
-                        builder.AppendLine($"Intersection solid volume: {solid.Volume}");
-                        Logger.Error(builder.ToString());
                     }
                 }
             }

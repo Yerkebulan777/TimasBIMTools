@@ -616,6 +616,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (!string.IsNullOrEmpty(levelText))
                     {
                         ActivatePlanViewByLevel();
+                        AllSelectChecked = false;
                     }
                 }
             }
@@ -634,6 +635,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (!string.IsNullOrEmpty(symbolText))
                     {
                         ActivatePlanViewByLevel();
+                        AllSelectChecked = false;
                     }
                 }
             }
