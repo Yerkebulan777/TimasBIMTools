@@ -128,32 +128,32 @@ namespace RevitTimasBIMTools.CutOpening
 
 
 
-                    //if (curveloops != null)
-                    //{
-                    //    double minSize = Math.Min(width, height);
-                    //    if (minSize >= minSideSize)
-                    //    {
-                    //        ElementModel model = new(elem, level)
-                    //        {
-                    //            Width = width,
-                    //            Height = height,
-                    //            Vector = vector,
-                    //            Origin = centroid,
-                    //            Normal = hostNormal,
-                    //            CurveLoops = curveloops,
-                    //        };
-                    //        model.SetSizeDescription(minSize * footToMm);
-                    //        yield return model;
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    StringBuilder builder = new();
-                    //    builder.AppendLine($"Host element Id: {host.Id.IntegerValue}");
-                    //    builder.AppendLine($"Collision element Id: {elem.Id.IntegerValue}");
-                    //    builder.AppendLine("Was unable to determine the intersection geometry");
-                    //    Logger.Error(builder.ToString());
-                    //}
+                    if (curveloops != null)
+                    {
+                        double minSize = Math.Min(width, height);
+                        if (minSize >= minSideSize)
+                        {
+                            ElementModel model = new(elem, level)
+                            {
+                                Width = width,
+                                Height = height,
+                                Vector = vector,
+                                Origin = centroid,
+                                Normal = hostNormal,
+                                CurveLoops = curveloops,
+                            };
+                            model.SetSizeDescription(minSize * footToMm);
+                            yield return model;
+                        }
+                    }
+                    else
+                    {
+                        StringBuilder builder = new();
+                        builder.AppendLine($"Host element Id: {host.Id.IntegerValue}");
+                        builder.AppendLine($"Collision element Id: {elem.Id.IntegerValue}");
+                        builder.AppendLine("Was unable to determine the intersection geometry");
+                        Logger.Error(builder.ToString());
+                    }
                 }
             }
         }
