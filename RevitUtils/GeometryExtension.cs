@@ -170,22 +170,21 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                     finally
                     {
-                        foreach (Face f in solid.Faces)
+                        if (solid != null && solid.Volume > 0)
                         {
-                            Mesh mesh = f.Triangulate();
-                            int n = mesh.NumTriangles;
-
-                            for (int i = 0; i < n; ++i)
+                            foreach (Face f in solid.Faces)
                             {
-                                MeshTriangle triangle = mesh.get_Triangle(i);
+                                Mesh mesh = f.Triangulate();
+                                int n = mesh.NumTriangles;
 
-                                XYZ p1 = triangle.get_Vertex(0);
-                                XYZ p2 = triangle.get_Vertex(1);
-                                XYZ p3 = triangle.get_Vertex(2);
+                                for (int i = 0; i < n; ++i)
+                                {
+                                    MeshTriangle triangle = mesh.get_Triangle(i);
 
-                                vertices.Add(p1);
-                                vertices.Add(p2);
-                                vertices.Add(p3);
+                                    vertices.Add(triangle.get_Vertex(0));
+                                    vertices.Add(triangle.get_Vertex(1));
+                                    vertices.Add(triangle.get_Vertex(2));
+                                }
                             }
                         }
                     }
