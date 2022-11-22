@@ -4,9 +4,6 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Windows;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 using Options = Autodesk.Revit.DB.Options;
@@ -154,6 +151,46 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
             return result;
+        }
+
+
+        public static List<XYZ> GetIntersectionVerticles(this Solid source, in Element elem, in Transform global, in Options options)
+        {
+            List<XYZ> vertices = new(3);
+            GeometryElement geomElement = elem.get_Geometry(options);
+            BooleanOperationsType intersect = BooleanOperationsType.Intersect;
+            foreach (GeometryObject obj in geomElement.GetTransformed(global))
+            {
+                if (obj is Solid solid && solid != null && solid.Faces.Size > 0)
+                {
+                    try
+                    {
+                        solid = BooleanOperationsUtils.ExecuteBooleanOperation(source, solid, intersect);
+                    }
+                    finally
+                    {
+                        foreach (Face f in solid.Faces)
+                        {
+                            Mesh mesh = f.Triangulate();
+                            int n = mesh.NumTriangles;
+
+                            for (int i = 0; i < n; ++i)
+                            {
+                                MeshTriangle triangle = mesh.get_Triangle(i);
+
+                                XYZ p1 = triangle.get_Vertex(0);
+                                XYZ p2 = triangle.get_Vertex(1);
+                                XYZ p3 = triangle.get_Vertex(2);
+
+                                vertices.Add(p1);
+                                vertices.Add(p2);
+                                vertices.Add(p3);
+                            }
+                        }
+                    }
+                }
+            }
+            return vertices;
         }
 
 
