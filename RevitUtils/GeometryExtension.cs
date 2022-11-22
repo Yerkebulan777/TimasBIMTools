@@ -157,7 +157,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static List<XYZ> GetIntersectionVerticles(this Solid source, in Element elem, in Transform global, in Options options)
         {
-            List<XYZ> vertices = new(3);
+            List<XYZ> vertices = new(15);
             GeometryElement geomElement = elem.get_Geometry(options);
             BooleanOperationsType intersect = BooleanOperationsType.Intersect;
             foreach (GeometryObject obj in geomElement.GetTransformed(global))
