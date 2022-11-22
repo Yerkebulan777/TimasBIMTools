@@ -154,7 +154,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxUV GetSectionBound(this Solid solid, Document doc, in XYZ centroid,  in XYZ normal,out IList<CurveLoop> loops)
+        public static BoundingBoxUV GetSectionBound(this Solid solid, Document doc, XYZ normal, in XYZ centroid, out IList<CurveLoop> loops)
         {
             loops = null;
             BoundingBoxUV result = null;
@@ -163,7 +163,8 @@ namespace RevitTimasBIMTools.RevitUtils
                 TransactionStatus status = trx.Start();
                 try
                 {
-                    Plane plane = Plane.CreateByNormalAndOrigin(normal.Normalize(), centroid);
+                    normal = normal.Normalize();
+                    Plane plane = Plane.CreateByNormalAndOrigin(normal, centroid);
                     Face face = ExtrusionAnalyzer.Create(solid, plane, normal).GetExtrusionBase();
                     loops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), normal);
                     result = face.GetBoundingBox();
@@ -174,7 +175,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     if (!trx.HasEnded())
                     {
                         status = trx.RollBack();
-                        Logger.Error(ex.ToString());
+                        Logger.Error(ex.ToString() + normal.ToString());
                     }
                 }
             }
@@ -182,15 +183,16 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static IList<CurveLoop> GetSectionSize(this Solid solid, Document doc, in XYZ centroid, in XYZ normal, out double width, out double height)
+        public static IList<CurveLoop> GetSectionSize(this Solid solid, Document doc, XYZ normal, in XYZ centroid, out double width, out double height)
         {
+            width = 0; height = 0;
             BoundingBoxUV size = solid.GetSectionBound(doc, normal, in centroid, out IList<CurveLoop> loops);
-            if (normal.IsAlmostEqualTo(XYZ.BasisX, 0.5))
+            if (size != null && normal.IsAlmostEqualTo(XYZ.BasisX, 0.5))
             {
                 width = Math.Round(size.Max.U - size.Min.U, 5);
                 height = Math.Round(size.Max.V - size.Min.V, 5);
             }
-            else
+            if (size != null && normal.IsAlmostEqualTo(XYZ.BasisY, 0.5))
             {
                 width = Math.Round(size.Max.V - size.Min.V, 5);
                 height = Math.Round(size.Max.U - size.Min.U, 5);

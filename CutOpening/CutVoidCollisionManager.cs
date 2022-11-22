@@ -5,7 +5,6 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Windows.Media.Media3D;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -122,7 +121,7 @@ namespace RevitTimasBIMTools.CutOpening
                     intersectBbox = intersectSolid.GetBoundingBox();
                     centroid = intersectSolid.ComputeCentroid();
 
-                    curveloops = intersectSolid.GetSectionSize(doc, centroid, hostNormal, out width, out height);
+                    curveloops = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
                     int minSize = Convert.ToInt16(Math.Round(Math.Min(width, height) * 304.8));
                     if (minSize > minSideSize)
                     {
