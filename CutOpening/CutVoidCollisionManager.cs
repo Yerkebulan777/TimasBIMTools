@@ -201,9 +201,6 @@ namespace RevitTimasBIMTools.CutOpening
             return Line.CreateBound(strPnt, endPnt);
         }
 
-
-
-
         #endregion
 
 
@@ -279,13 +276,6 @@ namespace RevitTimasBIMTools.CutOpening
         {
             return Math.Round(Math.Tan(angle * hostDeph), 5);
         }
-
-
-        //IList<ElementId> GetCollisionInLinks()
-        //{
-
-        //}
-
 
 
         //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ vector, View view)
