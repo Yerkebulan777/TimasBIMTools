@@ -154,18 +154,18 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxUV GetSectionBound(this Solid solid, Document doc, in XYZ direction, in XYZ centroid, out IList<CurveLoop> curveloops)
+        public static BoundingBoxUV GetSectionBound(this Solid solid, Document doc, in XYZ centroid,  in XYZ normal,out IList<CurveLoop> loops)
         {
-            curveloops = null;
+            loops = null;
             BoundingBoxUV result = null;
             using (Transaction trx = new(doc, "GetSectionBound"))
             {
                 TransactionStatus status = trx.Start();
                 try
                 {
-                    Plane plane = Plane.CreateByNormalAndOrigin(direction.Normalize(), centroid);
-                    Face face = ExtrusionAnalyzer.Create(solid, plane, direction).GetExtrusionBase();
-                    curveloops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), direction);
+                    Plane plane = Plane.CreateByNormalAndOrigin(normal.Normalize(), centroid);
+                    Face face = ExtrusionAnalyzer.Create(solid, plane, normal).GetExtrusionBase();
+                    loops = ExporterIFCUtils.ValidateCurveLoops(face.GetEdgesAsCurveLoops(), normal);
                     result = face.GetBoundingBox();
                     status = trx.Commit();
                 }
@@ -179,6 +179,23 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
             return result;
+        }
+
+
+        public static int GetSectionSize(this Solid solid, Document doc, in XYZ centroid, in XYZ normal, out IList<CurveLoop> loops, out double width, out double height)
+        {
+            BoundingBoxUV size = solid.GetSectionBound(doc, normal, in centroid, out loops);
+            if (normal.IsAlmostEqualTo(XYZ.BasisX, 0.5))
+            {
+                width = Math.Round(size.Max.U - size.Min.U, 5);
+                height = Math.Round(size.Max.V - size.Min.V, 5);
+            }
+            else
+            {
+                width = Math.Round(size.Max.V - size.Min.V, 5);
+                height = Math.Round(size.Max.U - size.Min.U, 5);
+            }
+            return Convert.ToInt16(Math.Round(Math.Min(width, height) * 304.8));
         }
 
 

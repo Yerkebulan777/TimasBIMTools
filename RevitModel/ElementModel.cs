@@ -29,7 +29,7 @@ namespace RevitTimasBIMTools.RevitModel
 
         public XYZ Origin { get; internal set; }
         public XYZ Vector { get; internal set; }
-        public XYZ HostNormal { get; internal set; }
+        public XYZ Normal { get; internal set; }
         public string Description { get; internal set; }
         public IList<CurveLoop> CurveLoops { get; internal set; }
 
@@ -59,7 +59,7 @@ namespace RevitTimasBIMTools.RevitModel
             MinSizeValue = Convert.ToInt16(Math.Round(Math.Min(Width, Height) * 304.8));
             if (minSize <= MinSizeValue)
             {
-                Depth = Math.Abs(HostNormal.DotProduct(Vector));
+                Depth = Math.Abs(Normal.DotProduct(Vector));
                 int h = Convert.ToInt16(Height * 304.8);
                 int w = Convert.ToInt16(Width * 304.8);
                 Description = $"{w}x{h}(h)";

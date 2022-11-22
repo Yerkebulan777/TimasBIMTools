@@ -56,11 +56,14 @@ namespace RevitTimasBIMTools.CutOpening
         private Solid hostSolid = null;
         private XYZ vector = XYZ.BasisZ;
         private XYZ hostNormal = XYZ.BasisZ;
-        private Solid intersectionSolid = null;
+        private Solid intersectSolid = null;
 
 
         private BoundingBoxXYZ hostBbox = null;
-        private BoundingBoxXYZ intersectionBbox = null;
+        private BoundingBoxXYZ intersectBbox = null;
+        private IList<CurveLoop> curveloops = null;
+        private double width = 0;
+        private double hight = 0;
 
         #endregion
 
@@ -111,22 +114,28 @@ namespace RevitTimasBIMTools.CutOpening
             collector = new FilteredElementCollector(doc).OfCategoryId(category.Id).WherePasses(intersectFilter);
             foreach (Element elem in collector)
             {
-                centroid = elem.GetMiddlePointByBoundingBox(out intersectionBbox);
+                centroid = elem.GetMiddlePointByBoundingBox(out intersectBbox);
                 if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, out vector))
                 {
-                    intersectionSolid = hostSolid.GetIntersectionSolid(elem, global, options);
-                    intersectionBbox = intersectionSolid.GetBoundingBox();
-                    centroid = intersectionSolid.ComputeCentroid();
+                    intersectSolid = hostSolid.GetIntersectionSolid(elem, global, options);
+                    intersectBbox = intersectSolid.GetBoundingBox();
+                    centroid = intersectSolid.ComputeCentroid();
 
-                    ElementModel model = new(elem, level)
-                    {
-                        Vector = vector,
-                        Origin = centroid,
-                        HostNormal = hostNormal,
-                    };
+                    int minSize = intersectSolid.GetSectionSize(doc, centroid, hostNormal, out curveloops, out width, out hight);
 
-                    if (IsValidSectionSize(doc, ref model, vector, centroid))
+                    if (minSize > minSideSize)
                     {
+                        ElementModel model = new(elem, level)
+                        {
+                            Width = width,
+                            Height = hight,
+                            Vector = vector,
+                            Origin = centroid,
+                            Normal = hostNormal,
+                            MinSizeValue = minSize,
+                            CurveLoops = curveloops,
+                        };
+
                         yield return model;
                     }
                 }
@@ -193,29 +202,14 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        private bool IsValidSectionSize(Document doc, ref ElementModel model, in XYZ vector, in XYZ centroid)
-        {
-            BoundingBoxUV size = intersectionSolid.GetSectionBound(doc, in vector, in centroid, out IList<CurveLoop> curveloops);
-            if (vector.IsAlmostEqualTo(XYZ.BasisX, 0.5))
-            {
-                model.Width = Math.Round(size.Max.U - size.Min.U, 5);
-                model.Height = Math.Round(size.Max.V - size.Min.V, 5);
-            }
-            else
-            {
-                model.Width = Math.Round(size.Max.V - size.Min.V, 5);
-                model.Height = Math.Round(size.Max.U - size.Min.U, 5);
-            }
-            model.CurveLoops = curveloops;
-            return model.IsValidSectionSize(minSideSize);
-        }
+
 
         #endregion
 
 
         public void VerifyOpenningSize(Document doc, in ElementModel model, in double offset)
         {
-            Solid solid = model.CurveLoops.CreateExtrusionGeometry(model.HostNormal, model.Depth, offset);
+            Solid solid = model.CurveLoops.CreateExtrusionGeometry(model.Normal, model.Depth, offset);
             using Transaction trans = new(doc, "Create opening");
             TransactionStatus status = trans.Start();
             if (status == TransactionStatus.Started)
@@ -272,9 +266,9 @@ namespace RevitTimasBIMTools.CutOpening
         {
             width = model.Width + (offset * 2);
             height = model.Height + (offset * 2);
-            if (!model.HostNormal.IsParallel(model.Vector))
+            if (!model.Normal.IsParallel(model.Vector))
             {
-                model.HostNormal.GetAngleBetween(model.Vector, out double horizont, out double vertical);
+                model.Normal.GetAngleBetween(model.Vector, out double horizont, out double vertical);
                 height += CalculateSideSize(model.Depth, vertical);
                 width += CalculateSideSize(model.Depth, horizont);
             }
@@ -438,7 +432,7 @@ namespace RevitTimasBIMTools.CutOpening
         public void Dispose()
         {
             hostSolid?.Dispose();
-            intersectionSolid?.Dispose();
+            intersectSolid?.Dispose();
             searchDocument?.Dispose();
             searchTransform?.Dispose();
         }
