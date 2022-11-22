@@ -203,7 +203,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static Solid CreateExtrusionGeometry(this IList<CurveLoop> curveloops, in XYZ normal, in double height, in double offset)
         {
-            List<CurveLoop> profileLoops = new(5);
+            List<CurveLoop> profileLoops = new(3);
             foreach (CurveLoop loop in curveloops)
             {
                 if (loop.IsCounterclockwise(normal))
