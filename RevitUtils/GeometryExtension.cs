@@ -3,6 +3,7 @@ using Autodesk.Revit.DB.IFC;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
@@ -191,6 +192,24 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
             return vertices;
+        }
+
+
+        public static double SignedDistanceTo(this Plane plane, XYZ pnt)
+        {
+            Debug.Assert(plane.Normal.GetLength() == 1, "expected normalised plane normal");
+            return plane.Normal.DotProduct(pnt - plane.Origin);
+        }
+
+
+        /// <summary> Project given 3D XYZ point onto plane. </summary>
+        public static XYZ ProjectOnto(this Plane plane, XYZ p)
+        {
+            double d = plane.SignedDistanceTo(p);
+
+            XYZ q = p + d * plane.Normal;
+
+            return q;
         }
 
 
