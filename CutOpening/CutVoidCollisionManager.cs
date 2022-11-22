@@ -5,6 +5,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Windows.Media.Media3D;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -63,7 +64,7 @@ namespace RevitTimasBIMTools.CutOpening
         private BoundingBoxXYZ intersectBbox = null;
         private IList<CurveLoop> curveloops = null;
         private double width = 0;
-        private double hight = 0;
+        private double height = 0;
 
         #endregion
 
@@ -121,14 +122,14 @@ namespace RevitTimasBIMTools.CutOpening
                     intersectBbox = intersectSolid.GetBoundingBox();
                     centroid = intersectSolid.ComputeCentroid();
 
-                    int minSize = intersectSolid.GetSectionSize(doc, centroid, hostNormal, out curveloops, out width, out hight);
-
+                    curveloops = intersectSolid.GetSectionSize(doc, centroid, hostNormal, out width, out height);
+                    int minSize = Convert.ToInt16(Math.Round(Math.Min(width, height) * 304.8));
                     if (minSize > minSideSize)
                     {
                         ElementModel model = new(elem, level)
                         {
                             Width = width,
-                            Height = hight,
+                            Height = height,
                             Vector = vector,
                             Origin = centroid,
                             Normal = hostNormal,
@@ -369,7 +370,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         //private void УxtractSectionSize(Element floor)
         //{
-        //    hight = 0; widht = 0;
+        //    height = 0; widht = 0;
         //    int catIdInt = floor.Category.Id.IntegerValue;
         //    if (floor.Document.GetElement(floor.GetTypeId()) is ElementType)
         //    {
@@ -387,12 +388,12 @@ namespace RevitTimasBIMTools.CutOpening
         //                    if (diameterParam != null && diameterParam.HasValue)
         //                    {
         //                        diameter = diameterParam.AsDouble();
-        //                        hight = diameter;
+        //                        height = diameter;
         //                        widht = diameter;
         //                    }
         //                    else
         //                    {
-        //                        hight = floor.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM).AsDouble();
+        //                        height = floor.get_Parameter(BuiltInParameter.RBS_CURVE_HEIGHT_PARAM).AsDouble();
         //                        widht = floor.get_Parameter(BuiltInParameter.RBS_CURVE_WIDTH_PARAM).AsDouble();
         //                    }
         //                    return;
@@ -404,7 +405,7 @@ namespace RevitTimasBIMTools.CutOpening
         //                }
         //            case BuiltInCategory.OST_CableTray:
         //                {
-        //                    hight = floor.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM).AsDouble();
+        //                    height = floor.get_Parameter(BuiltInParameter.RBS_CABLETRAY_HEIGHT_PARAM).AsDouble();
         //                    widht = floor.get_Parameter(BuiltInParameter.RBS_CABLETRAY_WIDTH_PARAM).AsDouble();
         //                    return;
         //                }

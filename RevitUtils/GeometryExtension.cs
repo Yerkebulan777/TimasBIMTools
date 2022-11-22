@@ -182,9 +182,9 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static int GetSectionSize(this Solid solid, Document doc, in XYZ centroid, in XYZ normal, out IList<CurveLoop> loops, out double width, out double height)
+        public static IList<CurveLoop> GetSectionSize(this Solid solid, Document doc, in XYZ centroid, in XYZ normal, out double width, out double height)
         {
-            BoundingBoxUV size = solid.GetSectionBound(doc, normal, in centroid, out loops);
+            BoundingBoxUV size = solid.GetSectionBound(doc, normal, in centroid, out IList<CurveLoop> loops);
             if (normal.IsAlmostEqualTo(XYZ.BasisX, 0.5))
             {
                 width = Math.Round(size.Max.U - size.Min.U, 5);
@@ -195,7 +195,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 width = Math.Round(size.Max.V - size.Min.V, 5);
                 height = Math.Round(size.Max.U - size.Min.U, 5);
             }
-            return Convert.ToInt16(Math.Round(Math.Min(width, height) * 304.8));
+            return loops;
         }
 
 
