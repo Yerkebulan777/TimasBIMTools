@@ -5,6 +5,8 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Security.Cryptography;
 using System.Text;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
@@ -122,32 +124,36 @@ namespace RevitTimasBIMTools.CutOpening
 
                     curveloops = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
                     
-                    if (curveloops != null)
-                    {
-                        double minSize = Math.Min(width, height);
-                        if (minSize >= minSideSize)
-                        {
-                            ElementModel model = new(elem, level)
-                            {
-                                Width = width,
-                                Height = height,
-                                Vector = vector,
-                                Origin = centroid,
-                                Normal = hostNormal,
-                                CurveLoops = curveloops,
-                            };
-                            model.SetSizeDescription(minSize * footToMm);
-                            yield return model;
-                        }
-                    }
-                    else
-                    {
-                        StringBuilder builder = new();
-                        builder.AppendLine($"Host element Id: {host.Id.IntegerValue}");
-                        builder.AppendLine($"Collision element Id: {elem.Id.IntegerValue}");
-                        builder.AppendLine("Was unable to determine the intersection geometry");
-                        Logger.Error(builder.ToString());
-                    }
+                    var verticles = intersectSolid.GetIntersectionVerticles(elem, global, options);
+
+
+
+                    //if (curveloops != null)
+                    //{
+                    //    double minSize = Math.Min(width, height);
+                    //    if (minSize >= minSideSize)
+                    //    {
+                    //        ElementModel model = new(elem, level)
+                    //        {
+                    //            Width = width,
+                    //            Height = height,
+                    //            Vector = vector,
+                    //            Origin = centroid,
+                    //            Normal = hostNormal,
+                    //            CurveLoops = curveloops,
+                    //        };
+                    //        model.SetSizeDescription(minSize * footToMm);
+                    //        yield return model;
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    StringBuilder builder = new();
+                    //    builder.AppendLine($"Host element Id: {host.Id.IntegerValue}");
+                    //    builder.AppendLine($"Collision element Id: {elem.Id.IntegerValue}");
+                    //    builder.AppendLine("Was unable to determine the intersection geometry");
+                    //    Logger.Error(builder.ToString());
+                    //}
                 }
             }
         }
@@ -213,6 +219,9 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
         #endregion
+
+
+
 
 
         public void VerifyOpenningSize(Document doc, in ElementModel model)

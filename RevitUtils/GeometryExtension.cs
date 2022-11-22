@@ -180,7 +180,6 @@ namespace RevitTimasBIMTools.RevitUtils
                                 for (int i = 0; i < n; ++i)
                                 {
                                     MeshTriangle triangle = mesh.get_Triangle(i);
-
                                     vertices.Add(triangle.get_Vertex(0));
                                     vertices.Add(triangle.get_Vertex(1));
                                     vertices.Add(triangle.get_Vertex(2));
@@ -235,6 +234,35 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
+            return result;
+        }
+
+
+
+        static List<XYZ> GetProjectedPoints(Document doc, in XYZ normal, in XYZ centroid, in List<XYZ> points)
+        {
+            List<XYZ> result = new(points.Count);
+            using (Transaction trx = new(doc, "GetProjectedPoints"))
+            {
+                TransactionStatus status = trx.Start();
+                Plane plane = null;
+                try
+                {
+                    plane = Plane.CreateByNormalAndOrigin(normal, centroid);
+                    status = trx.Commit();
+                }
+                finally
+                {
+                    if (plane != null && plane.OrientationMatchesParametricOrientation)
+                    {
+                        for (int i = 0; i < points.Count; i++)
+                        {
+                            result.Add(plane.ProjectOnto(points[i]));
+                        }
+                    }
+                }
+            }
+
             return result;
         }
 
