@@ -194,10 +194,10 @@ namespace RevitTimasBIMTools.CutOpening
                             }
                             catch (Exception ex)
                             {
-                                Logger.Error(ex.Message);
                                 if (!transaction.HasEnded())
                                 {
                                     status = transaction.RollBack();
+                                    Logger.Error(ex.Message);
                                 }
                             }
                         }
