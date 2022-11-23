@@ -106,7 +106,7 @@ namespace RevitTimasBIMTools.CutOpening
         private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Element host, Transform global, Category category)
         {
             hostBbox = host.get_BoundingBox(null);
-            hostNormal = host.GetHostPositiveNormal();
+            hostNormal = host.GetHostNormal();
             hostSolid = host.GetSolidByVolume(identity, options);
             Level level = doc.GetElement(host.LevelId) as Level;
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());

@@ -28,16 +28,16 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static XYZ GetHostPositiveNormal(this Element elem, double tollerance = 0)
+        public static XYZ GetHostNormal(this Element elem, double tollerance = 0)
         {
             XYZ resultNormal = XYZ.BasisZ;
+            Transform local = Transform.Identity;
             if (elem is Wall wall)
             {
-                resultNormal = wall.Orientation.Normalize();
+                resultNormal = local.OfVector(wall.Orientation).Normalize();
             }
             else if (elem is HostObject hostObject)
             {
-                Transform local = Transform.Identity;
                 foreach (Reference refFace in HostObjectUtils.GetTopFaces(hostObject))
                 {
                     GeometryObject geo = elem.GetGeometryObjectFromReference(refFace);
@@ -45,16 +45,15 @@ namespace RevitTimasBIMTools.RevitUtils
                     {
                         try
                         {
-                            XYZ normal = resultNormal;
-                            if (face is PlanarFace planar && planar != null)
+                            if (face is PlanarFace planar)
                             {
-                                normal = planar.FaceNormal;
+                                resultNormal = local.OfVector(planar.FaceNormal).Normalize();
                             }
                             else
                             {
                                 BoundingBoxUV box = face.GetBoundingBox();
-                                normal = face.ComputeNormal((box.Max + box.Min) * 0.5);
-                                resultNormal = local.OfVector(normal).Normalize();
+                                resultNormal = face.ComputeNormal((box.Max + box.Min) * 0.5);
+                                resultNormal = local.OfVector(resultNormal).Normalize();
                             }
                         }
                         catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
