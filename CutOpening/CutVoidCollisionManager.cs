@@ -1,11 +1,11 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.IFC;
 using Autodesk.Revit.DB.Structure;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
@@ -121,7 +121,7 @@ namespace RevitTimasBIMTools.CutOpening
                     intersectBbox = intersectSolid.GetBoundingBox();
                     centroid = intersectSolid.ComputeCentroid();
 
-                    curveloops = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
+                    //curveloops = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
 
                     List<XYZ> points = hostSolid.GetIntersectionPoints(elem, global, options);
 
@@ -133,7 +133,7 @@ namespace RevitTimasBIMTools.CutOpening
                         double minY = 0, maxY = 0;
                         double minZ = 0, maxZ = 0;
 
-                        for (int i = 0; i < points.Count -1; ++i)
+                        for (int i = 0; i < points.Count - 1; ++i)
                         {
                             XYZ current = points[i];
                             XYZ previos = points[i - 1];
@@ -145,11 +145,28 @@ namespace RevitTimasBIMTools.CutOpening
                             maxZ = Math.Max(previos.Z, current.Z);
                         }
 
-                        XYZ min = new XYZ(minX, minY, minZ);
-                        XYZ max = new XYZ(maxX, maxY, maxZ);
+                        XYZ pt0 = new(minX, minY, minZ);
+                        XYZ pt1 = new(maxX, minY, minZ);
+                        XYZ pt2 = new(maxX, maxY, maxZ);
+                        XYZ pt3 = new(minX, maxY, maxZ);
 
-                        var outline = new Outline(min, max);
+                        //var outline = new Outline(pt0, pt2);
 
+                        List<Curve> edges = new()
+                        {
+                            Line.CreateBound(pt0, pt1),
+                            Line.CreateBound(pt1, pt2),
+                            Line.CreateBound(pt2, pt3),
+                            Line.CreateBound(pt3, pt0)
+                        };
+
+                        curveloops = new List<CurveLoop>()
+                        {
+                            CurveLoop.Create(edges),
+                        };
+
+                        width = pt0.DistanceTo(pt3);
+                        height = pt1.DistanceTo(pt2);
 
                         double minSize = Math.Min(width, height);
                         if (minSize >= minSideSize)
@@ -170,9 +187,9 @@ namespace RevitTimasBIMTools.CutOpening
                     else
                     {
                         StringBuilder builder = new();
-                        builder.AppendLine($"Host element Id: {host.Id.IntegerValue}");
-                        builder.AppendLine($"Collision element Id: {elem.Id.IntegerValue}");
-                        builder.AppendLine("Was unable to determine the intersection geometry");
+                        _ = builder.AppendLine($"Host element Id: {host.Id.IntegerValue}");
+                        _ = builder.AppendLine($"Collision element Id: {elem.Id.IntegerValue}");
+                        _ = builder.AppendLine("Was unable to determine the intersection geometry");
                         Logger.Error(builder.ToString());
                     }
                 }
