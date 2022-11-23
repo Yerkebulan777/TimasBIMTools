@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.IFC;
 using Autodesk.Revit.DB.Structure;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
@@ -62,7 +61,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private BoundingBoxXYZ hostBbox = null;
         private BoundingBoxXYZ intersectBbox = null;
-        private IList<CurveLoop> curveloops = null;
+        private IList<CurveLoop> profile = null;
         private double width = 0;
         private double height = 0;
 
@@ -121,7 +120,7 @@ namespace RevitTimasBIMTools.CutOpening
                     intersectBbox = intersectSolid.GetBoundingBox();
                     centroid = intersectSolid.ComputeCentroid();
 
-                    //curveloops = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
+                    //profile = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
 
                     List<XYZ> points = hostSolid.GetIntersectionPoints(elem, global, options);
 
@@ -133,16 +132,18 @@ namespace RevitTimasBIMTools.CutOpening
                         double minY = 0, maxY = 0;
                         double minZ = 0, maxZ = 0;
 
-                        for (int i = 0; i < points.Count - 1; ++i)
+                        for (int i = 0; i < points.Count; ++i)
                         {
-                            XYZ current = points[i];
-                            XYZ previos = points[i - 1];
-                            minX = Math.Min(previos.X, current.X);
-                            maxX = Math.Max(previos.X, current.X);
-                            minY = Math.Min(previos.Y, current.Y);
-                            maxY = Math.Max(previos.Y, current.Y);
-                            minZ = Math.Min(previos.Z, current.Z);
-                            maxZ = Math.Max(previos.Z, current.Z);
+                            XYZ point = points[i];
+                            double pntX = point.X;
+                            double pntY = point.Y;
+                            double pntZ = point.Z;
+                            minX = Math.Min(minX, pntX);
+                            maxX = Math.Max(maxX, pntX);
+                            minY = Math.Min(minY, pntY);
+                            maxY = Math.Max(maxX, pntY);
+                            minZ = Math.Min(minZ, pntZ);
+                            maxZ = Math.Max(maxZ, pntZ);
                         }
 
                         XYZ pt0 = new(minX, minY, minZ);
@@ -160,10 +161,13 @@ namespace RevitTimasBIMTools.CutOpening
                             Line.CreateBound(pt3, pt0)
                         };
 
-                        curveloops = new List<CurveLoop>()
+                        CurveLoop loop = CurveLoop.Create(edges);
+                        if (!loop.IsCounterclockwise(hostNormal))
                         {
-                            CurveLoop.Create(edges),
-                        };
+                            loop.Flip();
+                        }
+
+                        profile = new List<CurveLoop>() { loop };
 
                         width = pt0.DistanceTo(pt3);
                         height = pt1.DistanceTo(pt2);
@@ -178,9 +182,10 @@ namespace RevitTimasBIMTools.CutOpening
                                 Vector = vector,
                                 Origin = centroid,
                                 Normal = hostNormal,
-                                CurveLoops = curveloops,
+                                CurveLoops = profile,
+                                MinSizeInMm = Convert.ToInt32(minSize * footToMm)
                             };
-                            model.SetSizeDescription(minSize * footToMm);
+                            model.SetSizeDescription();
                             yield return model;
                         }
                     }
