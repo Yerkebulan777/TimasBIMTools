@@ -1,10 +1,13 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.IFC;
 using Autodesk.Revit.DB.Structure;
+using Autodesk.Revit.UI;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
@@ -125,34 +128,37 @@ namespace RevitTimasBIMTools.CutOpening
 
                     List<XYZ> points = hostSolid.GetIntersectionPoints(elem, global, options);
 
-                    points = centroid.ProjectPointsOnPlane(doc, hostNormal, points);
-
-                    if (points != null && points.Count > 0)
+                    Plane plane = null;
+                    using (Transaction trx = new(doc, "ProjectPointsOnPlane"))
                     {
-                        double minX = 0, maxX = 0;
-                        double minY = 0, maxY = 0;
-                        double minZ = 0, maxZ = 0;
-
-                        for (int i = 0; i < points.Count; ++i)
+                        TransactionStatus status = trx.Start();
+                        try
                         {
-                            XYZ point = points[i];
-                            double pntX = point.X;
-                            double pntY = point.Y;
-                            double pntZ = point.Z;
-                            minX = Math.Min(minX, pntX);
-                            maxX = Math.Max(maxX, pntX);
-                            minY = Math.Min(minY, pntY);
-                            maxY = Math.Max(maxX, pntY);
-                            minZ = Math.Min(minZ, pntZ);
-                            maxZ = Math.Max(maxZ, pntZ);
+                            plane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
+                            status = trx.Commit();
                         }
+                        catch(Exception ex)
+                        {
+                            Logger.Error(ex.Message);
+                        }
+                    }
 
-                        XYZ pt0 = new(minX, minY, minZ);
-                        XYZ pt1 = new(maxX, minY, minZ);
-                        XYZ pt2 = new(maxX, maxY, maxZ);
-                        XYZ pt3 = new(minX, maxY, maxZ);
+                    points = plane.ProjectPointsOnPlane(points, out UV min, out UV max);
+
+                    if (points != null && points.Count == 2)
+                    {
+                        XYZ minPt = points[0];
+                        XYZ maxPt = points[1];
+
+                        XYZ pt0 = new(minPt.X, minPt.Y, minPt.Z);
+                        XYZ pt1 = new(maxPt.X, minPt.Y, minPt.Z);
+                        XYZ pt2 = new(maxPt.X, maxPt.Y, maxPt.Z);
+                        XYZ pt3 = new(minPt.X, maxPt.Y, maxPt.Z);
 
                         //var outline = new Outline(pt0, pt2);
+
+                        width = pt0.DistanceTo(pt3);
+                        height = pt1.DistanceTo(pt2);
 
                         List<Curve> edges = new()
                         {
@@ -168,40 +174,34 @@ namespace RevitTimasBIMTools.CutOpening
                             loop.Flip();
                         }
 
-                        profile = new List<CurveLoop>() { loop };
+                        profile = ExporterIFCUtils.ValidateCurveLoops(new List<CurveLoop>() { loop }, plane.Normal);
 
-                        width = pt0.DistanceTo(pt3);
-                        height = pt1.DistanceTo(pt2);
-
-
-                        using Transaction transaction = new(doc, "CreateModelCurveArray");
-                        TransactionStatus status = transaction.Start();
-                        if (status == TransactionStatus.Started)
-                        {
-                            try
-                            {
-                                Plane plane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
-                                SketchPlane sketch = SketchPlane.Create(doc, plane);
-                                foreach (CurveLoop clp in profile)
-                                {
-                                    CurveArray array = ConvertLoopToArray(clp);
-                                    if (!array.IsEmpty)
-                                    {
-                                        _ = doc.Create.NewModelCurveArray(array, sketch);
-                                    }
-                                }
-                                status = transaction.Commit();
-                            }
-                            catch (Exception ex)
-                            {
-                                if (!transaction.HasEnded())
-                                {
-                                    status = transaction.RollBack();
-                                    Logger.Error(ex.Message);
-                                }
-                            }
-                        }
-
+                        //using Transaction trx = new(doc, "CreateModelCurves");
+                        //TransactionStatus status = trx.Start();
+                        //if (status == TransactionStatus.Started)
+                        //{
+                        //    try
+                        //    {
+                        //        SketchPlane sketch = SketchPlane.Create(doc, plane);
+                        //        foreach (CurveLoop clp in profile)
+                        //        {
+                        //            CurveArray array = ConvertLoopToArray(clp);
+                        //            if (!array.IsEmpty)
+                        //            {
+                        //                _ = doc.Create.NewModelCurveArray(array, sketch);
+                        //            }
+                        //        }
+                        //        status = trx.Commit();
+                        //    }
+                        //    catch (Exception ex)
+                        //    {
+                        //        if (!trx.HasEnded())
+                        //        {
+                        //            status = trx.RollBack();
+                        //            Logger.Error(ex.Message);
+                        //        }
+                        //    }
+                        //}
 
                         double minSize = Math.Min(width, height);
                         if (minSize >= minSideSize)

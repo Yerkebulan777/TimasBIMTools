@@ -64,7 +64,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-            return resultNormal.ConvertToPositive();
+            return resultNormal;
         }
 
 
@@ -192,40 +192,29 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static List<XYZ> ProjectPointsOnPlane(this XYZ centroid, Document doc, in XYZ normal, in List<XYZ> points)
+        public static List<XYZ> ProjectPointsOnPlane(this Plane plane, in List<XYZ> points, out UV min, out UV max)
         {
-            List<XYZ> result = new(points.Count);
-            using (Transaction trx = new(doc, "ProjectPointsOnPlane"))
+            min = null; max = null;
+            List<XYZ> result = new(2);
+            if (plane != null && plane.IsValidObject)
             {
-                TransactionStatus status = trx.Start();
-                Plane plane = null;
-                try
+                double minU = 0, maxU = 0;
+                double minV = 0, maxV = 0;
+                XYZ origin = plane.Origin;
+                for (int i = 0; i < points.Count; i++)
                 {
-                    plane = Plane.CreateByNormalAndOrigin(normal, centroid);
-                    status = trx.Commit();
+                    plane.Project(points[i], out UV uvp, out _);
+                    minU = Math.Min(minU, uvp.U);
+                    maxU = Math.Max(maxU, uvp.U);
+                    minV = Math.Min(minV, uvp.V);
+                    maxV = Math.Max(maxV, uvp.V);
                 }
-                finally
-                {
-                    if (plane != null && plane.IsValidObject)
-                    {
-                        for (int i = 0; i < points.Count; i++)
-                        {
-                            result.Add(plane.ProjectOnto(points[i]));
-                        }
-                    }
-                }
+                min = new UV(minU, minV);
+                max = new UV(maxU, maxV);
+                result.Add(origin + (min.U * plane.XVec) + (min.V * plane.YVec));
+                result.Add(origin + (max.U * plane.XVec) + (max.V * plane.YVec));
             }
             return result;
-        }
-
-
-
-        /// <summary> Project given 3D XYZ point onto plane. </summary>
-        public static XYZ ProjectOnto(this Plane plane, XYZ pnt)
-        {
-            XYZ normal = plane.Normal.Normalize();
-            plane.Project(pnt, out _, out double dist);
-            return 0 < pnt.DotProduct(normal) ? pnt + (normal * dist) : pnt - (normal * dist);
         }
 
 
@@ -254,8 +243,6 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             return result;
         }
-
-
 
 
         public static IList<CurveLoop> GetSectionSize(this Solid solid, Document doc, XYZ normal, in XYZ centroid, out double width, out double height)
@@ -388,6 +375,7 @@ namespace RevitTimasBIMTools.RevitUtils
             return Math.Abs(angle);
         }
 
+
         private static XYZ ConvertToPositive(this XYZ vector)
         {
             return new XYZ(Math.Abs(vector.X), Math.Abs(vector.Y), Math.Abs(vector.Z));
@@ -405,22 +393,6 @@ namespace RevitTimasBIMTools.RevitUtils
             return Math.Round(180 / Math.PI * radians, digit);
         }
 
-        private static void CreateRectangleProfile(double w, double d)
-        {
-            XYZ[] pts = new XYZ[] {
-            new XYZ(-w / 2.0, -d / 2.0, 0.0),
-            new XYZ(w / 2.0, -d / 2.0, 0.0),
-            new XYZ(w / 2.0, d / 2.0, 0.0),
-            new XYZ(-w / 2.0, d / 2.0, 0.0),
-            new XYZ(-w / 2.0, -d / 2.0, 0.0) };
-
-            CurveArray pLoop = new();
-            for (int i = 0; i < 4; ++i)
-            {
-                Line line = Line.CreateBound(pts[i], pts[i + 1]);
-                pLoop.Append(line);
-            }
-        }
 
     }
 }
