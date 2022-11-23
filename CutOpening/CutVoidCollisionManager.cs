@@ -174,7 +174,7 @@ namespace RevitTimasBIMTools.CutOpening
                         height = pt1.DistanceTo(pt2);
 
 
-                        using Transaction transaction = new(doc, "CreateSketchPlane");
+                        using Transaction transaction = new(doc, "CreateModelCurveArray");
                         TransactionStatus status = transaction.Start();
                         if (status == TransactionStatus.Started)
                         {
