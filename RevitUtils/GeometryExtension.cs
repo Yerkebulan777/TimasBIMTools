@@ -1,10 +1,8 @@
-﻿using Autodesk.Revit.Creation;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
@@ -221,21 +219,13 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static double SignedDistanceTo(this Plane plane, XYZ pnt)
-        {
-            Debug.Assert(plane.Normal.GetLength() == 1, "expected normalised plane normal");
-            return plane.Normal.DotProduct(pnt - plane.Origin);
-        }
-
 
         /// <summary> Project given 3D XYZ point onto plane. </summary>
-        public static XYZ ProjectOnto(this Plane plane, XYZ p)
+        public static XYZ ProjectOnto(this Plane plane, XYZ pnt)
         {
-            double d = plane.SignedDistanceTo(p);
-
-            XYZ q = p - d * plane.Normal;
-
-            return q;
+            XYZ normal = plane.Normal.Normalize();
+            plane.Project(pnt, out _, out double dist);
+            return 0 < pnt.DotProduct(normal) ? pnt + (normal * dist) : pnt - (normal * dist);
         }
 
 
@@ -398,8 +388,7 @@ namespace RevitTimasBIMTools.RevitUtils
             return Math.Abs(angle);
         }
 
-
-        static XYZ ConvertToPositive(this XYZ vector)
+        private static XYZ ConvertToPositive(this XYZ vector)
         {
             return new XYZ(Math.Abs(vector.X), Math.Abs(vector.Y), Math.Abs(vector.Z));
         }
@@ -416,9 +405,7 @@ namespace RevitTimasBIMTools.RevitUtils
             return Math.Round(180 / Math.PI * radians, digit);
         }
 
-
-
-        static void CreateRectangleProfile ( double w, double d)
+        private static void CreateRectangleProfile(double w, double d)
         {
             XYZ[] pts = new XYZ[] {
             new XYZ(-w / 2.0, -d / 2.0, 0.0),
@@ -427,7 +414,7 @@ namespace RevitTimasBIMTools.RevitUtils
             new XYZ(-w / 2.0, d / 2.0, 0.0),
             new XYZ(-w / 2.0, -d / 2.0, 0.0) };
 
-            CurveArray pLoop = new CurveArray();
+            CurveArray pLoop = new();
             for (int i = 0; i < 4; ++i)
             {
                 Line line = Line.CreateBound(pts[i], pts[i + 1]);

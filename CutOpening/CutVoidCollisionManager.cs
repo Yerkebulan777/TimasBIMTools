@@ -10,6 +10,7 @@ using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
 using Material = Autodesk.Revit.DB.Material;
+using Plane = Autodesk.Revit.DB.Plane;
 
 namespace RevitTimasBIMTools.CutOpening
 {
@@ -171,6 +172,36 @@ namespace RevitTimasBIMTools.CutOpening
 
                         width = pt0.DistanceTo(pt3);
                         height = pt1.DistanceTo(pt2);
+
+
+                        using Transaction transaction = new(doc, "CreateSketchPlane");
+                        TransactionStatus status = transaction.Start();
+                        if (status == TransactionStatus.Started)
+                        {
+                            try
+                            {
+                                Plane plane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
+                                SketchPlane sketch = SketchPlane.Create(doc, plane);
+                                foreach (CurveLoop clp in profile)
+                                {
+                                    CurveArray array = ConvertLoopToArray(clp);
+                                    if (!array.IsEmpty)
+                                    {
+                                        _ = doc.Create.NewModelCurveArray(array, sketch);
+                                    }
+                                }
+                                status = transaction.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Error(ex.Message);
+                                if (!transaction.HasEnded())
+                                {
+                                    status = transaction.RollBack();
+                                }
+                            }
+                        }
+
 
                         double minSize = Math.Min(width, height);
                         if (minSize >= minSideSize)
@@ -346,6 +377,17 @@ namespace RevitTimasBIMTools.CutOpening
         //    instanceId = collector.WherePasses(new BoundingBoxIntersectsFilter(outline)).FirstElementId();
         //    return instanceId == null;
         //}
+
+
+        public static CurveArray ConvertLoopToArray(CurveLoop loop)
+        {
+            CurveArray a = new();
+            foreach (Curve c in loop)
+            {
+                a.Append(c);
+            }
+            return a;
+        }
 
 
         #region Other methods
