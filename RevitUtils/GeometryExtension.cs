@@ -192,27 +192,25 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static List<XYZ> ProjectPointsOnPlane(this Plane plane, in List<XYZ> points, out UV min, out UV max)
+        public static BoundingBoxUV ProjectPointsOnPlane(this Plane plane, in List<XYZ> points)
         {
-            min = null; max = null;
-            List<XYZ> result = new(2);
+            BoundingBoxUV result = null;
             if (plane != null && plane.IsValidObject)
             {
                 double minU = 0, maxU = 0;
                 double minV = 0, maxV = 0;
-                XYZ origin = plane.Origin;
                 for (int i = 0; i < points.Count; i++)
                 {
-                    plane.Project(points[i], out UV uvp, out _);
-                    minU = Math.Min(minU, uvp.U);
-                    maxU = Math.Max(maxU, uvp.U);
-                    minV = Math.Min(minV, uvp.V);
-                    maxV = Math.Max(maxV, uvp.V);
+                    plane.Project(points[i], out UV uvp, out double dist);
+                    if (uvp != null && dist > 0)
+                    {
+                        minU = Math.Min(minU, uvp.U);
+                        maxU = Math.Max(maxU, uvp.U);
+                        minV = Math.Min(minV, uvp.V);
+                        maxV = Math.Max(maxV, uvp.V);
+                    }
                 }
-                min = new UV(minU, minV);
-                max = new UV(maxU, maxV);
-                result.Add(origin + (min.U * plane.XVec) + (min.V * plane.YVec));
-                result.Add(origin + (max.U * plane.XVec) + (max.V * plane.YVec));
+                result = new BoundingBoxUV(minU, minV, maxU, maxV);
             }
             return result;
         }

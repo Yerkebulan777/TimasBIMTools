@@ -1,13 +1,10 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.IFC;
 using Autodesk.Revit.DB.Structure;
-using Autodesk.Revit.UI;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
@@ -65,7 +62,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private BoundingBoxXYZ hostBbox = null;
         private BoundingBoxXYZ intersectBbox = null;
-        private IList<CurveLoop> profile = null;
+        private readonly IList<CurveLoop> profile = null;
         private double width = 0;
         private double height = 0;
 
@@ -137,44 +134,62 @@ namespace RevitTimasBIMTools.CutOpening
                             plane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
                             status = trx.Commit();
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             Logger.Error(ex.Message);
                         }
                     }
 
-                    points = plane.ProjectPointsOnPlane(points, out UV min, out UV max);
-
-                    if (points != null && points.Count == 2)
+                    BoundingBoxUV size = plane.ProjectPointsOnPlane(points);
+                    width = height = 0;
+                    if (size != null)
                     {
-                        XYZ minPt = points[0];
-                        XYZ maxPt = points[1];
+                        if (hostNormal.IsAlmostEqualTo(XYZ.BasisX, 0.5))
+                        {
+                            width = Math.Round(size.Max.U - size.Min.U, 5);
+                            height = Math.Round(size.Max.V - size.Min.V, 5);
+                        }
+                        if (hostNormal.IsAlmostEqualTo(XYZ.BasisY, 0.5))
+                        {
+                            width = Math.Round(size.Max.V - size.Min.V, 5);
+                            height = Math.Round(size.Max.U - size.Min.U, 5);
+                        }
 
-                        XYZ pt0 = new(minPt.X, minPt.Y, minPt.Z);
-                        XYZ pt1 = new(maxPt.X, minPt.Y, minPt.Z);
-                        XYZ pt2 = new(maxPt.X, maxPt.Y, maxPt.Z);
-                        XYZ pt3 = new(minPt.X, maxPt.Y, maxPt.Z);
+                        #region Testing
+
+                        //XYZ minPt = points[0];
+                        //XYZ maxPt = points[1];
+
+                        //Logger.Log($"Values: {minPt} {minPt}");
+
+                        //XYZ pt0 = new(minPt.X, minPt.Y, minPt.Z);
+                        //XYZ pt1 = new(minPt.X, maxPt.Y, maxPt.Z);
+                        //XYZ pt2 = new(maxPt.X, maxPt.Y, maxPt.Z);
+                        //XYZ pt3 = new(maxPt.X, minPt.Y, minPt.Z);
 
                         //var outline = new Outline(pt0, pt2);
 
-                        width = pt0.DistanceTo(pt3);
-                        height = pt1.DistanceTo(pt2);
 
-                        List<Curve> edges = new()
-                        {
-                            Line.CreateBound(pt0, pt1),
-                            Line.CreateBound(pt1, pt2),
-                            Line.CreateBound(pt2, pt3),
-                            Line.CreateBound(pt3, pt0)
-                        };
+                        //height = pt0.DistanceTo(pt1);
+                        //width = pt0.DistanceTo(pt3);
 
-                        CurveLoop loop = CurveLoop.Create(edges);
-                        if (!loop.IsCounterclockwise(hostNormal))
-                        {
-                            loop.Flip();
-                        }
+                        //List<Curve> edges = new()
+                        //{
+                        //    Line.CreateBound(pt0, pt1),
+                        //    Line.CreateBound(pt1, pt2),
+                        //    Line.CreateBound(pt2, pt3),
+                        //    Line.CreateBound(pt3, pt0)
+                        //};
 
-                        profile = ExporterIFCUtils.ValidateCurveLoops(new List<CurveLoop>() { loop }, plane.Normal);
+                        //Debug.Assert(width != 0 && height != 0, "Error size");
+
+                        //CurveLoop loop = CurveLoop.Create(edges);
+                        //if (loop.IsCounterclockwise(hostNormal))
+                        //{
+                        //    loop.Flip();
+                        //}
+
+                        //profile = ExporterIFCUtils.ValidateCurveLoops(new List<CurveLoop>() { loop }, plane.Normal);
 
                         //using Transaction trx = new(doc, "CreateModelCurves");
                         //TransactionStatus status = trx.Start();
@@ -202,6 +217,8 @@ namespace RevitTimasBIMTools.CutOpening
                         //        }
                         //    }
                         //}
+
+                        #endregion
 
                         double minSize = Math.Min(width, height);
                         if (minSize >= minSideSize)
