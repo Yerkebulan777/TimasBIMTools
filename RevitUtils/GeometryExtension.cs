@@ -156,10 +156,6 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-
-
-
-
         public static List<XYZ> GetIntersectionPoints(this Solid source, in Element elem, in Transform global, in Options options)
         {
             List<XYZ> vertices = new(15);
@@ -237,7 +233,7 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             double d = plane.SignedDistanceTo(p);
 
-            XYZ q = p + d * plane.Normal;
+            XYZ q = p - d * plane.Normal;
 
             return q;
         }
