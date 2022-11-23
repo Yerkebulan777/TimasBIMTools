@@ -5,6 +5,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
@@ -122,12 +123,34 @@ namespace RevitTimasBIMTools.CutOpening
 
                     curveloops = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
 
-                    List<XYZ> verticles = hostSolid.GetIntersectionPoints(elem, global, options);
+                    List<XYZ> points = hostSolid.GetIntersectionPoints(elem, global, options);
 
-                    verticles = centroid.ProjectPointsOnPlane(doc, hostNormal, verticles);
+                    points = centroid.ProjectPointsOnPlane(doc, hostNormal, points);
 
-                    if (curveloops != null)
+                    if (points != null && points.Count > 0)
                     {
+                        double minX = 0, maxX = 0;
+                        double minY = 0, maxY = 0;
+                        double minZ = 0, maxZ = 0;
+
+                        for (int i = 0; i < points.Count -1; ++i)
+                        {
+                            XYZ current = points[i];
+                            XYZ previos = points[i - 1];
+                            minX = Math.Min(previos.X, current.X);
+                            maxX = Math.Max(previos.X, current.X);
+                            minY = Math.Min(previos.Y, current.Y);
+                            maxY = Math.Max(previos.Y, current.Y);
+                            minZ = Math.Min(previos.Z, current.Z);
+                            maxZ = Math.Max(previos.Z, current.Z);
+                        }
+
+                        XYZ min = new XYZ(minX, minY, minZ);
+                        XYZ max = new XYZ(maxX, maxY, maxZ);
+
+                        var outline = new Outline(min, max);
+
+
                         double minSize = Math.Min(width, height);
                         if (minSize >= minSideSize)
                         {

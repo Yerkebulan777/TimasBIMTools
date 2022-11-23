@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.Creation;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
 using RevitTimasBIMTools.Services;
 using System;
@@ -417,6 +418,25 @@ namespace RevitTimasBIMTools.RevitUtils
         public static double ConvertToDegrees(this double radians, int digit = 3)
         {
             return Math.Round(180 / Math.PI * radians, digit);
+        }
+
+
+
+        static void CreateRectangleProfile ( double w, double d)
+        {
+            XYZ[] pts = new XYZ[] {
+            new XYZ(-w / 2.0, -d / 2.0, 0.0),
+            new XYZ(w / 2.0, -d / 2.0, 0.0),
+            new XYZ(w / 2.0, d / 2.0, 0.0),
+            new XYZ(-w / 2.0, d / 2.0, 0.0),
+            new XYZ(-w / 2.0, -d / 2.0, 0.0) };
+
+            CurveArray pLoop = new CurveArray();
+            for (int i = 0; i < 4; ++i)
+            {
+                Line line = Line.CreateBound(pts[i], pts[i + 1]);
+                pLoop.Append(line);
+            }
         }
 
     }
