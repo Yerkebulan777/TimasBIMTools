@@ -373,9 +373,13 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        private static XYZ ConvertToPositive(this XYZ vector)
+        public static XYZ ConvertToPositive(this XYZ vector)
         {
-            return new XYZ(Math.Abs(vector.X), Math.Abs(vector.Y), Math.Abs(vector.Z));
+            if (vector.X < 0 || vector.Y < 0 || vector.Z < 0)
+            {
+                return vector.Negate();
+            }
+            return vector;
         }
 
 

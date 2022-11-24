@@ -62,7 +62,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         private BoundingBoxXYZ hostBbox = null;
         private BoundingBoxXYZ intersectBbox = null;
-        private readonly IList<CurveLoop> profile = null;
+        private Plane plane = null;
         private double width = 0;
         private double height = 0;
 
@@ -125,7 +125,6 @@ namespace RevitTimasBIMTools.CutOpening
 
                     List<XYZ> points = hostSolid.GetIntersectionPoints(elem, global, options);
 
-                    Plane plane = null;
                     using (Transaction trx = new(doc, "ProjectPointsOnPlane"))
                     {
                         TransactionStatus status = trx.Start();
@@ -144,6 +143,7 @@ namespace RevitTimasBIMTools.CutOpening
                     width = height = 0;
                     if (size != null)
                     {
+                        hostNormal = hostNormal.ConvertToPositive();
                         if (hostNormal.IsAlmostEqualTo(XYZ.BasisX, 0.5))
                         {
                             width = Math.Round(size.Max.U - size.Min.U, 5);
@@ -230,7 +230,6 @@ namespace RevitTimasBIMTools.CutOpening
                                 Vector = vector,
                                 Origin = centroid,
                                 Normal = hostNormal,
-                                CurveLoops = profile,
                                 MinSizeInMm = Convert.ToInt32(minSize * footToMm)
                             };
                             model.SetSizeDescription();
