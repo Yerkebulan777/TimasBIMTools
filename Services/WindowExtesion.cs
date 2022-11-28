@@ -9,7 +9,7 @@ namespace RevitTimasBIMTools.Services
 {
     public static class WindowExtesion
     {
-        public static Tuple<int, int> SetActiveViewLocation(this UIApplication uiapp, Window window, int offset = 50)
+        public static Tuple<int, int> SetActiveViewLocation(this UIApplication uiapp, Window window, int offset = 25)
         {
             Tuple<int, int> point = null;
             IntPtr revitHandle = uiapp.MainWindowHandle;
