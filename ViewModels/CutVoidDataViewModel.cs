@@ -45,32 +45,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        #region Templory
-
-        private Document doc = null;
-        private object currentItem = null;
-        private PreviewControlModel control;
-
-
-        private View3D view3d { get; set; } = null;
-        private ElementId patternId { get; set; } = null;
-
-        private bool? dialogResult = false;
-        public bool? DialogResult
-        {
-            get => dialogResult;
-            set
-            {
-                if (SetProperty(ref dialogResult, value))
-                {
-                    control = null;
-                }
-            }
-        }
-
-        #endregion
-
-
         #region Visibility
 
         private bool started = false;
@@ -724,7 +698,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (currentItem is ElementModel model && model.IsValidModel())
                         {
-                            if (RevitViewManager.SetCustomSectionBox(uidoc, model.Plane.Origin, view3d))
+                            if (RevitViewManager.SetCustomSectionBox(uidoc, model.SectionPlane.Origin, view3d))
                             {
                                 patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
                                 RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
@@ -767,6 +741,32 @@ namespace RevitTimasBIMTools.ViewModels
                         }
                     }
                 });
+            }
+        }
+
+        #endregion
+
+
+        #region PreviewControl
+
+        private Document doc = null;
+        private object currentItem = null;
+        private PreviewControlModel control;
+
+
+        private View3D view3d { get; set; } = null;
+        private ElementId patternId { get; set; } = null;
+
+        private bool? dialogResult = false;
+        public bool? DialogResult
+        {
+            get => dialogResult;
+            set
+            {
+                if (SetProperty(ref dialogResult, value))
+                {
+                    control = null;
+                }
             }
         }
 

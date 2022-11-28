@@ -128,10 +128,10 @@ namespace RevitTimasBIMTools.CutOpening
                         {
                             Width = width,
                             Height = height,
-                            Plane = plane,
+                            SectionPlane = plane,
+                            SectionBox = sectionBox,
                             Depth = Math.Abs(hostNormal.DotProduct(vector)),
                             MinSizeInMm = Convert.ToInt32(minSize * footToMm),
-                            SectionBox = sectionBox,
                         };
                         model.SetSizeDescription();
                         yield return model;
@@ -249,9 +249,9 @@ namespace RevitTimasBIMTools.CutOpening
         {
             double offset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
 
-            Plane plane = model.Plane;
+            Plane plane = model.SectionPlane;
 
-            XYZ origin = model.Plane.Origin;
+            XYZ origin = model.SectionPlane.Origin;
 
             BoundingBoxUV bbox = model.SectionBox;
 
@@ -269,16 +269,16 @@ namespace RevitTimasBIMTools.CutOpening
             };
 
             CurveLoop loop = CurveLoop.Create(edges);
-            if (loop.IsCounterclockwise(model.Plane.Normal))
+            if (loop.IsCounterclockwise(model.SectionPlane.Normal))
             {
                 loop.Flip();
             }
 
             IList<CurveLoop> curveloops = new List<CurveLoop>() { loop };
 
-            curveloops = ExporterIFCUtils.ValidateCurveLoops(curveloops, model.Plane.Normal);
+            curveloops = ExporterIFCUtils.ValidateCurveLoops(curveloops, model.SectionPlane.Normal);
 
-            Solid solid = curveloops.CreateExtrusionGeometry(model.Plane.Normal, model.Depth, offset);
+            Solid solid = curveloops.CreateExtrusionGeometry(model.SectionPlane.Normal, model.Depth, offset);
             using Transaction trans = new(doc, "Create opening");
             TransactionStatus status = trans.Start();
             if (status == TransactionStatus.Started)
@@ -299,7 +299,7 @@ namespace RevitTimasBIMTools.CutOpening
                 Element instanse = model.Instanse;
                 try
                 {
-                    XYZ origin = model.Plane.Origin;
+                    XYZ origin = model.SectionPlane.Origin;
                     if (instanse is Wall wall && wall.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(origin, wallOpenning, model.HostLevel, StructuralType.NonStructural);
@@ -330,11 +330,6 @@ namespace RevitTimasBIMTools.CutOpening
             }
         }
 
-
-        private double CalculateSideSize(in double hostDeph, in double angle)
-        {
-            return Math.Round(Math.Tan(angle * hostDeph), 5);
-        }
 
 
         //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ vector, View view)
@@ -407,13 +402,13 @@ namespace RevitTimasBIMTools.CutOpening
         //    {
         //        Document doc = fi.Document;
         //        using Transaction trans = new(doc);
-        //        _ = trans.Start("Create Temporary Sketch Plane");
+        //        _ = trans.Start("Create Temporary Sketch SectionPlane");
         //        try
         //        {
         //            SketchPlane sketchPlan = SketchPlane.Create(doc, reference);
         //            if (null != sketchPlan)
         //            {
-        //                Plane plan = sketchPlan.GetPlane();
+        //                SectionPlane plan = sketchPlan.GetPlane();
         //                vector = plan.Normal;
         //                origin = plan.Origin;
         //                flag = true;
