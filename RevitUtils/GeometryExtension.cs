@@ -153,7 +153,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static ISet<XYZ> GetIntersectionPoints(this Solid source, in Element elem, in Transform global, in Options options)
+        public static ISet<XYZ> GetIntersectionPoints(this Solid source, in Element elem, in Transform global, in Options options, ref XYZ centroid)
         {
             ISet<XYZ> vertices = new HashSet<XYZ>(50);
             GeometryElement geomElement = elem.get_Geometry(options);
@@ -170,11 +170,11 @@ namespace RevitTimasBIMTools.RevitUtils
                     {
                         if (solid != null && solid.Volume > 0)
                         {
+                            centroid = solid.ComputeCentroid();
                             foreach (Face f in solid.Faces)
                             {
                                 Mesh mesh = f.Triangulate();
                                 int n = mesh.NumTriangles;
-
                                 for (int i = 0; i < n; ++i)
                                 {
                                     MeshTriangle triangle = mesh.get_Triangle(i);
@@ -244,27 +244,10 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static IList<CurveLoop> GetSectionSize(this Solid solid, Document doc, XYZ normal, in XYZ centroid, out double width, out double height)
-        {
-            width = 0; height = 0;
-            BoundingBoxUV size = solid.GetSectionBound(doc, normal, in centroid, out IList<CurveLoop> loops);
-            if (size != null && normal.IsAlmostEqualTo(XYZ.BasisX, 0.5))
-            {
-                width = Math.Round(size.Max.U - size.Min.U, 5);
-                height = Math.Round(size.Max.V - size.Min.V, 5);
-            }
-            if (size != null && normal.IsAlmostEqualTo(XYZ.BasisY, 0.5))
-            {
-                width = Math.Round(size.Max.V - size.Min.V, 5);
-                height = Math.Round(size.Max.U - size.Min.U, 5);
-            }
-            return loops;
-        }
-
-
         public static Solid CreateExtrusionGeometry(this IList<CurveLoop> curveloops, in XYZ normal, in double height, in double offset)
         {
             double half = height / 2;
+
             List<CurveLoop> profileLoops = new(5);
             foreach (CurveLoop loop in curveloops)
             {

@@ -57,7 +57,7 @@ namespace RevitTimasBIMTools.RevitModel
             Depth = Math.Abs(Normal.DotProduct(Vector));
             int h = Convert.ToInt16(Height * 304.8);
             int w = Convert.ToInt16(Width * 304.8);
-            Description = $"{w}x{h}(h)\t{Normal}";
+            Description = $"{w}x{h}(h)";
         }
 
 

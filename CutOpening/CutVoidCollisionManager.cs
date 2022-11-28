@@ -56,7 +56,7 @@ namespace RevitTimasBIMTools.CutOpening
         private Solid hostSolid = null;
         private XYZ vector = XYZ.BasisZ;
         private XYZ hostNormal = XYZ.BasisZ;
-        private Solid intersectSolid = null;
+        private readonly Solid intersectSolid = null;
 
 
         private BoundingBoxXYZ hostBbox = null;
@@ -111,64 +111,34 @@ namespace RevitTimasBIMTools.CutOpening
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).OfCategoryId(category.Id).WherePasses(intersectFilter);
+
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(out intersectBbox);
                 if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, out vector))
                 {
-                    intersectSolid = hostSolid.GetIntersectionSolid(elem, global, options);
-                    intersectBbox = intersectSolid.GetBoundingBox();
-                    centroid = intersectSolid.ComputeCentroid();
+                    ISet<XYZ> points = hostSolid.GetIntersectionPoints(elem, global, options, ref centroid);
 
-                    //profile = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
-
-                    ISet<XYZ> points = hostSolid.GetIntersectionPoints(elem, global, options);
-
-                    using (Transaction trx = new(doc, "ProjectPointsOnPlane"))
-                    {
-                        TransactionStatus status = trx.Start();
-                        try
-                        {
-                            plane = Plane.CreateByNormalAndOrigin(hostNormal, centroid);
-                            status = trx.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Error(ex.Message);
-                        }
-                    }
+                    plane = CreatePlaneByNormalAndCentroid(doc, hostNormal, centroid);
 
                     BoundingBoxUV size = plane.ProjectPointsOnPlane(points);
-                    width = height = 0;
-                    if (size != null)
-                    {
-                        hostNormal = hostNormal.ConvertToPositive();
-                        if (hostNormal.IsAlmostEqualTo(XYZ.BasisX, 0.5))
-                        {
-                            width = Math.Round(size.Max.U - size.Min.U, 5);
-                            height = Math.Round(size.Max.V - size.Min.V, 5);
-                        }
-                        if (hostNormal.IsAlmostEqualTo(XYZ.BasisY, 0.5))
-                        {
-                            width = Math.Round(size.Max.V - size.Min.V, 5);
-                            height = Math.Round(size.Max.U - size.Min.U, 5);
-                        }
 
-                        double minSize = Math.Min(width, height);
-                        if (minSize >= minSideSize)
+                    GetSectionSize(size, ref hostNormal, out width, out height);
+
+                    double minSize = Math.Min(width, height);
+                    if (minSize >= minSideSize)
+                    {
+                        ElementModel model = new(elem, level)
                         {
-                            ElementModel model = new(elem, level)
-                            {
-                                Width = width,
-                                Height = height,
-                                Vector = vector,
-                                Origin = centroid,
-                                Normal = hostNormal,
-                                MinSizeInMm = Convert.ToInt32(minSize * footToMm)
-                            };
-                            model.SetSizeDescription();
-                            yield return model;
-                        }
+                            Width = width,
+                            Height = height,
+                            Vector = vector,
+                            Origin = centroid,
+                            Normal = hostNormal,
+                            MinSizeInMm = Convert.ToInt32(minSize * footToMm)
+                        };
+                        model.SetSizeDescription();
+                        yield return model;
                     }
                 }
             }
@@ -177,7 +147,7 @@ namespace RevitTimasBIMTools.CutOpening
         #endregion
 
 
-        #region Validate Intersection
+        #region Validate Intersection And Verify Section Size
 
         private bool IsIntersectionValid(Element elem, in Solid solid, in XYZ normal, in XYZ centroid, out XYZ vector)
         {
@@ -233,6 +203,48 @@ namespace RevitTimasBIMTools.CutOpening
             XYZ endPnt = centroid + (direction * 3);
             return Line.CreateBound(strPnt, endPnt);
         }
+
+
+        private Plane CreatePlaneByNormalAndCentroid(Document doc, in XYZ normal, in XYZ centroid)
+        {
+            using (Transaction trx = new(doc, "CreatePlane"))
+            {
+                TransactionStatus status = trx.Start();
+                try
+                {
+                    plane = Plane.CreateByNormalAndOrigin(normal, centroid);
+                    status = trx.Commit();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                    plane = null;
+                }
+            }
+            return plane;
+        }
+
+
+        public void GetSectionSize(BoundingBoxUV size, ref XYZ normal, out double width, out double height)
+        {
+            width = 0; 
+            height = 0;
+            if (size != null)
+            {
+                normal = normal.ConvertToPositive();
+                if (normal.IsAlmostEqualTo(XYZ.BasisX, 0.5))
+                {
+                    width = Math.Round(size.Max.U - size.Min.U, 5);
+                    height = Math.Round(size.Max.V - size.Min.V, 5);
+                }
+                if (normal.IsAlmostEqualTo(XYZ.BasisY, 0.5))
+                {
+                    width = Math.Round(size.Max.V - size.Min.V, 5);
+                    height = Math.Round(size.Max.U - size.Min.U, 5);
+                }
+            }
+        }
+
 
         #endregion
 
