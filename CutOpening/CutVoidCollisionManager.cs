@@ -155,70 +155,10 @@ namespace RevitTimasBIMTools.CutOpening
                             height = Math.Round(size.Max.U - size.Min.U, 5);
                         }
 
-                        #region Testing
-
-                        //XYZ minPt = points[0];
-                        //XYZ maxPt = points[1];
-
-                        //Logger.Log($"Values: {minPt} {minPt}");
-
-                        //XYZ pt0 = new(minPt.X, minPt.Y, minPt.Z);
-                        //XYZ pt1 = new(minPt.X, maxPt.Y, maxPt.Z);
-                        //XYZ pt2 = new(maxPt.X, maxPt.Y, maxPt.Z);
-                        //XYZ pt3 = new(maxPt.X, minPt.Y, minPt.Z);
-
-                        //var outline = new Outline(pt0, pt2);
-
-
-                        //height = pt0.DistanceTo(pt1);
-                        //width = pt0.DistanceTo(pt3);
-
-                        //List<Curve> edges = new()
-                        //{
-                        //    Line.CreateBound(pt0, pt1),
-                        //    Line.CreateBound(pt1, pt2),
-                        //    Line.CreateBound(pt2, pt3),
-                        //    Line.CreateBound(pt3, pt0)
-                        //};
-
-                        //Debug.Assert(width != 0 && height != 0, "Error size");
-
-                        //CurveLoop loop = CurveLoop.Create(edges);
-                        //if (loop.IsCounterclockwise(hostNormal))
-                        //{
-                        //    loop.Flip();
-                        //}
-
-                        //profile = ExporterIFCUtils.ValidateCurveLoops(new List<CurveLoop>() { loop }, plane.Normal);
-
-                        //using Transaction trx = new(doc, "CreateModelCurves");
-                        //TransactionStatus status = trx.Start();
-                        //if (status == TransactionStatus.Started)
-                        //{
-                        //    try
-                        //    {
-                        //        SketchPlane sketch = SketchPlane.Create(doc, plane);
-                        //        foreach (CurveLoop clp in profile)
-                        //        {
-                        //            CurveArray array = ConvertLoopToArray(clp);
-                        //            if (!array.IsEmpty)
-                        //            {
-                        //                _ = doc.Create.NewModelCurveArray(array, sketch);
-                        //            }
-                        //        }
-                        //        status = trx.Commit();
-                        //    }
-                        //    catch (Exception ex)
-                        //    {
-                        //        if (!trx.HasEnded())
-                        //        {
-                        //            status = trx.RollBack();
-                        //            Logger.Error(ex.Message);
-                        //        }
-                        //    }
-                        //}
-
-                        #endregion
+                        if (width + height == 0)
+                        {
+                            Logger.Error($"ElementId {elem.Id} Normal {hostNormal}");
+                        }
 
                         double minSize = Math.Min(width, height);
                         if (minSize >= minSideSize)
@@ -235,14 +175,6 @@ namespace RevitTimasBIMTools.CutOpening
                             model.SetSizeDescription();
                             yield return model;
                         }
-                    }
-                    else
-                    {
-                        StringBuilder builder = new();
-                        _ = builder.AppendLine($"Host element Id: {host.Id.IntegerValue}");
-                        _ = builder.AppendLine($"Collision element Id: {elem.Id.IntegerValue}");
-                        _ = builder.AppendLine("Was unable to determine the intersection geometry");
-                        Logger.Error(builder.ToString());
                     }
                 }
             }

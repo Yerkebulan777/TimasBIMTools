@@ -375,11 +375,8 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static XYZ ConvertToPositive(this XYZ vector)
         {
-            if (vector.X < 0 || vector.Y < 0 || vector.Z < 0)
-            {
-                return vector.Negate();
-            }
-            return vector;
+            bool isPositive = vector.IsAlmostEqualTo(XYZ.BasisZ, 0.5) || vector.IsAlmostEqualTo(XYZ.BasisX, 0.5) || vector.IsAlmostEqualTo(XYZ.BasisY, 0.5);
+            return isPositive ? vector : vector.Negate();
         }
 
 
