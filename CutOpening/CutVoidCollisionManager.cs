@@ -302,7 +302,7 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     Element instanse = model.Instanse;
                     XYZ origin = model.SectionPlane.Origin;
-                    if (instanse.IsValidObject && opening!= null && opening.IsValidObject)
+                    if (instanse.IsValidObject && opening != null && opening.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(origin, openning, model.HostLevel, StructuralType.NonStructural);
                         if (opening != null && opening.IsValidObject)
