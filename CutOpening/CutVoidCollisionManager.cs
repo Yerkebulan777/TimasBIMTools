@@ -6,7 +6,6 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms.VisualStyles;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -256,19 +255,21 @@ namespace RevitTimasBIMTools.CutOpening
 
             BoundingBoxUV bbox = model.SectionBox;
 
-            XYZ pt0 = origin + bbox.Min.U * plane.XVec + bbox.Min.V * plane.YVec;
-            XYZ pt1 = origin + bbox.Max.U * plane.XVec + bbox.Min.V * plane.YVec;
-            XYZ pt2 = origin + bbox.Max.U * plane.XVec + bbox.Max.V * plane.YVec;
-            XYZ pt3 = origin + bbox.Min.U * plane.XVec + bbox.Max.V * plane.YVec;
+            XYZ pt0 = origin + (bbox.Min.U * plane.XVec) + (bbox.Min.V * plane.YVec);
+            XYZ pt1 = origin + (bbox.Max.U * plane.XVec) + (bbox.Min.V * plane.YVec);
+            XYZ pt2 = origin + (bbox.Max.U * plane.XVec) + (bbox.Max.V * plane.YVec);
+            XYZ pt3 = origin + (bbox.Min.U * plane.XVec) + (bbox.Max.V * plane.YVec);
 
-            List<Curve> edges = new List<Curve>();
-            edges.Add(Line.CreateBound(pt0, pt1));
-            edges.Add(Line.CreateBound(pt1, pt2));
-            edges.Add(Line.CreateBound(pt2, pt3));
-            edges.Add(Line.CreateBound(pt3, pt0));
+            List<Curve> edges = new()
+            {
+                Line.CreateBound(pt0, pt1),
+                Line.CreateBound(pt1, pt2),
+                Line.CreateBound(pt2, pt3),
+                Line.CreateBound(pt3, pt0)
+            };
 
 
-            IList<CurveLoop> curveloops = new List<CurveLoop>() 
+            IList<CurveLoop> curveloops = new List<CurveLoop>()
             {
                 CurveLoop.Create(edges)
             };
