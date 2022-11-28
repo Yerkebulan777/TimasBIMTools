@@ -155,11 +155,6 @@ namespace RevitTimasBIMTools.CutOpening
                             height = Math.Round(size.Max.U - size.Min.U, 5);
                         }
 
-                        if (width + height == 0)
-                        {
-                            Logger.Error($"ElementId {elem.Id} Normal {hostNormal}");
-                        }
-
                         double minSize = Math.Min(width, height);
                         if (minSize >= minSideSize)
                         {
