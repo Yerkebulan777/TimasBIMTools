@@ -1,10 +1,12 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.IFC;
 using Autodesk.Revit.DB.Structure;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms.VisualStyles;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -254,25 +256,33 @@ namespace RevitTimasBIMTools.CutOpening
 
             BoundingBoxUV bbox = model.SectionBox;
 
-            XYZ minPt = origin + bbox.Min.U * plane.XVec + bbox.Min.V * plane.YVec;
-            XYZ maxPt = origin + bbox.Max.U * plane.XVec + bbox.Max.V * plane.YVec;
+            XYZ pt0 = origin + bbox.Min.U * plane.XVec + bbox.Min.V * plane.YVec;
+            XYZ pt1 = origin + bbox.Max.U * plane.XVec + bbox.Min.V * plane.YVec;
+            XYZ pt2 = origin + bbox.Max.U * plane.XVec + bbox.Max.V * plane.YVec;
+            XYZ pt3 = origin + bbox.Min.U * plane.XVec + bbox.Max.V * plane.YVec;
 
-            XYZ pt0 = new XYZ(minPt.X, minPt.Y, minPt.Z);
-            XYZ pt1 = new XYZ(maxPt.X, minPt.Y, minPt.Z);
-            XYZ pt2 = new XYZ(maxPt.X, maxPt.Y, maxPt.Z);
-            XYZ pt3 = new XYZ(minPt.X, maxPt.Y, maxPt.Z);
+            List<Curve> edges = new List<Curve>();
+            edges.Add(Line.CreateBound(pt0, pt1));
+            edges.Add(Line.CreateBound(pt1, pt2));
+            edges.Add(Line.CreateBound(pt2, pt3));
+            edges.Add(Line.CreateBound(pt3, pt0));
 
 
-            IList<CurveLoop> curveloops = new List<CurveLoop>();
+            IList<CurveLoop> curveloops = new List<CurveLoop>() 
+            {
+                CurveLoop.Create(edges)
+            };
 
-            //Solid solid = loops.CreateExtrusionGeometry(model.Normal, model.Depth, offset);
-            //using Transaction trans = new(doc, "Create opening");
-            //TransactionStatus status = trans.Start();
-            //if (status == TransactionStatus.Started)
-            //{
-            //    solid.CreateDirectShape(doc);
-            //    status = trans.Commit();
-            //}
+            curveloops = ExporterIFCUtils.ValidateCurveLoops(curveloops, model.Normal);
+
+            Solid solid = curveloops.CreateExtrusionGeometry(model.Normal, model.Depth, offset);
+            using Transaction trans = new(doc, "Create opening");
+            TransactionStatus status = trans.Start();
+            if (status == TransactionStatus.Started)
+            {
+                solid.CreateDirectShape(doc);
+                status = trans.Commit();
+            }
         }
 
 
