@@ -260,7 +260,6 @@ namespace RevitTimasBIMTools.CutOpening
             //XYZ pt2 = new XYZ(bbox.Max.X, bbox.Max.Y, bbox.Min.Z);
             //XYZ pt3 = new XYZ(bbox.Min.X, bbox.Max.Y, bbox.Min.Z);
 
-
             IList<CurveLoop> curveloops = new List<CurveLoop>();
 
             //Solid solid = loops.CreateExtrusionGeometry(model.Normal, model.Depth, offset);
