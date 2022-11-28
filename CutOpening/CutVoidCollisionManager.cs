@@ -247,14 +247,25 @@ namespace RevitTimasBIMTools.CutOpening
 
         public void VerifyOpenningSize(Document doc, in ElementModel model)
         {
-            double offset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
+            IList<CurveLoop> profile = GetSectionProfile(model);
+            double offset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm * 2 / footToMm);
+            Solid solid = profile.CreateExtrusionGeometry(model.SectionPlane.Normal, model.Depth, offset);
+            using Transaction trans = new(doc, "Create opening");
+            TransactionStatus status = trans.Start();
+            if (status == TransactionStatus.Started)
+            {
+                solid.CreateDirectShape(doc);
+                status = trans.Commit();
+            }
+        }
 
+
+        private IList<CurveLoop> GetSectionProfile(ElementModel model)
+        {
             Plane plane = model.SectionPlane;
-
-            XYZ origin = model.SectionPlane.Origin;
-
             BoundingBoxUV bbox = model.SectionBox;
-
+            XYZ origin = model.SectionPlane.Origin;
+            
             XYZ pt0 = origin + (bbox.Min.U * plane.XVec) + (bbox.Min.V * plane.YVec);
             XYZ pt1 = origin + (bbox.Max.U * plane.XVec) + (bbox.Min.V * plane.YVec);
             XYZ pt2 = origin + (bbox.Max.U * plane.XVec) + (bbox.Max.V * plane.YVec);
@@ -276,16 +287,7 @@ namespace RevitTimasBIMTools.CutOpening
 
             IList<CurveLoop> curveloops = new List<CurveLoop>() { loop };
 
-            curveloops = ExporterIFCUtils.ValidateCurveLoops(curveloops, model.SectionPlane.Normal);
-
-            Solid solid = curveloops.CreateExtrusionGeometry(model.SectionPlane.Normal, model.Depth, offset);
-            using Transaction trans = new(doc, "Create opening");
-            TransactionStatus status = trans.Start();
-            if (status == TransactionStatus.Started)
-            {
-                solid.CreateDirectShape(doc);
-                status = trans.Commit();
-            }
+            return ExporterIFCUtils.ValidateCurveLoops(curveloops, model.SectionPlane.Normal);
         }
 
 
@@ -304,18 +306,14 @@ namespace RevitTimasBIMTools.CutOpening
                     {
                         opening = doc.Create.NewFamilyInstance(origin, wallOpenning, model.HostLevel, StructuralType.NonStructural);
                     }
-                    if (instanse is RoofBase roof && roof.IsValidObject)
+                    if (instanse is Floor || instanse is RoofBase  && instanse.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
                     }
-                    if (instanse is Floor floor && floor.IsValidObject)
+                    if (opening != null && opening.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
-                    }
-                    if (opening != null)
-                    {
-                        _ = opening.get_Parameter(definition).Set(width);
-                        _ = opening.get_Parameter(definition).Set(height);
+                        _ = opening.get_Parameter(definition).Set(model.Width);
+                        _ = opening.get_Parameter(definition).Set(model.Height);
                     }
                 }
                 catch (Exception ex)
@@ -329,7 +327,6 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
         }
-
 
 
         //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ vector, View view)

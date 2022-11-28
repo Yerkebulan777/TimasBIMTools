@@ -45,6 +45,14 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        #region Templory
+
+        private Document doc = null;
+        private object currentItem = null;
+
+        #endregion
+
+
         #region Visibility
 
         private bool started = false;
@@ -737,6 +745,7 @@ namespace RevitTimasBIMTools.ViewModels
                             else
                             {
                                 model.IsSelected = false;
+                                ViewDataCollection?.Refresh();
                             }
                         }
                     }
@@ -749,11 +758,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region PreviewControl
 
-        private Document doc = null;
-        private object currentItem = null;
         private PreviewControlModel control;
-
-
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
 
