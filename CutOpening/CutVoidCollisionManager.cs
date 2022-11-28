@@ -265,13 +265,13 @@ namespace RevitTimasBIMTools.CutOpening
             Plane plane = model.SectionPlane;
             BoundingBoxUV bbox = model.SectionBox;
             XYZ origin = model.SectionPlane.Origin;
-            
+
             XYZ pt0 = origin + (bbox.Min.U * plane.XVec) + (bbox.Min.V * plane.YVec);
             XYZ pt1 = origin + (bbox.Max.U * plane.XVec) + (bbox.Min.V * plane.YVec);
             XYZ pt2 = origin + (bbox.Max.U * plane.XVec) + (bbox.Max.V * plane.YVec);
             XYZ pt3 = origin + (bbox.Min.U * plane.XVec) + (bbox.Max.V * plane.YVec);
 
-            List<Curve> edges = new List<Curve>(4)
+            List<Curve> edges = new(4)
             {
                 Line.CreateBound(pt0, pt1),
                 Line.CreateBound(pt1, pt2),
@@ -298,22 +298,18 @@ namespace RevitTimasBIMTools.CutOpening
             TransactionStatus status = trans.Start();
             if (status == TransactionStatus.Started)
             {
-                Element instanse = model.Instanse;
                 try
                 {
+                    Element instanse = model.Instanse;
                     XYZ origin = model.SectionPlane.Origin;
-                    if (instanse is Wall wall && wall.IsValidObject)
-                    {
-                        opening = doc.Create.NewFamilyInstance(origin, wallOpenning, model.HostLevel, StructuralType.NonStructural);
-                    }
-                    if (instanse is Floor || instanse is RoofBase  && instanse.IsValidObject)
+                    if (instanse.IsValidObject)
                     {
                         opening = doc.Create.NewFamilyInstance(origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
-                    }
-                    if (opening != null && opening.IsValidObject)
-                    {
-                        _ = opening.get_Parameter(definition).Set(model.Width);
-                        _ = opening.get_Parameter(definition).Set(model.Height);
+                        if (opening != null && opening.IsValidObject)
+                        {
+                            _ = opening.get_Parameter(definition).Set(model.Width);
+                            _ = opening.get_Parameter(definition).Set(model.Height);
+                        }
                     }
                 }
                 catch (Exception ex)
