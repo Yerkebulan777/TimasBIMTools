@@ -153,9 +153,9 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static List<XYZ> GetIntersectionPoints(this Solid source, in Element elem, in Transform global, in Options options)
+        public static ISet<XYZ> GetIntersectionPoints(this Solid source, in Element elem, in Transform global, in Options options)
         {
-            List<XYZ> vertices = new(15);
+            ISet<XYZ> vertices = new HashSet<XYZ>(50);
             GeometryElement geomElement = elem.get_Geometry(options);
             BooleanOperationsType intersect = BooleanOperationsType.Intersect;
             foreach (GeometryObject obj in geomElement.GetTransformed(global))
@@ -178,9 +178,9 @@ namespace RevitTimasBIMTools.RevitUtils
                                 for (int i = 0; i < n; ++i)
                                 {
                                     MeshTriangle triangle = mesh.get_Triangle(i);
-                                    vertices.Add(triangle.get_Vertex(0));
-                                    vertices.Add(triangle.get_Vertex(1));
-                                    vertices.Add(triangle.get_Vertex(2));
+                                    _ = vertices.Add(triangle.get_Vertex(0));
+                                    _ = vertices.Add(triangle.get_Vertex(1));
+                                    _ = vertices.Add(triangle.get_Vertex(2));
                                 }
                             }
                         }
@@ -191,16 +191,17 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static BoundingBoxUV ProjectPointsOnPlane(this Plane plane, in List<XYZ> points)
+        public static BoundingBoxUV ProjectPointsOnPlane(this Plane plane, in ISet<XYZ> points)
         {
             BoundingBoxUV result = null;
             if (plane != null && plane.IsValidObject)
             {
                 double minU = 0, maxU = 0;
                 double minV = 0, maxV = 0;
-                for (int i = 0; i < points.Count; i++)
+
+                foreach (XYZ pnt in points)
                 {
-                    plane.Project(points[i], out UV uvp, out double dist);
+                    plane.Project(pnt, out UV uvp, out double dist);
                     if (uvp != null && dist > 0)
                     {
                         minU = Math.Min(minU, uvp.U);
@@ -209,6 +210,7 @@ namespace RevitTimasBIMTools.RevitUtils
                         maxV = Math.Max(maxV, uvp.V);
                     }
                 }
+
                 result = new BoundingBoxUV(minU, minV, maxU, maxV);
             }
             return result;

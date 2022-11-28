@@ -5,7 +5,6 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 using Line = Autodesk.Revit.DB.Line;
@@ -123,7 +122,7 @@ namespace RevitTimasBIMTools.CutOpening
 
                     //profile = intersectSolid.GetSectionSize(doc, hostNormal, centroid, out width, out height);
 
-                    List<XYZ> points = hostSolid.GetIntersectionPoints(elem, global, options);
+                    ISet<XYZ> points = hostSolid.GetIntersectionPoints(elem, global, options);
 
                     using (Transaction trx = new(doc, "ProjectPointsOnPlane"))
                     {
