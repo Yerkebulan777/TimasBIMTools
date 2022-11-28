@@ -746,7 +746,6 @@ namespace RevitTimasBIMTools.ViewModels
                             else
                             {
                                 model.IsSelected = false;
-                                ViewDataCollection?.Refresh();
                             }
                         }
                     }
