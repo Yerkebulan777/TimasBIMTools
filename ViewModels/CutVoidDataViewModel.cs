@@ -562,6 +562,7 @@ namespace RevitTimasBIMTools.ViewModels
                     viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
                     viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.MinSizeInMm), ListSortDirection.Ascending));
                     viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Ascending));
                 }
             }
         }
@@ -576,7 +577,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
                     AllSelectChecked = items.All(x => x.IsSelected == model.IsSelected) ? model.IsSelected : null;
-
                 }
             }
         }
