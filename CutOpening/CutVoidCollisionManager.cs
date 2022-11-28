@@ -291,7 +291,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        public void CreateOpening(Document doc, ElementModel model, FamilySymbol wallOpenning, FamilySymbol floorOpenning, Definition definition = null, double offset = 0)
+        public void CreateOpening(Document doc, ElementModel model, FamilySymbol openning, Definition definition = null, double offset = 0)
         {
             FamilyInstance opening = null;
             using Transaction trans = new(doc, "Create opening");
@@ -304,7 +304,7 @@ namespace RevitTimasBIMTools.CutOpening
                     XYZ origin = model.SectionPlane.Origin;
                     if (instanse.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(origin, openning, model.HostLevel, StructuralType.NonStructural);
                         if (opening != null && opening.IsValidObject)
                         {
                             _ = opening.get_Parameter(definition).Set(model.Width);
