@@ -25,7 +25,7 @@ namespace RevitTimasBIMTools.RevitModel
             try
             {
                 PreviewControl = new PreviewControl(doc, view3d.Id);
-                if (1 == window.GridControl.Children.Add(PreviewControl))
+                if (0 > window.GridControl.Children.Add(PreviewControl))
                 {
                     PreviewControl.Loaded += PreviewControlLoad;
                 }
