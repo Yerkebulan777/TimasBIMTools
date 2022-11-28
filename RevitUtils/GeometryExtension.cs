@@ -251,8 +251,8 @@ namespace RevitTimasBIMTools.RevitUtils
             foreach (CurveLoop loop in curveloops)
             {
                 CurveLoop newloop = loop.IsCounterclockwise(normal)
-                ? CurveLoop.CreateViaOffset(loop, -offset, normal)
-                : CurveLoop.CreateViaOffset(loop, offset, normal);
+                ? CurveLoop.CreateViaOffset(loop, offset, normal)
+                : CurveLoop.CreateViaOffset(loop, -offset, normal);
                 Transform trs = Transform.CreateTranslation(normal * half);
                 newloop.Transform(trs.Inverse);
                 profile.Add(newloop);
