@@ -39,6 +39,7 @@ namespace RevitTimasBIMTools.CutOpening
         private Transform searchTransform { get; set; } = null;
         private IDictionary<int, ElementId> ElementTypeIdData { get; set; } = null;
 
+        private double minSideSize;
         //private readonly string widthParamName = "ширина";
         //private readonly string heightParamName = "высота";
 
@@ -47,20 +48,14 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Fields
 
-        private double minSideSize;
-
         private FilteredElementCollector collector;
 
         private XYZ centroid = null;
-
         private Solid hostSolid = null;
         private XYZ vector = XYZ.BasisZ;
         private XYZ hostNormal = XYZ.BasisZ;
-        private readonly Solid intersectSolid = null;
-
-
         private BoundingBoxXYZ hostBbox = null;
-        private BoundingBoxXYZ intersectBbox = null;
+        private BoundingBoxXYZ elemBbox = null;
         private Plane plane = null;
         private double width = 0;
         private double height = 0;
@@ -114,16 +109,16 @@ namespace RevitTimasBIMTools.CutOpening
 
             foreach (Element elem in collector)
             {
-                centroid = elem.GetMiddlePointByBoundingBox(out intersectBbox);
+                centroid = elem.GetMiddlePointByBoundingBox(out elemBbox);
                 if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, out vector))
                 {
                     ISet<XYZ> points = hostSolid.GetIntersectionPoints(elem, global, options, ref centroid);
 
                     plane = CreatePlaneByNormalAndCentroid(doc, hostNormal, centroid);
 
-                    BoundingBoxUV size = plane.ProjectPointsOnPlane(points);
+                    BoundingBoxUV section = plane.ProjectPointsOnPlane(points);
 
-                    GetSectionSize(size, ref hostNormal, out width, out height);
+                    GetSectionSize(section, ref hostNormal, out width, out height);
 
                     double minSize = Math.Min(width, height);
                     if (minSize >= minSideSize)
@@ -132,10 +127,11 @@ namespace RevitTimasBIMTools.CutOpening
                         {
                             Width = width,
                             Height = height,
-                            Vector = vector,
                             Origin = centroid,
                             Normal = hostNormal,
-                            MinSizeInMm = Convert.ToInt32(minSize * footToMm)
+                            Depth = Math.Abs(hostNormal.DotProduct(vector)),
+                            MinSizeInMm = Convert.ToInt32(minSize * footToMm),
+                            Section = section,
                         };
                         model.SetSizeDescription();
                         yield return model;
@@ -227,7 +223,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public void GetSectionSize(BoundingBoxUV size, ref XYZ normal, out double width, out double height)
         {
-            width = 0; 
+            width = 0;
             height = 0;
             if (size != null)
             {
@@ -252,7 +248,10 @@ namespace RevitTimasBIMTools.CutOpening
         public void VerifyOpenningSize(Document doc, in ElementModel model)
         {
             double offset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
-            Solid solid = model.CurveLoops.CreateExtrusionGeometry(model.Normal, model.Depth, offset);
+
+
+
+            Solid solid = loops.CreateExtrusionGeometry(model.Normal, model.Depth, offset);
             using Transaction trans = new(doc, "Create opening");
             TransactionStatus status = trans.Start();
             if (status == TransactionStatus.Started)
@@ -287,7 +286,6 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                     if (opening != null)
                     {
-                        CalculateOpeningSize(ref model, offset, out double width, out double height);
                         _ = opening.get_Parameter(definition).Set(width);
                         _ = opening.get_Parameter(definition).Set(height);
                     }
@@ -301,19 +299,6 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     status = trans.Commit();
                 }
-            }
-        }
-
-
-        private void CalculateOpeningSize(ref ElementModel model, double offset, out double width, out double height)
-        {
-            width = model.Width + (offset * 2);
-            height = model.Height + (offset * 2);
-            if (!model.Normal.IsParallel(model.Vector))
-            {
-                model.Normal.GetAngleBetween(model.Vector, out double horizont, out double vertical);
-                height += CalculateSideSize(model.Depth, vertical);
-                width += CalculateSideSize(model.Depth, horizont);
             }
         }
 
@@ -479,7 +464,6 @@ namespace RevitTimasBIMTools.CutOpening
         public void Dispose()
         {
             hostSolid?.Dispose();
-            intersectSolid?.Dispose();
             searchDocument?.Dispose();
             searchTransform?.Dispose();
         }
