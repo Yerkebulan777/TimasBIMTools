@@ -249,16 +249,28 @@ namespace RevitTimasBIMTools.CutOpening
         {
             double offset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
 
+            XYZ origin = model.Origin;
+
+            BoundingBoxUV bbox = model.Section;
+
+            //bbox.Max
+
+            //XYZ pt0 = new XYZ(bbox.Min.X, bbox.Min.Y, bbox.Min.Z);
+            //XYZ pt1 = new XYZ(bbox.Max.X, bbox.Min.Y, bbox.Min.Z);
+            //XYZ pt2 = new XYZ(bbox.Max.X, bbox.Max.Y, bbox.Min.Z);
+            //XYZ pt3 = new XYZ(bbox.Min.X, bbox.Max.Y, bbox.Min.Z);
 
 
-            Solid solid = loops.CreateExtrusionGeometry(model.Normal, model.Depth, offset);
-            using Transaction trans = new(doc, "Create opening");
-            TransactionStatus status = trans.Start();
-            if (status == TransactionStatus.Started)
-            {
-                solid.CreateDirectShape(doc);
-                status = trans.Commit();
-            }
+            IList<CurveLoop> curveloops = new List<CurveLoop>();
+
+            //Solid solid = loops.CreateExtrusionGeometry(model.Normal, model.Depth, offset);
+            //using Transaction trans = new(doc, "Create opening");
+            //TransactionStatus status = trans.Start();
+            //if (status == TransactionStatus.Started)
+            //{
+            //    solid.CreateDirectShape(doc);
+            //    status = trans.Commit();
+            //}
         }
 
 
