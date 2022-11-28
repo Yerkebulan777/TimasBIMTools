@@ -260,7 +260,7 @@ namespace RevitTimasBIMTools.CutOpening
             XYZ pt2 = origin + (bbox.Max.U * plane.XVec) + (bbox.Max.V * plane.YVec);
             XYZ pt3 = origin + (bbox.Min.U * plane.XVec) + (bbox.Max.V * plane.YVec);
 
-            List<Curve> edges = new()
+            List<Curve> edges = new List<Curve>(4)
             {
                 Line.CreateBound(pt0, pt1),
                 Line.CreateBound(pt1, pt2),
@@ -268,15 +268,17 @@ namespace RevitTimasBIMTools.CutOpening
                 Line.CreateBound(pt3, pt0)
             };
 
-
-            IList<CurveLoop> curveloops = new List<CurveLoop>()
+            CurveLoop loop = CurveLoop.Create(edges);
+            if (loop.IsCounterclockwise(model.Plane.Normal))
             {
-                CurveLoop.Create(edges)
-            };
+                loop.Flip();
+            }
 
-            curveloops = ExporterIFCUtils.ValidateCurveLoops(curveloops, model.Normal);
+            IList<CurveLoop> curveloops = new List<CurveLoop>() { loop };
 
-            Solid solid = curveloops.CreateExtrusionGeometry(model.Normal, model.Depth, offset);
+            curveloops = ExporterIFCUtils.ValidateCurveLoops(curveloops, model.Plane.Normal);
+
+            Solid solid = curveloops.CreateExtrusionGeometry(model.Plane.Normal, model.Depth, offset);
             using Transaction trans = new(doc, "Create opening");
             TransactionStatus status = trans.Start();
             if (status == TransactionStatus.Started)
