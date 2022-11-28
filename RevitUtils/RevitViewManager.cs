@@ -142,7 +142,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region ShowElement
-        public static void ShowModelInPlanView(UIDocument uidoc, ElementModel model, ViewDiscipline discipline)
+        public static void ShowModelInPlanView(UIDocument uidoc, in ElementModel model, ViewDiscipline discipline)
         {
             ViewPlan viewPlan = GetPlanView(uidoc, model.HostLevel);
             if (viewPlan != null)
@@ -175,7 +175,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 finally
                 {
                     ActivateView(uidoc, viewPlan, discipline);
-                    BoundingBoxXYZ bbox = CreateBoundingBox(viewPlan, model.Instanse, model.Origin);
+                    BoundingBoxXYZ bbox = CreateBoundingBox(viewPlan, model.Instanse, model.Plane.Origin);
                     uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                     ZoomElementInView(uidoc, viewPlan, bbox);
                     uidoc.RefreshActiveView();

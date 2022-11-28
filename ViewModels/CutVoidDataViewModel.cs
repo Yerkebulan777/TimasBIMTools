@@ -724,7 +724,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         if (currentItem is ElementModel model && model.IsValidModel())
                         {
-                            if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
+                            if (RevitViewManager.SetCustomSectionBox(uidoc, model.Plane.Origin, view3d))
                             {
                                 patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
                                 RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);

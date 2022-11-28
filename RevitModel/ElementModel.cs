@@ -27,9 +27,9 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        public XYZ Origin { get; internal set; }
         public XYZ Normal { get; internal set; }
-        public BoundingBoxUV Section { get; internal set; }
+        public Plane Plane { get; internal set; }
+        public BoundingBoxUV SectionBox { get; internal set; }
         public string Description { get; internal set; }
         public int MinSizeInMm { get; internal set; }
         public double Height { get; internal set; }

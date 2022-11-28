@@ -116,9 +116,9 @@ namespace RevitTimasBIMTools.CutOpening
 
                     plane = CreatePlaneByNormalAndCentroid(doc, hostNormal, centroid);
 
-                    BoundingBoxUV section = plane.ProjectPointsOnPlane(points);
+                    BoundingBoxUV sectionBox = plane.ProjectPointsOnPlane(points);
 
-                    GetSectionSize(section, ref hostNormal, out width, out height);
+                    GetSectionSize(sectionBox, ref hostNormal, out width, out height);
 
                     double minSize = Math.Min(width, height);
                     if (minSize >= minSideSize)
@@ -127,11 +127,10 @@ namespace RevitTimasBIMTools.CutOpening
                         {
                             Width = width,
                             Height = height,
-                            Origin = centroid,
-                            Normal = hostNormal,
+                            Plane = plane,
                             Depth = Math.Abs(hostNormal.DotProduct(vector)),
                             MinSizeInMm = Convert.ToInt32(minSize * footToMm),
-                            Section = section,
+                            SectionBox = sectionBox,
                         };
                         model.SetSizeDescription();
                         yield return model;
@@ -249,16 +248,20 @@ namespace RevitTimasBIMTools.CutOpening
         {
             double offset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
 
-            XYZ origin = model.Origin;
+            Plane plane = model.Plane;
 
-            BoundingBoxUV bbox = model.Section;
+            XYZ origin = model.Plane.Origin;
 
-            //bbox.Max
+            BoundingBoxUV bbox = model.SectionBox;
 
-            //XYZ pt0 = new XYZ(bbox.Min.X, bbox.Min.Y, bbox.Min.Z);
-            //XYZ pt1 = new XYZ(bbox.Max.X, bbox.Min.Y, bbox.Min.Z);
-            //XYZ pt2 = new XYZ(bbox.Max.X, bbox.Max.Y, bbox.Min.Z);
-            //XYZ pt3 = new XYZ(bbox.Min.X, bbox.Max.Y, bbox.Min.Z);
+            XYZ minPt = origin + bbox.Min.U * plane.XVec + bbox.Min.V * plane.YVec;
+            XYZ maxPt = origin + bbox.Max.U * plane.XVec + bbox.Max.V * plane.YVec;
+
+            XYZ pt0 = new XYZ(minPt.X, minPt.Y, minPt.Z);
+            XYZ pt1 = new XYZ(maxPt.X, minPt.Y, minPt.Z);
+            XYZ pt2 = new XYZ(maxPt.X, maxPt.Y, maxPt.Z);
+            XYZ pt3 = new XYZ(minPt.X, maxPt.Y, maxPt.Z);
+
 
             IList<CurveLoop> curveloops = new List<CurveLoop>();
 
@@ -283,17 +286,18 @@ namespace RevitTimasBIMTools.CutOpening
                 Element instanse = model.Instanse;
                 try
                 {
+                    XYZ origin = model.Plane.Origin;
                     if (instanse is Wall wall && wall.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, wallOpenning, model.HostLevel, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(origin, wallOpenning, model.HostLevel, StructuralType.NonStructural);
                     }
                     if (instanse is RoofBase roof && roof.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
                     }
                     if (instanse is Floor floor && floor.IsValidObject)
                     {
-                        opening = doc.Create.NewFamilyInstance(model.Origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(origin, floorOpenning, model.HostLevel, StructuralType.NonStructural);
                     }
                     if (opening != null)
                     {
