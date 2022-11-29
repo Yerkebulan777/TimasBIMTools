@@ -317,7 +317,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        [STAThread]
         public async void StartHandler()
         {
             DocumentCollection = await RevitTask.RunAsync(app =>
@@ -334,7 +333,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
         private async void ClearAndResetData()
         {
             if (IsStarted)

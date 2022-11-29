@@ -40,6 +40,7 @@ namespace RevitTimasBIMTools.CutOpening
         private IDictionary<int, ElementId> ElementTypeIdData { get; set; } = null;
 
         private double minSideSize;
+        private double minDepthSize;
         //private readonly string widthParamName = "ширина";
         //private readonly string heightParamName = "высота";
 
@@ -83,6 +84,7 @@ namespace RevitTimasBIMTools.CutOpening
             Transform global = document.Transform;
             IList<ElementModel> output = new List<ElementModel>(50);
             minSideSize = Properties.Settings.Default.MinSideSizeInMm / footToMm;
+            minDepthSize = Properties.Settings.Default.MinDepthSizeInMm / footToMm;
             IEnumerable<Element> enclosures = ElementTypeIdData?.GetInstancesByTypeIdDataAndMaterial(doc, material);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             TransactionStatus status = transGroup.Start();
@@ -182,11 +184,11 @@ namespace RevitTimasBIMTools.CutOpening
                 {
                     interLine = curves.GetCurveSegment(0) as Line;
                     vector = interLine.GetEndPoint(1) - interLine.GetEndPoint(0);
-                    depth = Math.Abs(normal.DotProduct(vector));
+                    depth = Math.Round(Math.Abs(normal.DotProduct(vector)), 5);
                 }
             }
 
-            return depth < minSideSize;
+            return depth <= minDepthSize;
         }
 
 
@@ -237,7 +239,6 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
         }
-
 
         #endregion
 
