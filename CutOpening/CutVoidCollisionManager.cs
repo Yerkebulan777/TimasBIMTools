@@ -249,7 +249,7 @@ namespace RevitTimasBIMTools.CutOpening
         {
             XYZ normal = model.SectionPlane.Normal;
             double offset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
-            IList<CurveLoop> profile = model.GetSectionProfileWithOffset(offset);
+            IList<CurveLoop> profile = model.GetSectionProfileWithOffset(offset * 2);
             Solid solid = profile.CreateExtrusionGeometry(normal, model.Depth);
             using Transaction trans = new(doc, "Create opening");
             TransactionStatus status = trans.Start();
