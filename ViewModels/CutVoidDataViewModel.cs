@@ -311,7 +311,7 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-        
+
         private int cutOffset = Properties.Settings.Default.CutOffsetInMm;
         public int CutOffsetSize
         {
@@ -704,20 +704,19 @@ namespace RevitTimasBIMTools.ViewModels
                     currentItem = ViewDataCollection.GetItemAt(0);
                     if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        if (currentItem is ElementModel model && model.IsValidModel())
+                        if (previewControl is null && currentItem is ElementModel model && model.IsValidModel())
                         {
                             if (RevitViewManager.SetCustomSectionBox(uidoc, model.SectionPlane.Origin, view3d))
                             {
                                 patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
                                 RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
                                 RevitViewManager.ShowModelInPlanView(uidoc, model, ViewDiscipline.Mechanical);
-                                control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
-                                control.ShowPreviewControl(app, view3d);
+                                previewControl = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
+                                previewControl.ShowPreviewControl(app, view3d);
                             }
                         }
                     }
                 }
-
             });
         }
 
@@ -759,9 +758,9 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region PreviewControl
 
-        private PreviewControlModel control;
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
+        private PreviewControlModel previewControl { get; set; } = null;
 
         private bool? dialogResult = false;
         public bool? DialogResult
@@ -771,7 +770,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref dialogResult, value))
                 {
-                    control = null;
+                    if (dialogResult.HasValue)
+                    {
+                        previewControl = null;
+                    }
                 }
             }
         }

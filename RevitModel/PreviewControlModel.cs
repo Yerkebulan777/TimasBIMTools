@@ -9,7 +9,6 @@ namespace RevitTimasBIMTools.RevitModel
 {
     public sealed class PreviewControlModel
     {
-        private bool IsEnabled = false;
         private readonly PreviewDialogBox window;
         private PreviewControl previewControl { get; set; }
         public PreviewControlModel(PreviewDialogBox frame)
@@ -20,27 +19,25 @@ namespace RevitTimasBIMTools.RevitModel
 
         public void ShowPreviewControl(UIApplication uiapp, View3D view3d)
         {
-            if (!IsEnabled)
+
+            Document doc = uiapp.ActiveUIDocument.Document;
+            Tuple<int, int> point = uiapp.SetActiveViewLocation(window);
+            try
             {
-                Document doc = uiapp.ActiveUIDocument.Document;
-                Tuple<int, int> point = uiapp.SetActiveViewLocation(window);
-                try
+                previewControl = new PreviewControl(doc, view3d.Id);
+                if (0 > window.GridControl.Children.Add(previewControl))
                 {
-                    previewControl = new PreviewControl(doc, view3d.Id);
-                    if (0 > window.GridControl.Children.Add(previewControl))
-                    {
-                        previewControl.Loaded += PreviewControlLoad;
-                        IsEnabled = true;
-                    }
-                }
-                finally
-                {
-                    window.ShowInTaskbar = true;
-                    window.Left = point.Item1;
-                    window.Top = point.Item2;
-                    window.Show();
+                    previewControl.Loaded += PreviewControlLoad;
                 }
             }
+            finally
+            {
+                window.ShowInTaskbar = true;
+                window.Left = point.Item1;
+                window.Top = point.Item2;
+                window.Show();
+            }
+            
         }
 
 
