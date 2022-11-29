@@ -165,7 +165,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
                         MidpointRounding rule = MidpointRounding.AwayFromZero;
                         double elevation = toplvl.Elevation - botlvl.Elevation;
-                        elevation = elevation < 7.5 ? 3300 / 304.8 : elevation;
+                        elevation = elevation < 3.5 ? 3000 / 304.8 : elevation;
                         double cut = Math.Round(elevation * 304.8 * 0.5, rule) / 304.8;
                         double offset = Math.Round((cut * 304.8) / 3, rule) / 304.8;
 
@@ -174,8 +174,6 @@ namespace RevitTimasBIMTools.RevitUtils
                         viewRange.SetOffset(PlanViewPlane.BottomClipPlane, -offset);
                         viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, -offset);
 
-                        Logger.Log("Cut value" + cut * 304.8);
-                        Logger.Log("Offset value" + offset * 304.8);
                         TransactionStatus status = trx.Start();
                         viewPlan.SetViewRange(viewRange);
                         status = trx.Commit();
