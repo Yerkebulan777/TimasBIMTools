@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.IFC;
 using Autodesk.Revit.DB.Structure;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
@@ -58,8 +57,9 @@ namespace RevitTimasBIMTools.CutOpening
         private BoundingBoxXYZ hostBbox = null;
         private BoundingBoxXYZ elemBbox = null;
         private Plane plane = null;
-        private double width = 0;
         private double height = 0;
+        private double width = 0;
+        private double depth = 0;
 
         #endregion
 
@@ -111,7 +111,7 @@ namespace RevitTimasBIMTools.CutOpening
             foreach (Element elem in collector)
             {
                 centroid = elem.GetMiddlePointByBoundingBox(out elemBbox);
-                if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, out vector))
+                if (IsIntersectionValid(elem, hostSolid, hostNormal, centroid, out vector, out depth))
                 {
                     ISet<XYZ> points = hostSolid.GetIntersectionPoints(elem, global, options, ref centroid);
 
@@ -127,10 +127,10 @@ namespace RevitTimasBIMTools.CutOpening
                         ElementModel model = new(elem, level)
                         {
                             Width = width,
+                            Depth = depth,
                             Height = height,
                             SectionPlane = plane,
                             SectionBox = sectionBox,
-                            Depth = Math.Abs(hostNormal.DotProduct(vector)),
                             MinSizeInMm = Convert.ToInt32(minSize * footToMm),
                         };
                         model.SetSizeDescription();
@@ -145,16 +145,17 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Validate Intersection And Verify Section Size
 
-        private bool IsIntersectionValid(Element elem, in Solid solid, in XYZ normal, in XYZ centroid, out XYZ vector)
+        private bool IsIntersectionValid(Element elem, in Solid solid, in XYZ normal, in XYZ centroid, out XYZ vector, out double depth)
         {
-            Line line = null;
+            depth = 0;
             vector = XYZ.Zero;
+            Line interLine = null;
             if (elem.Location is LocationCurve curve)
             {
-                line = curve.Curve as Line;
-                if (normal.IsAlmostEqualTo(line.Direction, threshold))
+                interLine = curve.Curve as Line;
+                if (normal.IsAlmostEqualTo(interLine.Direction, threshold))
                 {
-                    vector = line.Direction.Normalize();
+                    vector = interLine.Direction.Normalize();
                 }
             }
             else if (elem is FamilyInstance instance)
@@ -164,32 +165,28 @@ namespace RevitTimasBIMTools.CutOpening
                 if (normal.IsAlmostEqualTo(transform.BasisX, threshold))
                 {
                     vector = transform.BasisX.Normalize();
-                    line = CreateLine(vector, centroid);
+                    interLine = CreateLine(vector, centroid);
                 }
 
                 if (normal.IsAlmostEqualTo(transform.BasisY, threshold))
                 {
                     vector = transform.BasisY.Normalize();
-                    line = CreateLine(vector, centroid);
+                    interLine = CreateLine(vector, centroid);
                 }
             }
 
-            return GetIntersectionVector(solid, ref line, ref vector);
-        }
-
-
-        private bool GetIntersectionVector(in Solid solid, ref Line line, ref XYZ vector)
-        {
-            if (solid != null && line != null)
+            if (solid != null && interLine != null)
             {
-                SolidCurveIntersection curves = solid.IntersectWithCurve(line, intersectOptions);
+                SolidCurveIntersection curves = solid.IntersectWithCurve(interLine, intersectOptions);
                 if (curves != null && 0 < curves.SegmentCount)
                 {
-                    line = curves.GetCurveSegment(0) as Line;
-                    vector = line.GetEndPoint(1) - line.GetEndPoint(0);
+                    interLine = curves.GetCurveSegment(0) as Line;
+                    vector = interLine.GetEndPoint(1) - interLine.GetEndPoint(0);
+                    depth = Math.Abs(normal.DotProduct(vector));
                 }
             }
-            return !vector.IsAlmostEqualTo(XYZ.Zero);
+
+            return depth < minSideSize;
         }
 
 
@@ -320,8 +317,8 @@ namespace RevitTimasBIMTools.CutOpening
 
         //private bool ComputeIntersectionVolume(Solid solidA, Solid solidB)
         //{
-        //    Solid line = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
-        //    return line.Volume > 0;
+        //    Solid interLine = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
+        //    return interLine.Volume > 0;
         //}
 
 

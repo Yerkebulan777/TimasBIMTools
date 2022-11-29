@@ -283,15 +283,15 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private int maxSize = Properties.Settings.Default.MaxSideSizeInMm;
-        public int MaxSideSize
+        private int minDepth = Properties.Settings.Default.MinDepthSizeInMm;
+        public int MinDepthSize
         {
-            get => maxSize;
+            get => minDepth;
             set
             {
-                if (SetProperty(ref maxSize, value))
+                if (SetProperty(ref minDepth, value))
                 {
-                    Properties.Settings.Default.MaxSideSizeInMm = maxSize;
+                    Properties.Settings.Default.MinDepthSizeInMm = minDepth;
                     Properties.Settings.Default.Save();
                 }
             }
