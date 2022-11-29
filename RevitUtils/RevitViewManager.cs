@@ -156,10 +156,10 @@ namespace RevitTimasBIMTools.RevitUtils
                     Document doc = viewPlan.Document;
                     PlanViewRange viewRange = viewPlan.GetViewRange();
 
-                    Element top = doc.GetElement(viewPlan.get_Parameter(BuiltInParameter.VIEW_UNDERLAY_TOP_ID).AsElementId());
-                    Element bot = doc.GetElement(viewPlan.get_Parameter(BuiltInParameter.VIEW_UNDERLAY_BOTTOM_ID).AsElementId());
+                    Element topLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.TopClipPlane));
+                    Element bottomLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.BottomClipPlane));
 
-                    if (top is Level toplvl && bot is Level botlvl)
+                    if (topLevel is Level toplvl && bottomLevel is Level botlvl)
                     {
                         using Transaction trx = new(doc, "SetViewRange");
 
