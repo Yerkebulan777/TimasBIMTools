@@ -107,20 +107,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool filled;
-        public bool IsModelDataFilled
-        {
-            get => filled;
-            set
-            {
-                if (SetProperty(ref filled, value) && !filled)
-                {
-                    UniqueSymbolNames = null;
-                    UniqueLevelNames = null;
-                }
-            }
-        }
-
         #endregion
 
 
@@ -359,7 +345,6 @@ namespace RevitTimasBIMTools.ViewModels
                     IsStarted = false;
                     IsDataRefresh = false;
                     IsOptionEnabled = false;
-                    IsModelDataFilled = false;
                     DocumentCollection = null;
                     EngineerCategories = null;
                     StructureMaterials = null;
@@ -368,6 +353,7 @@ namespace RevitTimasBIMTools.ViewModels
                     LevelTextFilter = null;
                     FamilySymbols = null;
                     currentItem = null;
+                    view3d = null;
 
                 }, taskContext);
             }
@@ -528,7 +514,6 @@ namespace RevitTimasBIMTools.ViewModels
                     ViewDataCollection = CollectionViewSource.GetDefaultView(modelData) as ListCollectionView;
                     UniqueLevelNames = new SortedSet<string>(modelData.Select(m => m.LevelName).Append(string.Empty)).ToList();
                     UniqueSymbolNames = new SortedSet<string>(modelData.Select(m => m.SymbolName).Append(string.Empty)).ToList();
-                    IsModelDataFilled = modelData.Count != 0;
                 }
             }
         }
@@ -673,7 +658,6 @@ namespace RevitTimasBIMTools.ViewModels
         private void RefreshActiveDataHandler()
         {
             IsDataRefresh = false;
-            IsModelDataFilled = false;
             if (document != null && material != null && category != null)
             {
                 Task task = Task.WhenAll();
