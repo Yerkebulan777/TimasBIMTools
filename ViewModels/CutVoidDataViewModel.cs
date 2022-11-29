@@ -555,7 +555,8 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (viewData != null && !viewData.IsEmpty)
             {
-                currentItem = viewData.GetItemAt(0);
+                currentItem = ViewDataCollection.GetItemAt(0);
+                ViewDataCollection.Filter = FilterModelCollection;
                 if (currentItem is ElementModel model && viewData.MoveCurrentTo(currentItem))
                 {
                     IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
