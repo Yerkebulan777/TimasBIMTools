@@ -244,19 +244,25 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
+
         public static Solid CreateExtrusionGeometry(this IList<CurveLoop> curveloops, in XYZ normal, in double height, in double offset)
         {
             double half = height / 2;
-            List<CurveLoop> profile = new(5);
+            IList<CurveLoop> profile = new List<CurveLoop>(4);
             foreach (CurveLoop loop in curveloops)
             {
-                CurveLoop newloop = loop.IsCounterclockwise(normal)
-                ? CurveLoop.CreateViaOffset(loop, offset, normal)
-                : CurveLoop.CreateViaOffset(loop, -offset, normal);
+                CurveLoop newloop = CurveLoop.CreateViaCopy(loop);
+                if (newloop.IsCounterclockwise(normal))
+                {
+                    newloop.Flip();
+                }
+                newloop = CurveLoop.CreateViaOffset(newloop, offset, normal);
                 Transform trs = Transform.CreateTranslation(normal * half);
                 newloop.Transform(trs.Inverse);
                 profile.Add(newloop);
             }
+
+            profile = ExporterIFCUtils.ValidateCurveLoops(profile, normal);
             return GeometryCreationUtilities.CreateExtrusionGeometry(profile, normal, height);
         }
 
