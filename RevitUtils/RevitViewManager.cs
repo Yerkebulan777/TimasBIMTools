@@ -149,7 +149,7 @@ namespace RevitTimasBIMTools.RevitUtils
         public static void ShowModelInPlanView(UIDocument uidoc, in ElementModel model, ViewDiscipline discipline)
         {
             ViewPlan viewPlan = GetPlanView(uidoc, model.HostLevel);
-            if (viewPlan != null && model.IsValidModel())
+            if (viewPlan != null && model.Instanse.IsValidObject)
             {
                 try
                 {
