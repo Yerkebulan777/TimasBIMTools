@@ -83,8 +83,8 @@ namespace RevitTimasBIMTools.CutOpening
         {
             Transform global = document.Transform;
             IList<ElementModel> output = new List<ElementModel>(50);
-            minSideSize = Properties.Settings.Default.MinSideSizeInMm / footToMm;
-            minDepthSize = Properties.Settings.Default.MinDepthSizeInMm / footToMm;
+            minSideSize = Math.Round(Properties.Settings.Default.MinSideSizeInMm / footToMm, 5);
+            minDepthSize = Math.Round(Properties.Settings.Default.MinDepthSizeInMm / footToMm, 5);
             IEnumerable<Element> enclosures = ElementTypeIdData?.GetInstancesByTypeIdDataAndMaterial(doc, material);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             TransactionStatus status = transGroup.Start();
@@ -188,7 +188,7 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
 
-            return minDepthSize <= depth;
+            return minDepthSize < depth;
         }
 
 
