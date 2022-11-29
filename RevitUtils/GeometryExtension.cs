@@ -266,7 +266,7 @@ namespace RevitTimasBIMTools.RevitUtils
             };
 
             CurveLoop loop = CurveLoop.Create(edges);
-            if (loop.IsCounterclockwise(normal)) { loop.Flip(); }
+            if (!loop.IsCounterclockwise(normal)) { loop.Flip(); }
             loop = CurveLoop.CreateViaOffset(loop, offset, normal);
             IList<CurveLoop> curveloops = new List<CurveLoop>() { loop };
 
