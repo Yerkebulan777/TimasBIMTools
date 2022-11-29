@@ -18,6 +18,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Default Properties
 
+        private const double epsilon = 0.0005;
         private const double footToMm = 304.8;
         private readonly Options options = new()
         {
@@ -83,8 +84,8 @@ namespace RevitTimasBIMTools.CutOpening
         {
             Transform global = document.Transform;
             IList<ElementModel> output = new List<ElementModel>(50);
-            minSideSize = Math.Round(Properties.Settings.Default.MinSideSizeInMm / footToMm, 5);
-            minDepthSize = Math.Round(Properties.Settings.Default.MinDepthSizeInMm / footToMm, 5);
+            minSideSize = Math.Round(Properties.Settings.Default.MinSideSizeInMm / footToMm - epsilon, 5);
+            minDepthSize = Math.Round(Properties.Settings.Default.MinDepthSizeInMm / footToMm - epsilon, 5);
             IEnumerable<Element> enclosures = ElementTypeIdData?.GetInstancesByTypeIdDataAndMaterial(doc, material);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             TransactionStatus status = transGroup.Start();
@@ -124,7 +125,7 @@ namespace RevitTimasBIMTools.CutOpening
                     GetSectionSize(sectionBox, ref hostNormal, out width, out height);
 
                     double minSize = Math.Min(width, height);
-                    if (minSize >= minSideSize)
+                    if (minSideSize < minSize)
                     {
                         ElementModel model = new(elem, level)
                         {
