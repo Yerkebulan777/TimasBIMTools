@@ -41,6 +41,10 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                     finally
                     {
+                        ViewDetailLevel detail = ViewDetailLevel.Fine;
+                        DisplayStyle style = DisplayStyle.RealisticWithEdges;
+                        ViewDiscipline discipline = ViewDiscipline.Mechanical;
+                        SetViewSettings(doc, view3d, discipline, style, detail);
                         vft.Dispose();
                     }
                 }
@@ -56,9 +60,9 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 if (!view3d.IsTemplate && view3d.Name.Equals(viewName))
                 {
-                    DisplayStyle style = DisplayStyle.Realistic;
                     ViewDetailLevel detail = ViewDetailLevel.Fine;
-                    ViewDiscipline discipline = ViewDiscipline.Coordination;
+                    DisplayStyle style = DisplayStyle.RealisticWithEdges;
+                    ViewDiscipline discipline = ViewDiscipline.Mechanical;
                     SetViewSettings(doc, view3d, discipline, style, detail);
                     return view3d;
                 }
