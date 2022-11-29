@@ -469,6 +469,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         UIDocument uidoc = app.ActiveUIDocument;
                         System.Windows.Clipboard.SetText(model.Instanse.Id.ToString());
+                        uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                         RevitViewManager.ShowModelInPlanView(uidoc, model, ViewDiscipline.Mechanical);
                     }
                 });
@@ -685,11 +686,11 @@ namespace RevitTimasBIMTools.ViewModels
                     currentItem = ViewDataCollection.GetItemAt(0);
                     if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
+                        patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
                         if (previewControl is null && currentItem is ElementModel model && model.IsValidModel())
                         {
                             if (RevitViewManager.SetCustomSectionBox(uidoc, model.SectionPlane.Origin, view3d))
                             {
-                                patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
                                 uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                                 RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
                                 RevitViewManager.ShowModelInPlanView(uidoc, model, ViewDiscipline.Mechanical);
