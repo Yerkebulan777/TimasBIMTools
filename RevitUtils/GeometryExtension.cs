@@ -276,15 +276,15 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static Solid CreateExtrusionGeometry(this IList<CurveLoop> curveloops, in XYZ normal, in double height)
         {
-            double half = height / 2;
             IList<CurveLoop> profile = new List<CurveLoop>(4);
             foreach (CurveLoop loop in curveloops)
             {
                 CurveLoop newloop = CurveLoop.CreateViaCopy(loop);
-                Transform trs = Transform.CreateTranslation(normal * half);
+                Transform trs = Transform.CreateTranslation(normal * height / 2);
                 newloop.Transform(trs.Inverse);
                 profile.Add(newloop);
             }
+            profile = ExporterIFCUtils.ValidateCurveLoops(profile, normal);
             return GeometryCreationUtilities.CreateExtrusionGeometry(profile, normal, height);
         }
 
