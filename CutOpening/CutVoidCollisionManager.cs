@@ -247,9 +247,10 @@ namespace RevitTimasBIMTools.CutOpening
 
         public void VerifyOpenningSize(Document doc, in ElementModel model)
         {
-            IList<CurveLoop> profile = GetSectionProfile(model);
+            XYZ normal = model.SectionPlane.Normal;
             double offset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm * 2 / footToMm);
-            Solid solid = profile.CreateExtrusionGeometry(model.SectionPlane.Normal, model.Depth, offset);
+            IList<CurveLoop> profile = model.GetSectionProfileWithOffset(offset);
+            Solid solid = profile.CreateExtrusionGeometry(normal, model.Depth);
             using Transaction trans = new(doc, "Create opening");
             TransactionStatus status = trans.Start();
             if (status == TransactionStatus.Started)
@@ -257,37 +258,6 @@ namespace RevitTimasBIMTools.CutOpening
                 solid.CreateDirectShape(doc);
                 status = trans.Commit();
             }
-        }
-
-
-        private IList<CurveLoop> GetSectionProfile(ElementModel model)
-        {
-            Plane plane = model.SectionPlane;
-            BoundingBoxUV bbox = model.SectionBox;
-            XYZ origin = model.SectionPlane.Origin;
-
-            XYZ pt0 = origin + (bbox.Min.U * plane.XVec) + (bbox.Min.V * plane.YVec);
-            XYZ pt1 = origin + (bbox.Max.U * plane.XVec) + (bbox.Min.V * plane.YVec);
-            XYZ pt2 = origin + (bbox.Max.U * plane.XVec) + (bbox.Max.V * plane.YVec);
-            XYZ pt3 = origin + (bbox.Min.U * plane.XVec) + (bbox.Max.V * plane.YVec);
-
-            List<Curve> edges = new(4)
-            {
-                Line.CreateBound(pt0, pt1),
-                Line.CreateBound(pt1, pt2),
-                Line.CreateBound(pt2, pt3),
-                Line.CreateBound(pt3, pt0)
-            };
-
-            CurveLoop loop = CurveLoop.Create(edges);
-            if (loop.IsCounterclockwise(model.SectionPlane.Normal))
-            {
-                loop.Flip();
-            }
-
-            IList<CurveLoop> curveloops = new List<CurveLoop>() { loop };
-
-            return ExporterIFCUtils.ValidateCurveLoops(curveloops, model.SectionPlane.Normal);
         }
 
 

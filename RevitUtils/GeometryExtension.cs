@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
+using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
@@ -244,25 +245,47 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
+        public static IList<CurveLoop> GetSectionProfileWithOffset(this ElementModel model, in double offset)
+        {
+            Plane plane = model.SectionPlane;
+            BoundingBoxUV bbox = model.SectionBox;
+            XYZ origin = model.SectionPlane.Origin;
+            XYZ normal = model.SectionPlane.Normal;
 
-        public static Solid CreateExtrusionGeometry(this IList<CurveLoop> curveloops, in XYZ normal, in double height, in double offset)
+            XYZ pt0 = origin + (bbox.Min.U * plane.XVec) + (bbox.Min.V * plane.YVec);
+            XYZ pt1 = origin + (bbox.Max.U * plane.XVec) + (bbox.Min.V * plane.YVec);
+            XYZ pt2 = origin + (bbox.Max.U * plane.XVec) + (bbox.Max.V * plane.YVec);
+            XYZ pt3 = origin + (bbox.Min.U * plane.XVec) + (bbox.Max.V * plane.YVec);
+
+            IList<Curve> edges = new List<Curve>(4)
+            {
+                Line.CreateBound(pt0, pt1),
+                Line.CreateBound(pt1, pt2),
+                Line.CreateBound(pt2, pt3),
+                Line.CreateBound(pt3, pt0)
+            };
+
+            CurveLoop loop = CurveLoop.Create(edges);
+            if (loop.IsCounterclockwise(normal)) { loop.Flip(); }
+            loop = CurveLoop.CreateViaThicken(loop, offset, normal);
+            IList<CurveLoop> curveloops = new List<CurveLoop>() { loop };
+
+            return ExporterIFCUtils.ValidateCurveLoops(curveloops, normal);
+        }
+
+
+        public static Solid CreateExtrusionGeometry(this IList<CurveLoop> curveloops, in XYZ normal, in double height)
         {
             double half = height / 2;
             IList<CurveLoop> profile = new List<CurveLoop>(4);
             foreach (CurveLoop loop in curveloops)
             {
+                
                 CurveLoop newloop = CurveLoop.CreateViaCopy(loop);
-                if (newloop.IsCounterclockwise(normal))
-                {
-                    newloop.Flip();
-                }
-                newloop = CurveLoop.CreateViaOffset(newloop, offset, normal);
                 Transform trs = Transform.CreateTranslation(normal * half);
                 newloop.Transform(trs.Inverse);
                 profile.Add(newloop);
             }
-
-            profile = ExporterIFCUtils.ValidateCurveLoops(profile, normal);
             return GeometryCreationUtilities.CreateExtrusionGeometry(profile, normal, height);
         }
 
