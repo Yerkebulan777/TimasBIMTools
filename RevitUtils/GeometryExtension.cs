@@ -280,7 +280,6 @@ namespace RevitTimasBIMTools.RevitUtils
             IList<CurveLoop> profile = new List<CurveLoop>(4);
             foreach (CurveLoop loop in curveloops)
             {
-                
                 CurveLoop newloop = CurveLoop.CreateViaCopy(loop);
                 Transform trs = Transform.CreateTranslation(normal * half);
                 newloop.Transform(trs.Inverse);
