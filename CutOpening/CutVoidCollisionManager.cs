@@ -188,7 +188,7 @@ namespace RevitTimasBIMTools.CutOpening
                 }
             }
 
-            return depth <= minDepthSize;
+            return minDepthSize <= depth;
         }
 
 
