@@ -184,7 +184,6 @@ namespace RevitTimasBIMTools.RevitUtils
                     uidoc.Selection.Dispose();
                     ActivateView(uidoc, viewPlan, discipline);
                     BoundingBoxXYZ bbox = CreateBoundingBox(viewPlan, model.Instanse, model.SectionPlane.Origin);
-                    uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                     ZoomElementInView(uidoc, viewPlan, bbox);
                     uidoc.RefreshActiveView();
                 }

@@ -690,6 +690,7 @@ namespace RevitTimasBIMTools.ViewModels
                             if (RevitViewManager.SetCustomSectionBox(uidoc, model.SectionPlane.Origin, view3d))
                             {
                                 patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
+                                uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                                 RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
                                 RevitViewManager.ShowModelInPlanView(uidoc, model, ViewDiscipline.Mechanical);
                                 previewControl = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
