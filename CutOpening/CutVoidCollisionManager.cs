@@ -134,7 +134,6 @@ namespace RevitTimasBIMTools.CutOpening
                             Height = height,
                             SectionPlane = plane,
                             SectionBox = sectionBox,
-                            MinSizeInMm = Convert.ToInt32(minSize * footToMm),
                         };
                         model.SetSizeDescription();
                         yield return model;

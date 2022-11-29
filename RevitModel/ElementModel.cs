@@ -30,7 +30,7 @@ namespace RevitTimasBIMTools.RevitModel
         public Plane SectionPlane { get; internal set; }
         public BoundingBoxUV SectionBox { get; internal set; }
         public string Description { get; internal set; }
-        public int MinSizeInMm { get; internal set; }
+        public int SizeInMm { get; internal set; }
         public double Height { get; internal set; }
         public double Width { get; internal set; }
         public double Depth { get; internal set; }
@@ -55,6 +55,7 @@ namespace RevitTimasBIMTools.RevitModel
             int h = Convert.ToInt16(Height * 304.8);
             int w = Convert.ToInt16(Width * 304.8);
             Description = $"{w}x{h}(h)";
+            SizeInMm = h + w;
         }
 
 
