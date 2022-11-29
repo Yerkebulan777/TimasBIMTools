@@ -248,7 +248,7 @@ namespace RevitTimasBIMTools.CutOpening
         public void VerifyOpenningSize(Document doc, in ElementModel model)
         {
             XYZ normal = model.SectionPlane.Normal;
-            double offset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm * 2 / footToMm);
+            double offset = Convert.ToDouble(Properties.Settings.Default.CutOffsetInMm / footToMm);
             IList<CurveLoop> profile = model.GetSectionProfileWithOffset(offset);
             Solid solid = profile.CreateExtrusionGeometry(normal, model.Depth);
             using Transaction trans = new(doc, "Create opening");
