@@ -159,14 +159,17 @@ namespace RevitTimasBIMTools.RevitUtils
                     Element top = doc.GetElement(viewPlan.get_Parameter(BuiltInParameter.VIEW_UNDERLAY_TOP_ID).AsElementId());
                     Element bot = doc.GetElement(viewPlan.get_Parameter(BuiltInParameter.VIEW_UNDERLAY_BOTTOM_ID).AsElementId());
 
-                    if (top is Level topLevel && bot is Level botLevel)
+                    if (top is Level toplvl && bot is Level botlvl)
                     {
                         using Transaction trx = new(doc, "SetViewRange");
 
-                        double elevation = topLevel.Elevation - botLevel.Elevation;
-                        double offset = Math.Round(elevation * 0.3 * 304.8) / 304.8;
+                        MidpointRounding rule = MidpointRounding.AwayFromZero;
+                        double elevation = toplvl.Elevation - botlvl.Elevation;
+                        elevation = elevation < 7.5 ? 3300 / 304.8 : elevation;
+                        double cut = Math.Round(elevation * 304.8 * 0.5, rule) / 304.8;
+                        double offset = Math.Round(cut * 304.8 * 0.5, rule) / 304.8;
 
-                        viewRange.SetOffset(PlanViewPlane.CutPlane, offset);
+                        viewRange.SetOffset(PlanViewPlane.CutPlane, cut);
                         viewRange.SetOffset(PlanViewPlane.TopClipPlane, offset);
                         viewRange.SetOffset(PlanViewPlane.BottomClipPlane, -offset);
                         viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, -offset);
