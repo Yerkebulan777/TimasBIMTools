@@ -9,33 +9,37 @@ namespace RevitTimasBIMTools.RevitModel
 {
     public sealed class PreviewControlModel
     {
+        private bool IsEnabled = false;
         private readonly PreviewDialogBox window;
-        private PreviewControl PreviewControl { get; set; }
+        private PreviewControl previewControl { get; set; }
         public PreviewControlModel(PreviewDialogBox frame)
         {
             window = frame;
-            window.WindowStartupLocation = WindowStartupLocation.Manual;
         }
 
 
         public void ShowPreviewControl(UIApplication uiapp, View3D view3d)
         {
-            Document doc = uiapp.ActiveUIDocument.Document;
-            Tuple<int, int> point = uiapp.SetActiveViewLocation(window);
-            try
+            if (!IsEnabled)
             {
-                PreviewControl = new PreviewControl(doc, view3d.Id);
-                if (0 > window.GridControl.Children.Add(PreviewControl))
+                Document doc = uiapp.ActiveUIDocument.Document;
+                Tuple<int, int> point = uiapp.SetActiveViewLocation(window);
+                try
                 {
-                    PreviewControl.Loaded += PreviewControlLoad;
+                    previewControl = new PreviewControl(doc, view3d.Id);
+                    if (0 > window.GridControl.Children.Add(previewControl))
+                    {
+                        previewControl.Loaded += PreviewControlLoad;
+                        IsEnabled = true;
+                    }
                 }
-            }
-            finally
-            {
-                window.ShowInTaskbar = true;
-                window.Left = point.Item1;
-                window.Top = point.Item2;
-                window.Show();
+                finally
+                {
+                    window.ShowInTaskbar = true;
+                    window.Left = point.Item1;
+                    window.Top = point.Item2;
+                    window.Show();
+                }
             }
         }
 
@@ -44,8 +48,8 @@ namespace RevitTimasBIMTools.RevitModel
         {
             if (window.Activate())
             {
-                PreviewControl.Loaded -= PreviewControlLoad;
-                PreviewControl.UIView.ZoomToFit();
+                previewControl.Loaded -= PreviewControlLoad;
+                previewControl.UIView.ZoomToFit();
             }
         }
     }
