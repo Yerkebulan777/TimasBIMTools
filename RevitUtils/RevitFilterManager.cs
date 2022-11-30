@@ -11,6 +11,9 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitFilterManager
     {
+
+        const double epsilon = 1.0e-3;
+
         #region Document Collector
 
         public static FilteredElementCollector GetRevitLinkInstanceCollector(Document doc)
@@ -203,7 +206,6 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public static FilteredElementCollector ParamFilterFactory(FilteredElementCollector collector, ElementId paramId, double value, int ruleSwitch = 0)
         {
-            const double epsilon = 1.0e-3;
             FilterRule filterRule;
             switch (ruleSwitch)
             {
