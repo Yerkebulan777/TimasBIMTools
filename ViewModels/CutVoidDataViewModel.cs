@@ -43,7 +43,7 @@ namespace RevitTimasBIMTools.ViewModels
             ShowCollisionCommand = new AsyncRelayCommand(ShowHandelCommandAsync);
             OkCanselCommand = new AsyncRelayCommand(OkCanselHandelCommandAsync);
         }
-        /*asssdsds*/
+        
 
         #region Templory
 
