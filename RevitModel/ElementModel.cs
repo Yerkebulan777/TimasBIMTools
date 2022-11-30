@@ -27,12 +27,10 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        public XYZ Origin { get; internal set; }
-        public XYZ Vector { get; internal set; }
-        public XYZ Normal { get; internal set; }
-        public IList<CurveLoop> CurveLoops { get; internal set; }
+        public Plane SectionPlane { get; internal set; }
+        public BoundingBoxUV SectionBox { get; internal set; }
         public string Description { get; internal set; }
-        public int MinSizeValue { get; internal set; }
+        public int SizeInMm { get; internal set; }
         public double Height { get; internal set; }
         public double Width { get; internal set; }
         public double Depth { get; internal set; }
@@ -52,13 +50,12 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
-        public void SetSizeDescription(double minSizeInMm)
+        public void SetSizeDescription()
         {
-            Depth = Math.Abs(Normal.DotProduct(Vector));
-            MinSizeValue = Convert.ToInt32(minSizeInMm);
             int h = Convert.ToInt16(Height * 304.8);
             int w = Convert.ToInt16(Width * 304.8);
             Description = $"{w}x{h}(h)";
+            SizeInMm = h + w;
         }
 
 

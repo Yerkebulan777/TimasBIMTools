@@ -41,6 +41,10 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                     finally
                     {
+                        ViewDetailLevel detail = ViewDetailLevel.Fine;
+                        DisplayStyle style = DisplayStyle.RealisticWithEdges;
+                        ViewDiscipline discipline = ViewDiscipline.Mechanical;
+                        SetViewSettings(doc, view3d, discipline, style, detail);
                         vft.Dispose();
                     }
                 }
@@ -56,9 +60,9 @@ namespace RevitTimasBIMTools.RevitUtils
             {
                 if (!view3d.IsTemplate && view3d.Name.Equals(viewName))
                 {
-                    DisplayStyle style = DisplayStyle.Realistic;
                     ViewDetailLevel detail = ViewDetailLevel.Fine;
-                    ViewDiscipline discipline = ViewDiscipline.Coordination;
+                    DisplayStyle style = DisplayStyle.RealisticWithEdges;
+                    ViewDiscipline discipline = ViewDiscipline.Mechanical;
                     SetViewSettings(doc, view3d, discipline, style, detail);
                     return view3d;
                 }
@@ -142,27 +146,30 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         #region ShowElement
-        public static void ShowModelInPlanView(UIDocument uidoc, ElementModel model, ViewDiscipline discipline)
+        public static void ShowModelInPlanView(UIDocument uidoc, in ElementModel model, ViewDiscipline discipline)
         {
             ViewPlan viewPlan = GetPlanView(uidoc, model.HostLevel);
-            if (viewPlan != null)
+            if (viewPlan != null && model.Instanse.IsValidObject)
             {
                 try
                 {
                     Document doc = viewPlan.Document;
                     PlanViewRange viewRange = viewPlan.GetViewRange();
 
-                    Element top = doc.GetElement(viewPlan.get_Parameter(BuiltInParameter.VIEW_UNDERLAY_TOP_ID).AsElementId());
-                    Element bot = doc.GetElement(viewPlan.get_Parameter(BuiltInParameter.VIEW_UNDERLAY_BOTTOM_ID).AsElementId());
+                    Element topLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.TopClipPlane));
+                    Element bottomLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.BottomClipPlane));
 
-                    if (top is Level topLevel && bot is Level botLevel)
+                    if (topLevel is Level toplvl && bottomLevel is Level botlvl)
                     {
                         using Transaction trx = new(doc, "SetViewRange");
 
-                        double elevation = topLevel.Elevation - botLevel.Elevation;
-                        double offset = Math.Round(elevation * 0.3 * 304.8) / 304.8;
+                        MidpointRounding rule = MidpointRounding.AwayFromZero;
+                        double elevation = toplvl.Elevation - botlvl.Elevation;
+                        elevation = elevation < 3.5 ? 3000 / 304.8 : elevation;
+                        double cut = Math.Round(elevation * 304.8 * 0.5, rule) / 304.8;
+                        double offset = Math.Round((cut * 304.8) / 3, rule) / 304.8;
 
-                        viewRange.SetOffset(PlanViewPlane.CutPlane, offset);
+                        viewRange.SetOffset(PlanViewPlane.CutPlane, cut);
                         viewRange.SetOffset(PlanViewPlane.TopClipPlane, offset);
                         viewRange.SetOffset(PlanViewPlane.BottomClipPlane, -offset);
                         viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, -offset);
@@ -175,8 +182,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 finally
                 {
                     ActivateView(uidoc, viewPlan, discipline);
-                    BoundingBoxXYZ bbox = CreateBoundingBox(viewPlan, model.Instanse, model.Origin);
-                    uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
+                    BoundingBoxXYZ bbox = CreateBoundingBox(viewPlan, model.Instanse, model.SectionPlane.Origin);
                     ZoomElementInView(uidoc, viewPlan, bbox);
                     uidoc.RefreshActiveView();
                 }

@@ -1,9 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
+using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
@@ -29,16 +29,16 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static XYZ GetHostPositiveNormal(this Element elem, double tollerance = 0)
+        public static XYZ GetHostNormal(this Element elem, double tollerance = 0)
         {
             XYZ resultNormal = XYZ.BasisZ;
+            Transform local = Transform.Identity;
             if (elem is Wall wall)
             {
-                resultNormal = wall.Orientation.Normalize();
+                resultNormal = local.OfVector(wall.Orientation).Normalize();
             }
             else if (elem is HostObject hostObject)
             {
-                Transform local = Transform.Identity;
                 foreach (Reference refFace in HostObjectUtils.GetTopFaces(hostObject))
                 {
                     GeometryObject geo = elem.GetGeometryObjectFromReference(refFace);
@@ -46,16 +46,15 @@ namespace RevitTimasBIMTools.RevitUtils
                     {
                         try
                         {
-                            XYZ normal = resultNormal;
-                            if (face is PlanarFace planar && planar != null)
+                            if (face is PlanarFace planar)
                             {
-                                normal = planar.FaceNormal;
+                                resultNormal = local.OfVector(planar.FaceNormal).Normalize();
                             }
                             else
                             {
                                 BoundingBoxUV box = face.GetBoundingBox();
-                                normal = face.ComputeNormal((box.Max + box.Min) * 0.5);
-                                resultNormal = local.OfVector(normal).Normalize();
+                                resultNormal = face.ComputeNormal((box.Max + box.Min) * 0.5);
+                                resultNormal = local.OfVector(resultNormal).Normalize();
                             }
                         }
                         catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
@@ -65,7 +64,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     }
                 }
             }
-            return resultNormal.ConvertToPositive();
+            return resultNormal;
         }
 
 
@@ -155,9 +154,9 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static List<XYZ> GetIntersectionVerticles(this Solid source, in Element elem, in Transform global, in Options options)
+        public static ISet<XYZ> GetIntersectionPoints(this Solid source, in Element elem, in Transform global, in Options options, ref XYZ centroid)
         {
-            List<XYZ> vertices = new(3);
+            ISet<XYZ> vertices = new HashSet<XYZ>(50);
             GeometryElement geomElement = elem.get_Geometry(options);
             BooleanOperationsType intersect = BooleanOperationsType.Intersect;
             foreach (GeometryObject obj in geomElement.GetTransformed(global))
@@ -172,18 +171,17 @@ namespace RevitTimasBIMTools.RevitUtils
                     {
                         if (solid != null && solid.Volume > 0)
                         {
+                            centroid = solid.ComputeCentroid();
                             foreach (Face f in solid.Faces)
                             {
                                 Mesh mesh = f.Triangulate();
                                 int n = mesh.NumTriangles;
-
                                 for (int i = 0; i < n; ++i)
                                 {
                                     MeshTriangle triangle = mesh.get_Triangle(i);
-
-                                    vertices.Add(triangle.get_Vertex(0));
-                                    vertices.Add(triangle.get_Vertex(1));
-                                    vertices.Add(triangle.get_Vertex(2));
+                                    _ = vertices.Add(triangle.get_Vertex(0));
+                                    _ = vertices.Add(triangle.get_Vertex(1));
+                                    _ = vertices.Add(triangle.get_Vertex(2));
                                 }
                             }
                         }
@@ -194,21 +192,29 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static double SignedDistanceTo(this Plane plane, XYZ pnt)
+        public static BoundingBoxUV ProjectPointsOnPlane(this Plane plane, in ISet<XYZ> points)
         {
-            Debug.Assert(plane.Normal.GetLength() == 1, "expected normalised plane normal");
-            return plane.Normal.DotProduct(pnt - plane.Origin);
-        }
+            BoundingBoxUV result = null;
+            if (plane != null && plane.IsValidObject)
+            {
+                double minU = 0, maxU = 0;
+                double minV = 0, maxV = 0;
 
+                foreach (XYZ pnt in points)
+                {
+                    plane.Project(pnt, out UV uvp, out double dist);
+                    if (uvp != null && dist > 0)
+                    {
+                        minU = Math.Min(minU, uvp.U);
+                        maxU = Math.Max(maxU, uvp.U);
+                        minV = Math.Min(minV, uvp.V);
+                        maxV = Math.Max(maxV, uvp.V);
+                    }
+                }
 
-        /// <summary> Project given 3D XYZ point onto plane. </summary>
-        public static XYZ ProjectOnto(this Plane plane, XYZ p)
-        {
-            double d = plane.SignedDistanceTo(p);
-
-            XYZ q = p + d * plane.Normal;
-
-            return q;
+                result = new BoundingBoxUV(minU, minV, maxU, maxV);
+            }
+            return result;
         }
 
 
@@ -239,36 +245,48 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static IList<CurveLoop> GetSectionSize(this Solid solid, Document doc, XYZ normal, in XYZ centroid, out double width, out double height)
+        public static IList<CurveLoop> GetSectionProfileWithOffset(this ElementModel model, in double offset)
         {
-            width = 0; height = 0;
-            BoundingBoxUV size = solid.GetSectionBound(doc, normal, in centroid, out IList<CurveLoop> loops);
-            if (size != null && normal.IsAlmostEqualTo(XYZ.BasisX, 0.5))
+            Plane plane = model.SectionPlane;
+            BoundingBoxUV bbox = model.SectionBox;
+            XYZ origin = model.SectionPlane.Origin;
+            XYZ normal = model.SectionPlane.Normal;
+
+            XYZ pt0 = origin + (bbox.Min.U * plane.XVec) + (bbox.Min.V * plane.YVec);
+            XYZ pt1 = origin + (bbox.Max.U * plane.XVec) + (bbox.Min.V * plane.YVec);
+            XYZ pt2 = origin + (bbox.Max.U * plane.XVec) + (bbox.Max.V * plane.YVec);
+            XYZ pt3 = origin + (bbox.Min.U * plane.XVec) + (bbox.Max.V * plane.YVec);
+
+            IList<Curve> edges = new List<Curve>(4)
             {
-                width = Math.Round(size.Max.U - size.Min.U, 5);
-                height = Math.Round(size.Max.V - size.Min.V, 5);
-            }
-            if (size != null && normal.IsAlmostEqualTo(XYZ.BasisY, 0.5))
-            {
-                width = Math.Round(size.Max.V - size.Min.V, 5);
-                height = Math.Round(size.Max.U - size.Min.U, 5);
-            }
-            return loops;
+                Line.CreateBound(pt0, pt1),
+                Line.CreateBound(pt1, pt2),
+                Line.CreateBound(pt2, pt3),
+                Line.CreateBound(pt3, pt0)
+            };
+
+            CurveLoop loop = CurveLoop.Create(edges);
+            if (!loop.IsCounterclockwise(normal)) { loop.Flip(); }
+            loop = CurveLoop.CreateViaOffset(loop, offset, normal);
+            IList<CurveLoop> curveloops = new List<CurveLoop>() { loop };
+
+            return ExporterIFCUtils.ValidateCurveLoops(curveloops, normal);
         }
 
 
-        public static Solid CreateExtrusionGeometry(this IList<CurveLoop> curveloops, in XYZ normal, in double height, in double offset)
+        public static Solid CreateExtrusionGeometry(this IList<CurveLoop> curveloops, in XYZ normal, in double height)
         {
-            double half = height / 2;
-            List<CurveLoop> profileLoops = new(5);
+            double distance = Math.Abs(Math.Round(height + 0.25, 5));
+            IList<CurveLoop> profile = new List<CurveLoop>(4);
             foreach (CurveLoop loop in curveloops)
             {
-                CurveLoop newloop = CurveLoop.CreateViaOffset(loop, offset, normal);
-                Transform trs = Transform.CreateTranslation(normal * half);
+                CurveLoop newloop = CurveLoop.CreateViaCopy(loop);
+                Transform trs = Transform.CreateTranslation(normal * distance / 2);
                 newloop.Transform(trs.Inverse);
-                profileLoops.Add(newloop);
+                profile.Add(newloop);
             }
-            return GeometryCreationUtilities.CreateExtrusionGeometry(profileLoops, normal, height);
+            profile = ExporterIFCUtils.ValidateCurveLoops(profile, normal);
+            return GeometryCreationUtilities.CreateExtrusionGeometry(profile, normal, distance);
         }
 
 
@@ -370,9 +388,10 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        static XYZ ConvertToPositive(this XYZ vector)
+        public static XYZ ConvertToPositive(this XYZ vector)
         {
-            return new XYZ(Math.Abs(vector.X), Math.Abs(vector.Y), Math.Abs(vector.Z));
+            bool isPositive = vector.IsAlmostEqualTo(XYZ.BasisZ, 0.5) || vector.IsAlmostEqualTo(XYZ.BasisX, 0.5) || vector.IsAlmostEqualTo(XYZ.BasisY, 0.5);
+            return isPositive ? vector : vector.Negate();
         }
 
 
@@ -386,6 +405,7 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             return Math.Round(180 / Math.PI * radians, digit);
         }
+
 
     }
 }

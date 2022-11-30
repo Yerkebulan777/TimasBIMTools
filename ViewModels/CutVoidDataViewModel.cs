@@ -43,30 +43,12 @@ namespace RevitTimasBIMTools.ViewModels
             ShowCollisionCommand = new AsyncRelayCommand(ShowHandelCommandAsync);
             OkCanselCommand = new AsyncRelayCommand(OkCanselHandelCommandAsync);
         }
-
+        /*asssdsds*/
 
         #region Templory
 
         private Document doc = null;
         private object currentItem = null;
-        private PreviewControlModel control;
-
-
-        private View3D view3d { get; set; } = null;
-        private ElementId patternId { get; set; } = null;
-
-        private bool? dialogResult = false;
-        public bool? DialogResult
-        {
-            get => dialogResult;
-            set
-            {
-                if (SetProperty(ref dialogResult, value))
-                {
-                    control = null;
-                }
-            }
-        }
 
         #endregion
 
@@ -124,20 +106,6 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
-
-        private bool filled;
-        public bool IsModelDataFilled
-        {
-            get => filled;
-            set
-            {
-                if (SetProperty(ref filled, value) && !filled)
-                {
-                    UniqueSymbolNames = null;
-                    UniqueLevelNames = null;
-                }
-            }
-        }
 
         #endregion
 
@@ -315,21 +283,21 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private int maxSize = Properties.Settings.Default.MaxSideSizeInMm;
-        public int MaxSideSize
+        private int minDepth = Properties.Settings.Default.MinDepthSizeInMm;
+        public int MinDepthSize
         {
-            get => maxSize;
+            get => minDepth;
             set
             {
-                if (SetProperty(ref maxSize, value))
+                if (SetProperty(ref minDepth, value))
                 {
-                    Properties.Settings.Default.MaxSideSizeInMm = maxSize;
+                    Properties.Settings.Default.MinDepthSizeInMm = minDepth;
                     Properties.Settings.Default.Save();
                 }
             }
         }
 
-        
+
         private int cutOffset = Properties.Settings.Default.CutOffsetInMm;
         public int CutOffsetSize
         {
@@ -349,7 +317,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Methods
 
-        [STAThread]
         public async void StartHandler()
         {
             DocumentCollection = await RevitTask.RunAsync(app =>
@@ -366,7 +333,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        [STAThread]
         private async void ClearAndResetData()
         {
             if (IsStarted)
@@ -377,7 +343,6 @@ namespace RevitTimasBIMTools.ViewModels
                     IsStarted = false;
                     IsDataRefresh = false;
                     IsOptionEnabled = false;
-                    IsModelDataFilled = false;
                     DocumentCollection = null;
                     EngineerCategories = null;
                     StructureMaterials = null;
@@ -386,6 +351,7 @@ namespace RevitTimasBIMTools.ViewModels
                     LevelTextFilter = null;
                     FamilySymbols = null;
                     currentItem = null;
+                    view3d = null;
 
                 }, taskContext);
             }
@@ -503,6 +469,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         UIDocument uidoc = app.ActiveUIDocument;
                         System.Windows.Clipboard.SetText(model.Instanse.Id.ToString());
+                        uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                         RevitViewManager.ShowModelInPlanView(uidoc, model, ViewDiscipline.Mechanical);
                     }
                 });
@@ -546,7 +513,6 @@ namespace RevitTimasBIMTools.ViewModels
                     ViewDataCollection = CollectionViewSource.GetDefaultView(modelData) as ListCollectionView;
                     UniqueLevelNames = new SortedSet<string>(modelData.Select(m => m.LevelName).Append(string.Empty)).ToList();
                     UniqueSymbolNames = new SortedSet<string>(modelData.Select(m => m.SymbolName).Append(string.Empty)).ToList();
-                    IsModelDataFilled = modelData.Count != 0;
                 }
             }
         }
@@ -576,10 +542,9 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     viewData.SortDescriptions.Clear();
                     viewData.GroupDescriptions.Clear();
-                    viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.IsSelected)));
                     viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
-                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.MinSizeValue), ListSortDirection.Ascending));
-                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SymbolName), ListSortDirection.Ascending));
+                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
+                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SizeInMm), ListSortDirection.Ascending));
                 }
             }
         }
@@ -589,12 +554,12 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (viewData != null && !viewData.IsEmpty)
             {
-                currentItem = viewData.GetItemAt(0);
+                currentItem = ViewDataCollection.GetItemAt(0);
+                ViewDataCollection.Filter = FilterModelCollection;
                 if (currentItem is ElementModel model && viewData.MoveCurrentTo(currentItem))
                 {
                     IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
                     AllSelectChecked = items.All(x => x.IsSelected == model.IsSelected) ? model.IsSelected : null;
-
                 }
             }
         }
@@ -691,7 +656,6 @@ namespace RevitTimasBIMTools.ViewModels
         private void RefreshActiveDataHandler()
         {
             IsDataRefresh = false;
-            IsModelDataFilled = false;
             if (document != null && material != null && category != null)
             {
                 Task task = Task.WhenAll();
@@ -722,19 +686,20 @@ namespace RevitTimasBIMTools.ViewModels
                     currentItem = ViewDataCollection.GetItemAt(0);
                     if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        if (currentItem is ElementModel model && model.IsValidModel())
+                        patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
+                        if (previewControl is null && currentItem is ElementModel model && model.IsValidModel())
                         {
-                            if (RevitViewManager.SetCustomSectionBox(uidoc, model.Origin, view3d))
+                            if (RevitViewManager.SetCustomSectionBox(uidoc, model.SectionPlane.Origin, view3d))
                             {
-                                patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
+                                uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                                 RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
-                                control = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
-                                control.ShowPreviewControl(app, view3d);
+                                RevitViewManager.ShowModelInPlanView(uidoc, model, ViewDiscipline.Mechanical);
+                                previewControl = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
+                                previewControl.ShowPreviewControl(app, view3d);
                             }
                         }
                     }
                 }
-
             });
         }
 
@@ -758,11 +723,14 @@ namespace RevitTimasBIMTools.ViewModels
                             if (dialogResult.Value && ElementModelData.Remove(model))
                             {
                                 collisionManager.VerifyOpenningSize(doc, model);
-                                collisionManager.CreateOpening(doc, model, wallOpenning, floorOpenning);
+                                collisionManager.CreateOpening(doc, model, wallOpenning);
                             }
                             else
                             {
                                 model.IsSelected = false;
+                                ViewDataCollection.Remove(model);
+                                ViewDataCollection.AddNewItem(model);
+                                ViewDataCollection.CommitNew();    
                             }
                         }
                     }
@@ -773,22 +741,46 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
+        #region PreviewControl
+
+        private View3D view3d { get; set; } = null;
+        private ElementId patternId { get; set; } = null;
+        private PreviewControlModel previewControl { get; set; } = null;
+
+        private bool? dialogResult = false;
+        public bool? DialogResult
+        {
+            get => dialogResult;
+            set
+            {
+                if (SetProperty(ref dialogResult, value))
+                {
+                    if (dialogResult.HasValue)
+                    {
+                        previewControl = null;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+
         // Алгоритм проверки семейств отверстия
         /*
-        * Проверить семейство что это реальное отверстие
+        * Проверить семейство отверстий правильно ли они расположены
         * Найти все семейства и определить пересекается ли оно с чем либо (по краю)
         * Если не пересекается проверить есть ли по центру элемент если нет то удалить
         * Если пересекается то удалить
         */
 
 
-        // Общий алгоритм проверки пользователем елементов
+        // Общий алгоритм проверки пользователем элементов
         /*
          * Объединения элементов в одном месте в один большой solid если они пересекаются
          * Объединения проема если пересекаются solid или находятся очень близко (можно по точке или bbox создать)
          * Создать новое семейство проема с возможностью изменения размеров => CutOffset сохраняется
          * Реализовать автосинхронизацию при окончание выполнение или изменения проекта
-         * Кнопки = (показать/создать/остановить)
          */
 
 

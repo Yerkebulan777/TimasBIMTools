@@ -6,10 +6,12 @@
         d:DataContext="{d:DesignInstance Type=vm:CutVoidDataViewModel}"
         xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
         xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
-        mc:Ignorable="d" 
-        Background="WhiteSmoke"
-        WindowStyle="None"  Topmost="True"
-        Title="Preview dialog control" Height="500" Width="450" >
+        mc:Ignorable="d"
+        Topmost="True"
+        WindowStyle="None"  
+        WindowStartupLocation="Manual"
+        Title="Preview dialog control" 
+        Height="500" Width="450" Background="WhiteSmoke">
 
     <Grid>
         <Grid.RowDefinitions>
