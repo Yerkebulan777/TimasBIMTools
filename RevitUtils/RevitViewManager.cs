@@ -398,7 +398,6 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
-
         public static void CreateViewFilter(Document doc, View view, Element elem, ElementFilter filter)
         {
             string filterName = "Filter" + elem.Name;
