@@ -5,6 +5,7 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Color = Autodesk.Revit.DB.Color;
 using Level = Autodesk.Revit.DB.Level;
 using View = Autodesk.Revit.DB.View;
@@ -397,5 +398,61 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
+
+        public static void CreateViewFilter(Document doc, View view, Element elem, ElementFilter filter)
+        {
+            string filterName = "Filter" + elem.Name;
+            OverrideGraphicSettings ogSettings = new();
+            IList<ElementId> categories = GetFilterableCategoriesByElement(elem);
+            ParameterFilterElement prmFilter = ParameterFilterElement.Create(doc, filterName, categories, filter);
+            ogSettings = ogSettings.SetProjectionLineColor(new Color(255, 0, 0));
+            view.SetFilterOverrides(prmFilter.Id, ogSettings);
+        }
+
+
+        public static ElementFilter CreateElementFilterFromFilterRules(IList<FilterRule> filterRules)
+        {
+            IList<ElementFilter> elemFilters = new List<ElementFilter>();
+            foreach (FilterRule filterRule in filterRules)
+            {
+                ElementParameterFilter elemParamFilter = new(filterRule);
+                elemFilters.Add(elemParamFilter);
+            }
+            LogicalAndFilter elemFilter = new(elemFilters);
+            return elemFilter;
+        }
+
+
+        public static void ShowFilterableParameters(Document doc, Element elem)
+        {
+            IList<ElementId> categories = new List<ElementId>() { elem.Category.Id };
+            StringBuilder builder = new StringBuilder("FilterableParametrsByElement");
+            foreach (ElementId prmId in ParameterFilterUtilities.GetFilterableParametersInCommon(doc, categories))
+            {
+                _ = builder.AppendLine(LabelUtils.GetLabelFor((BuiltInParameter)prmId.IntegerValue));
+            }
+            Logger.Info(builder.ToString());
+            builder.Clear();
+        }
+
+
+        //ParameterValueProvider provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.ID_PARAM));
+        //FilterElementIdRule rule = new FilterElementIdRule(provider, new FilterNumericEquals(), view.Id);
+
+
+        private static IList<ElementId> GetFilterableCategoriesByElement(Element elem)
+        {
+            ICollection<ElementId> catIds = ParameterFilterUtilities.GetAllFilterableCategories();
+            IList<ElementId> categories = new List<ElementId>();
+            foreach (ElementId catId in catIds)
+            {
+                if (elem.Category.Id == catId)
+                {
+                    categories.Add(catId);
+                    break;
+                }
+            }
+            return categories;
+        }
     }
 }
