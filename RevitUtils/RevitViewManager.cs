@@ -157,22 +157,19 @@ namespace RevitTimasBIMTools.RevitUtils
                     PlanViewRange viewRange = viewPlan.GetViewRange();
 
                     Element topLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.TopClipPlane));
-                    Element bottomLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.BottomClipPlane));
+                    Element botLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.BottomClipPlane));
 
-                    if (topLevel is Level toplvl && bottomLevel is Level botlvl)
+                    if (topLevel is Level && botLevel is Level && topLevel.Id != botLevel.Id)
                     {
+                        double cutPlane = 1350 / 304.8;
+                        double offsetPlane = 300 / 304.8;
+
                         using Transaction trx = new(doc, "SetViewRange");
 
-                        MidpointRounding rule = MidpointRounding.AwayFromZero;
-                        double elevation = toplvl.Elevation - botlvl.Elevation;
-                        elevation = elevation < 3.5 ? 3000 / 304.8 : elevation;
-                        double cut = Math.Round(elevation * 304.8 * 0.5, rule) / 304.8;
-                        double offset = Math.Round((cut * 304.8) / 3, rule) / 304.8;
-
-                        viewRange.SetOffset(PlanViewPlane.CutPlane, cut);
-                        viewRange.SetOffset(PlanViewPlane.TopClipPlane, offset);
-                        viewRange.SetOffset(PlanViewPlane.BottomClipPlane, -offset);
-                        viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, -offset);
+                        viewRange.SetOffset(PlanViewPlane.CutPlane, cutPlane);
+                        viewRange.SetOffset(PlanViewPlane.TopClipPlane, offsetPlane);
+                        viewRange.SetOffset(PlanViewPlane.BottomClipPlane, -offsetPlane);
+                        viewRange.SetOffset(PlanViewPlane.ViewDepthPlane, -offsetPlane);
 
                         TransactionStatus status = trx.Start();
                         viewPlan.SetViewRange(viewRange);

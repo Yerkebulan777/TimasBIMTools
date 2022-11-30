@@ -10,7 +10,6 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -43,7 +42,7 @@ namespace RevitTimasBIMTools.ViewModels
             ShowCollisionCommand = new AsyncRelayCommand(ShowHandelCommandAsync);
             OkCanselCommand = new AsyncRelayCommand(OkCanselHandelCommandAsync);
         }
-        
+
 
         #region Templory
 
@@ -51,7 +50,7 @@ namespace RevitTimasBIMTools.ViewModels
         private object currentItem = null;
 
         #endregion
-        /*asdsadsadfgfgdfgdfgdfg*/
+
 
         #region Visibility
 
@@ -730,7 +729,7 @@ namespace RevitTimasBIMTools.ViewModels
                                 model.IsSelected = false;
                                 ViewDataCollection.Remove(model);
                                 ViewDataCollection.AddNewItem(model);
-                                ViewDataCollection.CommitNew();    
+                                ViewDataCollection.CommitNew();
                             }
                         }
                     }
@@ -742,7 +741,6 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region PreviewControl
-
         private View3D view3d { get; set; } = null;
         private ElementId patternId { get; set; } = null;
         private PreviewControlModel previewControl { get; set; } = null;
