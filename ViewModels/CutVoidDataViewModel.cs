@@ -51,7 +51,7 @@ namespace RevitTimasBIMTools.ViewModels
         private object currentItem = null;
 
         #endregion
-        /*asdsadsads*/
+        /*asdsadsadfgfgdfgdfgdfg*/
 
         #region Visibility
 
