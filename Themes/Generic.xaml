@@ -8,8 +8,8 @@
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Colors.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
+    <converters:NullToVisibilityConverter x:Key="NullBoolToVis" />
     <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-    <converters:NullVisibilityConverter x:Key="NullToVis"/>
 
     <DropShadowEffect x:Key="ShadowBlur" />
     
@@ -40,7 +40,7 @@
     
     <!--ComboBox-->
     <Style TargetType="{x:Type ComboBox}">
-        <Setter Property="Margin" Value="10,5"/>
+        <Setter Property="Margin" Value="5"/>
         <Setter Property="IsReadOnly" Value="True"/>
         <Setter Property="SelectedIndex" Value="0"/>
         <Setter Property="SnapsToDevicePixels" Value="true" />
@@ -106,5 +106,5 @@
         <Setter Property="Margin" Value="2.5"/>
     </Style>
 
-
+ 
 </ResourceDictionary>

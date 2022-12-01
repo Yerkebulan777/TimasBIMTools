@@ -1,11 +1,16 @@
-﻿using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
+using System.IO;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Threading;
-
+using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -74,7 +79,7 @@ namespace RevitTimasBIMTools.Views
 
         private void ShowModelButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is ElementModel model)
+            if (sender is System.Windows.Controls.Button btn && btn.DataContext is ElementModel model)
             {
                 if (model != null && model.Instanse.IsValidObject)
                 {
@@ -87,6 +92,50 @@ namespace RevitTimasBIMTools.Views
         private void CheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             Dispatcher.CurrentDispatcher.Invoke(DataContextHandler.VerifySelectDataViewCollection);
+        }
+
+
+        private void LoadFamily_Click(object sender, RoutedEventArgs e)
+        {
+            string docPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            OpenFileDialog openDialog = new()
+            {
+                Filter = "Family Files (*.rfa)|*.rfa",
+                Title = "Open opening family",
+                InitialDirectory = docPath,
+                AutoUpgradeEnabled = true,
+                CheckFileExists = true,
+                ValidateNames = true,
+                Multiselect = false,
+            };
+
+            if (DialogResult.OK == openDialog.ShowDialog())
+            {
+                Family family = null;
+                _ = RevitTask.RunAsync(app =>
+                {
+                    Document doc = app.ActiveUIDocument.Document;
+                    using Transaction trx = new(doc, "Load Family");
+                    TransactionStatus status = trx.Start();
+                    if (status == TransactionStatus.Started)
+                    {
+                        if (doc.LoadFamily(openDialog.FileName, out family))
+                        {
+                            status = trx.Commit();
+                            Document familyDocument = doc.EditFamily(family);
+                            string path = Path.Combine(docPath, "SmartBIMTool");
+                            if (!Directory.Exists(path)) { _ = Directory.CreateDirectory(path); }
+                            SaveAsOptions options = new() { OverwriteExistingFile = true };
+                            familyDocument.SaveAs(@$"{path}\{family.Name}.rfa", options);
+                            foreach (ElementId symbId in family.GetFamilySymbolIds())
+                            {
+                                Element symbol = doc.GetElement(symbId);
+                                string symbName = symbol.Name;
+                            }
+                        }
+                    }
+                });
+            }
         }
 
 
