@@ -5,11 +5,12 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Threading;
-
+using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -96,11 +97,16 @@ namespace RevitTimasBIMTools.Views
 
         private void LoadFamily_Click(object sender, RoutedEventArgs e)
         {
-            string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string docPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             OpenFileDialog openDialog = new()
             {
                 Filter = "Family Files (*.rfa)|*.rfa",
-                InitialDirectory = docPath
+                Title = "Open opening family",
+                InitialDirectory = docPath,
+                AutoUpgradeEnabled = true,
+                CheckFileExists = true,
+                ValidateNames = true,
+                Multiselect = false,
             };
 
             if (DialogResult.OK == openDialog.ShowDialog())
@@ -115,9 +121,18 @@ namespace RevitTimasBIMTools.Views
                     {
                         if (doc.LoadFamily(openDialog.FileName, out family))
                         {
-                            string name = family.Name;
+                            status = trx.Commit();
+                            Document familyDocument = doc.EditFamily(family);
+                            string path = Path.Combine(docPath, "SmartBIMTool");
+                            if (!Directory.Exists(path)) { _ = Directory.CreateDirectory(path); }
+                            SaveAsOptions options = new() { OverwriteExistingFile = true };
+                            familyDocument.SaveAs(@$"{path}\{family.Name}.rfa", options);
+                            foreach (ElementId symbId in family.GetFamilySymbolIds())
+                            {
+                                Element symbol = doc.GetElement(symbId);
+                                string symbName = symbol.Name;
+                            }
                         }
-                        status = trx.Commit();
                     }
                 });
             }

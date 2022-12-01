@@ -9,7 +9,6 @@
     </ResourceDictionary.MergedDictionaries>
 
     <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-    <converters:NullVisibilityConverter x:Key="NullToVis"/>
 
     <DropShadowEffect x:Key="ShadowBlur" />
     

@@ -8,7 +8,7 @@
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     x:Class="RevitTimasBIMTools.Views.CutVoidDockPaneView" 
     d:Height="Auto" d:Width="300" mc:Ignorable="d"
-    MinHeight="300" MinWidth="300"
+    MinHeight="300" MinWidth="350"
     Background="WhiteSmoke">
 
     <Page.Resources>
@@ -64,34 +64,34 @@
             </Border>
 
 
+            <!--Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}"
+                      Style="{DynamicResource VisibleAnimation}"-->
             <!-- Options -->
-            <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch" 
-                      Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}"
-                      Style="{DynamicResource VisibleAnimation}" >
+            <ListView Name="sidePanel" Grid.Row="1" VerticalAlignment="Top"  HorizontalContentAlignment="Stretch" >
 
                 <ListViewItem>
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <StackPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Project name: " Width="125"/>
-                                <ComboBox Name="ComboDocumentModels" Height="23" Width="125" 
+                                <Label Content="Project name: " Width="120"/>
+                                <ComboBox Name="ComboDocumentModels" Height="23" Width="150" 
                                           ItemsSource="{Binding Path=DocumentCollection}" 
                                           SelectedItem="{Binding Path=SelectedDocument}"
                                           SelectedIndex="0"/>
                             </WrapPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Structure material: " Width="125"/>
-                                <ComboBox Name="ComboStructureMats" Height="23" Width="125" DisplayMemberPath="Value.Name" 
+                                <Label Content="Structure material: " Width="120"/>
+                                <ComboBox Name="ComboStructureMats" Height="23" Width="150" DisplayMemberPath="Value.Name" 
                                           ItemsSource="{Binding Path=StructureMaterials, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedMaterial}" 
                                           SelectedIndex="-1" />
                             </WrapPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Collision category: " Width="125"/>
-                                <ComboBox Name="ComboEngineerCats" Height="23" Width="125" DisplayMemberPath="Value.Name" 
+                                <Label Content="Collision category: " Width="120"/>
+                                <ComboBox Name="ComboEngineerCats" Height="23" Width="150" DisplayMemberPath="Value.Name" 
                                           ItemsSource="{Binding Path=EngineerCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedCategory}"
                                           SelectedIndex="-1" />
@@ -102,78 +102,82 @@
                 </ListViewItem>
 
                 <ListViewItem>
+                    <Border Style="{StaticResource GroupBoxBorderStyle}">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+
+                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Cut offset: " Width="120" />
+                                <Slider Name="CutOffset" Height="23" Width="120" Margin="5"
+                                    Minimum="5" Maximum="150" TickFrequency="10" IsSnapToTickEnabled="True"
+                                    Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Text="{Binding ElementName=CutOffset, Path=Value}" 
+                                     Height="23" Width="40" TextAlignment="Center" Margin="5" />
+                            </WrapPanel>
+
+                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Minimum length: " Width="120" />
+                                <Slider Name="MinDephtSize" Height="23" Width="120" Margin="5"
+                                        Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
+                                        Value="{Binding Path=MinDepthSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Text="{Binding ElementName=MinDephtSize, Path=Value}"
+                                         Height="23" Width="40" TextAlignment="Center" Margin="5" />
+                            </WrapPanel>
+
+                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                                <Label Content="Minimum side size: " Width="120" />
+                                <Slider Name="MinSideSize" Height="23" Width="120" Margin="5" 
+                                        Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
+                                        Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Text="{Binding ElementName=MinSideSize, Path=Value}" 
+                                         Height="23" Width="40" TextAlignment="Center" Margin="5" />
+                            </WrapPanel>
+
+                        </StackPanel>
+                    </Border>
+                </ListViewItem>
+
+                <ListViewItem>
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <StackPanel>
+
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Wall opening:" Width="125" />
-                                <ComboBox Name="ComboWallOpenning" Height="23" Width="125" DisplayMemberPath="Value.Name" 
-                                          ItemsSource="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                                          SelectedValuePath="Value" SelectedValue="{Binding Path=WallOpenning}" 
-                                          SelectedIndex="-1" />
+                                <Label Content="Wall opening:" Width="120" />
+                                <ComboBox Name="ComboWallOpenning" HorizontalContentAlignment="Center" 
+                                          Height="23" Width="150" DisplayMemberPath="Value.Name"
+                                          SelectedValue="{Binding Path=WallOpenning}" 
+                                          SelectedValuePath="Value" >
+                                    <ComboBox.Resources>
+                                        <CollectionViewSource x:Key="symbolCollection" Source="{Binding Path=FamilySymbols}" />
+                                    </ComboBox.Resources>
+                                    <ComboBox.ItemsSource >
+                                        <CompositeCollection>
+                                            <CollectionContainer Collection="{Binding Source={StaticResource symbolCollection}}" />
+                                            <ComboBoxItem Visibility="{Binding Path=WallOpenning, Converter={StaticResource BoolToVis}, ConverterParameter=false}">
+                                                <Button Content="Load Family" Click="LoadFamily_Click" Width="125" />
+                                            </ComboBoxItem>
+                                        </CompositeCollection>
+                                    </ComboBox.ItemsSource>
+                                </ComboBox>
                             </WrapPanel>
+
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Floor opening: " Width="125" />
-                                <ComboBox Name="ComboFloorOpenning" Height="23" Width="125" DisplayMemberPath="Value.Name" 
+                                <Label Content="Floor opening: " Width="120" />
+                                <ComboBox Name="ComboFloorOpenning" Height="23" Width="150" DisplayMemberPath="Value.Name" 
                                           ItemsSource="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=FloorOpenning}"
                                           SelectedIndex="-1" />
                             </WrapPanel>
+                            
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Parameter: " Width="125" />
-                                <ComboBox Name="ComboParameter" Height="23" Width="125" DisplayMemberPath="Value.Name" 
+                                <Label Content="Parameter: " Width="120" />
+                                <ComboBox Name="ComboParameter" Height="23" Width="150" DisplayMemberPath="Value.Name" 
                                           ItemsSource="{Binding Path=ParameterDefinitions, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedDefinition}"
                                           SelectedIndex="-1" />
                             </WrapPanel>
-                        </StackPanel>
-                    </Border>
-                </ListViewItem>
-
-                <ListViewItem>
-                    <Border Style="{StaticResource GroupBoxBorderStyle}">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-
-                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
-                                <Label Content="Minimum side size: " Width="125" Margin="5" />
-                                <Slider Name="MinSideSize" Height="23" Width="125" Margin="5" 
-                                        Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
-                                        Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBox Text="{Binding ElementName=MinSideSize, Path=Value}" 
-                                         Height="23" Width="50" TextAlignment="Center" Margin="5" />
-                            </WrapPanel>
-
-                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
-                                <Label Content="Minimum depth size: " Width="125" Margin="5" />
-                                <Slider Name="MinDephtSize" Height="23" Width="125" Margin="5"
-                                        Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
-                                        Value="{Binding Path=MinDepthSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBox Text="{Binding ElementName=MinDephtSize, Path=Value}"
-                                         Height="23" Width="50" TextAlignment="Center" Margin="5" />
-                            </WrapPanel>
 
                         </StackPanel>
                     </Border>
-                </ListViewItem>
-
-                <ListViewItem>
-                    <Border Style="{StaticResource GroupBoxBorderStyle}" >
-                        <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" >
-                            <Label Content="Cut offset size: " Width="125" Margin="5"/>
-                            <Slider Name="CutOffset" Height="23" Width="125" Margin="5"
-                                    Minimum="0" Maximum="100" TickFrequency="10" IsSnapToTickEnabled="True"
-                                    Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <TextBox Text="{Binding ElementName=CutOffset, Path=Value}" 
-                                     Height="23" Width="50" TextAlignment="Center" Margin="5" />
-                        </WrapPanel>
-                    </Border>
-                </ListViewItem>
-
-                <ListViewItem>
-                    
-                    <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10">
-                        <Button Name="btnOpenFile" Content="Load Family"  Click="LoadFamily_Click" />
-                    </WrapPanel>
-
                 </ListViewItem>
 
             </ListView>

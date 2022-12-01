@@ -213,18 +213,21 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private FamilySymbol wallOpenning = null;
+        private FamilySymbol wallhole = null;
         public FamilySymbol WallOpenning
         {
-            get => wallOpenning;
+            get => wallhole;
             set
             {
-                if (SetProperty(ref wallOpenning, value) && wallOpenning != null)
+                if (SetProperty(ref wallhole, value))
                 {
-                    ActivateFamilySimbol(wallOpenning);
-                    GetSymbolSharedParameters(wallOpenning);
-                    Properties.Settings.Default.RectangSymbolUniqueId = wallOpenning.UniqueId;
-                    Properties.Settings.Default.Save();
+                    if (wallhole != null && wallhole.IsValidObject)
+                    {
+                        Properties.Settings.Default.RectangSymbolUniqueId = wallhole.UniqueId;
+                        Properties.Settings.Default.Save();
+                        GetSymbolSharedParameters(wallhole);
+                        ActivateFamilySimbol(wallhole);
+                    }
                 }
             }
         }
@@ -722,7 +725,7 @@ namespace RevitTimasBIMTools.ViewModels
                             if (dialogResult.Value && ElementModelData.Remove(model))
                             {
                                 collisionManager.VerifyOpenningSize(doc, model);
-                                collisionManager.CreateOpening(doc, model, wallOpenning);
+                                collisionManager.CreateOpening(doc, model, wallhole);
                             }
                             else
                             {
