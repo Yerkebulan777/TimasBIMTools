@@ -168,6 +168,14 @@
                     </Border>
                 </ListViewItem>
 
+                <ListViewItem>
+                    
+                    <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10">
+                        <Button Name="btnOpenFile" Content="Load Family"  Click="LoadFamily_Click" />
+                    </WrapPanel>
+
+                </ListViewItem>
+
             </ListView>
 
 

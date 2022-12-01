@@ -1,9 +1,13 @@
-﻿using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Threading;
 
 
@@ -74,7 +78,7 @@ namespace RevitTimasBIMTools.Views
 
         private void ShowModelButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is ElementModel model)
+            if (sender is System.Windows.Controls.Button btn && btn.DataContext is ElementModel model)
             {
                 if (model != null && model.Instanse.IsValidObject)
                 {
@@ -87,6 +91,36 @@ namespace RevitTimasBIMTools.Views
         private void CheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             Dispatcher.CurrentDispatcher.Invoke(DataContextHandler.VerifySelectDataViewCollection);
+        }
+
+
+        private void LoadFamily_Click(object sender, RoutedEventArgs e)
+        {
+            string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            OpenFileDialog openDialog = new()
+            {
+                Filter = "Family Files (*.rfa)|*.rfa",
+                InitialDirectory = docPath
+            };
+
+            if (DialogResult.OK == openDialog.ShowDialog())
+            {
+                Family family = null;
+                _ = RevitTask.RunAsync(app =>
+                {
+                    Document doc = app.ActiveUIDocument.Document;
+                    using Transaction trx = new(doc, "Load Family");
+                    TransactionStatus status = trx.Start();
+                    if (status == TransactionStatus.Started)
+                    {
+                        if (doc.LoadFamily(openDialog.FileName, out family))
+                        {
+                            string name = family.Name;
+                        }
+                        status = trx.Commit();
+                    }
+                });
+            }
         }
 
 
