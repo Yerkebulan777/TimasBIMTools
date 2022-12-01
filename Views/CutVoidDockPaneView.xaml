@@ -106,30 +106,30 @@
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Cut offset: " Width="120" />
-                                <Slider Name="CutOffset" Height="23" Width="120" Margin="5"
+                                <Label Content="Cut offset: " Width="120" Margin="2.5"/>
+                                <Slider Name="CutOffset" Height="23" Width="115" Margin="2.5"
                                     Minimum="5" Maximum="150" TickFrequency="10" IsSnapToTickEnabled="True"
                                     Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <TextBox Text="{Binding ElementName=CutOffset, Path=Value}" 
-                                     Height="23" Width="40" TextAlignment="Center" Margin="5" />
+                                     Height="23" Width="35" TextAlignment="Center" Margin="2.5" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Minimum length: " Width="120" />
-                                <Slider Name="MinDephtSize" Height="23" Width="120" Margin="5"
+                                <Label Content="Minimum length: " Width="120" Margin="2.5"/>
+                                <Slider Name="MinDephtSize" Height="23" Width="115" Margin="2.5"
                                         Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
                                         Value="{Binding Path=MinDepthSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <TextBox Text="{Binding ElementName=MinDephtSize, Path=Value}"
-                                         Height="23" Width="40" TextAlignment="Center" Margin="5" />
+                                         Height="23" Width="35" TextAlignment="Center" Margin="2.5" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Minimum side size: " Width="120" />
-                                <Slider Name="MinSideSize" Height="23" Width="120" Margin="5" 
+                                <Label Content="Minimum side size: " Width="120" Margin="2.5"/>
+                                <Slider Name="MinSideSize" Height="23" Width="115" Margin="2.5" 
                                         Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
                                         Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 <TextBox Text="{Binding ElementName=MinSideSize, Path=Value}" 
-                                         Height="23" Width="40" TextAlignment="Center" Margin="5" />
+                                         Height="23" Width="35" TextAlignment="Center" Margin="2.5" />
                             </WrapPanel>
 
                         </StackPanel>
@@ -152,7 +152,7 @@
                                     <ComboBox.ItemsSource >
                                         <CompositeCollection>
                                             <CollectionContainer Collection="{Binding Source={StaticResource symbolCollection}}" />
-                                            <ComboBoxItem Visibility="{Binding Path=WallOpenning, Converter={StaticResource BoolToVis}, ConverterParameter=false}">
+                                            <ComboBoxItem Visibility="{Binding Path=WallOpenning, Converter={StaticResource NullBoolToVis}}">
                                                 <Button Content="Load Family" Click="LoadFamily_Click" Width="125" />
                                             </ComboBoxItem>
                                         </CompositeCollection>
@@ -167,7 +167,7 @@
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=FloorOpenning}"
                                           SelectedIndex="-1" />
                             </WrapPanel>
-                            
+
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Parameter: " Width="120" />
                                 <ComboBox Name="ComboParameter" Height="23" Width="150" DisplayMemberPath="Value.Name" 
