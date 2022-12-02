@@ -276,7 +276,6 @@ namespace RevitTimasBIMTools.ViewModels
                         Logger.Error($"Not loaded family");
                     }
                 }
-
                 return symbols;
             });
         }
