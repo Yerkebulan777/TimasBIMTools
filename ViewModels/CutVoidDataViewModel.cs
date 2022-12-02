@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -35,7 +34,7 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
         private readonly CutVoidCollisionManager collisionManager = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
-        
+
 
         public CutVoidDataViewModel(APIEventHandler eventHandler)
         {
@@ -209,7 +208,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref symbols, value) && symbols != null)
                 {
                     Logger.Log("\tcount:\t" + symbols.Count.ToString());
-                    symbols[string.Empty] = null;
                 }
             }
         }
@@ -247,6 +245,43 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
         }
+
+
+        public async void LoadFamily(string familyPath)
+        {
+            Family family = null;
+            FamilySymbols = await RevitTask.RunAsync(app =>
+            {
+                Document doc = app.ActiveUIDocument.Document;
+                using Transaction trx = new(doc, "LoadFamily");
+                TransactionStatus status = trx.Start();
+                if (status == TransactionStatus.Started)
+                {
+                    if (doc.LoadFamily(familyPath, out family))
+                    {
+                        status = trx.Commit();
+                        Document familyDocument = doc.EditFamily(family);
+                        SaveAsOptions options = new() { OverwriteExistingFile = true };
+                        familyDocument.SaveAs(@$"{localPath}\{family.Name}.rfa", options);
+
+                        foreach (ElementId symbId in family.GetFamilySymbolIds())
+                        {
+                            if (doc.GetElement(symbId) is FamilySymbol symbol)
+                            {
+                                symbols[symbol.Name] = symbol;
+                            }
+                        }
+                    }
+                    else if (!trx.HasEnded())
+                    {
+                        status = trx.RollBack();
+                        Logger.Error($"Not loaded: {family.Name}");
+                    }
+                }
+                return symbols;
+            });
+        }
+
 
         #endregion
 
@@ -430,33 +465,6 @@ namespace RevitTimasBIMTools.ViewModels
                     return collisionManager.GetCollisionByInputData(doc, document, material, category).ToObservableCollection();
                 });
             }
-        }
-
-
-        private async void LoadFamily(string familyPath)
-        {
-            Family family = null;
-            await RevitTask.RunAsync(app =>
-            {
-                Document doc = app.ActiveUIDocument.Document;
-                using Transaction trx = new(doc, "Load Family");
-                TransactionStatus status = trx.Start();
-                if (status == TransactionStatus.Started)
-                {
-                    if (doc.LoadFamily(familyPath, out family))
-                    {
-                        status = trx.Commit();
-                        Document familyDocument = doc.EditFamily(family);
-                        SaveAsOptions options = new() { OverwriteExistingFile = true };
-                        familyDocument.SaveAs(@$"{localPath}\{family.Name}.rfa", options);
-                        foreach (ElementId symbId in family.GetFamilySymbolIds())
-                        {
-                            Element symbol = doc.GetElement(symbId);
-                            string symbName = symbol.Name;
-                        }
-                    }
-                }
-            });
         }
 
 
