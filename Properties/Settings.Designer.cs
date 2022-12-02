@@ -74,24 +74,24 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string RectangSymbolUniqueId {
+        public string WallSymbollUniqueId {
             get {
-                return ((string)(this["RectangSymbolUniqueId"]));
+                return ((string)(this["WallSymbollUniqueId"]));
             }
             set {
-                this["RectangSymbolUniqueId"] = value;
+                this["WallSymbollUniqueId"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string RoundedSymbolUniqueId {
+        public string FloorSymbolUniqueId {
             get {
-                return ((string)(this["RoundedSymbolUniqueId"]));
+                return ((string)(this["FloorSymbolUniqueId"]));
             }
             set {
-                this["RoundedSymbolUniqueId"] = value;
+                this["FloorSymbolUniqueId"] = value;
             }
         }
     }

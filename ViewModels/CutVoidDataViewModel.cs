@@ -44,6 +44,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+
         #region Templory
 
         private Document doc = null;
@@ -213,44 +214,45 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private FamilySymbol wallHollow = null;
+        private FamilySymbol wSymbol = null;
         public FamilySymbol WallOpenning
         {
-            get => wallHollow;
+            get => wSymbol;
             set
             {
-                if (SetProperty(ref wallHollow, value))
+                if (SetProperty(ref wSymbol, value) && wSymbol != null)
                 {
-                    if (wallHollow != null && wallHollow.IsValidObject)
-                    {
-                        Properties.Settings.Default.RectangSymbolUniqueId = wallHollow.UniqueId;
-                        GetSymbolSharedParameters(wallHollow);
-                        Properties.Settings.Default.Save();
-                        ActivateFamilySimbol(wallHollow);
-                    }
+                    Properties.Settings.Default.WallSymbollUniqueId = wSymbol.UniqueId;
+                    GetSymbolSharedParameters(wSymbol);
+                    Properties.Settings.Default.Save();
+                    ActivateFamilySimbol(wSymbol);
                 }
             }
         }
 
 
-        private FamilySymbol floorOpenning = null;
+        private FamilySymbol fSymbol = null;
         public FamilySymbol FloorOpenning
         {
-            get => floorOpenning;
+            get => fSymbol;
             set
             {
-                if (SetProperty(ref floorOpenning, value) && floorOpenning != null)
+                if (SetProperty(ref fSymbol, value) && fSymbol != null)
                 {
-                    ActivateFamilySimbol(floorOpenning);
-                    GetSymbolSharedParameters(floorOpenning);
-                    Properties.Settings.Default.RoundedSymbolUniqueId = floorOpenning.UniqueId;
+                    Properties.Settings.Default.FloorSymbolUniqueId = fSymbol.UniqueId;
+                    GetSymbolSharedParameters(fSymbol);
                     Properties.Settings.Default.Save();
+                    ActivateFamilySimbol(fSymbol);
                 }
             }
         }
 
+        #endregion
 
-        private IList<Definition> definitions;
+
+        #region Definitions
+
+        private IList<Definition> definitions = new List<Definition>();
         public IList<Definition> ParameterDefinitions
         {
             get => definitions;
@@ -258,11 +260,27 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private Definition definition;
-        public Definition SelectedDefinition
+        private Definition widthMark;
+        public Definition WidthMarkDefinition
         {
-            get => definition;
-            set => SetProperty(ref definition, value);
+            get => widthMark;
+            set => SetProperty(ref widthMark, value);
+        }
+
+
+        private Definition heightMark;
+        public Definition HeightMarkDefinition
+        {
+            get => heightMark;
+            set => SetProperty(ref heightMark, value);
+        }
+
+
+        private Definition elevMark;
+        public Definition ElevMarkDefinition
+        {
+            get => elevMark;
+            set => SetProperty(ref elevMark, value);
         }
 
         #endregion
@@ -434,7 +452,6 @@ namespace RevitTimasBIMTools.ViewModels
             ParameterDefinitions = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                List<Definition> definitions = new(3);
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     foreach (Parameter param in symbol.GetOrderedParameters())
@@ -725,13 +742,13 @@ namespace RevitTimasBIMTools.ViewModels
                             if (dialogResult.Value && ElementModelData.Remove(model))
                             {
                                 collisionManager.VerifyOpenningSize(doc, model);
-                                collisionManager.CreateOpening(doc, model, wallHollow);
+                                collisionManager.CreateOpening(doc, model, wSymbol);
                             }
                             else
                             {
                                 model.IsSelected = false;
                                 ViewDataCollection.Remove(model);
-                                ViewDataCollection.AddNewItem(model);
+                                _ = ViewDataCollection.AddNewItem(model);
                                 ViewDataCollection.CommitNew();
                             }
                         }
