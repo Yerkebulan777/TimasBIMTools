@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -29,11 +30,12 @@ namespace RevitTimasBIMTools.ViewModels
         public CutVoidDockPaneView DockPanelView { get; set; }
         public static ExternalEvent RevitExternalEvent { get; set; }
 
+        private readonly string localPath = SmartToolHelper.LocalPath;
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
         private readonly CutVoidCollisionManager collisionManager = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
-
+        
 
         public CutVoidDataViewModel(APIEventHandler eventHandler)
         {
@@ -42,7 +44,6 @@ namespace RevitTimasBIMTools.ViewModels
             ShowCollisionCommand = new AsyncRelayCommand(ShowHandelCommandAsync);
             OkCanselCommand = new AsyncRelayCommand(OkCanselHandelCommandAsync);
         }
-
 
 
         #region Templory
@@ -429,6 +430,33 @@ namespace RevitTimasBIMTools.ViewModels
                     return collisionManager.GetCollisionByInputData(doc, document, material, category).ToObservableCollection();
                 });
             }
+        }
+
+
+        private async void LoadFamily(string familyPath)
+        {
+            Family family = null;
+            await RevitTask.RunAsync(app =>
+            {
+                Document doc = app.ActiveUIDocument.Document;
+                using Transaction trx = new(doc, "Load Family");
+                TransactionStatus status = trx.Start();
+                if (status == TransactionStatus.Started)
+                {
+                    if (doc.LoadFamily(familyPath, out family))
+                    {
+                        status = trx.Commit();
+                        Document familyDocument = doc.EditFamily(family);
+                        SaveAsOptions options = new() { OverwriteExistingFile = true };
+                        familyDocument.SaveAs(@$"{localPath}\{family.Name}.rfa", options);
+                        foreach (ElementId symbId in family.GetFamilySymbolIds())
+                        {
+                            Element symbol = doc.GetElement(symbId);
+                            string symbName = symbol.Name;
+                        }
+                    }
+                }
+            });
         }
 
 
