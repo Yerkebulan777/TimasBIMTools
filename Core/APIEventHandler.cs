@@ -20,8 +20,7 @@ namespace RevitTimasBIMTools.Core
                 Properties.Settings.Default.Save();
                 if (!Directory.Exists(localPath))
                 {
-                    DirectoryInfo info = Directory.CreateDirectory(localPath);
-                    info.Delete();
+                    Directory.CreateDirectory(localPath);
                 }
             }
             catch (Exception ex)

@@ -10,6 +10,7 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -208,7 +209,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref symbols, value) && symbols != null)
                 {
-                    Logger.Log("\tcount:\t" + symbols.Count.ToString());
+                    Logger.Log("FamilySymbols count: " + symbols.Count.ToString());
                 }
             }
         }
@@ -251,25 +252,24 @@ namespace RevitTimasBIMTools.ViewModels
         public async void LoadFamily(string familyPath)
         {
             Family family = null;
-            FamilySymbols = await RevitTask.RunAsync(app =>
+            FamilySymbols = await RevitTask.RunAsync((Func<UIApplication, IDictionary<string, FamilySymbol>>)(app =>
             {
-                Document doc = app.ActiveUIDocument.Document;
+                doc = app.ActiveUIDocument.Document;
                 using Transaction trx = new(doc, "LoadSymbols");
                 TransactionStatus status = trx.Start();
                 if (status == TransactionStatus.Started)
                 {
                     if (doc.LoadFamily(familyPath, out family))
                     {
+                        doc.Regenerate();
                         status = trx.Commit();
-                        Document familyDocument = doc.EditFamily(family);
+                        symbols = GetFamilySymbols(family);
+                        Document familyDoc = doc.EditFamily(family);
                         SaveAsOptions options = new() { OverwriteExistingFile = true };
-                        familyDocument.SaveAs(@$"{localPath}\{family.Name}.rfa", options);
-                        foreach (ElementId symbId in family.GetFamilySymbolIds())
+                        familyDoc.SaveAs(@$"{localPath}\{family.Name}.rfa", options);
+                        if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
-                            if (doc.GetElement(symbId) is FamilySymbol symbol)
-                            {
-                                symbols[symbol.Name.Trim()] = symbol;
-                            }
+                            familyDoc.Close(false);
                         }
                     }
                     else if (!trx.HasEnded())
@@ -279,12 +279,30 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                 }
                 return symbols;
-            });
+            }));
+        }
+
+
+        private IDictionary<string, FamilySymbol> GetFamilySymbols(Family family)
+        {
+            foreach (ElementId symbId in family.GetFamilySymbolIds())
+            {
+                Element elem = doc.GetElement(symbId);
+                if (elem is not null and FamilySymbol symbol)
+                {
+                    symbols[symbol.Name.Trim()] = symbol;
+                }
+            }
+            return symbols;
         }
 
 
         private string[] ProcessDirectory(string directory, string extension = "*.rfa")
         {
+            if (!Directory.Exists(directory))
+            {
+                Logger.Error("Not found directory path: " + directory);
+            }
             return Directory.GetFiles(directory, extension, SearchOption.TopDirectoryOnly);
         }
 
