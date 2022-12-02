@@ -283,16 +283,19 @@ namespace RevitTimasBIMTools.ViewModels
 
         private IDictionary<string, FamilySymbol> GetFamilySymbols(Family family)
         {
-            IDictionary<string, FamilySymbol> result = symbols ?? new SortedDictionary<string, FamilySymbol>();
-            foreach (ElementId symbId in family.GetFamilySymbolIds())
+            if (family != null && family.IsValidObject)
             {
-                Element elem = doc.GetElement(symbId);
-                if (elem is not null and FamilySymbol symbol)
+                symbols = symbols ?? new SortedDictionary<string, FamilySymbol>();
+                foreach (ElementId symbId in family.GetFamilySymbolIds())
                 {
-                    result[symbol.Name.Trim()] = symbol;
+                    Element elem = doc.GetElement(symbId);
+                    if (elem is not null and FamilySymbol symbol)
+                    {
+                        symbols[symbol.Name.Trim()] = symbol;
+                    }
                 }
             }
-            return result;
+            return symbols;
         }
 
 
