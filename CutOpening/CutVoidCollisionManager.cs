@@ -331,10 +331,10 @@ namespace RevitTimasBIMTools.CutOpening
         //    char[] delimiters = new[] { ' ', '_', '-' };
         //    foreach (Parameter param in floor.GetOrderedParameters())
         //    {
-        //        Definition definition = param.Definition;
-        //        if (param.HasValue && definition.ParameterType == lenParamType)
+        //        Definition highMark = param.Definition;
+        //        if (param.HasValue && highMark.ParameterType == lenParamType)
         //        {
-        //            string name = definition.Name;
+        //            string name = highMark.Name;
         //            string[] strArray = name.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
         //            if (strArray.Contains(paramName, StringComparer.CurrentCultureIgnoreCase))
         //            {

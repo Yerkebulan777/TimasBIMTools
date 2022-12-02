@@ -16,7 +16,7 @@ namespace RevitTimasBIMTools.Core
     public sealed class SmartToolHelper
     {
         public static string RibbonPanelName = "Automation";
-        public static string ApplicationName = "Smart BIM Tools";
+        public static string ApplicationName = "SmartBIMTools";
         public static string CutVoidToolName = "Cut Opening Manager";
         public static string CutVoidButtonName = "CutVoidButtonName";
         public static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
@@ -26,7 +26,9 @@ namespace RevitTimasBIMTools.Core
         public static readonly string DocumentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         public static readonly string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
         public static readonly string AppDirPath = Path.Combine(AppDataPath, @"Autodesk\Revit\Addins\2019\RevitTimasBIMTools");
-        public static readonly string LogPath = Path.Combine(DocumentPath, "RevitAsync.log");
+        public static readonly string LocalPath = Path.Combine(DocumentPath, ApplicationName);
+        public static readonly string LogPath = Path.Combine(LocalPath, "RevitAsync.log");
+
 
         public DockablePaneId CutVoidPaneId { get; } = new(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
         public bool IsActiveStart { get; set; } = false;

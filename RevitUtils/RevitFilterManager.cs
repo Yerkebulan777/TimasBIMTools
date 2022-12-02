@@ -321,24 +321,5 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
-        #region FamilyFilter
-
-        public static IDictionary<string, FamilySymbol> GetHostedFamilySymbols(Document doc, BuiltInCategory bic)
-        {
-            IDictionary<string, FamilySymbol> result = new SortedDictionary<string, FamilySymbol>();
-            FilteredElementCollector collector = GetElementsOfCategory(doc, typeof(FamilySymbol), bic);
-            foreach (FamilySymbol smb in collector)
-            {
-                Family fam = smb.Family;
-                if (fam.IsEditable && fam.IsUserCreated)
-                {
-                    result[smb.Name] = smb;
-                }
-            }
-            return result;
-        }
-
-        #endregion
-
     }
 }

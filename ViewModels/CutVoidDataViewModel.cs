@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -10,10 +11,12 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -29,6 +32,7 @@ namespace RevitTimasBIMTools.ViewModels
         public CutVoidDockPaneView DockPanelView { get; set; }
         public static ExternalEvent RevitExternalEvent { get; set; }
 
+        private readonly string localPath = SmartToolHelper.LocalPath;
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
@@ -84,12 +88,11 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         GetMEPCategoriesToData();
                         GetCoreMaterialsToData();
-                        GetHostedSymbolsToData();
+                        GetFamilySymbolsToData();
                     }
                 }
             }
         }
-
 
 
         private bool refresh = false;
@@ -161,7 +164,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref documents, value) && documents != null)
                 {
-                    Logger.Log("DocumentCollection count:\t" + value.Count.ToString());
+                    Logger.Log("DocumentCollection count:\t" + documents.Count.ToString());
                 }
             }
         }
@@ -175,7 +178,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref structs, value) && structs != null)
                 {
-                    Logger.Log("StructureMaterials count:\t" + value.Count.ToString());
+                    Logger.Log("StructureMaterials count:\t" + structs.Count.ToString());
                 }
             }
         }
@@ -189,7 +192,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref categos, value) && categos != null)
                 {
-                    Logger.Log("EngineerCategories count:\t" + value.Count.ToString());
+                    Logger.Log("EngineerCategories count:\t" + categos.Count.ToString());
                 }
             }
         }
@@ -207,51 +210,111 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref symbols, value) && symbols != null)
                 {
-                    Logger.Log("\tcount:\t" + value.Count.ToString());
-                    symbols[string.Empty] = null;
+                    Logger.Log("FamilySymbols count: " + symbols.Count.ToString());
                 }
             }
         }
 
 
-        private FamilySymbol wallHollow = null;
+        private FamilySymbol wSymbol = null;
         public FamilySymbol WallOpenning
         {
-            get => wallHollow;
+            get => wSymbol;
             set
             {
-                if (SetProperty(ref wallHollow, value))
+                if (SetProperty(ref wSymbol, value) && wSymbol != null)
                 {
-                    if (wallHollow != null && wallHollow.IsValidObject)
-                    {
-                        Properties.Settings.Default.RectangSymbolUniqueId = wallHollow.UniqueId;
-                        GetSymbolSharedParameters(wallHollow);
-                        Properties.Settings.Default.Save();
-                        ActivateFamilySimbol(wallHollow);
-                    }
+                    Properties.Settings.Default.WallSymbollUniqueId = wSymbol.UniqueId;
+                    GetSymbolSharedParameters(wSymbol);
+                    Properties.Settings.Default.Save();
+                    ActivateFamilySimbol(wSymbol);
                 }
             }
         }
 
 
-        private FamilySymbol floorOpenning = null;
+        private FamilySymbol fSymbol = null;
         public FamilySymbol FloorOpenning
         {
-            get => floorOpenning;
+            get => fSymbol;
             set
             {
-                if (SetProperty(ref floorOpenning, value) && floorOpenning != null)
+                if (SetProperty(ref fSymbol, value) && fSymbol != null)
                 {
-                    ActivateFamilySimbol(floorOpenning);
-                    GetSymbolSharedParameters(floorOpenning);
-                    Properties.Settings.Default.RoundedSymbolUniqueId = floorOpenning.UniqueId;
+                    Properties.Settings.Default.FloorSymbolUniqueId = fSymbol.UniqueId;
+                    GetSymbolSharedParameters(fSymbol);
                     Properties.Settings.Default.Save();
+                    ActivateFamilySimbol(fSymbol);
                 }
             }
         }
 
 
-        private IList<Definition> definitions;
+        public async void LoadFamily(string familyPath)
+        {
+            Family family = null;
+            FamilySymbols = await RevitTask.RunAsync(app =>
+            {
+                doc = app.ActiveUIDocument.Document;
+                using Transaction trx = new(doc, "LoadSymbols");
+                TransactionStatus status = trx.Start();
+                if (status == TransactionStatus.Started)
+                {
+                    if (doc.LoadFamily(familyPath, out family))
+                    {
+                        status = trx.Commit();
+                        symbols = GetFamilySymbols(family);
+                        Document familyDoc = doc.EditFamily(family);
+                        SaveAsOptions options = new() { OverwriteExistingFile = true };
+                        familyDoc.SaveAs(@$"{localPath}\{family.Name}.rfa", options);
+                        if (familyDoc != null && familyDoc.IsFamilyDocument)
+                        {
+                            familyDoc.Close(false);
+                        }
+                    }
+                    else if (!trx.HasEnded())
+                    {
+                        status = trx.RollBack();
+                        Logger.Error($"Not loaded family");
+                    }
+                }
+
+                return symbols;
+            });
+        }
+
+
+        private IDictionary<string, FamilySymbol> GetFamilySymbols(Family family)
+        {
+            IDictionary<string, FamilySymbol> result = new SortedDictionary<string, FamilySymbol>();
+            
+            foreach (ElementId symbId in family.GetFamilySymbolIds())
+            {
+                Element elem = doc.GetElement(symbId);
+                if (elem is not null and FamilySymbol symbol)
+                {
+                    result[symbol.Name.Trim()] = symbol;
+                }
+            }
+            return result.Union(symbols).ToDictionary(pair => pair.Key, pair => pair.Value);
+        }
+
+
+        private string[] ProcessDirectory(string directory, string extension = "*.rfa")
+        {
+            if (!Directory.Exists(directory))
+            {
+                Logger.Error("Not found directory path: " + directory);
+            }
+            return Directory.GetFiles(directory, extension, SearchOption.TopDirectoryOnly);
+        }
+
+        #endregion
+
+
+        #region Definitions
+
+        private IList<Definition> definitions = new List<Definition>();
         public IList<Definition> ParameterDefinitions
         {
             get => definitions;
@@ -259,11 +322,27 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private Definition definition;
-        public Definition SelectedDefinition
+        private Definition widthMark;
+        public Definition WidthMarkDefinition
         {
-            get => definition;
-            set => SetProperty(ref definition, value);
+            get => widthMark;
+            set => SetProperty(ref widthMark, value);
+        }
+
+
+        private Definition heightMark;
+        public Definition HeightMarkDefinition
+        {
+            get => heightMark;
+            set => SetProperty(ref heightMark, value);
+        }
+
+
+        private Definition elevMark;
+        public Definition ElevMarkDefinition
+        {
+            get => elevMark;
+            set => SetProperty(ref elevMark, value);
         }
 
         #endregion
@@ -391,12 +470,17 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void GetHostedSymbolsToData()
+        private async void GetFamilySymbolsToData()
         {
-            FamilySymbols ??= await RevitTask.RunAsync(app =>
+            await RevitTask.RunAsync(app =>
             {
-                doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+                if (symbols == null || symbols.Count == 0)
+                {
+                    foreach (string familyPath in ProcessDirectory(localPath))
+                    {
+                        LoadFamily(familyPath);
+                    }
+                }
             });
         }
 
@@ -435,7 +519,6 @@ namespace RevitTimasBIMTools.ViewModels
             ParameterDefinitions = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                List<Definition> definitions = new(3);
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
                     foreach (Parameter param in symbol.GetOrderedParameters())
@@ -726,13 +809,13 @@ namespace RevitTimasBIMTools.ViewModels
                             if (dialogResult.Value && ElementModelData.Remove(model))
                             {
                                 collisionManager.VerifyOpenningSize(doc, model);
-                                collisionManager.CreateOpening(doc, model, wallHollow);
+                                collisionManager.CreateOpening(doc, model, wSymbol);
                             }
                             else
                             {
                                 model.IsSelected = false;
                                 ViewDataCollection.Remove(model);
-                                ViewDataCollection.AddNewItem(model);
+                                _ = ViewDataCollection.AddNewItem(model);
                                 ViewDataCollection.CommitNew();
                             }
                         }

@@ -1,10 +1,14 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using RevitTimasBIMTools.Services;
+using System;
+using System.IO;
 
 namespace RevitTimasBIMTools.Core
 {
     public class APIEventHandler : IExternalEventHandler
     {
+        private readonly string localPath = SmartToolHelper.LocalPath;
         public void Execute(UIApplication app)
         {
             try
@@ -14,11 +18,17 @@ namespace RevitTimasBIMTools.Core
                 Document doc = app.ActiveUIDocument.Document;
                 Properties.Settings.Default.ActiveDocumentUniqueId = doc.ProjectInformation.UniqueId;
                 Properties.Settings.Default.Save();
+                if (!Directory.Exists(localPath))
+                {
+                    Directory.CreateDirectory(localPath);
+                }
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error(ex.Message + GetName());
             }
         }
+
 
         public string GetName()
         {

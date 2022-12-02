@@ -5,44 +5,44 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     public static class TransactionManager
     {
-        /// <summary> The method used to create a single sub-transaction </summary>
+        /// <summary> The method used to create a single sub-strx </summary>
         public static void CreateSubTransaction(Document document, Action action)
         {
-            using (SubTransaction transaction = new SubTransaction(document))
+            using (SubTransaction strx = new SubTransaction(document))
             {
-                _ = transaction.Start();
+                _ = strx.Start();
                 try
                 {
                     action?.Invoke();
-                    _ = transaction.Commit();
+                    _ = strx.Commit();
                 }
                 catch (Exception)
                 {
-                    if (!transaction.HasEnded())
+                    if (!strx.HasEnded())
                     {
-                        _ = transaction.RollBack();
+                        _ = strx.RollBack();
                     }
                 }
             }
         }
 
-        /// <summary> The method used to create a single transaction </summary>
+        /// <summary> The method used to create a single strx </summary>
         public static void CreateTransaction(Document document, string transactionName, Action action)
         {
-            using (Transaction transaction = new Transaction(document))
+            using (Transaction trx = new Transaction(document))
             {
-                if (transaction.Start(transactionName) == TransactionStatus.Started)
+                if (trx.Start(transactionName) == TransactionStatus.Started)
                 {
                     try
                     {
                         action?.Invoke();
-                        _ = transaction.Commit();
+                        _ = trx.Commit();
                     }
                     catch (Exception)
                     {
-                        if (!transaction.HasEnded())
+                        if (!trx.HasEnded())
                         {
-                            _ = transaction.RollBack();
+                            _ = trx.RollBack();
                         }
                     }
                     finally { }
