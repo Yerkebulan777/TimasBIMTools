@@ -91,7 +91,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-
         private bool refresh = false;
         public bool IsDataRefresh
         {
@@ -161,7 +160,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref documents, value) && documents != null)
                 {
-                    Logger.Log("DocumentCollection count:\t" + value.Count.ToString());
+                    Logger.Log("DocumentCollection count:\t" + documents.Count.ToString());
                 }
             }
         }
@@ -175,7 +174,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref structs, value) && structs != null)
                 {
-                    Logger.Log("StructureMaterials count:\t" + value.Count.ToString());
+                    Logger.Log("StructureMaterials count:\t" + structs.Count.ToString());
                 }
             }
         }
@@ -189,7 +188,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref categos, value) && categos != null)
                 {
-                    Logger.Log("EngineerCategories count:\t" + value.Count.ToString());
+                    Logger.Log("EngineerCategories count:\t" + categos.Count.ToString());
                 }
             }
         }
@@ -207,7 +206,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref symbols, value) && symbols != null)
                 {
-                    Logger.Log("\tcount:\t" + value.Count.ToString());
+                    Logger.Log("\tcount:\t" + symbols.Count.ToString());
                     symbols[string.Empty] = null;
                 }
             }

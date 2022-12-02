@@ -141,7 +141,7 @@
                         <StackPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
-                                <Label Content="Wall opening:" Width="120" />
+                                <Label Content="Wall opening: " Width="120" />
                                 <ComboBox Name="ComboWallOpenning" HorizontalContentAlignment="Center" 
                                           Height="23" Width="150" DisplayMemberPath="Value.Name"
                                           SelectedValue="{Binding Path=WallOpenning}" 
@@ -153,7 +153,11 @@
                                         <CompositeCollection>
                                             <CollectionContainer Collection="{Binding Source={StaticResource symbolCollection}}" />
                                             <ComboBoxItem Visibility="{Binding Path=WallOpenning, Converter={StaticResource NullBoolToVis}}">
-                                                <Button Content="Load Family" Click="LoadFamily_Click" Width="125" />
+                                                <TextBlock Width="125">
+                                                    <Hyperlink Click="LoadFamily_Click">
+                                                        <TextBlock Text="Load Family" />
+                                                    </Hyperlink>
+                                                </TextBlock>
                                             </ComboBoxItem>
                                         </CompositeCollection>
                                     </ComboBox.ItemsSource>
@@ -162,10 +166,26 @@
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Floor opening: " Width="120" />
-                                <ComboBox Name="ComboFloorOpenning" Height="23" Width="150" DisplayMemberPath="Value.Name" 
-                                          ItemsSource="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                                          SelectedValuePath="Value" SelectedValue="{Binding Path=FloorOpenning}"
-                                          SelectedIndex="-1" />
+                                <ComboBox Name="ComboFloorOpenning" HorizontalContentAlignment="Center" 
+                                          Height="23" Width="150" DisplayMemberPath="Value.Name"
+                                          SelectedValue="{Binding Path=FloorOpenning}" 
+                                          SelectedValuePath="Value" >
+                                    <ComboBox.Resources>
+                                        <CollectionViewSource x:Key="symbolCollection" Source="{Binding Path=FamilySymbols}" />
+                                    </ComboBox.Resources>
+                                    <ComboBox.ItemsSource >
+                                        <CompositeCollection>
+                                            <CollectionContainer Collection="{Binding Source={StaticResource symbolCollection}}" />
+                                            <ComboBoxItem Visibility="{Binding Path=FloorOpenning, Converter={StaticResource NullBoolToVis}}">
+                                                <TextBlock Width="125">
+                                                    <Hyperlink Click="LoadFamily_Click">
+                                                        <TextBlock Text="Load Family" />
+                                                    </Hyperlink>
+                                                </TextBlock>
+                                            </ComboBoxItem>
+                                        </CompositeCollection>
+                                    </ComboBox.ItemsSource>
+                                </ComboBox>
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
