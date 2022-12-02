@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,7 +10,6 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -286,8 +284,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private IDictionary<string, FamilySymbol> GetFamilySymbols(Family family)
         {
-            IDictionary<string, FamilySymbol> result = new SortedDictionary<string, FamilySymbol>();
-            
+            IDictionary<string, FamilySymbol> result = symbols ?? new SortedDictionary<string, FamilySymbol>();
             foreach (ElementId symbId in family.GetFamilySymbolIds())
             {
                 Element elem = doc.GetElement(symbId);
@@ -296,7 +293,7 @@ namespace RevitTimasBIMTools.ViewModels
                     result[symbol.Name.Trim()] = symbol;
                 }
             }
-            return result.Union(symbols).ToDictionary(pair => pair.Key, pair => pair.Value);
+            return result;
         }
 
 
