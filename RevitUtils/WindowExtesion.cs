@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 
-namespace RevitTimasBIMTools.Services
+namespace RevitTimasBIMTools.RevitUtils
 {
     public static class WindowExtesion
     {

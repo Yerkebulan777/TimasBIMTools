@@ -245,7 +245,7 @@
     <Compile Include="RevitUtils\TransactionManager.cs" />
     <Compile Include="RevitUtils\RevitWPFViewer.cs" />
     <Compile Include="Services\MutexServise.cs" />
-    <Compile Include="Services\WindowExtesion.cs" />
+    <Compile Include="RevitUtils\WindowExtesion.cs" />
     <Compile Include="Services\Timer.cs" />
     <Compile Include="ViewConverters\ElementNameConverter.cs" />
     <Compile Include="ViewConverters\InverseBooleanToVisibilityConverter.cs" />

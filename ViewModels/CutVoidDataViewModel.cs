@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -85,7 +86,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         GetMEPCategoriesToData();
                         GetCoreMaterialsToData();
-                        GetHostedSymbolsToData();
+                        GetFamilySymbolsToData();
                     }
                 }
             }
@@ -263,12 +264,11 @@ namespace RevitTimasBIMTools.ViewModels
                         Document familyDocument = doc.EditFamily(family);
                         SaveAsOptions options = new() { OverwriteExistingFile = true };
                         familyDocument.SaveAs(@$"{localPath}\{family.Name}.rfa", options);
-
                         foreach (ElementId symbId in family.GetFamilySymbolIds())
                         {
                             if (doc.GetElement(symbId) is FamilySymbol symbol)
                             {
-                                symbols[symbol.Name] = symbol;
+                                symbols[symbol.Name.Trim()] = symbol;
                             }
                         }
                     }
@@ -282,6 +282,10 @@ namespace RevitTimasBIMTools.ViewModels
             });
         }
 
+        private string[] ProcessDirectory(string directory, string extension = "*.rfa")
+        {
+            return Directory.GetFiles(directory, extension, SearchOption.TopDirectoryOnly);
+        }
 
         #endregion
 
@@ -444,12 +448,18 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void GetHostedSymbolsToData()
+        private async void GetFamilySymbolsToData()
         {
-            FamilySymbols ??= await RevitTask.RunAsync(app =>
+            await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return RevitFilterManager.GetHostedFamilySymbols(doc, BuiltInCategory.OST_GenericModel);
+                if (symbols == null || symbols.Count == 0)
+                {
+                    foreach (string familyPath in ProcessDirectory(localPath))
+                    {
+                        LoadFamily(familyPath);
+                    }
+                }
             });
         }
 
