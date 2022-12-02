@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -252,7 +253,7 @@ namespace RevitTimasBIMTools.ViewModels
         public async void LoadFamily(string familyPath)
         {
             Family family = null;
-            FamilySymbols = await RevitTask.RunAsync((Func<UIApplication, IDictionary<string, FamilySymbol>>)(app =>
+            FamilySymbols = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 using Transaction trx = new(doc, "LoadSymbols");
@@ -261,7 +262,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (doc.LoadFamily(familyPath, out family))
                     {
-                        doc.Regenerate();
                         status = trx.Commit();
                         symbols = GetFamilySymbols(family);
                         Document familyDoc = doc.EditFamily(family);
@@ -278,22 +278,25 @@ namespace RevitTimasBIMTools.ViewModels
                         Logger.Error($"Not loaded family");
                     }
                 }
+
                 return symbols;
-            }));
+            });
         }
 
 
         private IDictionary<string, FamilySymbol> GetFamilySymbols(Family family)
         {
+            IDictionary<string, FamilySymbol> result = new SortedDictionary<string, FamilySymbol>();
+            
             foreach (ElementId symbId in family.GetFamilySymbolIds())
             {
                 Element elem = doc.GetElement(symbId);
                 if (elem is not null and FamilySymbol symbol)
                 {
-                    symbols[symbol.Name.Trim()] = symbol;
+                    result[symbol.Name.Trim()] = symbol;
                 }
             }
-            return symbols;
+            return result.Union(symbols).ToDictionary(pair => pair.Key, pair => pair.Value);
         }
 
 
