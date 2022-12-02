@@ -254,7 +254,7 @@ namespace RevitTimasBIMTools.ViewModels
             FamilySymbols = await RevitTask.RunAsync(app =>
             {
                 Document doc = app.ActiveUIDocument.Document;
-                using Transaction trx = new(doc, "LoadFamily");
+                using Transaction trx = new(doc, "LoadSymbols");
                 TransactionStatus status = trx.Start();
                 if (status == TransactionStatus.Started)
                 {
@@ -281,6 +281,7 @@ namespace RevitTimasBIMTools.ViewModels
                 return symbols;
             });
         }
+
 
         private string[] ProcessDirectory(string directory, string extension = "*.rfa")
         {
@@ -452,7 +453,6 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                doc = app.ActiveUIDocument.Document;
                 if (symbols == null || symbols.Count == 0)
                 {
                     foreach (string familyPath in ProcessDirectory(localPath))

@@ -1,16 +1,12 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using Revit.Async;
+﻿using Autodesk.Revit.UI;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Threading;
-using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -111,30 +107,11 @@ namespace RevitTimasBIMTools.Views
 
             if (DialogResult.OK == openDialog.ShowDialog())
             {
-                Family family = null;
-                _ = RevitTask.RunAsync(app =>
+                string path = openDialog.FileName;
+                if (!string.IsNullOrEmpty(path))
                 {
-                    Document doc = app.ActiveUIDocument.Document;
-                    using Transaction trx = new(doc, "Load Family");
-                    TransactionStatus status = trx.Start();
-                    if (status == TransactionStatus.Started)
-                    {
-                        if (doc.LoadFamily(openDialog.FileName, out family))
-                        {
-                            status = trx.Commit();
-                            Document familyDocument = doc.EditFamily(family);
-                            string path = Path.Combine(docPath, "SmartBIMTool");
-                            if (!Directory.Exists(path)) { _ = Directory.CreateDirectory(path); }
-                            SaveAsOptions options = new() { OverwriteExistingFile = true };
-                            familyDocument.SaveAs(@$"{path}\{family.Name}.rfa", options);
-                            foreach (ElementId symbId in family.GetFamilySymbolIds())
-                            {
-                                Element symbol = doc.GetElement(symbId);
-                                string symbName = symbol.Name;
-                            }
-                        }
-                    }
-                });
+                    DataContextHandler.LoadFamily(path);
+                }
             }
         }
 
