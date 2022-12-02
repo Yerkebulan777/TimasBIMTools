@@ -275,7 +275,7 @@ namespace RevitTimasBIMTools.ViewModels
                     else if (!trx.HasEnded())
                     {
                         status = trx.RollBack();
-                        Logger.Error($"Not loaded: {family.Name}");
+                        Logger.Error($"Not loaded family");
                     }
                 }
                 return symbols;
