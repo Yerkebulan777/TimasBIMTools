@@ -230,6 +230,17 @@ namespace RevitTimasBIMTools.RevitUtils
         #endregion
 
 
+        public static ElementFilter CreateElementFilterFromFilterRules(IList<FilterRule> filterRules)
+        {
+            IList<ElementFilter> elemFilters = new List<ElementFilter>();
+            foreach (FilterRule filterRule in filterRules)
+            {
+                elemFilters.Add(new ElementParameterFilter(filterRule));
+            }
+            return new LogicalAndFilter(elemFilters);
+        }
+
+
         #region Material filter
 
         public static Material GetCompoundStructureMaterial(Document doc, Element element, CompoundStructure compound)

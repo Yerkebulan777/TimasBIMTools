@@ -409,17 +409,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-        public static ElementFilter CreateElementFilterFromFilterRules(IList<FilterRule> filterRules)
-        {
-            IList<ElementFilter> elemFilters = new List<ElementFilter>();
-            foreach (FilterRule filterRule in filterRules)
-            {
-                ElementParameterFilter elemParamFilter = new(filterRule);
-                elemFilters.Add(elemParamFilter);
-            }
-            LogicalAndFilter elemFilter = new(elemFilters);
-            return elemFilter;
-        }
+
 
 
         public static void ShowFilterableParameters(Document doc, Element elem)

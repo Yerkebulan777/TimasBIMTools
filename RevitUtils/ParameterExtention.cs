@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using GlobalParameter = Autodesk.Revit.DB.GlobalParameter;
 
@@ -7,13 +8,7 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     public static class ParameterExtention
     {
-        public const string Caption = "Smart BIM Tools";
 
-        /// <summary>
-        /// Return Real String Of Double
-        /// </summary>
-        /// <param name="arg"></param>
-        /// <returns></returns>
         public static string RealString(double arg)
         {
             return arg.ToString("0.##");
@@ -197,5 +192,10 @@ namespace RevitTimasBIMTools.RevitUtils
 
             return result;
         }
+
+
+
+
+
     }
 }
