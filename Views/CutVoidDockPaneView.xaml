@@ -149,10 +149,9 @@
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Wall opening: " Width="120" VerticalContentAlignment="Center" />
-                                <ComboBox Name="ComboWallOpenning" HorizontalContentAlignment="Center" 
-                                          Height="23" Width="150" DisplayMemberPath="Name"
-                                          SelectedValue="{Binding Path=WallOpenning}" 
-                                          SelectedValuePath="Value" >
+                                <ComboBox Name="ComboWallOpenning" HorizontalContentAlignment="Center"
+                                          Height="23" Width="150" DisplayMemberPath="Name" 
+                                          SelectedValue="{Binding Path=WallOpenning}" >
                                     
                                     <ComboBox.ItemsSource >
                                         <CompositeCollection>
@@ -173,8 +172,7 @@
                                 <Label Content="Floor opening: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboFloorOpenning" HorizontalContentAlignment="Center" 
                                           Height="23" Width="150" DisplayMemberPath="Name"
-                                          SelectedValue="{Binding Path=FloorOpenning}" 
-                                          SelectedValuePath="Value" >
+                                          SelectedValue="{Binding Path=FloorOpenning}">
                                     
                                     <ComboBox.ItemsSource >
                                         <CompositeCollection>

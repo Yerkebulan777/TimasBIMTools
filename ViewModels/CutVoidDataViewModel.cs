@@ -313,8 +313,6 @@ namespace RevitTimasBIMTools.ViewModels
             return Directory.GetFiles(directory, extension, SearchOption.TopDirectoryOnly);
         }
 
-
-
         #endregion
 
 
