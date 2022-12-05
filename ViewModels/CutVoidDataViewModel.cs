@@ -200,8 +200,8 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region FamilySymbol
 
-        private IDictionary<string, FamilySymbol> symbols = null;
-        public IDictionary<string, FamilySymbol> FamilySymbols
+        private ISet<FamilySymbol> symbols = null;
+        public ISet<FamilySymbol> FamilySymbols
         {
             get => symbols;
             set
@@ -253,6 +253,7 @@ namespace RevitTimasBIMTools.ViewModels
             Family family = null;
             FamilySymbols = await RevitTask.RunAsync(app =>
             {
+                ISet<FamilySymbol> result = null;
                 doc = app.ActiveUIDocument.Document;
                 using Transaction trx = new(doc, "LoadSymbols");
                 TransactionStatus status = trx.Start();
@@ -261,13 +262,16 @@ namespace RevitTimasBIMTools.ViewModels
                     if (doc.LoadFamily(familyPath, out family))
                     {
                         status = trx.Commit();
-                        symbols = GetFamilySymbols(family);
+                        result = GetFamilySymbolSet(family);
                         Document familyDoc = doc.EditFamily(family);
                         SaveAsOptions options = new() { OverwriteExistingFile = true };
                         familyDoc.SaveAs(@$"{localPath}\{family.Name}.rfa", options);
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
-                            familyDoc.Close(false);
+                            if (familyDoc.Close(false) && symbols != null)
+                            {
+                                result.UnionWith(symbols);
+                            }
                         }
                     }
                     else if (!trx.HasEnded())
@@ -276,26 +280,27 @@ namespace RevitTimasBIMTools.ViewModels
                         Logger.Error($"Not loaded family");
                     }
                 }
-                return symbols;
+
+                return result;
             });
         }
 
 
-        private IDictionary<string, FamilySymbol> GetFamilySymbols(Family family)
+        private ISet<FamilySymbol> GetFamilySymbolSet(Family family)
         {
+            ISet<FamilySymbol> result = new HashSet<FamilySymbol>(5);
             if (family != null && family.IsValidObject)
             {
-                symbols = symbols ?? new SortedDictionary<string, FamilySymbol>();
                 foreach (ElementId symbId in family.GetFamilySymbolIds())
                 {
                     Element elem = doc.GetElement(symbId);
-                    if (elem is not null and FamilySymbol symbol)
+                    if (elem is FamilySymbol symbol)
                     {
-                        symbols[symbol.Name.Trim()] = symbol;
+                        _ = result.Add(symbol);
                     }
                 }
             }
-            return symbols;
+            return result;
         }
 
 
@@ -307,6 +312,8 @@ namespace RevitTimasBIMTools.ViewModels
             }
             return Directory.GetFiles(directory, extension, SearchOption.TopDirectoryOnly);
         }
+
+
 
         #endregion
 
@@ -848,6 +855,9 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         #endregion
+
+
+
 
 
         // Алгоритм проверки семейств отверстия

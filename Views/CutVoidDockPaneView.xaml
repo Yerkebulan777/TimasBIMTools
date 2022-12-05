@@ -143,15 +143,17 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <StackPanel>
 
+                            <StackPanel.Resources>
+                                <CollectionViewSource x:Key="symbolCollection" Source="{Binding Path=FamilySymbols}" />
+                            </StackPanel.Resources>
+
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Wall opening: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboWallOpenning" HorizontalContentAlignment="Center" 
-                                          Height="23" Width="150" DisplayMemberPath="Value.Name"
+                                          Height="23" Width="150" DisplayMemberPath="Name"
                                           SelectedValue="{Binding Path=WallOpenning}" 
                                           SelectedValuePath="Value" >
-                                    <ComboBox.Resources>
-                                        <CollectionViewSource x:Key="symbolCollection" Source="{Binding Path=FamilySymbols}" />
-                                    </ComboBox.Resources>
+                                    
                                     <ComboBox.ItemsSource >
                                         <CompositeCollection>
                                             <CollectionContainer Collection="{Binding Source={StaticResource symbolCollection}}" />
@@ -170,12 +172,10 @@
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Floor opening: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboFloorOpenning" HorizontalContentAlignment="Center" 
-                                          Height="23" Width="150" DisplayMemberPath="Value.Name"
+                                          Height="23" Width="150" DisplayMemberPath="Name"
                                           SelectedValue="{Binding Path=FloorOpenning}" 
                                           SelectedValuePath="Value" >
-                                    <ComboBox.Resources>
-                                        <CollectionViewSource x:Key="symbolCollection" Source="{Binding Path=FamilySymbols}" />
-                                    </ComboBox.Resources>
+                                    
                                     <ComboBox.ItemsSource >
                                         <CompositeCollection>
                                             <CollectionContainer Collection="{Binding Source={StaticResource symbolCollection}}" />
