@@ -74,24 +74,24 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string WallSymbollUniqueId {
+        public string WallOpeningSymbolId {
             get {
-                return ((string)(this["WallSymbollUniqueId"]));
+                return ((string)(this["WallOpeningSymbolId"]));
             }
             set {
-                this["WallSymbollUniqueId"] = value;
+                this["WallOpeningSymbolId"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FloorSymbolUniqueId {
+        public string FloorOpeningSymbolId {
             get {
-                return ((string)(this["FloorSymbolUniqueId"]));
+                return ((string)(this["FloorOpeningSymbolId"]));
             }
             set {
-                this["FloorSymbolUniqueId"] = value;
+                this["FloorOpeningSymbolId"] = value;
             }
         }
         
@@ -122,12 +122,12 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("00000000-0000-0000-0000-000000000000")]
-        public global::System.Guid ElevMarkGuid {
+        public global::System.Guid ElevatMarkGuid {
             get {
-                return ((global::System.Guid)(this["ElevMarkGuid"]));
+                return ((global::System.Guid)(this["ElevatMarkGuid"]));
             }
             set {
-                this["ElevMarkGuid"] = value;
+                this["ElevatMarkGuid"] = value;
             }
         }
     }

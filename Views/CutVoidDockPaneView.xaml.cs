@@ -133,7 +133,7 @@ namespace RevitTimasBIMTools.Views
                 }
                 if (comboBox.Name.Equals("ComboElevMark"))
                 {
-                    Properties.Settings.Default.ElevMarkGuid = guid;
+                    Properties.Settings.Default.ElevatMarkGuid = guid;
                     Properties.Settings.Default.Save();
                 }
             }

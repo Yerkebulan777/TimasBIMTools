@@ -29,12 +29,12 @@ namespace RevitTimasBIMTools.RevitModel
 
         public Plane SectionPlane { get; internal set; }
         public BoundingBoxUV SectionBox { get; internal set; }
+        public int HostCategoryIntId { get; internal set; }
         public string Description { get; internal set; }
         public int SizeInMm { get; internal set; }
         public double Height { get; internal set; }
         public double Width { get; internal set; }
         public double Depth { get; internal set; }
-
 
         private bool selected = false;
         public bool IsSelected
@@ -42,7 +42,7 @@ namespace RevitTimasBIMTools.RevitModel
             get => selected;
             set => SetProperty(ref selected, value);
         }
-
+        
 
         public bool IsValidModel()
         {

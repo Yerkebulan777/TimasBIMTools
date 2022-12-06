@@ -203,7 +203,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref wSymbol, value) && wSymbol != null)
                 {
-                    Properties.Settings.Default.WallSymbollUniqueId = wSymbol.UniqueId;
+                    Properties.Settings.Default.WallOpeningSymbolId = wSymbol.UniqueId;
                     Properties.Settings.Default.Save();
                     ActivateFamilySimbol(wSymbol);
                 }
@@ -219,7 +219,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref fSymbol, value) && fSymbol != null)
                 {
-                    Properties.Settings.Default.FloorSymbolUniqueId = fSymbol.UniqueId;
+                    Properties.Settings.Default.FloorOpeningSymbolId = fSymbol.UniqueId;
                     Properties.Settings.Default.Save();
                     ActivateFamilySimbol(fSymbol);
                 }
@@ -763,7 +763,7 @@ namespace RevitTimasBIMTools.ViewModels
                             if (dialogResult.Value && ElementModelData.Remove(model))
                             {
                                 collisionManager.VerifyOpenningSize(doc, model);
-                                collisionManager.CreateOpening(doc, model, wSymbol);
+                                collisionManager.CreateOpening(doc, model);
                             }
                             else
                             {
@@ -803,7 +803,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         #endregion
-
 
 
         // Алгоритм проверки семейств отверстия
