@@ -1,5 +1,4 @@
-﻿using Autodesk.Revit.Creation;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
@@ -42,7 +41,7 @@ namespace RevitTimasBIMTools.CutOpening
         private IDictionary<int, ElementId> ElementTypeIdData { get; set; } = null;
 
         private Guid widthGuid = Properties.Settings.Default.WidthMarkGuid;
-        private Guid hightGuid = Properties.Settings.Default.HeightMarkGuid;
+        private Guid heightGuid = Properties.Settings.Default.HeightMarkGuid;
         private Guid elevatGuid = Properties.Settings.Default.ElevatMarkGuid;
         private double minSideSize = Math.Round((Properties.Settings.Default.MinSideSizeInMm / footToMm) - epsilon, 5);
         private double minDepthSize = Math.Round((Properties.Settings.Default.MinDepthSizeInMm / footToMm) - epsilon, 5);
@@ -87,7 +86,7 @@ namespace RevitTimasBIMTools.CutOpening
             Properties.Settings.Default.Upgrade();
             Transform global = document.Transform;
             widthGuid = Properties.Settings.Default.WidthMarkGuid;
-            hightGuid = Properties.Settings.Default.HeightMarkGuid;
+            heightGuid = Properties.Settings.Default.HeightMarkGuid;
             elevatGuid = Properties.Settings.Default.ElevatMarkGuid;
             IList<ElementModel> output = new List<ElementModel>(50);
             minSideSize = Math.Round((Properties.Settings.Default.MinSideSizeInMm / footToMm) - epsilon, 5);
@@ -288,15 +287,16 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                     if (opening != null && opening.IsValidObject)
                     {
+                        //double elevLevel = level.ProjectElevation;
                         //var prm = SharedParameterElement.Lookup(doc, elevatGuid);
-                        double elevLevel = level.ProjectElevation;
-                        double elevMark = opening.get_Parameter(elevatGuid).AsDouble();
-                        double elevValue = opening.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble();
-                        if (opening.get_Parameter(elevatGuid).Set(elevLevel + elevMark + elevValue))
+                        //double elevMark = opening.get_Parameter(elevatGuid).AsDouble();
+                        Parameter elevatParam = opening.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
+                        bool elevatBolean = opening.get_Parameter(elevatGuid).Set(elevatParam.AsDouble());
+                        if (opening.get_Parameter(heightGuid).Set(model.Height))
                         {
-                            if (opening.get_Parameter(hightGuid).Set(model.Height))
+                            if (opening.get_Parameter(widthGuid).Set(model.Width))
                             {
-                                if (opening.get_Parameter(widthGuid).Set(model.Width))
+                                if (elevatBolean && elevatParam.Set(0))
                                 {
                                     status = trx.Commit();
                                 }
