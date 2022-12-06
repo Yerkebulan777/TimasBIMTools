@@ -40,11 +40,11 @@ namespace RevitTimasBIMTools.CutOpening
         private Transform searchTransform { get; set; } = null;
         private IDictionary<int, ElementId> ElementTypeIdData { get; set; } = null;
 
-        private double minSideSize;
-        private double minDepthSize;
         private Guid widthGuid = Properties.Settings.Default.WidthMarkGuid;
         private Guid hightGuid = Properties.Settings.Default.HeightMarkGuid;
         private Guid elevatGuid = Properties.Settings.Default.ElevatMarkGuid;
+        private double minSideSize = Math.Round((Properties.Settings.Default.MinSideSizeInMm / footToMm) - epsilon, 5);
+        private double minDepthSize = Math.Round((Properties.Settings.Default.MinDepthSizeInMm / footToMm) - epsilon, 5);
 
         #endregion
 
@@ -83,7 +83,11 @@ namespace RevitTimasBIMTools.CutOpening
 
         public IList<ElementModel> GetCollisionByInputData(Document doc, DocumentModel document, Material material, Category category)
         {
+            Properties.Settings.Default.Upgrade();
             Transform global = document.Transform;
+            widthGuid = Properties.Settings.Default.WidthMarkGuid;
+            hightGuid = Properties.Settings.Default.HeightMarkGuid;
+            elevatGuid = Properties.Settings.Default.ElevatMarkGuid;
             IList<ElementModel> output = new List<ElementModel>(50);
             minSideSize = Math.Round((Properties.Settings.Default.MinSideSizeInMm / footToMm) - epsilon, 5);
             minDepthSize = Math.Round((Properties.Settings.Default.MinDepthSizeInMm / footToMm) - epsilon, 5);
@@ -286,6 +290,7 @@ namespace RevitTimasBIMTools.CutOpening
                     }
                     if (opening != null && opening.IsValidObject)
                     {
+                        //var prm = SharedParameterElement.Lookup(doc, elevatGuid);
                         double elevLevel = model.HostLevel.ProjectElevation;
                         double elevMark = opening.get_Parameter(elevatGuid).AsDouble();
                         double elevValue = opening.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble();

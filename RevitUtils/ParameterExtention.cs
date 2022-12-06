@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using GlobalParameter = Autodesk.Revit.DB.GlobalParameter;
 
 namespace RevitTimasBIMTools.RevitUtils
@@ -192,8 +193,6 @@ namespace RevitTimasBIMTools.RevitUtils
 
             return result;
         }
-
-
 
 
 
