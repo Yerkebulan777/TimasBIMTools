@@ -197,22 +197,23 @@
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
                         <StackPanel>
 
-                            <StackPanel.Resources>
+                            <!--<StackPanel.Resources>
                                 <CollectionViewSource x:Key="definitions" Source="{Binding Path=ParameterDefinitions, Mode=OneWay}" />
-                            </StackPanel.Resources>
+                            </StackPanel.Resources>-->
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Width mark" Width="120" VerticalContentAlignment="Center" />
-                                <ComboBox Name="ComboWidthMark" Height="23" Width="150" 
-                                          ItemsSource="{Binding Source={StaticResource definitions}}" 
-                                          SelectedValue="{Binding Path=WidthMarkDefinition}" 
+                                <ComboBox Name="ComboWidthMark" Height="23" Width="150" IsEditable="False" 
+                                          ItemsSource="{Binding Path=ParameterDefinitions, Mode=Default, UpdateSourceTrigger=PropertyChanged}" 
+                                          Text="{Binding SelectedItem.Name, RelativeSource={RelativeSource Self}, Mode=OneWay}"
+                                          SelectedValue="{Binding Path=WidthMarkDefinition, UpdateSourceTrigger=Explicit}"
                                           DisplayMemberPath="Name" />
                             </WrapPanel>
 
-                            <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
+                            <!--<WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Height mark" Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboHeightMark" Height="23" Width="150" 
-                                          ItemsSource="{Binding Source={StaticResource definitions}}" 
+                                          ItemsSource="{Binding Path=ParameterDefinitions, Mode=OneWay}"
                                           SelectedValue="{Binding Path=HeightMarkDefinition}" 
                                           DisplayMemberPath="Name" />
                             </WrapPanel>
@@ -220,10 +221,10 @@
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Elevation mark" Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboElevation" Height="23" Width="150" 
-                                          ItemsSource="{Binding Source={StaticResource definitions}}"
+                                          ItemsSource="{Binding Path=ParameterDefinitions, Mode=OneWay}"
                                           SelectedValue="{Binding Path=ElevMarkDefinition}"
                                           DisplayMemberPath="Name" />
-                            </WrapPanel>
+                            </WrapPanel>-->
                             
                         </StackPanel>
                     </Border>

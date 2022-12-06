@@ -409,9 +409,6 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
 
-
-
-
         public static void ShowFilterableParameters(Document doc, Element elem)
         {
             IList<ElementId> categories = new List<ElementId>() { elem.Category.Id };

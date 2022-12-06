@@ -10,12 +10,14 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -251,7 +253,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 ISet<FamilySymbol> result = null;
                 doc = app.ActiveUIDocument.Document;
-                using Transaction trx = new(doc, "LoadSymbols");
+                using Transaction trx = new(doc, "LoadFamily");
                 TransactionStatus status = trx.Start();
                 if (status == TransactionStatus.Started)
                 {
@@ -262,7 +264,6 @@ namespace RevitTimasBIMTools.ViewModels
                         Document familyDoc = doc.EditFamily(family);
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
-                            GetFamilyParameterDefinitionList(familyDoc);
                             string familyPath = @$"{localPath}\{family.Name}.rfa";
                             if (File.Exists(familyPath)) { File.Delete(familyPath); }
                             familyDoc.SaveAs(familyPath, new SaveAsOptions
@@ -271,6 +272,7 @@ namespace RevitTimasBIMTools.ViewModels
                                 MaximumBackups = 3,
                                 OverwriteExistingFile = true
                             });
+                            GetFamilySharedParameterData(familyDoc);
                             if (familyDoc.Close(false) && symbols != null)
                             {
                                 result.UnionWith(symbols);
@@ -291,7 +293,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private ISet<FamilySymbol> GetFamilySymbolSet(Family family)
         {
-            ISet<FamilySymbol> result = new HashSet<FamilySymbol>(5);
+            ISet<FamilySymbol> result = new HashSet<FamilySymbol>(10);
             if (family != null && family.IsValidObject)
             {
                 foreach (ElementId symbId in family.GetFamilySymbolIds())
@@ -336,60 +338,49 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Definitions
 
-        private IList<Definition> definitions = null;
-        public IList<Definition> ParameterDefinitions
+        public Definition WidthMarkDefinition { get; internal set; }
+
+
+        public Definition HeightMarkDefinition { get; internal set; }
+
+
+        public Definition ElevMarkDefinition { get; internal set; }
+
+
+        private IDictionary<string, Guid> paramData = null;
+        public IDictionary<string, Guid> SharedParameterData
         {
-            get => definitions;
+            get => paramData;
             set
             {
-                if (SetProperty(ref definitions, value))
+                if (SetProperty(ref paramData, value))
                 {
-                    Logger.Info("Definitions count: " + definitions.Count.ToString());
+                    StringBuilder builder = new(10);
+                    foreach (string name in paramData.Keys)
+                    {
+                        _ = builder.AppendLine(name);
+                    }
+                    Logger.Info("Definition names:\n" + builder.ToString());
+                    _ = builder.Clear();
                 }
             }
         }
 
 
-        private Definition widthMark;
-        public Definition WidthMarkDefinition
+        private void GetFamilySharedParameterData(Document familyDoc)
         {
-            get => widthMark;
-            set => SetProperty(ref widthMark, value);
-        }
-
-
-        private Definition heightMark;
-        public Definition HeightMarkDefinition
-        {
-            get => heightMark;
-            set => SetProperty(ref heightMark, value);
-        }
-
-
-        private Definition elevMark;
-        public Definition ElevMarkDefinition
-        {
-            get => elevMark;
-            set => SetProperty(ref elevMark, value);
-        }
-
-
-        private void GetFamilyParameterDefinitionList(Document familyDoc)
-        {
-            IList<Definition> result = new List<Definition> (5);
+            SortedList<string, Guid> result = new(10);
             FamilyManager familyManager = familyDoc.FamilyManager;
             foreach (FamilyParameter param in familyManager.GetParameters())
             {
                 if (param.IsInstance && param.UserModifiable && param.IsShared)
                 {
-                    result.Add(param.Definition);
+                    if (!param.IsReadOnly && !result.ContainsValue(param.GUID))
+                    {
+                        result[param.Definition.Name] = param.GUID;
+                    }
                 }
             }
-            if (definitions!= null && definitions.Any() && result.Any())
-            {
-                result = definitions.Union(result).ToList();
-            }
-            ParameterDefinitions = result;
         }
 
         #endregion
