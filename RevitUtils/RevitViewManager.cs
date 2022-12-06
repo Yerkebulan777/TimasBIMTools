@@ -402,23 +402,10 @@ namespace RevitTimasBIMTools.RevitUtils
         {
             string filterName = "Filter" + elem.Name;
             OverrideGraphicSettings ogSettings = new();
-            IList<ElementId> categories = GetFilterableCategoriesByElement(elem);
+            IList<ElementId> categories = CheckFilterableCategoryByElement(elem);
             ParameterFilterElement prmFilter = ParameterFilterElement.Create(doc, filterName, categories, filter);
             ogSettings = ogSettings.SetProjectionLineColor(new Color(255, 0, 0));
             view.SetFilterOverrides(prmFilter.Id, ogSettings);
-        }
-
-
-        public static ElementFilter CreateElementFilterFromFilterRules(IList<FilterRule> filterRules)
-        {
-            IList<ElementFilter> elemFilters = new List<ElementFilter>();
-            foreach (FilterRule filterRule in filterRules)
-            {
-                ElementParameterFilter elemParamFilter = new(filterRule);
-                elemFilters.Add(elemParamFilter);
-            }
-            LogicalAndFilter elemFilter = new(elemFilters);
-            return elemFilter;
         }
 
 
@@ -439,7 +426,7 @@ namespace RevitTimasBIMTools.RevitUtils
         //FilterElementIdRule rule = new FilterElementIdRule(provider, new FilterNumericEquals(), view.Id);
 
 
-        private static IList<ElementId> GetFilterableCategoriesByElement(Element elem)
+        private static IList<ElementId> CheckFilterableCategoryByElement(Element elem)
         {
             ICollection<ElementId> catIds = ParameterFilterUtilities.GetAllFilterableCategories();
             IList<ElementId> categories = new List<ElementId>();

@@ -11,8 +11,7 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     internal sealed class RevitFilterManager
     {
-
-        const double epsilon = 1.0e-3;
+        private const double epsilon = 1.0e-3;
 
         #region Document Collector
 
@@ -225,6 +224,39 @@ namespace RevitTimasBIMTools.RevitUtils
                     return collector;
             }
             return collector.WherePasses(new ElementParameterFilter(filterRule));
+        }
+
+        #endregion
+
+
+        #region FamilySymbol View Filter
+        public static void CreateFilterByFamilySymbol(FamilySymbol symbol)
+        {
+            Document doc = symbol.Document;
+            using Transaction trx = new(doc);
+            string symbolName = symbol.Name;
+            string familyName = symbol.FamilyName;
+            TransactionStatus status = trx.Start("Createfilter");
+            IList<FilterRule> filterRules = new List<FilterRule>();
+            ElementId symbolParamId = new(BuiltInParameter.SYMBOL_NAME_PARAM);
+            ElementId familyParamId = new(BuiltInParameter.ALL_MODEL_FAMILY_NAME);
+            ICollection<ElementId> categories = new List<ElementId>() { symbol.Category.Id };
+            filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(familyParamId, familyName, false));
+            filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(symbolParamId, symbolName, false));
+            ElementFilter elementFilter = CreateElementFilterFromFilterRules(filterRules);
+            ParameterFilterElement paramFilter = ParameterFilterElement.Create(doc, symbol.Name, categories, elementFilter);
+            status = trx.Commit();
+        }
+
+
+        public static ElementFilter CreateElementFilterFromFilterRules(IList<FilterRule> filterRules)
+        {
+            IList<ElementFilter> elemFilters = new List<ElementFilter>();
+            foreach (FilterRule filterRule in filterRules)
+            {
+                elemFilters.Add(new ElementParameterFilter(filterRule));
+            }
+            return new LogicalAndFilter(elemFilters);
         }
 
         #endregion
