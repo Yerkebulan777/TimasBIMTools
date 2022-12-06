@@ -260,23 +260,20 @@ namespace RevitTimasBIMTools.ViewModels
                         status = trx.Commit();
                         result = GetFamilySymbolSet(family);
                         Document familyDoc = doc.EditFamily(family);
-                        if (File.Exists(familyPath)) { File.Delete(familyPath); }
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
-                            GetFamilyParameterDefinitionSet(familyDoc);
+                            GetFamilyParameterDefinitionList(familyDoc);
                             string familyPath = @$"{localPath}\{family.Name}.rfa";
+                            if (File.Exists(familyPath)) { File.Delete(familyPath); }
                             familyDoc.SaveAs(familyPath, new SaveAsOptions
                             {
                                 Compact = true,
                                 MaximumBackups = 3,
                                 OverwriteExistingFile = true
                             });
-                            if (familyDoc.Close(false))
+                            if (familyDoc.Close(false) && symbols != null)
                             {
-                                if (symbols != null)
-                                {
-                                    result.UnionWith(symbols);
-                                }
+                                result.UnionWith(symbols);
                             }
                         }
                     }
@@ -339,15 +336,15 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Definitions
 
-        private ISet<Definition> definitions = null;
-        public ISet<Definition> ParameterDefinitions
+        private IList<Definition> definitions = null;
+        public IList<Definition> ParameterDefinitions
         {
             get => definitions;
             set
             {
                 if (SetProperty(ref definitions, value))
                 {
-
+                    Logger.Info("Definitions count: " + definitions.Count.ToString());
                 }
             }
         }
@@ -377,18 +374,22 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void GetFamilyParameterDefinitionSet(Document familyDoc)
+        private void GetFamilyParameterDefinitionList(Document familyDoc)
         {
-            ISet<Definition> result = new HashSet<Definition>(3);
+            IList<Definition> result = new List<Definition> (5);
             FamilyManager familyManager = familyDoc.FamilyManager;
             foreach (FamilyParameter param in familyManager.GetParameters())
             {
                 if (param.IsInstance && param.UserModifiable && param.IsShared)
                 {
-                    _ = result.Add(param.Definition);
-                    ParameterDefinitions = result;
+                    result.Add(param.Definition);
                 }
             }
+            if (definitions!= null && definitions.Any() && result.Any())
+            {
+                result = definitions.Union(result).ToList();
+            }
+            ParameterDefinitions = result;
         }
 
         #endregion
