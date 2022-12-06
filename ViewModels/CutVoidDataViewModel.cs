@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
-using UnitType = Autodesk.Revit.DB.UnitType;
 
 namespace RevitTimasBIMTools.ViewModels
 {
@@ -222,7 +221,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref wSymbol, value) && wSymbol != null)
                 {
                     Properties.Settings.Default.WallSymbollUniqueId = wSymbol.UniqueId;
-                    GetSymbolSharedDefinitions(wSymbol, UnitType.UT_Length);
                     Properties.Settings.Default.Save();
                     ActivateFamilySimbol(wSymbol);
                 }
@@ -239,7 +237,6 @@ namespace RevitTimasBIMTools.ViewModels
                 if (SetProperty(ref fSymbol, value) && fSymbol != null)
                 {
                     Properties.Settings.Default.FloorSymbolUniqueId = fSymbol.UniqueId;
-                    GetSymbolSharedDefinitions(fSymbol, UnitType.UT_Length);
                     Properties.Settings.Default.Save();
                     ActivateFamilySimbol(fSymbol);
                 }
@@ -260,23 +257,26 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (doc.LoadFamily(familyPath, out family))
                     {
-                        doc.Regenerate();
                         status = trx.Commit();
                         result = GetFamilySymbolSet(family);
                         Document familyDoc = doc.EditFamily(family);
+                        if (File.Exists(familyPath)) { File.Delete(familyPath); }
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
+                            GetFamilyParameterDefinitionSet(familyDoc);
                             string familyPath = @$"{localPath}\{family.Name}.rfa";
-                            if (File.Exists(familyPath)) { File.Delete(familyPath); }
                             familyDoc.SaveAs(familyPath, new SaveAsOptions
                             {
                                 Compact = true,
                                 MaximumBackups = 3,
                                 OverwriteExistingFile = true
                             });
-                            if (familyDoc.Close(false) && symbols != null)
+                            if (familyDoc.Close(false))
                             {
-                                result.UnionWith(symbols);
+                                if (symbols != null)
+                                {
+                                    result.UnionWith(symbols);
+                                }
                             }
                         }
                     }
@@ -339,11 +339,17 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region Definitions
 
-        private IList<Definition> definitions = null;
-        public IList<Definition> ParameterDefinitions
+        private ISet<Definition> definitions = null;
+        public ISet<Definition> ParameterDefinitions
         {
             get => definitions;
-            set => SetProperty(ref definitions, value);
+            set
+            {
+                if (SetProperty(ref definitions, value))
+                {
+
+                }
+            }
         }
 
 
@@ -371,44 +377,18 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void GetSymbolSharedDefinitions(FamilySymbol symbol, UnitType unitType)
+        private void GetFamilyParameterDefinitionSet(Document familyDoc)
         {
-            ParameterDefinitions = await RevitTask.RunAsync(app =>
+            ISet<Definition> result = new HashSet<Definition>(3);
+            FamilyManager familyManager = familyDoc.FamilyManager;
+            foreach (FamilyParameter param in familyManager.GetParameters())
             {
-                doc = app.ActiveUIDocument.Document;
-                IList<Definition> result = new List<Definition>();
-                if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
+                if (param.IsInstance && param.UserModifiable && param.IsShared)
                 {
-                    string symbolName = symbol.Name;
-                    string familyName = symbol.FamilyName;
-                    IList<FilterRule> filterRules = new List<FilterRule>();
-                    using Transaction trx = new(doc, "Addfilter");
-                    TransactionStatus status = trx.Start();
-                    ElementId symbolParamId = new(BuiltInParameter.SYMBOL_NAME_PARAM);
-                    ElementId familyParamId = new(BuiltInParameter.ALL_MODEL_FAMILY_NAME);
-                    ICollection<ElementId> categories = new List<ElementId>() { symbol.Category.Id };
-                    filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(familyParamId, familyName, false));
-                    filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(symbolParamId, symbolName, false));
-                    ElementFilter elementFilter = RevitFilterManager.CreateElementFilterFromFilterRules(filterRules);
-                    ParameterFilterElement parameterFilter = ParameterFilterElement.Create(doc, symbol.Name, categories, elementFilter);
-                    foreach (ElementId id in parameterFilter.GetElementFilterParameters())
-                    {
-                        Element elem = doc.GetElement(id);
-                        if (elem is not null and ParameterElement param)
-                        {
-                            Definition defin = param.GetDefinition();
-                            Logger.Log("Info: " + defin.Name.Trim());
-                            if (defin.UnitType.Equals(unitType))
-                            {
-                                result.Add(defin);
-                            }
-                        }
-                    }
-                    status = trx.RollBack();
+                    _ = result.Add(param.Definition);
+                    ParameterDefinitions = result;
                 }
-
-                return result;
-            });
+            }
         }
 
         #endregion
