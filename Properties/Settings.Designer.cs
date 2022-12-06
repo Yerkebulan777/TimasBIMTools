@@ -94,5 +94,41 @@ namespace RevitTimasBIMTools.Properties {
                 this["FloorSymbolUniqueId"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00000000-0000-0000-0000-000000000000")]
+        public global::System.Guid WidthMarkGuid {
+            get {
+                return ((global::System.Guid)(this["WidthMarkGuid"]));
+            }
+            set {
+                this["WidthMarkGuid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00000000-0000-0000-0000-000000000000")]
+        public global::System.Guid HeightMarkGuid {
+            get {
+                return ((global::System.Guid)(this["HeightMarkGuid"]));
+            }
+            set {
+                this["HeightMarkGuid"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00000000-0000-0000-0000-000000000000")]
+        public global::System.Guid ElevMarkGuid {
+            get {
+                return ((global::System.Guid)(this["ElevMarkGuid"]));
+            }
+            set {
+                this["ElevMarkGuid"] = value;
+            }
+        }
     }
 }

@@ -17,7 +17,6 @@ using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -116,13 +115,7 @@ namespace RevitTimasBIMTools.ViewModels
         public DocumentModel SelectedDocument
         {
             get => document;
-            set
-            {
-                if (SetProperty(ref document, value) && document != null)
-                {
-                    RefreshActiveDataHandler();
-                }
-            }
+            set => SetProperty(ref document, value);
         }
 
 
@@ -130,13 +123,7 @@ namespace RevitTimasBIMTools.ViewModels
         public Material SelectedMaterial
         {
             get => material;
-            set
-            {
-                if (SetProperty(ref material, value) && material != null)
-                {
-                    RefreshActiveDataHandler();
-                }
-            }
+            set => SetProperty(ref material, value);
         }
 
 
@@ -144,13 +131,7 @@ namespace RevitTimasBIMTools.ViewModels
         public Category SelectedCategory
         {
             get => category;
-            set
-            {
-                if (SetProperty(ref category, value) && category != null)
-                {
-                    RefreshActiveDataHandler();
-                }
-            }
+            set => SetProperty(ref category, value);
         }
 
 
@@ -336,48 +317,28 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region Definitions
-
-        public Definition WidthMarkDefinition { get; internal set; }
-
-
-        public Definition HeightMarkDefinition { get; internal set; }
-
-
-        public Definition ElevMarkDefinition { get; internal set; }
-
+        #region ParameterData
 
         private IDictionary<string, Guid> paramData = null;
         public IDictionary<string, Guid> SharedParameterData
         {
             get => paramData;
-            set
-            {
-                if (SetProperty(ref paramData, value))
-                {
-                    StringBuilder builder = new(10);
-                    foreach (string name in paramData.Keys)
-                    {
-                        _ = builder.AppendLine(name);
-                    }
-                    Logger.Info("Definition names:\n" + builder.ToString());
-                    _ = builder.Clear();
-                }
-            }
+            set => SetProperty(ref paramData, value);
         }
 
 
         private void GetFamilySharedParameterData(Document familyDoc)
         {
-            SortedList<string, Guid> result = new(10);
             FamilyManager familyManager = familyDoc.FamilyManager;
+            SharedParameterData ??= new SortedList<string, Guid>(10);
             foreach (FamilyParameter param in familyManager.GetParameters())
             {
                 if (param.IsInstance && param.UserModifiable && param.IsShared)
                 {
-                    if (!param.IsReadOnly && !result.ContainsValue(param.GUID))
+                    string name = param.Definition.Name;
+                    if (!paramData.TryGetValue(name, out _))
                     {
-                        result[param.Definition.Name] = param.GUID;
+                        SharedParameterData[name] = param.GUID;
                     }
                 }
             }
@@ -624,6 +585,7 @@ namespace RevitTimasBIMTools.ViewModels
                     viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.FamilyName)));
                     viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.IsSelected), ListSortDirection.Descending));
                     viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.SizeInMm), ListSortDirection.Ascending));
+                    viewData.Filter = FilterModelCollection;
                 }
             }
         }
@@ -633,8 +595,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             if (viewData != null && !viewData.IsEmpty)
             {
-                currentItem = ViewDataCollection.GetItemAt(0);
-                ViewDataCollection.Filter = FilterModelCollection;
+                currentItem = viewData.GetItemAt(0);
                 if (currentItem is ElementModel model && viewData.MoveCurrentTo(currentItem))
                 {
                     IEnumerable<ElementModel> items = viewData.OfType<ElementModel>();
@@ -842,8 +803,6 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
         #endregion
-
-
 
 
 

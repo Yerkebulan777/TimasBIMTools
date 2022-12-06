@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Threading;
+using ComboBox = System.Windows.Controls.ComboBox;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -116,6 +117,29 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        private void ComboMark_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ComboBox comboBox && comboBox.SelectedValue is Guid guid)
+            {
+                if (comboBox.Name.Equals("ComboWidthMark"))
+                {
+                    Properties.Settings.Default.WidthMarkGuid = guid;
+                    Properties.Settings.Default.Save();
+                }
+                if (comboBox.Name.Equals("ComboHeightMark"))
+                {
+                    Properties.Settings.Default.HeightMarkGuid = guid;
+                    Properties.Settings.Default.Save();
+                }
+                if (comboBox.Name.Equals("ComboElevMark"))
+                {
+                    Properties.Settings.Default.ElevMarkGuid = guid;
+                    Properties.Settings.Default.Save();
+                }
+            }
+        }
+
+
         public void Dispose()
         {
             if (!Disposed)
@@ -124,7 +148,5 @@ namespace RevitTimasBIMTools.Views
                 DataContextHandler?.Dispose();
             }
         }
-
-
     }
 }
