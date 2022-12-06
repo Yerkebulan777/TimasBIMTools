@@ -11,6 +11,7 @@ namespace RevitTimasBIMTools.RevitModel
         public string LevelName { get; private set; }
         public string SymbolName { get; private set; }
         public string FamilyName { get; private set; }
+        public int HostCategoryIntId { get; private set; }
 
         public ElementModel(Element instanse, Element host)
         {
@@ -23,13 +24,14 @@ namespace RevitTimasBIMTools.RevitModel
                 LevelName = level?.Name;
                 SymbolName = elementType.Name;
                 FamilyName = elementType.FamilyName;
+                HostCategoryIntId = host.Category.Id.IntegerValue;
             }
         }
 
 
         public Plane SectionPlane { get; internal set; }
         public BoundingBoxUV SectionBox { get; internal set; }
-        public int HostCategoryIntId { get; internal set; }
+        
         public string Description { get; internal set; }
         public int SizeInMm { get; internal set; }
         public double Height { get; internal set; }

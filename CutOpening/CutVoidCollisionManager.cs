@@ -132,16 +132,13 @@ namespace RevitTimasBIMTools.CutOpening
                     double minSize = Math.Min(width, height);
                     if (minSideSize < minSize)
                     {
-                        Level level = doc.GetElement(host.LevelId) as Level;
-                        int hostCatIntId = host.Category.Id.IntegerValue;
-                        ElementModel model = new(elem, level)
+                        ElementModel model = new(elem, host)
                         {
                             Width = width,
                             Depth = depth,
                             Height = height,
                             SectionPlane = plane,
                             SectionBox = sectionBox,
-                            HostCategoryIntId = hostCatIntId
                         };
                         model.SetSizeDescription();
                         yield return model;
@@ -276,7 +273,6 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 FamilyInstance opening = null;
                 XYZ origin = model.SectionPlane.Origin;
-                Element instanse = model.Instanse;
                 Level level = doc.GetElement(model.Host.LevelId) as Level;
                 if (status == TransactionStatus.Started)
                 {
