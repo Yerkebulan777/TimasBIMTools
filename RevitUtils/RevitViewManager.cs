@@ -76,7 +76,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region GetCreatePlanView
 
-        public static ViewPlan GetPlanView(UIDocument uidoc, Level level, string prefix = "Preview")
+        public static ViewPlan GetPlanViewByLevel(UIDocument uidoc, Level level, string prefix = "Preview")
         {
             if (level == null)
             {
@@ -149,12 +149,13 @@ namespace RevitTimasBIMTools.RevitUtils
         #region ShowElement
         public static void ShowModelInPlanView(UIDocument uidoc, in ElementModel model, ViewDiscipline discipline)
         {
-            ViewPlan viewPlan = GetPlanView(uidoc, model.HostLevel);
+            Document doc = uidoc.Document;
+            Level level = doc.GetElement(model.Host.LevelId) as Level;
+            ViewPlan viewPlan = GetPlanViewByLevel(uidoc, level: level);
             if (viewPlan != null && model.Instanse.IsValidObject)
             {
                 try
                 {
-                    Document doc = viewPlan.Document;
                     PlanViewRange viewRange = viewPlan.GetViewRange();
 
                     Element topLevel = doc.GetElement(viewRange.GetLevelId(PlanViewPlane.TopClipPlane));

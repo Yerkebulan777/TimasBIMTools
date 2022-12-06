@@ -333,12 +333,15 @@ namespace RevitTimasBIMTools.ViewModels
             SharedParameterData ??= new SortedList<string, Guid>(10);
             foreach (FamilyParameter param in familyManager.GetParameters())
             {
-                if (param.IsInstance && param.UserModifiable && param.IsShared)
+                if (param.UserModifiable && param.IsInstance)
                 {
-                    string name = param.Definition.Name;
-                    if (!paramData.TryGetValue(name, out _))
+                    if (!param.IsReadOnly && param.IsShared)
                     {
-                        SharedParameterData[name] = param.GUID;
+                        string name = param.Definition.Name;
+                        if (!paramData.TryGetValue(name, out _))
+                        {
+                            SharedParameterData[name] = param.GUID;
+                        }
                     }
                 }
             }
@@ -433,7 +436,6 @@ namespace RevitTimasBIMTools.ViewModels
                     FamilySymbols = null;
                     currentItem = null;
                     view3d = null;
-
                 }, taskContext);
             }
         }
@@ -491,7 +493,6 @@ namespace RevitTimasBIMTools.ViewModels
                 ElementModelData = await RevitTask.RunAsync(app =>
                 {
                     doc = app.ActiveUIDocument.Document;
-                    Properties.Settings.Default.Upgrade();
                     return collisionManager.GetCollisionByInputData(doc, document, material, category).ToObservableCollection();
                 });
             }
@@ -505,9 +506,9 @@ namespace RevitTimasBIMTools.ViewModels
                 Task task = RevitTask.RunAsync(app =>
                 {
                     doc = app.ActiveUIDocument.Document;
+                    UIDocument uidoc = app.ActiveUIDocument;
                     if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        UIDocument uidoc = app.ActiveUIDocument;
                         System.Windows.Clipboard.SetText(model.Instanse.Id.ToString());
                         uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                         RevitViewManager.ShowModelInPlanView(uidoc, model, ViewDiscipline.Mechanical);
@@ -680,8 +681,10 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     Task task = RevitTask.RunAsync(app =>
                     {
+                        doc = app.ActiveUIDocument.Document;
                         UIDocument uidoc = app.ActiveUIDocument;
-                        ViewPlan view = RevitViewManager.GetPlanView(uidoc, model.HostLevel);
+                        Level level = doc.GetElement(model.Host.LevelId) as Level;
+                        ViewPlan view = RevitViewManager.GetPlanViewByLevel(uidoc, level);
                         RevitViewManager.ActivateView(uidoc, view, ViewDiscipline.Mechanical);
                     });
                 }

@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.Creation;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
@@ -274,24 +275,25 @@ namespace RevitTimasBIMTools.CutOpening
             try
             {
                 FamilyInstance opening = null;
-                Element instanse = model.Instanse;
                 XYZ origin = model.SectionPlane.Origin;
+                Element instanse = model.Instanse;
+                Level level = doc.GetElement(model.Host.LevelId) as Level;
                 if (status == TransactionStatus.Started)
                 {
                     if (model.HostCategoryIntId.Equals(-2000011))
                     {
                         FamilySymbol symbol = GetOpeningFamilySymbol(doc, Properties.Settings.Default.WallOpeningSymbolId);
-                        opening = doc.Create.NewFamilyInstance(origin, symbol, model.HostLevel, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(origin, symbol, model.Host, level, StructuralType.NonStructural);
                     }
                     else if (model.HostCategoryIntId.Equals(-2000032) || model.HostCategoryIntId.Equals(-2000035))
                     {
                         FamilySymbol symbol = GetOpeningFamilySymbol(doc, Properties.Settings.Default.FloorOpeningSymbolId);
-                        opening = doc.Create.NewFamilyInstance(origin, symbol, model.HostLevel, StructuralType.NonStructural);
+                        opening = doc.Create.NewFamilyInstance(origin, symbol, model.Host, level, StructuralType.NonStructural);
                     }
                     if (opening != null && opening.IsValidObject)
                     {
                         //var prm = SharedParameterElement.Lookup(doc, elevatGuid);
-                        double elevLevel = model.HostLevel.ProjectElevation;
+                        double elevLevel = level.ProjectElevation;
                         double elevMark = opening.get_Parameter(elevatGuid).AsDouble();
                         double elevValue = opening.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM).AsDouble();
                         if (opening.get_Parameter(elevatGuid).Set(elevLevel + elevMark + elevValue))
