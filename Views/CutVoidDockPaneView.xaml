@@ -76,26 +76,25 @@
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Project name: " Width="120" VerticalContentAlignment="Center" />
-                                <ComboBox Name="ComboDocumentModels" Height="23" Width="150" 
+                                <ComboBox Name="ComboDocumentModels" HorizontalContentAlignment="Center" 
                                           ItemsSource="{Binding Path=DocumentCollection}" 
-                                          SelectedItem="{Binding Path=SelectedDocument}"
-                                          SelectedIndex="0"/>
+                                          SelectedItem="{Binding Path=SelectedDocument}" />
                             </WrapPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Structure material: " Width="120" VerticalContentAlignment="Center" />
-                                <ComboBox Name="ComboStructureMats" Height="23" Width="150" DisplayMemberPath="Value.Name" 
+                                <ComboBox Name="ComboStructureMats" HorizontalContentAlignment="Center"
                                           ItemsSource="{Binding Path=StructureMaterials, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedMaterial}" 
-                                          SelectedIndex="-1" />
+                                          DisplayMemberPath="Value.Name" SelectedIndex="-1" />
                             </WrapPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Collision category: " Width="120" VerticalContentAlignment="Center" />
-                                <ComboBox Name="ComboEngineerCats" Height="23" Width="150" DisplayMemberPath="Value.Name" 
+                                <ComboBox Name="ComboEngineerCats" HorizontalContentAlignment="Center"
                                           ItemsSource="{Binding Path=EngineerCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                           SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedCategory}"
-                                          SelectedIndex="-1" />
+                                          DisplayMemberPath="Value.Name" SelectedIndex="-1" />
                             </WrapPanel>
 
                         </StackPanel>
@@ -188,6 +187,7 @@
                                     </ComboBox.ItemsSource>
                                 </ComboBox>
                             </WrapPanel>
+                        
                         </StackPanel>
                     </Border>
                 </ListViewItem>
@@ -203,7 +203,7 @@
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Width mark" Width="120" VerticalContentAlignment="Center" />
-                                <ComboBox Name="ComboWidthMark" Height="23" Width="150" 
+                                <ComboBox Name="ComboWidthMark" HorizontalContentAlignment="Center"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
                                           SelectionChanged="ComboMark_SelectionChanged"
@@ -212,7 +212,7 @@
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Height mark" Width="120" VerticalContentAlignment="Center" />
-                                <ComboBox Name="ComboHeightMark" Height="23" Width="150"
+                                <ComboBox Name="ComboHeightMark" HorizontalContentAlignment="Center"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
                                           SelectionChanged="ComboMark_SelectionChanged"
@@ -221,7 +221,7 @@
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Elevation mark" Width="120" VerticalContentAlignment="Center" />
-                                <ComboBox Name="ComboElevMark" Height="23" Width="150"
+                                <ComboBox Name="ComboElevMark"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
                                           SelectionChanged="ComboMark_SelectionChanged" 
@@ -240,11 +240,11 @@
                        Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" 
                        Style="{DynamicResource VisibleAnimation}" >
 
-                <ComboBox Name="ComboLevelFilter" Height="23" Width="120" Margin="5"
+                <ComboBox Name="ComboLevelFilter" Margin="5"
                     ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                     SelectedValue="{Binding Path=LevelTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
 
-                <ComboBox Name="ComboSymbolFilter" Height="23" Width="120" Margin="5"
+                <ComboBox Name="ComboSymbolFilter" Margin="5"
                     ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                     SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
 

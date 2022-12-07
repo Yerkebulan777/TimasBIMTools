@@ -143,7 +143,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref documents, value) && documents != null)
                 {
-                    Logger.Log("DocumentCollection count:\t" + documents.Count.ToString());
+                    SelectedDocument = documents.FirstOrDefault();
                 }
             }
         }
@@ -153,13 +153,7 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<string, Material> StructureMaterials
         {
             get => structs;
-            set
-            {
-                if (SetProperty(ref structs, value) && structs != null)
-                {
-                    Logger.Log("StructureMaterials count:\t" + structs.Count.ToString());
-                }
-            }
+            set => SetProperty(ref structs, value);
         }
 
 
@@ -167,13 +161,7 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<string, Category> EngineerCategories
         {
             get => categos;
-            set
-            {
-                if (SetProperty(ref categos, value) && categos != null)
-                {
-                    Logger.Log("EngineerCategories count:\t" + categos.Count.ToString());
-                }
-            }
+            set => SetProperty(ref categos, value);
         }
 
         #endregion
@@ -204,7 +192,6 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         status = trx.Commit();
                         result = GetFamilySymbolData(ref family);
-                        Logger.Info("FamilySymbolData: " + result.Count.ToString());
                         Document familyDoc = doc.EditFamily(family);
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
@@ -217,7 +204,7 @@ namespace RevitTimasBIMTools.ViewModels
                                 MaximumBackups = 3,
                                 Compact = true,
                             });
-                            familyDoc.Close(false);
+                            _ = familyDoc.Close(false);
                         }
                     }
                     else if (!trx.HasEnded())
@@ -289,16 +276,14 @@ namespace RevitTimasBIMTools.ViewModels
             SharedParameterData ??= new SortedList<string, Guid>(10);
             foreach (FamilyParameter param in familyManager.GetParameters())
             {
+                //OnPropertyChanged(nameof(SharedParameterData));
                 if (param.UserModifiable && param.IsInstance)
                 {
                     if (!param.IsReadOnly && param.IsShared)
                     {
-                        Guid guid = param.GUID;
                         string name = param.Definition.Name;
-                        if (!paramData.ContainsKey(name))
-                        {
-                            SharedParameterData[name] = guid;
-                        }
+                        Logger.Info("Parameter name: " + name);
+                        SharedParameterData[name] = param.GUID;
                     }
                 }
             }
@@ -387,10 +372,11 @@ namespace RevitTimasBIMTools.ViewModels
                     DocumentCollection = null;
                     EngineerCategories = null;
                     StructureMaterials = null;
+                    SharedParameterData = null;
+                    FamilySymbolData = null;
                     ElementModelData = null;
                     SymbolTextFilter = null;
                     LevelTextFilter = null;
-                    FamilySymbolData = null;
                     currentItem = null;
                     view3d = null;
                 }, taskContext);
@@ -473,7 +459,6 @@ namespace RevitTimasBIMTools.ViewModels
                 });
             }
         }
-
 
         #endregion
 

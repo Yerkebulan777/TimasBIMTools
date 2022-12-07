@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
@@ -10,6 +11,7 @@ using System.Windows.Forms;
 using System.Windows.Threading;
 using ComboBox = System.Windows.Controls.ComboBox;
 
+
 namespace RevitTimasBIMTools.Views
 {
     /// <summary> Логика взаимодействия для CutVoidDockPaneView.xaml </summary>
@@ -17,6 +19,7 @@ namespace RevitTimasBIMTools.Views
     {
         private bool Disposed { get; set; } = false;
         private readonly CutVoidDataViewModel DataContextHandler;
+        private readonly string docPath = SmartToolHelper.DocumentPath;
         private static readonly ExternalEvent externalEvent = CutVoidDataViewModel.RevitExternalEvent;
 
         public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
@@ -95,7 +98,6 @@ namespace RevitTimasBIMTools.Views
 
         private void LoadFamily_Click(object sender, RoutedEventArgs e)
         {
-            string docPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             OpenFileDialog openDialog = new()
             {
                 Filter = "Family Files (*.rfa)|*.rfa",
