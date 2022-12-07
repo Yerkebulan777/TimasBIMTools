@@ -157,7 +157,7 @@
                                         <CompositeCollection>
                                             <CollectionContainer Collection="{Binding Source={StaticResource symbols}, UpdateSourceTrigger=PropertyChanged}" />
                                             <ComboBoxItem >
-                                                <TextBlock Width="125">
+                                                <TextBlock Width="Auto">
                                                     <Hyperlink Click="LoadFamily_Click">
                                                         <TextBlock Text="Load Family" />
                                                     </Hyperlink>
@@ -178,7 +178,7 @@
                                         <CompositeCollection>
                                             <CollectionContainer Collection="{Binding Source={StaticResource symbols}, UpdateSourceTrigger=PropertyChanged}" />
                                             <ComboBoxItem>
-                                                <TextBlock Width="125">
+                                                <TextBlock Width="Auto">
                                                     <Hyperlink Click="LoadFamily_Click">
                                                         <TextBlock Text="Load Family" />
                                                     </Hyperlink>
