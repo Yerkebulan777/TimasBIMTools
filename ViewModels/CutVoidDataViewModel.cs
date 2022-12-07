@@ -182,35 +182,35 @@ namespace RevitTimasBIMTools.ViewModels
         #region FamilySymbols
 
         private IDictionary<string, FamilySymbol> symbols = null;
-        public IDictionary<string, FamilySymbol> FamilySymbols
+        public IDictionary<string, FamilySymbol> FamilySymbolData
         {
             get => symbols;
             set
             {
                 if (SetProperty(ref symbols, value) && symbols != null)
                 {
-                    Logger.Log("FamilySymbols count: " + symbols.Count.ToString());
+                    Logger.Info("FamilySymbolData count: " + symbols.Count.ToString());
                 }
             }
         }
 
 
-        public void LoadFamily(string familyPath)
+        public async void LoadFamilyAsync(string familyPath)
         {
-            Family family = null;
-            _ = RevitTask.RunAsync(app =>
+            FamilySymbolData = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                using Transaction trx = new(doc, "LoadFamily");
+                IDictionary<string, FamilySymbol> result = null;
+                using Transaction trx = new(doc, "LoadFamilyAsync");
                 TransactionStatus status = trx.Start();
                 if (status == TransactionStatus.Started)
                 {
                     IFamilyLoadOptions opt = new FamilyLoadOptions();
-                    if (doc.LoadFamily(familyPath, opt, out family))
+                    if (doc.LoadFamily(familyPath, opt, out Family family))
                     {
                         status = trx.Commit();
-                        GetOpenningFamilySymbolData(ref family);
                         Document familyDoc = doc.EditFamily(family);
+                        result = GetOpenningFamilySymbolData(ref family);
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
                             GetFamilySharedParameterData(familyDoc);
@@ -231,6 +231,7 @@ namespace RevitTimasBIMTools.ViewModels
                         Logger.Error($"Not loaded family");
                     }
                 }
+                return symbols.Merge(result);
             });
         }
 
@@ -245,20 +246,23 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void GetOpenningFamilySymbolData(ref Family family)
+        private IDictionary<string, FamilySymbol> GetOpenningFamilySymbolData(ref Family family)
         {
-            FamilySymbols ??= new SortedList<string, FamilySymbol>(15);
+            IDictionary<string, FamilySymbol> result = new SortedList<string, FamilySymbol>(10);
             if (family != null && family.IsValidObject && family.IsEditable)
             {
                 foreach (ElementId symbId in family.GetFamilySymbolIds())
                 {
                     FamilySymbol symbol = doc.GetElement(symbId) as FamilySymbol;
                     string sname = $"{symbol.FamilyName}: {symbol.Name.Trim()}";
-                    FamilySymbols.Add(sname, symbol);
-                    ActivateFamilySimbol(ref symbol);
-                    Logger.Info(sname);
+                    if (!symbols.ContainsKey(sname))
+                    {
+                        ActivateFamilySimbol(ref symbol);
+                        result[sname] = symbol;
+                    }
                 }
             }
+            return result;
         }
 
 
@@ -267,9 +271,9 @@ namespace RevitTimasBIMTools.ViewModels
             using Transaction trx = new(symbol.Document);
             if (symbol.IsValidObject && !symbol.IsActive)
             {
-                _ = trx.Start("Activate family");
+                trx.Start("Activate family");
                 symbol.Activate();
-                _ = trx.Commit();
+                trx.Commit();
             }
         }
 
@@ -392,7 +396,7 @@ namespace RevitTimasBIMTools.ViewModels
                     ElementModelData = null;
                     SymbolTextFilter = null;
                     LevelTextFilter = null;
-                    FamilySymbols = null;
+                    FamilySymbolData = null;
                     currentItem = null;
                     view3d = null;
                 }, taskContext);
@@ -438,7 +442,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     foreach (string familyPath in ProcessDirectory(localPath))
                     {
-                        LoadFamily(familyPath);
+                        LoadFamilyAsync(familyPath);
                     }
                 }
             });
@@ -475,6 +479,7 @@ namespace RevitTimasBIMTools.ViewModels
                 });
             }
         }
+
 
         #endregion
 

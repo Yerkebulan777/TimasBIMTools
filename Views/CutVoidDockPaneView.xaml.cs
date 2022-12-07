@@ -112,7 +112,7 @@ namespace RevitTimasBIMTools.Views
                 string path = openDialog.FileName;
                 if (!string.IsNullOrEmpty(path))
                 {
-                    DataContextHandler.LoadFamily(path);
+                    DataContextHandler.LoadFamilyAsync(path);
                 }
             }
         }

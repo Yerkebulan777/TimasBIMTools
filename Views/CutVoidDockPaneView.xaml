@@ -144,19 +144,18 @@
                         <StackPanel>
 
                             <StackPanel.Resources>
-                                <CollectionViewSource x:Key="symbols" Source="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <CollectionViewSource x:Key="symbols" Source="{Binding Path=FamilySymbolData, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel.Resources>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Wall opening: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboWallOpenning" HorizontalContentAlignment="Center"
                                           DisplayMemberPath="Key" SelectedValuePath="Value"
-                                          SelectionChanged="ComboOpenning_SelectionChanged"
-                                          IsSynchronizedWithCurrentItem="False">
+                                          SelectionChanged="ComboOpenning_SelectionChanged" >
                                     
                                     <ComboBox.ItemsSource >
                                         <CompositeCollection>
-                                            <CollectionContainer Collection="{Binding Source={StaticResource symbols}}" />
+                                            <CollectionContainer Collection="{Binding Source={StaticResource symbols}, UpdateSourceTrigger=PropertyChanged}" />
                                             <ComboBoxItem >
                                                 <TextBlock Width="125">
                                                     <Hyperlink Click="LoadFamily_Click">
@@ -173,12 +172,11 @@
                                 <Label Content="Floor opening: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboFloorOpenning" HorizontalContentAlignment="Center" 
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
-                                          SelectionChanged="ComboOpenning_SelectionChanged" 
-                                          IsSynchronizedWithCurrentItem="False" >
+                                          SelectionChanged="ComboOpenning_SelectionChanged" >
                                     
                                     <ComboBox.ItemsSource >
                                         <CompositeCollection>
-                                            <CollectionContainer Collection="{Binding Source={StaticResource symbols}}" />
+                                            <CollectionContainer Collection="{Binding Source={StaticResource symbols}, UpdateSourceTrigger=PropertyChanged}" />
                                             <ComboBoxItem>
                                                 <TextBlock Width="125">
                                                     <Hyperlink Click="LoadFamily_Click">

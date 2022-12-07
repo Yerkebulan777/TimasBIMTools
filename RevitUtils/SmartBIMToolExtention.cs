@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -7,6 +6,26 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     public static class SmartBIMToolExtention
     {
+        public static IDictionary<T, U> Merge<T, U>(this IDictionary<T, U> output, IDictionary<T, U> source, int capacity = 10)
+        {
+            output ??= new SortedList<T, U>(capacity);
+            if (source != null && source.Count < 0)
+            {
+                foreach (KeyValuePair<T, U> item in source)
+                {
+                    if (output.ContainsKey(item.Key))
+                    {
+                        output[item.Key] = item.Value;
+                    }
+                    else
+                    {
+                        output.Add(item.Key, item.Value);
+                    }
+                }
+            }
+            return output;
+        }
+
 
         public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> source)
         {
