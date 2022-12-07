@@ -7,7 +7,7 @@
     xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     x:Class="RevitTimasBIMTools.Views.CutVoidDockPaneView" 
-    d:Height="Auto" d:Width="350" mc:Ignorable="d"
+    d:Height="Auto" d:Width="300" mc:Ignorable="d"
     MinHeight="500" MinWidth="250"
     Background="WhiteSmoke">
 
@@ -137,10 +137,10 @@
                     </Border>
                 </ListViewItem>
 
-                <!--Symbol data -->
+                <!--Simbol data -->
                 <ListViewItem>
                     <Border Style="{StaticResource GroupBoxBorderStyle}" >
-                        <StackPanel>
+                        <StackPanel Name ="FamilySimbolPanel">
 
                             <StackPanel.Resources>
                                 <CollectionViewSource x:Key="symbols" Source="{Binding Path=FamilySymbolData, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -151,10 +151,10 @@
                                 <ComboBox Name="ComboWallOpenning" HorizontalContentAlignment="Center"
                                           DisplayMemberPath="Key" SelectedValuePath="Value"
                                           SelectionChanged="ComboOpenning_SelectionChanged" >
-                                    
+
                                     <ComboBox.ItemsSource >
                                         <CompositeCollection>
-                                            <CollectionContainer Collection="{Binding Source={StaticResource symbols}, UpdateSourceTrigger=PropertyChanged}" />
+                                            <CollectionContainer Collection="{Binding Source={StaticResource symbols}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                                             <ComboBoxItem >
                                                 <TextBlock Width="Auto">
                                                     <Hyperlink Click="LoadFamily_Click">

@@ -207,7 +207,6 @@
     <Compile Include="Core\RevitEventWrapper.cs" />
     <Compile Include="Core\SmartToolApp.cs" />
     <Compile Include="RevitModel\PreviewControlModel.cs" />
-    <Compile Include="RevitUtils\FamilyLoadOptions.cs" />
     <Compile Include="RevitUtils\SmartBIMToolExtention.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
     <Compile Include="RevitUtils\CacheDataRepository.cs" />

@@ -22,6 +22,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
 
+
 namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutVoidDataViewModel : ObservableObject
@@ -46,9 +47,10 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Templory
-
+                
         private Document doc = null;
         private object currentItem = null;
+        //private IList<Family> families= null;
 
         #endregion
 
@@ -173,16 +175,20 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<string, FamilySymbol> FamilySymbolData
         {
             get => symbols;
-            set => SetProperty(ref symbols, value);
+            set
+            {
+                Logger.Info("Property: " + value.Count.ToString());
+                OnPropertyChanged(nameof(FamilySymbolData));
+            }
         }
 
 
         public async void LoadFamilyAsync(string familyPath)
         {
-            FamilySymbolData = await RevitTask.RunAsync(app =>
+            IDictionary<string, FamilySymbol> result = null;
+            FamilySymbolData = await RevitTask.RunAsync(async app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                IDictionary<string, FamilySymbol> result = null;
                 using Transaction trx = new(doc, "LoadFamilyAsync");
                 TransactionStatus status = trx.Start();
                 if (status == TransactionStatus.Started)
@@ -191,7 +197,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (doc.LoadFamily(familyPath, opt, out Family family))
                     {
                         status = trx.Commit();
-                        result = GetFamilySymbolData(ref family);
+                        result = GetFamilySymbolData(family);
                         Document familyDoc = doc.EditFamily(family);
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
@@ -204,16 +210,20 @@ namespace RevitTimasBIMTools.ViewModels
                                 MaximumBackups = 3,
                                 Compact = true,
                             });
-                            _ = familyDoc.Close(false);
+                            if (familyDoc.Close(false))
+                            {
+                                await Task.Yield();
+                            }
                         }
                     }
                     else if (!trx.HasEnded())
                     {
                         status = trx.RollBack();
-                        Logger.Error($"Not loaded family");
                     }
                 }
-                return symbols.Merge(result);
+                result = symbols.Update(result);
+                Logger.Info("Output: " + result.Count.ToString());
+                return result;
             });
         }
 
@@ -228,24 +238,23 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<string, FamilySymbol> GetFamilySymbolData(ref Family family)
+        private IDictionary<string, FamilySymbol> GetFamilySymbolData(Family family)
         {
-            IDictionary<string, FamilySymbol> result = new SortedList<string, FamilySymbol>(10);
+            SortedList<string, FamilySymbol> result = new(10);
             if (family != null && family.IsValidObject && family.IsEditable)
             {
                 foreach (ElementId symbId in family.GetFamilySymbolIds())
                 {
                     FamilySymbol symbol = doc.GetElement(symbId) as FamilySymbol;
                     string name = $"{symbol.FamilyName}: {symbol.Name.Trim()}";
-                    ActivateFamilySimbol(ref symbol);
-                    result.Add(name, symbol);
+                    result[name] = symbol;
                 }
             }
             return result;
         }
 
 
-        private void ActivateFamilySimbol(ref FamilySymbol symbol)
+        internal void ActivateFamilySimbol(FamilySymbol symbol)
         {
             using Transaction trx = new(symbol.Document);
             if (symbol.IsValidObject && !symbol.IsActive)
@@ -772,5 +781,4 @@ namespace RevitTimasBIMTools.ViewModels
             collisionManager?.Dispose();
         }
     }
-
 }

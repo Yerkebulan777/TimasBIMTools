@@ -127,11 +127,13 @@ namespace RevitTimasBIMTools.Views
                 if (comboBox.Name.Equals(ComboWallOpenning.Name))
                 {
                     Properties.Settings.Default.WallOpeningUId = symbol.UniqueId;
+                    DataContextHandler.ActivateFamilySimbol(symbol);
                     Properties.Settings.Default.Save();
                 }
                 if (comboBox.Name.Equals(ComboFloorOpenning.Name))
                 {
                     Properties.Settings.Default.FloorOpeningUId = symbol.UniqueId;
+                    DataContextHandler.ActivateFamilySimbol(symbol);
                     Properties.Settings.Default.Save();
                 }
             }
