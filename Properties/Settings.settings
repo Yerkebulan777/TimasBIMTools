@@ -14,10 +14,10 @@
     <Setting Name="CutOffsetInMm" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50</Value>
     </Setting>
-    <Setting Name="WallOpeningSymbolId" Type="System.String" Scope="User">
+    <Setting Name="WallOpeningUId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="FloorOpeningSymbolId" Type="System.String" Scope="User">
+    <Setting Name="FloorOpeningUId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="WidthMarkGuid" Type="System.Guid" Scope="User">

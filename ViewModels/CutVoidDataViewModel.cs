@@ -179,10 +179,10 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-        #region FamilySymbol
+        #region FamilySymbols
 
-        private ISet<FamilySymbol> symbols = null;
-        public ISet<FamilySymbol> FamilySymbols
+        private IDictionary<string, FamilySymbol> symbols = null;
+        public IDictionary<string, FamilySymbol> FamilySymbols
         {
             get => symbols;
             set
@@ -195,44 +195,11 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private FamilySymbol wSymbol = null;
-        public FamilySymbol WallOpenning
-        {
-            get => wSymbol;
-            set
-            {
-                if (SetProperty(ref wSymbol, value) && wSymbol != null)
-                {
-                    Properties.Settings.Default.WallOpeningSymbolId = wSymbol.UniqueId;
-                    Properties.Settings.Default.Save();
-                    ActivateFamilySimbol(wSymbol);
-                }
-            }
-        }
-
-
-        private FamilySymbol fSymbol = null;
-        public FamilySymbol FloorOpenning
-        {
-            get => fSymbol;
-            set
-            {
-                if (SetProperty(ref fSymbol, value) && fSymbol != null)
-                {
-                    Properties.Settings.Default.FloorOpeningSymbolId = fSymbol.UniqueId;
-                    Properties.Settings.Default.Save();
-                    ActivateFamilySimbol(fSymbol);
-                }
-            }
-        }
-
-
-        public async void LoadFamily(string familyPath)
+        public void LoadFamily(string familyPath)
         {
             Family family = null;
-            FamilySymbols = await RevitTask.RunAsync(app =>
+            RevitTask.RunAsync(app =>
             {
-                ISet<FamilySymbol> result = null;
                 doc = app.ActiveUIDocument.Document;
                 using Transaction trx = new(doc, "LoadFamily");
                 TransactionStatus status = trx.Start();
@@ -241,7 +208,7 @@ namespace RevitTimasBIMTools.ViewModels
                     if (doc.LoadFamily(familyPath, out family))
                     {
                         status = trx.Commit();
-                        result = GetFamilySymbolSet(family);
+                        GetOpenningFamilySymbolData(ref family);
                         Document familyDoc = doc.EditFamily(family);
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
@@ -254,10 +221,7 @@ namespace RevitTimasBIMTools.ViewModels
                                 OverwriteExistingFile = true
                             });
                             GetFamilySharedParameterData(familyDoc);
-                            if (familyDoc.Close(false) && symbols != null)
-                            {
-                                result.UnionWith(symbols);
-                            }
+                            _ = familyDoc.Close(false);
                         }
                     }
                     else if (!trx.HasEnded())
@@ -266,27 +230,7 @@ namespace RevitTimasBIMTools.ViewModels
                         Logger.Error($"Not loaded family");
                     }
                 }
-
-                return result;
-            });
-        }
-
-
-        private ISet<FamilySymbol> GetFamilySymbolSet(Family family)
-        {
-            ISet<FamilySymbol> result = new HashSet<FamilySymbol>(10);
-            if (family != null && family.IsValidObject)
-            {
-                foreach (ElementId symbId in family.GetFamilySymbolIds())
-                {
-                    Element elem = doc.GetElement(symbId);
-                    if (elem is FamilySymbol symbol)
-                    {
-                        _ = result.Add(symbol);
-                    }
-                }
-            }
-            return result;
+            }).Start(taskContext);
         }
 
 
@@ -300,18 +244,31 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void ActivateFamilySimbol(FamilySymbol symbol)
+        private void GetOpenningFamilySymbolData(ref Family family)
         {
-            await RevitTask.RunAsync(app =>
+            FamilySymbols ??= new SortedList<string, FamilySymbol>(15);
+            if (family != null && family.IsValidObject && family.IsEditable)
             {
-                if (symbol.IsValidObject && !symbol.IsActive)
+                foreach (ElementId symbId in family.GetFamilySymbolIds())
                 {
-                    using Transaction tx = new(app.ActiveUIDocument.Document);
-                    TransactionStatus status = tx.Start("Activate family");
-                    symbol.Activate();
-                    status = tx.Commit();
+                    FamilySymbol symbol = doc.GetElement(symbId) as FamilySymbol;
+                    string combinetName = symbol.FamilyName + symbol.Name.Trim();
+                    FamilySymbols.Add(combinetName, symbol);
+                    ActivateFamilySimbol(ref symbol);
                 }
-            });
+            }
+        }
+
+
+        private void ActivateFamilySimbol(ref FamilySymbol symbol)
+        {
+            using Transaction trx = new(symbol.Document);
+            if (symbol.IsValidObject && !symbol.IsActive)
+            {
+                trx.Start("Activate family");
+                symbol.Activate();
+                trx.Commit();
+            }
         }
 
         #endregion

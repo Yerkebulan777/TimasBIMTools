@@ -74,24 +74,24 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string WallOpeningSymbolId {
+        public string WallOpeningUId {
             get {
-                return ((string)(this["WallOpeningSymbolId"]));
+                return ((string)(this["WallOpeningUId"]));
             }
             set {
-                this["WallOpeningSymbolId"] = value;
+                this["WallOpeningUId"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FloorOpeningSymbolId {
+        public string FloorOpeningUId {
             get {
-                return ((string)(this["FloorOpeningSymbolId"]));
+                return ((string)(this["FloorOpeningUId"]));
             }
             set {
-                this["FloorOpeningSymbolId"] = value;
+                this["FloorOpeningUId"] = value;
             }
         }
         

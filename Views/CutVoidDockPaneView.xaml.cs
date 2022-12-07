@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
@@ -117,21 +118,39 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        private void ComboOpenning_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ComboBox comboBox && comboBox.SelectedValue is FamilySymbol symbol)
+            {
+                if (comboBox.Name.Equals(ComboWallOpenning.Name))
+                {
+                    Properties.Settings.Default.WallOpeningUId = symbol.UniqueId;
+                    Properties.Settings.Default.Save();
+                }
+                if (comboBox.Name.Equals(ComboFloorOpenning.Name))
+                {
+                    Properties.Settings.Default.FloorOpeningUId = symbol.UniqueId;
+                    Properties.Settings.Default.Save();
+                }
+            }
+        }
+
+
         private void ComboMark_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (sender is ComboBox comboBox && comboBox.SelectedValue is Guid guid)
             {
-                if (comboBox.Name.Equals("ComboWidthMark"))
+                if (comboBox.Name.Equals(ComboWidthMark.Name))
                 {
                     Properties.Settings.Default.WidthMarkGuid = guid;
                     Properties.Settings.Default.Save();
                 }
-                if (comboBox.Name.Equals("ComboHeightMark"))
+                if (comboBox.Name.Equals(ComboHeightMark.Name))
                 {
                     Properties.Settings.Default.HeightMarkGuid = guid;
                     Properties.Settings.Default.Save();
                 }
-                if (comboBox.Name.Equals("ComboElevMark"))
+                if (comboBox.Name.Equals(ComboElevMark.Name))
                 {
                     Properties.Settings.Default.ElevatMarkGuid = guid;
                     Properties.Settings.Default.Save();
@@ -148,5 +167,7 @@ namespace RevitTimasBIMTools.Views
                 DataContextHandler?.Dispose();
             }
         }
+
+
     }
 }

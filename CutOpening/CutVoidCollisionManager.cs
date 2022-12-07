@@ -85,9 +85,6 @@ namespace RevitTimasBIMTools.CutOpening
         {
             Properties.Settings.Default.Upgrade();
             Transform global = document.Transform;
-            widthGuid = Properties.Settings.Default.WidthMarkGuid;
-            heightGuid = Properties.Settings.Default.HeightMarkGuid;
-            elevatGuid = Properties.Settings.Default.ElevatMarkGuid;
             IList<ElementModel> output = new List<ElementModel>(50);
             minSideSize = Math.Round((Properties.Settings.Default.MinSideSizeInMm / footToMm) - epsilon, 5);
             minDepthSize = Math.Round((Properties.Settings.Default.MinDepthSizeInMm / footToMm) - epsilon, 5);
@@ -272,25 +269,26 @@ namespace RevitTimasBIMTools.CutOpening
             {
                 FamilyInstance opening = null;
                 XYZ origin = model.SectionPlane.Origin;
+                widthGuid = Properties.Settings.Default.WidthMarkGuid;
+                heightGuid = Properties.Settings.Default.HeightMarkGuid;
+                elevatGuid = Properties.Settings.Default.ElevatMarkGuid;
                 Level level = doc.GetElement(model.Host.LevelId) as Level;
                 if (status == TransactionStatus.Started)
                 {
                     if (model.HostCategoryIntId.Equals(-2000011))
                     {
-                        FamilySymbol symbol = GetOpeningFamilySymbol(doc, Properties.Settings.Default.WallOpeningSymbolId);
+                        FamilySymbol symbol = GetOpeningFamilySymbol(doc, Properties.Settings.Default.WallOpeningUId);
                         opening = doc.Create.NewFamilyInstance(origin, symbol, model.Host, level, StructuralType.NonStructural);
                     }
                     else if (model.HostCategoryIntId.Equals(-2000032) || model.HostCategoryIntId.Equals(-2000035))
                     {
-                        FamilySymbol symbol = GetOpeningFamilySymbol(doc, Properties.Settings.Default.FloorOpeningSymbolId);
+                        FamilySymbol symbol = GetOpeningFamilySymbol(doc, Properties.Settings.Default.FloorOpeningUId);
                         opening = doc.Create.NewFamilyInstance(origin, symbol, model.Host, level, StructuralType.NonStructural);
                     }
                     if (opening != null && opening.IsValidObject)
                     {
-                        //double elevLevel = level.ProjectElevation;
-                        //var prm = SharedParameterElement.Lookup(doc, elevatGuid);
-                        //double elevMark = opening.get_Parameter(elevatGuid).AsDouble();
                         Parameter elevatParam = opening.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
+
                         bool heightBolean = opening.get_Parameter(heightGuid).Set(elevatParam.AsDouble());
                         bool elevatBolean = opening.get_Parameter(elevatGuid).Set(elevatParam.AsDouble());
                         if (opening.get_Parameter(heightGuid).Set(model.Height))
