@@ -48,7 +48,7 @@
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
         <Setter Property="MinWidth" Value="125" />
-        <Setter Property="MaxWidth" Value="225" />
+        <Setter Property="MaxWidth" Value="175" />
         <Setter Property="Height" Value="23" />
     </Style>
 

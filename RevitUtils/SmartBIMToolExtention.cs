@@ -1,12 +1,25 @@
 ﻿using Autodesk.Revit.DB;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+
 
 namespace RevitTimasBIMTools.RevitUtils
 {
     public static class SmartBIMToolExtention
     {
+        public static IDictionary<T, U> Update<T, U>(this IDictionary<T, U> target, IDictionary<T, U> source, int capacity = 10)
+        {
+            if (source != null && source.Count > 0)
+            {
+                target ??= new Dictionary<T, U>(capacity);
+                foreach (KeyValuePair<T, U> item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
+            }
+            return target;
+        }
+
 
         public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> source)
         {

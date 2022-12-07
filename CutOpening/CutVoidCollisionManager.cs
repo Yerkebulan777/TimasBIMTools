@@ -40,10 +40,11 @@ namespace RevitTimasBIMTools.CutOpening
         private Transform searchTransform { get; set; } = null;
         private IDictionary<int, ElementId> ElementTypeIdData { get; set; } = null;
 
-        private double minSideSize;
-        private double minDepthSize;
-        //private readonly string widthParamName = "ширина";
-        //private readonly string heightParamName = "высота";
+        private Guid widthGuid = Properties.Settings.Default.WidthMarkGuid;
+        private Guid heightGuid = Properties.Settings.Default.HeightMarkGuid;
+        private Guid elevatGuid = Properties.Settings.Default.ElevatMarkGuid;
+        private double minSideSize = Math.Round((Properties.Settings.Default.MinSideSizeInMm / footToMm) - epsilon, 5);
+        private double minDepthSize = Math.Round((Properties.Settings.Default.MinDepthSizeInMm / footToMm) - epsilon, 5);
 
         #endregion
 
@@ -82,10 +83,11 @@ namespace RevitTimasBIMTools.CutOpening
 
         public IList<ElementModel> GetCollisionByInputData(Document doc, DocumentModel document, Material material, Category category)
         {
+            Properties.Settings.Default.Upgrade();
             Transform global = document.Transform;
             IList<ElementModel> output = new List<ElementModel>(50);
-            minSideSize = Math.Round(Properties.Settings.Default.MinSideSizeInMm / footToMm - epsilon, 5);
-            minDepthSize = Math.Round(Properties.Settings.Default.MinDepthSizeInMm / footToMm - epsilon, 5);
+            minSideSize = Math.Round((Properties.Settings.Default.MinSideSizeInMm / footToMm) - epsilon, 5);
+            minDepthSize = Math.Round((Properties.Settings.Default.MinDepthSizeInMm / footToMm) - epsilon, 5);
             IEnumerable<Element> enclosures = ElementTypeIdData?.GetInstancesByTypeIdDataAndMaterial(doc, material);
             using TransactionGroup transGroup = new(doc, "GetCollision");
             TransactionStatus status = transGroup.Start();
@@ -103,10 +105,9 @@ namespace RevitTimasBIMTools.CutOpening
 
         private IEnumerable<ElementModel> GetIntersectionByElement(Document doc, Element host, Transform global, Category category)
         {
-            hostBbox = host.get_BoundingBox(null);
             hostNormal = host.GetHostNormal();
+            hostBbox = host.get_BoundingBox(null);
             hostSolid = host.GetSolidByVolume(identity, options);
-            Level level = doc.GetElement(host.LevelId) as Level;
             ElementQuickFilter bboxFilter = new BoundingBoxIntersectsFilter(hostBbox.GetOutLine());
             LogicalAndFilter intersectFilter = new(bboxFilter, new ElementIntersectsSolidFilter(hostSolid));
             collector = new FilteredElementCollector(doc).OfCategoryId(category.Id).WherePasses(intersectFilter);
@@ -127,7 +128,7 @@ namespace RevitTimasBIMTools.CutOpening
                     double minSize = Math.Min(width, height);
                     if (minSideSize < minSize)
                     {
-                        ElementModel model = new(elem, level)
+                        ElementModel model = new(elem, host)
                         {
                             Width = width,
                             Depth = depth,
@@ -259,37 +260,75 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        public void CreateOpening(Document doc, ElementModel model, FamilySymbol openning, Definition definition = null, double offset = 0)
+        public void CreateOpening(Document doc, ElementModel model)
         {
-            FamilyInstance opening = null;
-            using Transaction trans = new(doc, "Create opening");
-            TransactionStatus status = trans.Start();
-            if (status == TransactionStatus.Started)
+            using Transaction trx = new(doc);
+            if (!model.IsValidModel()) { return; }
+            TransactionStatus status = trx.Start("Create opening");
+            try
             {
-                try
+                FamilyInstance opening = null;
+                XYZ origin = model.SectionPlane.Origin;
+                widthGuid = Properties.Settings.Default.WidthMarkGuid;
+                heightGuid = Properties.Settings.Default.HeightMarkGuid;
+                elevatGuid = Properties.Settings.Default.ElevatMarkGuid;
+                Level level = doc.GetElement(model.Host.LevelId) as Level;
+                if (status == TransactionStatus.Started)
                 {
-                    Element instanse = model.Instanse;
-                    XYZ origin = model.SectionPlane.Origin;
-                    if (instanse.IsValidObject && opening != null && opening.IsValidObject)
+                    if (model.HostCategoryIntId.Equals(-2000011))
                     {
-                        opening = doc.Create.NewFamilyInstance(origin, openning, model.HostLevel, StructuralType.NonStructural);
-                        if (opening != null && opening.IsValidObject)
+                        FamilySymbol symbol = GetOpeningFamilySymbol(doc, Properties.Settings.Default.WallOpeningUId);
+                        opening = doc.Create.NewFamilyInstance(origin, symbol, model.Host, level, StructuralType.NonStructural);
+                    }
+                    else if (model.HostCategoryIntId.Equals(-2000032) || model.HostCategoryIntId.Equals(-2000035))
+                    {
+                        FamilySymbol symbol = GetOpeningFamilySymbol(doc, Properties.Settings.Default.FloorOpeningUId);
+                        opening = doc.Create.NewFamilyInstance(origin, symbol, model.Host, level, StructuralType.NonStructural);
+                    }
+                    if (opening != null && opening.IsValidObject)
+                    {
+                        Parameter elevatParam = opening.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
+
+                        bool heightBolean = opening.get_Parameter(heightGuid).Set(elevatParam.AsDouble());
+                        bool elevatBolean = opening.get_Parameter(elevatGuid).Set(elevatParam.AsDouble());
+                        if (opening.get_Parameter(heightGuid).Set(model.Height))
                         {
-                            _ = opening.get_Parameter(definition).Set(model.Width);
-                            _ = opening.get_Parameter(definition).Set(model.Height);
+                            if (opening.get_Parameter(widthGuid).Set(model.Width))
+                            {
+                                if (elevatBolean && elevatParam.Set(0))
+                                {
+                                    status = trx.Commit();
+                                }
+                            }
                         }
                     }
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex.Message);
+            }
+            finally
+            {
+                if (!trx.HasEnded())
                 {
-                    status = trans.RollBack();
-                    Logger.Error(ex.Message);
-                }
-                finally
-                {
-                    status = trans.Commit();
+                    status = trx.RollBack();
                 }
             }
+        }
+
+
+        private FamilySymbol GetOpeningFamilySymbol(Document doc, string uniqueId)
+        {
+            FamilySymbol familySymbol = null;
+            if (!string.IsNullOrEmpty(uniqueId))
+            {
+                if (doc.GetElement(uniqueId) is FamilySymbol symbol)
+                {
+                    familySymbol = symbol;
+                }
+            }
+            return familySymbol;
         }
 
 
@@ -362,8 +401,8 @@ namespace RevitTimasBIMTools.CutOpening
         //    if (null != reference)
         //    {
         //        Document doc = fi.Document;
-        //        using Transaction trans = new(doc);
-        //        _ = trans.Start("Create Temporary Sketch SectionPlane");
+        //        using Transaction trx = new(doc);
+        //        _ = trx.Start("Create Temporary Sketch SectionPlane");
         //        try
         //        {
         //            SketchPlane sketchPlan = SketchPlane.Create(doc, reference);
@@ -377,7 +416,7 @@ namespace RevitTimasBIMTools.CutOpening
         //        }
         //        finally
         //        {
-        //            _ = trans.RollBack();
+        //            _ = trx.RollBack();
         //        }
         //    }
         //    return flag;

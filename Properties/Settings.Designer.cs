@@ -74,24 +74,24 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string WallSymbollUniqueId {
+        public string WallOpeningUId {
             get {
-                return ((string)(this["WallSymbollUniqueId"]));
+                return ((string)(this["WallOpeningUId"]));
             }
             set {
-                this["WallSymbollUniqueId"] = value;
+                this["WallOpeningUId"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FloorSymbolUniqueId {
+        public string FloorOpeningUId {
             get {
-                return ((string)(this["FloorSymbolUniqueId"]));
+                return ((string)(this["FloorOpeningUId"]));
             }
             set {
-                this["FloorSymbolUniqueId"] = value;
+                this["FloorOpeningUId"] = value;
             }
         }
         
@@ -122,12 +122,12 @@ namespace RevitTimasBIMTools.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("00000000-0000-0000-0000-000000000000")]
-        public global::System.Guid ElevMarkGuid {
+        public global::System.Guid ElevatMarkGuid {
             get {
-                return ((global::System.Guid)(this["ElevMarkGuid"]));
+                return ((global::System.Guid)(this["ElevatMarkGuid"]));
             }
             set {
-                this["ElevMarkGuid"] = value;
+                this["ElevatMarkGuid"] = value;
             }
         }
     }

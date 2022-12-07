@@ -22,6 +22,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
 
+
 namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class CutVoidDataViewModel : ObservableObject
@@ -46,9 +47,10 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Templory
-
+                
         private Document doc = null;
         private object currentItem = null;
+        //private IList<Family> families= null;
 
         #endregion
 
@@ -143,7 +145,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref documents, value) && documents != null)
                 {
-                    Logger.Log("DocumentCollection count:\t" + documents.Count.ToString());
+                    SelectedDocument = documents.FirstOrDefault();
                 }
             }
         }
@@ -153,13 +155,7 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<string, Material> StructureMaterials
         {
             get => structs;
-            set
-            {
-                if (SetProperty(ref structs, value) && structs != null)
-                {
-                    Logger.Log("StructureMaterials count:\t" + structs.Count.ToString());
-                }
-            }
+            set => SetProperty(ref structs, value);
         }
 
 
@@ -167,151 +163,106 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<string, Category> EngineerCategories
         {
             get => categos;
-            set
-            {
-                if (SetProperty(ref categos, value) && categos != null)
-                {
-                    Logger.Log("EngineerCategories count:\t" + categos.Count.ToString());
-                }
-            }
+            set => SetProperty(ref categos, value);
         }
 
         #endregion
 
 
-        #region FamilySymbol
+        #region FamilySymbols
 
-        private ISet<FamilySymbol> symbols = null;
-        public ISet<FamilySymbol> FamilySymbols
+        private IDictionary<string, FamilySymbol> symbols = null;
+        public IDictionary<string, FamilySymbol> FamilySymbolData
         {
             get => symbols;
             set
             {
-                if (SetProperty(ref symbols, value) && symbols != null)
-                {
-                    Logger.Log("FamilySymbols count: " + symbols.Count.ToString());
-                }
+                Logger.Info("Property: " + value.Count.ToString());
+                OnPropertyChanged(nameof(FamilySymbolData));
             }
         }
 
 
-        private FamilySymbol wSymbol = null;
-        public FamilySymbol WallOpenning
+        public async void LoadFamilyAsync(string familyPath)
         {
-            get => wSymbol;
-            set
+            IDictionary<string, FamilySymbol> result = null;
+            FamilySymbolData = await RevitTask.RunAsync(async app =>
             {
-                if (SetProperty(ref wSymbol, value) && wSymbol != null)
-                {
-                    Properties.Settings.Default.WallSymbollUniqueId = wSymbol.UniqueId;
-                    Properties.Settings.Default.Save();
-                    ActivateFamilySimbol(wSymbol);
-                }
-            }
-        }
-
-
-        private FamilySymbol fSymbol = null;
-        public FamilySymbol FloorOpenning
-        {
-            get => fSymbol;
-            set
-            {
-                if (SetProperty(ref fSymbol, value) && fSymbol != null)
-                {
-                    Properties.Settings.Default.FloorSymbolUniqueId = fSymbol.UniqueId;
-                    Properties.Settings.Default.Save();
-                    ActivateFamilySimbol(fSymbol);
-                }
-            }
-        }
-
-
-        public async void LoadFamily(string familyPath)
-        {
-            Family family = null;
-            FamilySymbols = await RevitTask.RunAsync(app =>
-            {
-                ISet<FamilySymbol> result = null;
                 doc = app.ActiveUIDocument.Document;
-                using Transaction trx = new(doc, "LoadFamily");
+                using Transaction trx = new(doc, "LoadFamilyAsync");
                 TransactionStatus status = trx.Start();
                 if (status == TransactionStatus.Started)
                 {
-                    if (doc.LoadFamily(familyPath, out family))
+                    IFamilyLoadOptions opt = UIDocument.GetRevitUIFamilyLoadOptions();
+                    if (doc.LoadFamily(familyPath, opt, out Family family))
                     {
                         status = trx.Commit();
-                        result = GetFamilySymbolSet(family);
+                        result = GetFamilySymbolData(family);
                         Document familyDoc = doc.EditFamily(family);
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
+                            GetFamilySharedParameterData(familyDoc);
                             string familyPath = @$"{localPath}\{family.Name}.rfa";
                             if (File.Exists(familyPath)) { File.Delete(familyPath); }
                             familyDoc.SaveAs(familyPath, new SaveAsOptions
                             {
-                                Compact = true,
+                                OverwriteExistingFile = true,
                                 MaximumBackups = 3,
-                                OverwriteExistingFile = true
+                                Compact = true,
                             });
-                            GetFamilySharedParameterData(familyDoc);
-                            if (familyDoc.Close(false) && symbols != null)
+                            if (familyDoc.Close(false))
                             {
-                                result.UnionWith(symbols);
+                                await Task.Yield();
                             }
                         }
                     }
                     else if (!trx.HasEnded())
                     {
                         status = trx.RollBack();
-                        Logger.Error($"Not loaded family");
                     }
                 }
-
+                result = symbols.Update(result);
+                Logger.Info("Output: " + result.Count.ToString());
                 return result;
             });
         }
 
 
-        private ISet<FamilySymbol> GetFamilySymbolSet(Family family)
+        private string[] ProcessDirectory(string directory)
         {
-            ISet<FamilySymbol> result = new HashSet<FamilySymbol>(10);
-            if (family != null && family.IsValidObject)
+            if (!Directory.Exists(directory))
+            {
+                Logger.Error("Not found directory path: " + directory);
+            }
+            return Directory.GetFiles(directory, "*.rfa", SearchOption.TopDirectoryOnly);
+        }
+
+
+        private IDictionary<string, FamilySymbol> GetFamilySymbolData(Family family)
+        {
+            SortedList<string, FamilySymbol> result = new(10);
+            if (family != null && family.IsValidObject && family.IsEditable)
             {
                 foreach (ElementId symbId in family.GetFamilySymbolIds())
                 {
-                    Element elem = doc.GetElement(symbId);
-                    if (elem is FamilySymbol symbol)
-                    {
-                        _ = result.Add(symbol);
-                    }
+                    FamilySymbol symbol = doc.GetElement(symbId) as FamilySymbol;
+                    string name = $"{symbol.FamilyName}: {symbol.Name.Trim()}";
+                    result[name] = symbol;
                 }
             }
             return result;
         }
 
 
-        private string[] ProcessDirectory(string directory, string extension = "*.rfa")
+        internal void ActivateFamilySimbol(FamilySymbol symbol)
         {
-            if (!Directory.Exists(directory))
+            using Transaction trx = new(symbol.Document);
+            if (symbol.IsValidObject && !symbol.IsActive)
             {
-                Logger.Error("Not found directory path: " + directory);
+                trx.Start("Activate family");
+                symbol.Activate();
+                trx.Commit();
             }
-            return Directory.GetFiles(directory, extension, SearchOption.TopDirectoryOnly);
-        }
-
-
-        private async void ActivateFamilySimbol(FamilySymbol symbol)
-        {
-            await RevitTask.RunAsync(app =>
-            {
-                if (symbol.IsValidObject && !symbol.IsActive)
-                {
-                    using Transaction tx = new(app.ActiveUIDocument.Document);
-                    TransactionStatus status = tx.Start("Activate family");
-                    symbol.Activate();
-                    status = tx.Commit();
-                }
-            });
         }
 
         #endregion
@@ -333,11 +284,11 @@ namespace RevitTimasBIMTools.ViewModels
             SharedParameterData ??= new SortedList<string, Guid>(10);
             foreach (FamilyParameter param in familyManager.GetParameters())
             {
-                if (param.IsInstance && param.UserModifiable && param.IsShared)
+                if (param.UserModifiable && param.IsInstance)
                 {
-                    string name = param.Definition.Name;
-                    if (!paramData.TryGetValue(name, out _))
+                    if (!param.IsReadOnly && param.IsShared)
                     {
+                        string name = param.Definition.Name;
                         SharedParameterData[name] = param.GUID;
                     }
                 }
@@ -427,13 +378,13 @@ namespace RevitTimasBIMTools.ViewModels
                     DocumentCollection = null;
                     EngineerCategories = null;
                     StructureMaterials = null;
+                    SharedParameterData = null;
+                    FamilySymbolData = null;
                     ElementModelData = null;
                     SymbolTextFilter = null;
                     LevelTextFilter = null;
-                    FamilySymbols = null;
                     currentItem = null;
                     view3d = null;
-
                 }, taskContext);
             }
         }
@@ -477,7 +428,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     foreach (string familyPath in ProcessDirectory(localPath))
                     {
-                        LoadFamily(familyPath);
+                        LoadFamilyAsync(familyPath);
                     }
                 }
             });
@@ -491,7 +442,6 @@ namespace RevitTimasBIMTools.ViewModels
                 ElementModelData = await RevitTask.RunAsync(app =>
                 {
                     doc = app.ActiveUIDocument.Document;
-                    Properties.Settings.Default.Upgrade();
                     return collisionManager.GetCollisionByInputData(doc, document, material, category).ToObservableCollection();
                 });
             }
@@ -505,9 +455,9 @@ namespace RevitTimasBIMTools.ViewModels
                 Task task = RevitTask.RunAsync(app =>
                 {
                     doc = app.ActiveUIDocument.Document;
+                    UIDocument uidoc = app.ActiveUIDocument;
                     if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        UIDocument uidoc = app.ActiveUIDocument;
                         System.Windows.Clipboard.SetText(model.Instanse.Id.ToString());
                         uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                         RevitViewManager.ShowModelInPlanView(uidoc, model, ViewDiscipline.Mechanical);
@@ -665,7 +615,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private bool FilterModelCollection(object obj)
         {
-            return obj is not null && obj is ElementModel model
+            return obj is ElementModel model
             && model.SymbolName.Equals(symbolText)
             && model.LevelName.Equals(levelText);
         }
@@ -680,8 +630,10 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     Task task = RevitTask.RunAsync(app =>
                     {
+                        doc = app.ActiveUIDocument.Document;
                         UIDocument uidoc = app.ActiveUIDocument;
-                        ViewPlan view = RevitViewManager.GetPlanView(uidoc, model.HostLevel);
+                        Level level = doc.GetElement(model.Host.LevelId) as Level;
+                        ViewPlan view = RevitViewManager.GetPlanViewByLevel(uidoc, level);
                         RevitViewManager.ActivateView(uidoc, view, ViewDiscipline.Mechanical);
                     });
                 }
@@ -763,7 +715,7 @@ namespace RevitTimasBIMTools.ViewModels
                             if (dialogResult.Value && ElementModelData.Remove(model))
                             {
                                 collisionManager.VerifyOpenningSize(doc, model);
-                                collisionManager.CreateOpening(doc, model, wSymbol);
+                                collisionManager.CreateOpening(doc, model);
                             }
                             else
                             {
@@ -805,7 +757,6 @@ namespace RevitTimasBIMTools.ViewModels
         #endregion
 
 
-
         // Алгоритм проверки семейств отверстия
         /*
         * Проверить семейство отверстий правильно ли они расположены
@@ -830,5 +781,4 @@ namespace RevitTimasBIMTools.ViewModels
             collisionManager?.Dispose();
         }
     }
-
 }

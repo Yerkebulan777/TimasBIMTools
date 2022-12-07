@@ -1,40 +1,42 @@
 ﻿using Autodesk.Revit.DB;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
-using System.Collections.Generic;
 
 namespace RevitTimasBIMTools.RevitModel
 {
     public sealed class ElementModel : ObservableObject
     {
-        public readonly Level HostLevel;
+        public readonly Element Host;
         public readonly Element Instanse;
         public string LevelName { get; private set; }
         public string SymbolName { get; private set; }
         public string FamilyName { get; private set; }
+        public int HostCategoryIntId { get; private set; }
 
-        public ElementModel(Element elem, Level level)
+        public ElementModel(Element instanse, Element host)
         {
-            Element etype = elem.Document.GetElement(elem.GetTypeId());
+            Element etype = instanse.Document.GetElement(instanse.GetTypeId());
+            Level level = host.Document.GetElement(host.LevelId) as Level;
             if (etype.IsValidObject && etype is ElementType elementType)
             {
-                Instanse = elem;
-                HostLevel = level;
-                LevelName = level.Name;
+                Host = host;
+                Instanse = instanse;
+                LevelName = level?.Name;
                 SymbolName = elementType.Name;
                 FamilyName = elementType.FamilyName;
+                HostCategoryIntId = host.Category.Id.IntegerValue;
             }
         }
 
 
         public Plane SectionPlane { get; internal set; }
         public BoundingBoxUV SectionBox { get; internal set; }
+        
         public string Description { get; internal set; }
         public int SizeInMm { get; internal set; }
         public double Height { get; internal set; }
         public double Width { get; internal set; }
         public double Depth { get; internal set; }
-
 
         private bool selected = false;
         public bool IsSelected
