@@ -187,7 +187,7 @@ namespace RevitTimasBIMTools.ViewModels
                 TransactionStatus status = trx.Start();
                 if (status == TransactionStatus.Started)
                 {
-                    IFamilyLoadOptions opt = new FamilyLoadOptions();
+                    IFamilyLoadOptions opt = UIDocument.GetRevitUIFamilyLoadOptions();
                     if (doc.LoadFamily(familyPath, opt, out Family family))
                     {
                         status = trx.Commit();
@@ -237,7 +237,6 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     FamilySymbol symbol = doc.GetElement(symbId) as FamilySymbol;
                     string name = $"{symbol.FamilyName}: {symbol.Name.Trim()}";
-                    Logger.Info("FamilySymbolData name: " + name);
                     ActivateFamilySimbol(ref symbol);
                     result.Add(name, symbol);
                 }
@@ -251,9 +250,9 @@ namespace RevitTimasBIMTools.ViewModels
             using Transaction trx = new(symbol.Document);
             if (symbol.IsValidObject && !symbol.IsActive)
             {
-                _ = trx.Start("Activate family");
+                trx.Start("Activate family");
                 symbol.Activate();
-                _ = trx.Commit();
+                trx.Commit();
             }
         }
 
@@ -276,13 +275,11 @@ namespace RevitTimasBIMTools.ViewModels
             SharedParameterData ??= new SortedList<string, Guid>(10);
             foreach (FamilyParameter param in familyManager.GetParameters())
             {
-                //OnPropertyChanged(nameof(SharedParameterData));
                 if (param.UserModifiable && param.IsInstance)
                 {
                     if (!param.IsReadOnly && param.IsShared)
                     {
                         string name = param.Definition.Name;
-                        Logger.Info("Parameter name: " + name);
                         SharedParameterData[name] = param.GUID;
                     }
                 }
@@ -609,7 +606,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private bool FilterModelCollection(object obj)
         {
-            return obj is not null && obj is ElementModel model
+            return obj is ElementModel model
             && model.SymbolName.Equals(symbolText)
             && model.LevelName.Equals(levelText);
         }

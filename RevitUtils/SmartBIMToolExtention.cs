@@ -9,6 +9,7 @@ namespace RevitTimasBIMTools.RevitUtils
     {
         public static IDictionary<T, U> Merge<T, U>(this IDictionary<T, U> target, IDictionary<T, U> source, int capacity = 10)
         {
+            source ??= new Dictionary<T, U>(capacity);
             target ??= new Dictionary<T, U>(capacity);
             foreach (KeyValuePair<T, U> item in source)
             {

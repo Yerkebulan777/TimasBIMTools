@@ -206,8 +206,7 @@
                                 <ComboBox Name="ComboWidthMark" HorizontalContentAlignment="Center"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
-                                          SelectionChanged="ComboMark_SelectionChanged"
-                                          IsSynchronizedWithCurrentItem="False" />
+                                          SelectionChanged="ComboMark_SelectionChanged" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
@@ -215,17 +214,15 @@
                                 <ComboBox Name="ComboHeightMark" HorizontalContentAlignment="Center"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
-                                          SelectionChanged="ComboMark_SelectionChanged"
-                                          IsSynchronizedWithCurrentItem="False" />
+                                          SelectionChanged="ComboMark_SelectionChanged" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Elevation mark" Width="120" VerticalContentAlignment="Center" />
-                                <ComboBox Name="ComboElevMark"
+                                <ComboBox Name="ComboElevMark" HorizontalContentAlignment="Center"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
-                                          SelectionChanged="ComboMark_SelectionChanged" 
-                                          IsSynchronizedWithCurrentItem="False" />
+                                          SelectionChanged="ComboMark_SelectionChanged" />
                             </WrapPanel>
                             
                         </StackPanel>
