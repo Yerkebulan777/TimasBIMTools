@@ -2,28 +2,19 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+
 namespace RevitTimasBIMTools.RevitUtils
 {
     public static class SmartBIMToolExtention
     {
-        public static IDictionary<T, U> Merge<T, U>(this IDictionary<T, U> output, IDictionary<T, U> source, int capacity = 10)
+        public static IDictionary<T, U> Merge<T, U>(this IDictionary<T, U> target, IDictionary<T, U> source, int capacity = 10)
         {
-            output ??= new SortedList<T, U>(capacity);
-            if (source != null && source.Count < 0)
+            target ??= new Dictionary<T, U>(capacity);
+            foreach (KeyValuePair<T, U> item in source)
             {
-                foreach (KeyValuePair<T, U> item in source)
-                {
-                    if (output.ContainsKey(item.Key))
-                    {
-                        output[item.Key] = item.Value;
-                    }
-                    else
-                    {
-                        output.Add(item.Key, item.Value);
-                    }
-                }
+                target[item.Key] = item.Value;
             }
-            return output;
+            return target;
         }
 
 

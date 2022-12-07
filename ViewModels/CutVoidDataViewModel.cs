@@ -185,13 +185,7 @@ namespace RevitTimasBIMTools.ViewModels
         public IDictionary<string, FamilySymbol> FamilySymbolData
         {
             get => symbols;
-            set
-            {
-                if (SetProperty(ref symbols, value) && symbols != null)
-                {
-                    Logger.Info("FamilySymbolData count: " + symbols.Count.ToString());
-                }
-            }
+            set => SetProperty(ref symbols, value);
         }
 
 
@@ -209,8 +203,9 @@ namespace RevitTimasBIMTools.ViewModels
                     if (doc.LoadFamily(familyPath, opt, out Family family))
                     {
                         status = trx.Commit();
+                        result = GetFamilySymbolData(ref family);
+                        Logger.Info("FamilySymbolData: " + result.Count.ToString());
                         Document familyDoc = doc.EditFamily(family);
-                        result = GetOpenningFamilySymbolData(ref family);
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
                             GetFamilySharedParameterData(familyDoc);
@@ -246,7 +241,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<string, FamilySymbol> GetOpenningFamilySymbolData(ref Family family)
+        private IDictionary<string, FamilySymbol> GetFamilySymbolData(ref Family family)
         {
             IDictionary<string, FamilySymbol> result = new SortedList<string, FamilySymbol>(10);
             if (family != null && family.IsValidObject && family.IsEditable)
@@ -254,12 +249,10 @@ namespace RevitTimasBIMTools.ViewModels
                 foreach (ElementId symbId in family.GetFamilySymbolIds())
                 {
                     FamilySymbol symbol = doc.GetElement(symbId) as FamilySymbol;
-                    string sname = $"{symbol.FamilyName}: {symbol.Name.Trim()}";
-                    if (!symbols.ContainsKey(sname))
-                    {
-                        ActivateFamilySimbol(ref symbol);
-                        result[sname] = symbol;
-                    }
+                    string name = $"{symbol.FamilyName}: {symbol.Name.Trim()}";
+                    Logger.Info("FamilySymbolData name: " + name);
+                    ActivateFamilySimbol(ref symbol);
+                    result.Add(name, symbol);
                 }
             }
             return result;
@@ -271,9 +264,9 @@ namespace RevitTimasBIMTools.ViewModels
             using Transaction trx = new(symbol.Document);
             if (symbol.IsValidObject && !symbol.IsActive)
             {
-                trx.Start("Activate family");
+                _ = trx.Start("Activate family");
                 symbol.Activate();
-                trx.Commit();
+                _ = trx.Commit();
             }
         }
 
@@ -300,10 +293,11 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (!param.IsReadOnly && param.IsShared)
                     {
+                        Guid guid = param.GUID;
                         string name = param.Definition.Name;
-                        if (!paramData.TryGetValue(name, out _))
+                        if (!paramData.ContainsKey(name))
                         {
-                            SharedParameterData[name] = param.GUID;
+                            SharedParameterData[name] = guid;
                         }
                     }
                 }
