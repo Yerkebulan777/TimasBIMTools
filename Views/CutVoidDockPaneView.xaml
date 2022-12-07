@@ -7,8 +7,8 @@
     xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     x:Class="RevitTimasBIMTools.Views.CutVoidDockPaneView" 
-    d:Height="Auto" d:Width="300" mc:Ignorable="d"
-    MinHeight="300" MinWidth="350"
+    d:Height="Auto" d:Width="350" mc:Ignorable="d"
+    MinHeight="500" MinWidth="250"
     Background="WhiteSmoke">
 
     <Page.Resources>
@@ -144,7 +144,7 @@
                         <StackPanel>
 
                             <StackPanel.Resources>
-                                <CollectionViewSource x:Key="symbols" Source="{Binding Path=FamilySymbols, Mode=OneWay}" />
+                                <CollectionViewSource x:Key="symbols" Source="{Binding Path=FamilySymbols, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel.Resources>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
@@ -157,7 +157,7 @@
                                     <ComboBox.ItemsSource >
                                         <CompositeCollection>
                                             <CollectionContainer Collection="{Binding Source={StaticResource symbols}}" />
-                                            <ComboBoxItem Visibility="{Binding Path=WallOpenning, Converter={StaticResource NullBoolToVis}}">
+                                            <ComboBoxItem >
                                                 <TextBlock Width="125">
                                                     <Hyperlink Click="LoadFamily_Click">
                                                         <TextBlock Text="Load Family" />
@@ -179,7 +179,7 @@
                                     <ComboBox.ItemsSource >
                                         <CompositeCollection>
                                             <CollectionContainer Collection="{Binding Source={StaticResource symbols}}" />
-                                            <ComboBoxItem Visibility="{Binding Path=FloorOpenning, Converter={StaticResource NullBoolToVis}}">
+                                            <ComboBoxItem>
                                                 <TextBlock Width="125">
                                                     <Hyperlink Click="LoadFamily_Click">
                                                         <TextBlock Text="Load Family" />

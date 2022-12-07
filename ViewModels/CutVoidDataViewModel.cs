@@ -198,29 +198,30 @@ namespace RevitTimasBIMTools.ViewModels
         public void LoadFamily(string familyPath)
         {
             Family family = null;
-            RevitTask.RunAsync(app =>
+            _ = RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
                 using Transaction trx = new(doc, "LoadFamily");
                 TransactionStatus status = trx.Start();
                 if (status == TransactionStatus.Started)
                 {
-                    if (doc.LoadFamily(familyPath, out family))
+                    IFamilyLoadOptions opt = new FamilyLoadOptions();
+                    if (doc.LoadFamily(familyPath, opt, out family))
                     {
                         status = trx.Commit();
                         GetOpenningFamilySymbolData(ref family);
                         Document familyDoc = doc.EditFamily(family);
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
+                            GetFamilySharedParameterData(familyDoc);
                             string familyPath = @$"{localPath}\{family.Name}.rfa";
                             if (File.Exists(familyPath)) { File.Delete(familyPath); }
                             familyDoc.SaveAs(familyPath, new SaveAsOptions
                             {
-                                Compact = true,
+                                OverwriteExistingFile = true,
                                 MaximumBackups = 3,
-                                OverwriteExistingFile = true
+                                Compact = true,
                             });
-                            GetFamilySharedParameterData(familyDoc);
                             _ = familyDoc.Close(false);
                         }
                     }
@@ -230,17 +231,17 @@ namespace RevitTimasBIMTools.ViewModels
                         Logger.Error($"Not loaded family");
                     }
                 }
-            }).Start(taskContext);
+            });
         }
 
 
-        private string[] ProcessDirectory(string directory, string extension = "*.rfa")
+        private string[] ProcessDirectory(string directory)
         {
             if (!Directory.Exists(directory))
             {
                 Logger.Error("Not found directory path: " + directory);
             }
-            return Directory.GetFiles(directory, extension, SearchOption.TopDirectoryOnly);
+            return Directory.GetFiles(directory, "*.rfa", SearchOption.TopDirectoryOnly);
         }
 
 
@@ -252,9 +253,10 @@ namespace RevitTimasBIMTools.ViewModels
                 foreach (ElementId symbId in family.GetFamilySymbolIds())
                 {
                     FamilySymbol symbol = doc.GetElement(symbId) as FamilySymbol;
-                    string combinetName = symbol.FamilyName + symbol.Name.Trim();
-                    FamilySymbols.Add(combinetName, symbol);
+                    string sname = $"{symbol.FamilyName}: {symbol.Name.Trim()}";
+                    FamilySymbols.Add(sname, symbol);
                     ActivateFamilySimbol(ref symbol);
+                    Logger.Info(sname);
                 }
             }
         }
@@ -265,9 +267,9 @@ namespace RevitTimasBIMTools.ViewModels
             using Transaction trx = new(symbol.Document);
             if (symbol.IsValidObject && !symbol.IsActive)
             {
-                trx.Start("Activate family");
+                _ = trx.Start("Activate family");
                 symbol.Activate();
-                trx.Commit();
+                _ = trx.Commit();
             }
         }
 
