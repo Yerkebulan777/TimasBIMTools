@@ -193,10 +193,10 @@ namespace RevitTimasBIMTools.ViewModels
         {
             FamilySymbolList = await RevitTask.RunAsync(async app =>
             {
+                using Transaction trx = new(doc);
                 IList<FamilySymbol> result = null;
                 doc = app.ActiveUIDocument.Document;
-                using Transaction trx = new(doc, "LoadFamilyAsync");
-                TransactionStatus status = trx.Start();
+                TransactionStatus status = trx.Start("LoadFamily");
                 if (status == TransactionStatus.Started)
                 {
                     IFamilyLoadOptions opt = UIDocument.GetRevitUIFamilyLoadOptions();
@@ -227,7 +227,6 @@ namespace RevitTimasBIMTools.ViewModels
                         status = trx.RollBack();
                     }
                 }
-                Logger.Info("Input: " + result.Count.ToString());
                 return result;
             });
         }
@@ -263,13 +262,17 @@ namespace RevitTimasBIMTools.ViewModels
 
         internal void ActivateFamilySimbol(FamilySymbol symbol)
         {
-            using Transaction trx = new(symbol.Document);
-            if (symbol.IsValidObject && !symbol.IsActive)
+            Task task = Task.WhenAll();
+            task = task.ContinueWith(task =>
             {
-                _ = trx.Start("Activate family");
-                symbol.Activate();
-                _ = trx.Commit();
-            }
+                using Transaction trx = new(symbol.Document);
+                if (symbol.IsValidObject && !symbol.IsActive)
+                {
+                    trx.Start("Activate family");
+                    symbol.Activate();
+                    trx.Commit();
+                }
+            }, taskContext);
         }
 
         #endregion
