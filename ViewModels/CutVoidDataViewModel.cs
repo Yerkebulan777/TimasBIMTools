@@ -69,6 +69,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         StartHandler();
                         GetGeneral3DView();
+                        SmartToolHelper.IsActive = true;
                     }
                 }
             }
