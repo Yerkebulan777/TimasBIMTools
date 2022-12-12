@@ -183,7 +183,7 @@ namespace RevitTimasBIMTools.ViewModels
                 }
                 if (SetProperty(ref symbols, value) && symbols != null)
                 {
-                    Logger.Info("Output: " + symbols.Count.ToString());
+                    Logger.Log("Output: " + symbols.Count.ToString());
                 }
             }
         }
