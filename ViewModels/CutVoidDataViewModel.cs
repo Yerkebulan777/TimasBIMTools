@@ -267,9 +267,9 @@ namespace RevitTimasBIMTools.ViewModels
                 using Transaction trx = new(symbol.Document);
                 if (symbol.IsValidObject && !symbol.IsActive)
                 {
-                    trx.Start("Activate family");
+                    _ = trx.Start("Activate family");
                     symbol.Activate();
-                    trx.Commit();
+                    _ = trx.Commit();
                 }
             });
         }
@@ -297,8 +297,11 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (!param.IsReadOnly && param.IsShared)
                     {
-                        string name = param.Definition.Name;
-                        SharedParameterData[name] = param.GUID;
+                        if (!param.IsDeterminedByFormula)
+                        {
+                            string name = param.Definition.Name;
+                            SharedParameterData[name] = param.GUID;
+                        }
                     }
                 }
             }
