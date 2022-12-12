@@ -47,7 +47,7 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         #region Templory
-                
+
         private Document doc = null;
         private object currentItem = null;
         //private IList<Family> families= null;
@@ -171,23 +171,29 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region FamilySymbols
 
-        private IDictionary<string, FamilySymbol> symbols = null;
-        public IDictionary<string, FamilySymbol> FamilySymbolData
+        private IList<FamilySymbol> symbols;
+        public IList<FamilySymbol> FamilySymbolList
         {
             get => symbols;
             set
             {
-                Logger.Info("Property: " + value.Count.ToString());
-                OnPropertyChanged(nameof(FamilySymbolData));
+                if (symbols != null && symbols.Count > 0)
+                {
+                    value = value.Union(symbols).ToList();
+                }
+                if (SetProperty(ref symbols, value) && symbols != null)
+                {
+                    Logger.Info("Output: " + symbols.Count.ToString());
+                }
             }
         }
 
 
         public async void LoadFamilyAsync(string familyPath)
         {
-            IDictionary<string, FamilySymbol> result = null;
-            FamilySymbolData = await RevitTask.RunAsync(async app =>
+            FamilySymbolList = await RevitTask.RunAsync(async app =>
             {
+                IList<FamilySymbol> result = null;
                 doc = app.ActiveUIDocument.Document;
                 using Transaction trx = new(doc, "LoadFamilyAsync");
                 TransactionStatus status = trx.Start();
@@ -221,8 +227,7 @@ namespace RevitTimasBIMTools.ViewModels
                         status = trx.RollBack();
                     }
                 }
-                result = symbols.Update(result);
-                Logger.Info("Output: " + result.Count.ToString());
+                Logger.Info("Input: " + result.Count.ToString());
                 return result;
             });
         }
@@ -238,16 +243,18 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IDictionary<string, FamilySymbol> GetFamilySymbolData(Family family)
+        private IList<FamilySymbol> GetFamilySymbolData(Family family)
         {
-            SortedList<string, FamilySymbol> result = new(10);
+            IList<FamilySymbol> result = new List<FamilySymbol>(5);
             if (family != null && family.IsValidObject && family.IsEditable)
             {
                 foreach (ElementId symbId in family.GetFamilySymbolIds())
                 {
-                    FamilySymbol symbol = doc.GetElement(symbId) as FamilySymbol;
-                    string name = $"{symbol.FamilyName}: {symbol.Name.Trim()}";
-                    result[name] = symbol;
+                    Element element = doc.GetElement(symbId);
+                    if (element is FamilySymbol symbol)
+                    {
+                        result.Add(symbol);
+                    }
                 }
             }
             return result;
@@ -259,9 +266,9 @@ namespace RevitTimasBIMTools.ViewModels
             using Transaction trx = new(symbol.Document);
             if (symbol.IsValidObject && !symbol.IsActive)
             {
-                trx.Start("Activate family");
+                _ = trx.Start("Activate family");
                 symbol.Activate();
-                trx.Commit();
+                _ = trx.Commit();
             }
         }
 
@@ -379,7 +386,7 @@ namespace RevitTimasBIMTools.ViewModels
                     EngineerCategories = null;
                     StructureMaterials = null;
                     SharedParameterData = null;
-                    FamilySymbolData = null;
+                    FamilySymbolList = null;
                     ElementModelData = null;
                     SymbolTextFilter = null;
                     LevelTextFilter = null;
@@ -424,7 +431,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                if (symbols == null || symbols.Count == 0)
+                if (symbols == null || symbols.Count > 0)
                 {
                     foreach (string familyPath in ProcessDirectory(localPath))
                     {
