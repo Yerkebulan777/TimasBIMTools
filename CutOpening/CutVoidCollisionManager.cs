@@ -81,7 +81,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Get Collision Data
 
-        public IList<ElementModel> GetCollisionByInputData(Document doc, DocumentModel document, Material material, Category category)
+        public IList<ElementModel> GetCollisionData(Document doc, DocumentModel document, Material material, Category category)
         {
             Properties.Settings.Default.Upgrade();
             Transform global = document.Transform;

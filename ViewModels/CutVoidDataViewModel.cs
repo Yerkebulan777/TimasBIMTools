@@ -34,7 +34,7 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
         private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
-        private readonly CutVoidCollisionManager collisionManager = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
+        private readonly CutVoidCollisionManager collisionMng = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
 
 
         public CutVoidDataViewModel(APIEventHandler eventHandler)
@@ -368,8 +368,8 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                 {
+                    collisionMng.InitializeElementTypeIdData(doc);
                     DockPanelView.ActiveDocTitle.Content = doc.Title;
-                    collisionManager.InitializeElementTypeIdData(doc);
                     return RevitFilterManager.GetDocumentCollection(doc);
                 }
                 return null;
@@ -427,7 +427,7 @@ namespace RevitTimasBIMTools.ViewModels
             StructureMaterials ??= await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return collisionManager.GetStructureCoreMaterialData(doc);
+                return collisionMng.GetStructureCoreMaterialData(doc);
             });
         }
 
@@ -453,8 +453,10 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 ElementModelData = await RevitTask.RunAsync(app =>
                 {
+                    IList<ElementModel> result = null;
                     doc = app.ActiveUIDocument.Document;
-                    return collisionManager.GetCollisionByInputData(doc, document, material, category).ToObservableCollection();
+                    result = collisionMng.GetCollisionData(doc, document, material, category);
+                    return result.ToObservableCollection();
                 });
             }
         }
@@ -726,8 +728,8 @@ namespace RevitTimasBIMTools.ViewModels
                         {
                             if (dialogResult.Value && ElementModelData.Remove(model))
                             {
-                                collisionManager.VerifyOpenningSize(doc, model);
-                                collisionManager.CreateOpening(doc, model);
+                                collisionMng.VerifyOpenningSize(doc, model);
+                                collisionMng.CreateOpening(doc, model);
                             }
                             else
                             {
@@ -790,7 +792,7 @@ namespace RevitTimasBIMTools.ViewModels
         public void Dispose()
         {
             ClearAndResetData();
-            collisionManager?.Dispose();
+            collisionMng?.Dispose();
         }
     }
 }
