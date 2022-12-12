@@ -262,8 +262,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         internal void ActivateFamilySimbol(FamilySymbol symbol)
         {
-            Task task = Task.WhenAll();
-            task = task.ContinueWith(task =>
+            Task task = RevitTask.RunAsync(app =>
             {
                 using Transaction trx = new(symbol.Document);
                 if (symbol.IsValidObject && !symbol.IsActive)
@@ -272,7 +271,7 @@ namespace RevitTimasBIMTools.ViewModels
                     symbol.Activate();
                     trx.Commit();
                 }
-            }, taskContext);
+            });
         }
 
         #endregion
