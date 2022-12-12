@@ -108,7 +108,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
             }
 
-            //Attempting to recover all purgeable elements and delete them from the document
+            //Attempting to recover all purgeable elements and delete them from the docmodel
             List<ElementId> purgeableIds = GetPurgeableElements(doc, performanceAdviserRuleIds);
             if (purgeableIds != null)
             {

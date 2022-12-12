@@ -113,11 +113,11 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region GeneralData
 
-        private DocumentModel document = null;
+        private DocumentModel docmodel = null;
         public DocumentModel SelectedDocument
         {
-            get => document;
-            set => SetProperty(ref document, value);
+            get => docmodel;
+            set => SetProperty(ref docmodel, value);
         }
 
 
@@ -449,13 +449,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void SnoopIntersectionByInputData()
         {
-            if (document != null && material != null && category != null)
+            if (docmodel != null && material != null && category != null)
             {
                 ElementModelData = await RevitTask.RunAsync(app =>
                 {
                     IList<ElementModel> result = null;
                     doc = app.ActiveUIDocument.Document;
-                    result = collisionMng.GetCollisionData(doc, document, material, category);
+                    result = collisionMng.GetCollisionData(doc, docmodel, material, category);
                     return result.ToObservableCollection();
                 });
             }
@@ -662,7 +662,7 @@ namespace RevitTimasBIMTools.ViewModels
         private void RefreshActiveDataHandler()
         {
             IsDataRefresh = false;
-            if (document != null && material != null && category != null)
+            if (docmodel != null && material != null && category != null)
             {
                 Task task = Task.WhenAll();
                 task = task.ContinueWith(_ =>
