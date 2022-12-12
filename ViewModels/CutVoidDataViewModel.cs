@@ -290,7 +290,7 @@ namespace RevitTimasBIMTools.ViewModels
         private void GetFamilySharedParameterData(Document familyDoc)
         {
             FamilyManager familyManager = familyDoc.FamilyManager;
-            SharedParameterData ??= new SortedList<string, Guid>(10);
+            SharedParameterData ??= new SortedList<string, Guid>(5);
             foreach (FamilyParameter param in familyManager.GetParameters())
             {
                 if (param.UserModifiable && param.IsInstance)
