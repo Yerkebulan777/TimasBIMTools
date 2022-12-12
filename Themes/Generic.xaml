@@ -4,6 +4,7 @@
     xmlns:converters ="clr-namespace:RevitTimasBIMTools.ViewConverters" >
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/DataTemplate.xaml"/>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Animation.xaml"/>
         <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Colors.xaml"/>
     </ResourceDictionary.MergedDictionaries>

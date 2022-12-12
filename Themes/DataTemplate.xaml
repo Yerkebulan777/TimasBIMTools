@@ -1,0 +1,37 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <DataTemplate x:Key="SymbolGroupHeader" >
+        <TextBlock x:Name="Text" Text="{Binding FamilyName}" FontWeight="Bold" Margin="5,0" />
+    </DataTemplate>
+    
+    <DataTemplate x:Key="SymbolGroupTemplate" >
+        <StackPanel Orientation="Horizontal" Margin="2.5" Height="20" 
+                        HorizontalAlignment="Right" VerticalAlignment="Center">
+            <Ellipse Fill="LawnGreen" Height="5" Width="5" Margin="5"/>
+            <TextBlock Text="{Binding Path=Name}" Margin="5,0"/>
+        </StackPanel>
+    </DataTemplate>
+    
+    <Style x:Key="SymbolContainerStyle"  TargetType="{x:Type GroupItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type GroupItem}">
+                    <Expander x:Name="Expander" IsExpanded="False" >
+                        <Expander.Header>
+                            <StackPanel>
+                                <TextBlock Margin="5,0" 
+                                        HorizontalAlignment="Left" 
+                                        VerticalAlignment="Center"
+                                        Text="{Binding Name}"
+                                        FontWeight="Bold" />
+                            </StackPanel>
+                        </Expander.Header>
+                        <ItemsPresenter />
+                    </Expander>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
