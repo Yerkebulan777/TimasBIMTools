@@ -41,13 +41,11 @@ namespace RevitTimasBIMTools.CutOpening
                         {
                             pane.Hide();
                             view.Dispose();
-                            toolHelper.IsActiveStart = false;
                         }
                         else
                         {
                             pane.Show();
                             view.RaiseExternalEvent();
-                            toolHelper.IsActiveStart = true;
                         }
                     }
                 }

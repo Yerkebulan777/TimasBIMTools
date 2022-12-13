@@ -142,6 +142,7 @@ namespace RevitTimasBIMTools.RevitUtils
             FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(View3D));
             return collector.Cast<View3D>().First(v3 => !v3.IsTemplate);
         }
+
         #endregion
 
 

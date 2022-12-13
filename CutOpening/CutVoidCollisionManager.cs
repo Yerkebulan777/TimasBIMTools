@@ -81,7 +81,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         #region Get Collision Data
 
-        public IList<ElementModel> GetCollisionByInputData(Document doc, DocumentModel document, Material material, Category category)
+        public IList<ElementModel> GetCollisionData(Document doc, DocumentModel document, Material material, Category category)
         {
             Properties.Settings.Default.Upgrade();
             Transform global = document.Transform;
@@ -288,7 +288,6 @@ namespace RevitTimasBIMTools.CutOpening
                     if (opening != null && opening.IsValidObject)
                     {
                         Parameter elevatParam = opening.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
-
                         bool heightBolean = opening.get_Parameter(heightGuid).Set(elevatParam.AsDouble());
                         bool elevatBolean = opening.get_Parameter(elevatGuid).Set(elevatParam.AsDouble());
                         if (opening.get_Parameter(heightGuid).Set(model.Height))

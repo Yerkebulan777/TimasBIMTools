@@ -10,6 +10,7 @@
     </ResourceDictionary.MergedDictionaries>
 
     <converters:NullToVisibilityConverter x:Key="NullBoolToVis" />
+    <converters:PercentageConverter x:Key="SizeConverter" />
     <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
     <DropShadowEffect x:Key="ShadowBlur" />
@@ -18,6 +19,8 @@
     <Style TargetType="{x:Type TextBox}">
         <Setter Property="IsUndoEnabled" Value="False"/>
         <Setter Property="TextWrapping" Value="NoWrap"/>
+        <Setter Property="MinWidth" Value="30" />
+        <Setter Property="MaxWidth" Value="250" />
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Style.Triggers>
             <MultiTrigger>
@@ -48,8 +51,18 @@
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
-        <Setter Property="MinWidth" Value="125" />
-        <Setter Property="MaxWidth" Value="175" />
+        <Setter Property="MinWidth" Value="100" />
+        <Setter Property="MaxWidth" Value="250" />
+        <Setter Property="Height" Value="23" />
+    </Style>
+
+    <!--SliderStandart-->
+    <Style TargetType="Slider">
+        <Setter Property="Margin" Value="2.5" />
+        <Setter Property="IsSelectionRangeEnabled" Value="True" />
+        <Setter Property="IsSnapToTickEnabled" Value="True" />
+        <Setter Property="MinWidth" Value="100" />
+        <Setter Property="MaxWidth" Value="250" />
         <Setter Property="Height" Value="23" />
     </Style>
 
@@ -97,6 +110,7 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+
     
     <!--GroupBoxBorderStyle-->
     <Style x:Key="GroupBoxBorderStyle"  TargetType="{x:Type Border}" >

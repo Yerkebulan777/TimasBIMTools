@@ -31,7 +31,7 @@ namespace RevitTimasBIMTools.Core
 
 
         public DockablePaneId CutVoidPaneId { get; } = new(new Guid("{C586E687-A52C-42EE-AC75-CD81EE1E7A9A}"));
-        public bool IsActiveStart { get; set; } = false;
+        public static bool IsActive { get; internal set; } = false;
 
         #region IconConvertToImageSource
         [DllImport("gdi32.dll", EntryPoint = "DeleteObject")]

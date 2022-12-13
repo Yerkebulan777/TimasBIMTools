@@ -6,8 +6,8 @@
     </DataTemplate>
     
     <DataTemplate x:Key="SymbolGroupTemplate" >
-        <StackPanel Orientation="Horizontal" Margin="2.5" Height="20" 
-                        HorizontalAlignment="Right" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Margin="2.5" Height="20"
+                    HorizontalAlignment="Left"  VerticalAlignment="Center">
             <Ellipse Fill="LawnGreen" Height="5" Width="5" Margin="5"/>
             <TextBlock Text="{Binding Path=Name}" Margin="5,0"/>
         </StackPanel>
@@ -21,10 +21,10 @@
                         <Expander.Header>
                             <StackPanel>
                                 <TextBlock Margin="5,0" 
-                                        HorizontalAlignment="Left" 
-                                        VerticalAlignment="Center"
-                                        Text="{Binding Name}"
-                                        FontWeight="Bold" />
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Name}"
+                                    FontWeight="Bold" />
                             </StackPanel>
                         </Expander.Header>
                         <ItemsPresenter />

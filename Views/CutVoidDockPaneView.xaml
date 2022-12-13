@@ -22,7 +22,7 @@
 
     <!-- GridMain -->
     <Border BorderThickness="2.5" BorderBrush="Gray">
-        <Grid Name="PageMainGrid" >
+        <Grid Name="ParentGrid" >
  
             <Grid.RowDefinitions>
                 <RowDefinition Height="45"/>
@@ -77,24 +77,27 @@
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Project name: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboDocumentModels" HorizontalContentAlignment="Center" 
-                                          ItemsSource="{Binding Path=DocumentCollection}" 
-                                          SelectedItem="{Binding Path=SelectedDocument}" />
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
+                                    ItemsSource="{Binding Path=DocumentCollection}" 
+                                    SelectedItem="{Binding Path=SelectedDocument}" />
                             </WrapPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Structure material: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboStructureMats" HorizontalContentAlignment="Center"
-                                          ItemsSource="{Binding Path=StructureMaterials, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                                          SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedMaterial}" 
-                                          DisplayMemberPath="Value.Name" SelectedIndex="-1" />
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
+                                    ItemsSource="{Binding Path=StructureMaterials, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                    SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedMaterial}" 
+                                    DisplayMemberPath="Value.Name" SelectedIndex="-1" />
                             </WrapPanel>
 
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Collision category: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboEngineerCats" HorizontalContentAlignment="Center"
-                                          ItemsSource="{Binding Path=EngineerCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                          SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedCategory}"
-                                          DisplayMemberPath="Value.Name" SelectedIndex="-1" />
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
+                                    ItemsSource="{Binding Path=EngineerCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedCategory}"
+                                    DisplayMemberPath="Value.Name" SelectedIndex="-1" />
                             </WrapPanel>
 
                         </StackPanel>
@@ -108,29 +111,32 @@
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Cut offset: " Width="120" Margin="2.5" VerticalContentAlignment="Center" />
-                                <Slider Name="CutOffset" Height="23" Width="115" Margin="2.5"
+                                <Slider Name="CutOffset" Height="23" Margin="2.5"
                                     Minimum="5" Maximum="150" TickFrequency="10" IsSnapToTickEnabled="True"
-                                    Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.4'}" />
                                 <TextBox Text="{Binding ElementName=CutOffset, Path=Value}" 
-                                     Height="23" Width="35" TextAlignment="Center" Margin="2.5" />
+                                     Height="23" Width="30" TextAlignment="Center" Margin="2.5" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Minimum length: " Width="120" Margin="2.5" VerticalContentAlignment="Center" />
-                                <Slider Name="MinDephtSize" Height="23" Width="115" Margin="2.5"
-                                        Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
-                                        Value="{Binding Path=MinDepthSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Name="MinDephtSize" Height="23" Margin="2.5"
+                                    Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
+                                    Value="{Binding Path=MinDepthSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.4'}" />
                                 <TextBox Text="{Binding ElementName=MinDephtSize, Path=Value}"
-                                         Height="23" Width="35" TextAlignment="Center" Margin="2.5" />
+                                         Height="23" Width="30" TextAlignment="Center" Margin="2.5" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Minimum side size: " Width="120" Margin="2.5" VerticalContentAlignment="Center" />
-                                <Slider Name="MinSideSize" Height="23" Width="115" Margin="2.5"  
-                                        Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
-                                        Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Slider Name="MinSideSize" Height="23" Margin="2.5"  
+                                    Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
+                                    Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.4'}" />
                                 <TextBox Text="{Binding ElementName=MinSideSize, Path=Value}" 
-                                         Height="23" Width="35" TextAlignment="Center" Margin="2.5" />
+                                         Height="23" Width="30" TextAlignment="Center" Margin="2.5" />
                             </WrapPanel>
 
                         </StackPanel>
@@ -157,6 +163,7 @@
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Wall opening: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboWallOpenning" HorizontalContentAlignment="Center"
+                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                           ItemTemplate="{Binding Source={StaticResource SymbolGroupTemplate}}"
                                           ItemsSource="{Binding Source={StaticResource symbols}}"
                                           SelectionChanged="ComboOpenning_SelectionChanged" 
@@ -173,6 +180,7 @@
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Floor opening: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboFloorOpenning" HorizontalContentAlignment="Center"
+                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                           ItemTemplate="{Binding Source={StaticResource SymbolGroupTemplate}}"
                                           ItemsSource="{Binding Source={StaticResource symbols}}"
                                           SelectionChanged="ComboOpenning_SelectionChanged"
@@ -202,25 +210,31 @@
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Width mark" Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboWidthMark" HorizontalContentAlignment="Center"
+                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
-                                          SelectionChanged="ComboMark_SelectionChanged" />
+                                          SelectionChanged="ComboMark_SelectionChanged"
+                                          IsSynchronizedWithCurrentItem="False" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Height mark" Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboHeightMark" HorizontalContentAlignment="Center"
+                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
-                                          SelectionChanged="ComboMark_SelectionChanged" />
+                                          SelectionChanged="ComboMark_SelectionChanged"
+                                          IsSynchronizedWithCurrentItem="False" />
                             </WrapPanel>
 
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Elevation mark" Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboElevMark" HorizontalContentAlignment="Center"
+                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
-                                          SelectionChanged="ComboMark_SelectionChanged" />
+                                          SelectionChanged="ComboMark_SelectionChanged"
+                                          IsSynchronizedWithCurrentItem="False" />
                             </WrapPanel>
                             
                         </StackPanel>
@@ -232,27 +246,29 @@
             
             <!-- Filter Control -->
             <WrapPanel Grid.Row="2" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10,5"
-                       Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" 
-                       Style="{DynamicResource VisibleAnimation}" >
+                    Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" 
+                    Style="{DynamicResource VisibleAnimation}" >
 
                 <ComboBox Name="ComboLevelFilter" Margin="5"
-                    ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                    SelectedValue="{Binding Path=LevelTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
+                    MinWidth="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}" 
+                    SelectedValue="{Binding Path=LevelTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" 
+                    ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <ComboBox Name="ComboSymbolFilter" Margin="5"
-                    ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
-                    SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
+                    MinWidth="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                    SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 
             </WrapPanel>
 
 
             <!-- DataGridView -->
             <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto"  HorizontalScrollBarVisibility="Auto"
-                          Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" 
-                          Style="{DynamicResource VisibleAnimation}" >
+                Visibility="{Binding  Path=IsDataRefresh, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" 
+                Style="{DynamicResource VisibleAnimation}" >
                 
                 <DataGrid Name="DataGridView" Style="{DynamicResource DataGridStandart}"
-                          ItemsSource="{Binding Path=ViewDataCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                    ItemsSource="{Binding Path=ViewDataCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
 
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
@@ -272,7 +288,7 @@
                                     <CheckBox Name="CheckSelectAll" VerticalAlignment="Center" HorizontalAlignment="Center" 
                                               IsChecked="{Binding DataContext.AllSelectChecked, RelativeSource={RelativeSource AncestorType=DataGrid}}">
                                         <CheckBox.LayoutTransform>
-                                            <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>
+                                            <ScaleTransform ScaleX="1.05" ScaleY="1.05" />
                                         </CheckBox.LayoutTransform>
                                     </CheckBox>
                                 </DataTemplate>
@@ -300,7 +316,7 @@
                                 </Style>
                             </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
-                        
+
                         <DataGridTextColumn Width="120" Header="Family Name" Binding="{Binding FamilyName, Mode=OneWay}">
                             <DataGridTextColumn.EditingElementStyle>
                                 <Style TargetType="TextBox">
@@ -328,8 +344,18 @@
                 <DockPanel Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5" >
 
                     <WrapPanel VerticalAlignment="Center" Margin="5">
-                        <Label ContentStringFormat="Found collision: {0} " FontSize="12" 
-                            Content="{Binding Path=ElementModelData.Count, Mode=OneWay}" />
+                        <Label ContentStringFormat="Found collision: {0} " FontSize="13" 
+                            Content="{Binding Path=ElementModelData.Count, Mode=OneWay}" >
+                            <Label.Style>
+                                <Style TargetType="Label">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=ElementModelData.Count}" Value="0">
+                                            <Setter Property="Foreground" Value="Red" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Label.Style>
+                        </Label>
                     </WrapPanel>
 
                     <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"
