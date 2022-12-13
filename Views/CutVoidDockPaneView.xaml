@@ -350,7 +350,6 @@
                                 <Style TargetType="Label">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Path=ElementModelData.Count}" Value="0">
-                                            <Setter Property="FontWeight" Value="Heavy" />
                                             <Setter Property="Foreground" Value="Red" />
                                         </DataTrigger>
                                     </Style.Triggers>
