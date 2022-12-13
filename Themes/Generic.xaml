@@ -10,6 +10,7 @@
     </ResourceDictionary.MergedDictionaries>
 
     <converters:NullToVisibilityConverter x:Key="NullBoolToVis" />
+    <converters:PercentageConverter x:Key="PercentageConverter" />
     <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
     <DropShadowEffect x:Key="ShadowBlur" />
