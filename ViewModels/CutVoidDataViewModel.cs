@@ -171,6 +171,22 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region FamilySymbols
 
+        private Family family;
+        public Family RevitFamily
+        {
+            get => family;
+            set
+            {
+                family = value;
+                if (family != null)
+                {
+
+                }
+            }
+        }
+
+
+
         private IList<FamilySymbol> symbols;
         public IList<FamilySymbol> FamilySymbolList
         {
@@ -443,18 +459,22 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetFamilySymbolsToData()
         {
-            await RevitTask.RunAsync(app =>
+            List<FamilySymbol> output = new(15);
+            FamilySymbolList = await RevitTask.RunAsync(app =>
             {
-                doc = app.ActiveUIDocument.Document;
                 foreach (string familyPath in ProcessDirectory(localPath))
                 {
-                    FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(Family));
+                    doc = app.ActiveUIDocument.Document;
                     string fileName = System.IO.Path.GetFileNameWithoutExtension(familyPath);
-                    if (collector.FirstOrDefault(x => x.Name == fileName) is null)
+                    FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(Family));
+                    IList<FamilySymbol> result = collector.FirstOrDefault(x => x.Name == fileName) is Family family
+                    ? GetFamilySymbolData(family) : LoadFamilyAndSymbols(doc, familyPath);
+                    if (result != null && result.Count < 0)
                     {
-                        LoadFamilyAsync(familyPath);
+                        output.AddRange(result);
                     }
                 }
+                return output;
             });
         }
 
