@@ -33,7 +33,6 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly string localPath = SmartToolHelper.LocalPath;
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
-        private readonly RevitPurginqManager constructManager = SmartToolApp.ServiceProvider.GetRequiredService<RevitPurginqManager>();
         private readonly CutVoidCollisionManager collisionMng = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
 
 
@@ -68,7 +67,6 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         StartHandler();
                         GetGeneral3DView();
-                        SmartToolHelper.IsActive = true;
                     }
                 }
             }
@@ -194,7 +192,7 @@ namespace RevitTimasBIMTools.ViewModels
             FamilySymbolList = await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                return LoadFamilyAndSymbols(doc, familyPath);
+                return LoadSymbols(doc, familyPath);
             });
         }
 
@@ -209,7 +207,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IList<FamilySymbol> LoadFamilyAndSymbols(Document doc, string familyPath)
+        private IList<FamilySymbol> LoadSymbols(Document doc, string familyPath)
         {
             using Transaction trx = new(doc);
             IList<FamilySymbol> result = null;
@@ -235,7 +233,10 @@ namespace RevitTimasBIMTools.ViewModels
                                 MaximumBackups = 3,
                                 Compact = true,
                             });
-                            familyDoc.Close(false);
+                            if (familyDoc.Close(false))
+                            {
+                                familyDoc = null;
+                            }
                         }
                     }
                     else if (!trx.HasEnded())
@@ -270,12 +271,15 @@ namespace RevitTimasBIMTools.ViewModels
         {
             Task task = RevitTask.RunAsync(app =>
             {
-                using Transaction trx = new(symbol.Document);
+                doc = symbol.Document;
+                TransactionStatus status;
+                using Transaction trx = new(doc, "Activate");
                 if (symbol.IsValidObject && !symbol.IsActive)
                 {
-                    _ = trx.Start("Activate familyType");
+                    status = trx.Start();
                     symbol.Activate();
-                    _ = trx.Commit();
+                    doc.Regenerate();
+                    status = trx.Commit();
                 }
             });
         }
@@ -440,19 +444,22 @@ namespace RevitTimasBIMTools.ViewModels
 
         private async void GetFamilySymbolsToData()
         {
-            List<FamilySymbol> output = new(15);
             FamilySymbolList = await RevitTask.RunAsync(app =>
             {
+                List<FamilySymbol> output = new(15);
+                FilteredElementCollector collector = null;
                 foreach (string familyPath in ProcessDirectory(localPath))
                 {
-                    doc = app.ActiveUIDocument.Document;
-                    string fileName = System.IO.Path.GetFileNameWithoutExtension(familyPath);
-                    FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(Family));
-                    IList<FamilySymbol> result = collector.FirstOrDefault(x => x.Name == fileName) is Family family
-                    ? GetFamilySymbolData(family) : LoadFamilyAndSymbols(doc, familyPath);
-                    if (result != null && result.Count < 0)
+                    string fileName = Path.GetFileNameWithoutExtension(familyPath);
+                    collector = new FilteredElementCollector(app.ActiveUIDocument.Document).OfClass(typeof(Family));
+                    Element element = collector.FirstOrDefault(x => x.Name == fileName);
+                    if (element is not null and Family family)
                     {
-                        output.AddRange(result);
+                        output.AddRange(GetFamilySymbolData(family));
+                    }
+                    else
+                    {
+                        output.AddRange(LoadSymbols(doc, familyPath));
                     }
                 }
                 return output;
