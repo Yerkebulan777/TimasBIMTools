@@ -235,10 +235,7 @@ namespace RevitTimasBIMTools.ViewModels
                                 MaximumBackups = 3,
                                 Compact = true,
                             });
-                            if (familyDoc.Close(false))
-                            {
-                                _ = Task.Yield();
-                            }
+                            familyDoc.Close(false);
                         }
                     }
                     else if (!trx.HasEnded())
