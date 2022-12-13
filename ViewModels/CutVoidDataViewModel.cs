@@ -175,13 +175,17 @@ namespace RevitTimasBIMTools.ViewModels
             get => symbols;
             set
             {
-                if (value != null && symbols != null)
+                IList<FamilySymbol> tempSymbols = symbols;
+                if (SetProperty(ref symbols, value) && tempSymbols != null)
                 {
-                    value = value.Union(symbols).ToList();
-                }
-                if (SetProperty(ref symbols, value) && symbols != null)
-                {
-                    Logger.Log("Output: " + symbols.Count.ToString());
+                    string[] uids = symbols?.Select(s => s.UniqueId).ToArray();
+                    foreach (FamilySymbol symbol in tempSymbols)
+                    {
+                        if (!uids.Contains(symbol.UniqueId))
+                        {
+                            symbols.Add(symbol);
+                        }
+                    }
                 }
             }
         }

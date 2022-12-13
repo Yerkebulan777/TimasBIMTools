@@ -77,7 +77,7 @@
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Project name: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboDocumentModels" HorizontalContentAlignment="Center" 
-                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                     ItemsSource="{Binding Path=DocumentCollection}" 
                                     SelectedItem="{Binding Path=SelectedDocument}" />
                             </WrapPanel>
@@ -85,7 +85,7 @@
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Structure material: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboStructureMats" HorizontalContentAlignment="Center"
-                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                     ItemsSource="{Binding Path=StructureMaterials, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                     SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedMaterial}" 
                                     DisplayMemberPath="Value.Name" SelectedIndex="-1" />
@@ -94,7 +94,7 @@
                             <WrapPanel  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Collision category: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboEngineerCats" HorizontalContentAlignment="Center"
-                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                     ItemsSource="{Binding Path=EngineerCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                     SelectedValuePath="Value" SelectedValue="{Binding Path=SelectedCategory}"
                                     DisplayMemberPath="Value.Name" SelectedIndex="-1" />
@@ -163,7 +163,7 @@
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Wall opening: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboWallOpenning" HorizontalContentAlignment="Center"
-                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
+                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                           ItemTemplate="{Binding Source={StaticResource SymbolGroupTemplate}}"
                                           ItemsSource="{Binding Source={StaticResource symbols}}"
                                           SelectionChanged="ComboOpenning_SelectionChanged" 
@@ -180,7 +180,7 @@
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Floor opening: " Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboFloorOpenning" HorizontalContentAlignment="Center"
-                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
+                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                           ItemTemplate="{Binding Source={StaticResource SymbolGroupTemplate}}"
                                           ItemsSource="{Binding Source={StaticResource symbols}}"
                                           SelectionChanged="ComboOpenning_SelectionChanged"
@@ -210,7 +210,7 @@
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Width mark" Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboWidthMark" HorizontalContentAlignment="Center"
-                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
+                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
                                           SelectionChanged="ComboMark_SelectionChanged"
@@ -220,7 +220,7 @@
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Height mark" Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboHeightMark" HorizontalContentAlignment="Center"
-                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
+                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
                                           SelectionChanged="ComboMark_SelectionChanged"
@@ -230,7 +230,7 @@
                             <WrapPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="2.5" >
                                 <Label Content="Elevation mark" Width="120" VerticalContentAlignment="Center" />
                                 <ComboBox Name="ComboElevMark" HorizontalContentAlignment="Center"
-                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
+                                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
                                           ItemsSource="{Binding Source={StaticResource paramData}}"
                                           DisplayMemberPath="Key" SelectedValuePath="Value" 
                                           SelectionChanged="ComboMark_SelectionChanged"
@@ -250,12 +250,12 @@
                     Style="{DynamicResource VisibleAnimation}" >
 
                 <ComboBox Name="ComboLevelFilter" Margin="5"
-                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}" 
+                    MinWidth="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}" 
                     SelectedValue="{Binding Path=LevelTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" 
                     ItemsSource="{Binding Path=UniqueLevelNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <ComboBox Name="ComboSymbolFilter" Margin="5"
-                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
+                    MinWidth="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
                     SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"
                     ItemsSource="{Binding Path=UniqueSymbolNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 
