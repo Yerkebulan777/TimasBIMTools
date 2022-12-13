@@ -171,22 +171,6 @@ namespace RevitTimasBIMTools.ViewModels
 
         #region FamilySymbols
 
-        private Family family;
-        public Family RevitFamily
-        {
-            get => family;
-            set
-            {
-                family = value;
-                if (family != null)
-                {
-
-                }
-            }
-        }
-
-
-
         private IList<FamilySymbol> symbols;
         public IList<FamilySymbol> FamilySymbolList
         {
