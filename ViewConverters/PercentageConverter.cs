@@ -7,7 +7,7 @@ namespace RevitTimasBIMTools.ViewConverters
 {
     public class PercentageConverter : MarkupExtension, IValueConverter
     {
-        private static PercentageConverter _instance;
+        private static PercentageConverter instance;
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return System.Convert.ToDouble(value) * System.Convert.ToDouble(parameter);
@@ -20,7 +20,7 @@ namespace RevitTimasBIMTools.ViewConverters
 
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            return _instance ??= new PercentageConverter();
+            return instance ??= new PercentageConverter();
         }
     }
 }
