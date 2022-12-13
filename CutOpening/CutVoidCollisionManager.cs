@@ -288,7 +288,6 @@ namespace RevitTimasBIMTools.CutOpening
                     if (opening != null && opening.IsValidObject)
                     {
                         Parameter elevatParam = opening.get_Parameter(BuiltInParameter.INSTANCE_ELEVATION_PARAM);
-
                         bool heightBolean = opening.get_Parameter(heightGuid).Set(elevatParam.AsDouble());
                         bool elevatBolean = opening.get_Parameter(elevatGuid).Set(elevatParam.AsDouble());
                         if (opening.get_Parameter(heightGuid).Set(model.Height))

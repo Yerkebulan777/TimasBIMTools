@@ -114,7 +114,7 @@
                                 <Slider Name="CutOffset" Height="23" Margin="2.5"
                                     Minimum="5" Maximum="150" TickFrequency="10" IsSnapToTickEnabled="True"
                                     Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}" />
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.4'}" />
                                 <TextBox Text="{Binding ElementName=CutOffset, Path=Value}" 
                                      Height="23" Width="30" TextAlignment="Center" Margin="2.5" />
                             </WrapPanel>
@@ -124,7 +124,7 @@
                                 <Slider Name="MinDephtSize" Height="23" Margin="2.5"
                                     Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
                                     Value="{Binding Path=MinDepthSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}" />
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.4'}" />
                                 <TextBox Text="{Binding ElementName=MinDephtSize, Path=Value}"
                                          Height="23" Width="30" TextAlignment="Center" Margin="2.5" />
                             </WrapPanel>
@@ -134,7 +134,7 @@
                                 <Slider Name="MinSideSize" Height="23" Margin="2.5"  
                                     Minimum="5" Maximum="150" TickFrequency="5" IsSnapToTickEnabled="True"
                                     Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}" />
+                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.4'}" />
                                 <TextBox Text="{Binding ElementName=MinSideSize, Path=Value}" 
                                          Height="23" Width="30" TextAlignment="Center" Margin="2.5" />
                             </WrapPanel>
@@ -345,7 +345,17 @@
 
                     <WrapPanel VerticalAlignment="Center" Margin="5">
                         <Label ContentStringFormat="Found collision: {0} " FontSize="12" 
-                            Content="{Binding Path=ElementModelData.Count, Mode=OneWay}" />
+                            Content="{Binding Path=ElementModelData.Count, Mode=OneWay}">
+                            <Label.Style>
+                                <Style TargetType="Label">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=ElementModelData.Count}" Value="0">
+                                            <Setter Property="Foreground"  Value="Red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Label.Style>
+                        </Label>
                     </WrapPanel>
 
                     <Button Name="SnoopCmd" Height="30" Width="75" Margin="5"

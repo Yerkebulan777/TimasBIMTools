@@ -736,7 +736,7 @@ namespace RevitTimasBIMTools.ViewModels
                             {
                                 model.IsSelected = false;
                                 ViewDataCollection.Remove(model);
-                                ViewDataCollection.AddNewItem(model);
+                                _ = ViewDataCollection.AddNewItem(model);
                                 ViewDataCollection.CommitNew();
                             }
                         }
