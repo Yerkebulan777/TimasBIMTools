@@ -33,7 +33,7 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly string localPath = SmartToolHelper.LocalPath;
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
-        private readonly CutVoidCollisionManager collisionMng = SmartToolApp.ServiceProvider.GetRequiredService<CutVoidCollisionManager>();
+        private readonly CutVoidCollisionManager collisionMng = SmartToolApp.Host.Services.GetRequiredService<CutVoidCollisionManager>();
 
 
         public CutVoidDataViewModel(APIEventHandler eventHandler)
@@ -724,7 +724,7 @@ namespace RevitTimasBIMTools.ViewModels
                                 uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
                                 RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
                                 RevitViewManager.ShowModelInPlanView(uidoc, model, ViewDiscipline.Mechanical);
-                                previewControl = SmartToolApp.ServiceProvider.GetRequiredService<PreviewControlModel>();
+                                previewControl = SmartToolApp.Host.Services.GetRequiredService<PreviewControlModel>();
                                 previewControl.ShowPreviewControl(app, view3d);
                             }
                         }

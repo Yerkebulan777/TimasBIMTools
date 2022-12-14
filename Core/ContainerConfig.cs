@@ -1,34 +1,38 @@
 ﻿using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
-using System;
+
 
 namespace RevitTimasBIMTools.Core
 {
     public sealed class ContainerConfig
     {
-        public static IServiceProvider ConfigureServices()
+        public static IHost ConfigureServices()
         {
-            ServiceCollection services = new();
+            IHost host = new HostBuilder()
+            .ConfigureServices((hostContext, services) =>
+            {
+                services.AddSingleton<SmartToolHelper>();
+                services.AddSingleton<APIEventHandler>();
+                services.AddSingleton<CutVoidDataViewModel>();
+                services.AddSingleton<CutVoidRegisterDockPane>();
+                services.AddSingleton<CutVoidShowPanelCommand>();
 
-            _ = services.AddSingleton<APIEventHandler>();
-            _ = services.AddSingleton<SmartToolHelper>();
-            _ = services.AddSingleton<CutVoidDataViewModel>();
-            _ = services.AddSingleton<CutVoidRegisterDockPane>();
-            _ = services.AddSingleton<CutVoidShowPanelCommand>();
+                services.AddSingleton<IDockablePaneProvider, CutVoidDockPaneView>();
 
-            _ = services.AddSingleton<IDockablePaneProvider, CutVoidDockPaneView>();
+                services.AddTransient<CutVoidCollisionManager>();
+                services.AddTransient<RevitPurginqManager>();
+                services.AddTransient<PreviewControlModel>();
+                services.AddTransient<PreviewDialogBox>();
 
-            _ = services.AddTransient<CutVoidCollisionManager>();
-            _ = services.AddTransient<RevitPurginqManager>();
-            _ = services.AddTransient<PreviewControlModel>();
-            _ = services.AddTransient<PreviewDialogBox>();
-            
-            return services.BuildServiceProvider();
+            }).Build();
+
+            return host;
         }
     }
 }
