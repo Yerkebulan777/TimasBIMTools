@@ -1,51 +1,37 @@
 ﻿using Autodesk.Revit.DB;
+using RevitTimasBIMTools.Services;
 using System;
+
 
 namespace RevitTimasBIMTools.RevitUtils
 {
     public static class TransactionManager
     {
-        /// <summary> The method used to create a single sub-strx </summary>
-        public static void CreateSubTransaction(Document document, Action action)
-        {
-            using (SubTransaction strx = new SubTransaction(document))
-            {
-                _ = strx.Start();
-                try
-                {
-                    action?.Invoke();
-                    _ = strx.Commit();
-                }
-                catch (Exception)
-                {
-                    if (!strx.HasEnded())
-                    {
-                        _ = strx.RollBack();
-                    }
-                }
-            }
-        }
+        private static readonly object SingleLocker = new();
+        private static TransactionStatus status = TransactionStatus.Uninitialized;
 
         /// <summary> The method used to create a single strx </summary>
         public static void CreateTransaction(Document document, string transactionName, Action action)
         {
-            using (Transaction trx = new Transaction(document))
+            lock (SingleLocker)
             {
-                if (trx.Start(transactionName) == TransactionStatus.Started)
+                using Transaction trx = new(document);
+                status = trx.Start(transactionName);
+                if (status == TransactionStatus.Started)
                 {
                     try
                     {
                         action?.Invoke();
-                        _ = trx.Commit();
+                        status = trx.Commit();
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         if (!trx.HasEnded())
                         {
-                            _ = trx.RollBack();
+                            status = trx.RollBack();
+                            Logger.Error(ex.ToString());
                         }
                     }
-                    finally { }
                 }
             }
         }
