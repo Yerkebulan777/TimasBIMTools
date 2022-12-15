@@ -39,7 +39,6 @@ namespace RevitTimasBIMTools.Core
             if (showButton != null)
             {
                 ribbonPanel.AddSeparator();
-                ///12345
             }
         }
     }
