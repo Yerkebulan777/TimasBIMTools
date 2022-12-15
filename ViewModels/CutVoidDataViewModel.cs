@@ -181,9 +181,12 @@ namespace RevitTimasBIMTools.ViewModels
                     string[] uids = symbols?.Select(s => s.UniqueId).ToArray();
                     foreach (FamilySymbol symbol in tempSymbols)
                     {
-                        if (!uids.Contains(symbol.UniqueId))
+                        if (symbol.IsValidObject && symbol.IsActive)
                         {
-                            symbols.Add(symbol);
+                            if (!uids.Contains(symbol.UniqueId))
+                            {
+                                symbols.Add(symbol);
+                            }
                         }
                     }
                 }
@@ -228,7 +231,6 @@ namespace RevitTimasBIMTools.ViewModels
                         Document familyDoc = doc.EditFamily(family);
                         if (familyDoc != null && familyDoc.IsFamilyDocument)
                         {
-                            GetFamilySharedParameterData(familyDoc);
                             familyPath = @$"{localPath}\{family.Name}.rfa";
                             if (File.Exists(familyPath)) { File.Delete(familyPath); }
                             familyDoc.SaveAs(familyPath, new SaveAsOptions
@@ -301,20 +303,24 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void GetFamilySharedParameterData(Document familyDoc)
+        private void GetFamilySymbolSharedParameterData(FamilySymbol symbol)
         {
-            FamilyManager familyManager = familyDoc.FamilyManager;
-            SharedParameterData ??= new SortedList<string, Guid>(5);
-            foreach (FamilyParameter param in familyManager.GetParameters())
+            Document familyDoc = doc.EditFamily(symbol.Family);
+            if (null != familyDoc && familyDoc.IsFamilyDocument)
             {
-                if (param.UserModifiable && param.IsInstance)
+                FamilyManager familyManager = familyDoc.FamilyManager;
+                SharedParameterData ??= new SortedList<string, Guid>(5);
+                foreach (FamilyParameter param in familyManager.GetParameters())
                 {
-                    if (!param.IsReadOnly && param.IsShared)
+                    if (param.UserModifiable && param.IsInstance)
                     {
-                        if (!param.IsDeterminedByFormula)
+                        if (!param.IsReadOnly && param.IsShared)
                         {
-                            string name = param.Definition.Name;
-                            SharedParameterData[name] = param.GUID;
+                            if (!param.IsDeterminedByFormula)
+                            {
+                                string name = param.Definition.Name;
+                                SharedParameterData[name] = param.GUID;
+                            }
                         }
                     }
                 }
