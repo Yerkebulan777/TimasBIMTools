@@ -17,7 +17,6 @@ namespace RevitTimasBIMTools.ViewConverters
             return (double)value;
         }
 
-
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();

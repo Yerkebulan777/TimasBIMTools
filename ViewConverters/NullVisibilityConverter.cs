@@ -2,9 +2,10 @@
 using System.Windows;
 using System.Windows.Data;
 
+
 namespace RevitTimasBIMTools.ViewConverters
 {
-    public class NullToVisibilityConverter : IValueConverter
+    public class NullVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {

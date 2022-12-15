@@ -1,30 +1,42 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <DataTemplate x:Key="SymbolGroupHeader" >
-        <TextBlock x:Name="Text" Text="{Binding FamilyName}" FontWeight="Bold" Margin="5,0" />
+    <DataTemplate x:Key="SymbolGroupHeader">
+        <TextBlock
+            x:Name="Text"
+            Margin="5,0"
+            FontWeight="Bold"
+            Text="{Binding FamilyName}" />
     </DataTemplate>
-    
-    <DataTemplate x:Key="SymbolGroupTemplate" >
-        <StackPanel Orientation="Horizontal" Margin="2.5" Height="20"
-                    HorizontalAlignment="Left"  VerticalAlignment="Center">
-            <Ellipse Fill="LawnGreen" Height="5" Width="5" Margin="5"/>
-            <TextBlock Text="{Binding Path=Name}" Margin="5,0"/>
+
+    <DataTemplate x:Key="SymbolGroupTemplate">
+        <StackPanel
+            Height="20"
+            Margin="2.5"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Orientation="Horizontal">
+            <Ellipse
+                Width="5"
+                Height="5"
+                Margin="5"
+                Fill="LawnGreen" />
+            <TextBlock Margin="5,0" Text="{Binding Path=Name}" />
         </StackPanel>
     </DataTemplate>
-    
-    <Style x:Key="SymbolContainerStyle"  TargetType="{x:Type GroupItem}">
+
+    <Style x:Key="SymbolContainerStyle" TargetType="{x:Type GroupItem}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type GroupItem}">
-                    <Expander x:Name="Expander" IsExpanded="False" >
+                    <Expander x:Name="Expander" IsExpanded="False">
                         <Expander.Header>
                             <StackPanel>
-                                <TextBlock Margin="5,0" 
-                                    HorizontalAlignment="Center" 
+                                <TextBlock
+                                    Margin="5,0"
+                                    HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    Text="{Binding Name}"
-                                    FontWeight="Bold" />
+                                    FontWeight="Bold"
+                                    Text="{Binding Name}" />
                             </StackPanel>
                         </Expander.Header>
                         <ItemsPresenter />
