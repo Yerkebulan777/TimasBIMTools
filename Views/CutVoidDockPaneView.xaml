@@ -75,76 +75,67 @@
                 </Grid>
             </Border>
 
-
-            <!--
-                Visibility="{Binding  Path=IsOptionEnabled, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}"
-                Style="{StaticResource VisibleAnimation}"
-            -->
             <!--  Options  -->
             <ListView
                 Name="OptionView"
                 Grid.Row="1"
                 VerticalAlignment="Top"
-                HorizontalContentAlignment="Stretch">
+                HorizontalContentAlignment="Stretch"
+                Style="{StaticResource VisibleAnimation}"
+                Visibility="{Binding Path=IsOptionEnabled, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}">
 
                 <!--  Main data  -->
                 <ListViewItem>
                     <Border Style="{StaticResource GroupBoxBorderStyle}">
                         <StackPanel>
 
-                            <WrapPanel
-                                Margin="2.5"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                                <Label
-                                    Width="120"
-                                    VerticalContentAlignment="Center"
-                                    Content="Project name: " />
+                            <BulletDecorator Margin="5">
+                                <BulletDecorator.Bullet>
+                                    <Label
+                                        Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                                        Content="Project name: "
+                                        Foreground="DarkBlue" />
+                                </BulletDecorator.Bullet>
                                 <ComboBox
                                     Name="ComboDocumentModels"
                                     Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
-                                    HorizontalContentAlignment="Center"
                                     ItemsSource="{Binding Path=DocumentCollection}"
                                     SelectedItem="{Binding Path=SelectedDocument}" />
-                            </WrapPanel>
+                            </BulletDecorator>
 
-                            <WrapPanel
-                                Margin="2.5"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                                <Label
-                                    Width="120"
-                                    VerticalContentAlignment="Center"
-                                    Content="Structure material: " />
+                            <BulletDecorator Margin="5">
+                                <BulletDecorator.Bullet>
+                                    <Label
+                                        Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                                        Content="Structure material: "
+                                        Foreground="DarkBlue" />
+                                </BulletDecorator.Bullet>
                                 <ComboBox
                                     Name="ComboStructureMats"
                                     Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
-                                    HorizontalContentAlignment="Center"
                                     DisplayMemberPath="Value.Name"
                                     ItemsSource="{Binding Path=StructureMaterials, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                     SelectedIndex="-1"
                                     SelectedValue="{Binding Path=SelectedMaterial}"
                                     SelectedValuePath="Value" />
-                            </WrapPanel>
+                            </BulletDecorator>
 
-                            <WrapPanel
-                                Margin="2.5"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                                <Label
-                                    Width="120"
-                                    VerticalContentAlignment="Center"
-                                    Content="Collision category: " />
+                            <BulletDecorator Margin="5">
+                                <BulletDecorator.Bullet>
+                                    <Label
+                                        Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                                        Content="Collision category: "
+                                        Foreground="DarkBlue" />
+                                </BulletDecorator.Bullet>
                                 <ComboBox
                                     Name="ComboEngineerCats"
                                     Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
-                                    HorizontalContentAlignment="Center"
                                     DisplayMemberPath="Value.Name"
                                     ItemsSource="{Binding Path=EngineerCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                     SelectedIndex="-1"
                                     SelectedValue="{Binding Path=SelectedCategory}"
                                     SelectedValuePath="Value" />
-                            </WrapPanel>
+                            </BulletDecorator>
 
                         </StackPanel>
                     </Border>
@@ -152,101 +143,93 @@
 
                 <!--  Size data  -->
                 <ListViewItem>
-                    <Border Style="{StaticResource GroupBoxBorderStyle}">
-                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Expander Grid.Row="3" Header="Size settings">
+                        <Border Style="{StaticResource GroupBoxBorderStyle}">
+                            <StackPanel>
 
-                            <WrapPanel
-                                Margin="2.5"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                                <Label
-                                    Width="120"
-                                    Margin="2.5"
-                                    VerticalContentAlignment="Center"
-                                    Content="Cut offset: " />
-                                <Slider
-                                    Name="CutOffset"
-                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.4'}"
-                                    Height="23"
-                                    Margin="2.5"
-                                    IsSnapToTickEnabled="True"
-                                    Maximum="150"
-                                    Minimum="5"
-                                    TickFrequency="10"
-                                    Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBox
-                                    Width="30"
-                                    Height="23"
-                                    Margin="2.5"
-                                    Text="{Binding ElementName=CutOffset, Path=Value}"
-                                    TextAlignment="Center" />
-                            </WrapPanel>
+                                <BulletDecorator Margin="5">
+                                    <BulletDecorator.Bullet>
+                                        <Label
+                                            Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                                            Content="Cut offset: "
+                                            Foreground="DarkBlue" />
+                                    </BulletDecorator.Bullet>
+                                    <StackPanel
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal">
+                                        <Slider
+                                            Name="CutOffset"
+                                            Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                                            Maximum="150"
+                                            Minimum="5"
+                                            TickFrequency="10"
+                                            Value="{Binding Path=CutOffsetSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBox
+                                            Width="30"
+                                            Text="{Binding ElementName=CutOffset, Path=Value}"
+                                            TextAlignment="Center" />
+                                    </StackPanel>
+                                </BulletDecorator>
 
-                            <WrapPanel
-                                Margin="2.5"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                                <Label
-                                    Width="120"
-                                    Margin="2.5"
-                                    VerticalContentAlignment="Center"
-                                    Content="Minimum length: " />
-                                <Slider
-                                    Name="MinDephtSize"
-                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.4'}"
-                                    Height="23"
-                                    Margin="2.5"
-                                    IsSnapToTickEnabled="True"
-                                    Maximum="150"
-                                    Minimum="5"
-                                    TickFrequency="5"
-                                    Value="{Binding Path=MinDepthSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBox
-                                    Width="30"
-                                    Height="23"
-                                    Margin="2.5"
-                                    Text="{Binding ElementName=MinDephtSize, Path=Value}"
-                                    TextAlignment="Center" />
-                            </WrapPanel>
+                                <BulletDecorator Margin="5">
+                                    <BulletDecorator.Bullet>
+                                        <Label
+                                            Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                                            Content="Minimum length: "
+                                            Foreground="DarkBlue" />
+                                    </BulletDecorator.Bullet>
+                                    <StackPanel
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal">
+                                        <Slider
+                                            Name="MinDephtSize"
+                                            Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                                            Maximum="150"
+                                            Minimum="5"
+                                            TickFrequency="5"
+                                            Value="{Binding Path=MinDepthSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBox
+                                            Width="30"
+                                            Text="{Binding ElementName=MinDephtSize, Path=Value}"
+                                            TextAlignment="Center" />
+                                    </StackPanel>
+                                </BulletDecorator>
 
-                            <WrapPanel
-                                Margin="2.5"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                                <Label
-                                    Width="120"
-                                    Margin="2.5"
-                                    VerticalContentAlignment="Center"
-                                    Content="Minimum side size: " />
-                                <Slider
-                                    Name="MinSideSize"
-                                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.4'}"
-                                    Height="23"
-                                    Margin="2.5"
-                                    IsSnapToTickEnabled="True"
-                                    Maximum="150"
-                                    Minimum="5"
-                                    TickFrequency="5"
-                                    Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                <TextBox
-                                    Width="30"
-                                    Height="23"
-                                    Margin="2.5"
-                                    Text="{Binding ElementName=MinSideSize, Path=Value}"
-                                    TextAlignment="Center" />
-                            </WrapPanel>
+                                <BulletDecorator Margin="5">
+                                    <BulletDecorator.Bullet>
+                                        <Label
+                                            Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                                            Content="Minimum side size: "
+                                            Foreground="DarkBlue" />
+                                    </BulletDecorator.Bullet>
+                                    <StackPanel
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal">
+                                        <Slider
+                                            Name="MinSideSize"
+                                            Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                                            Maximum="150"
+                                            Minimum="5"
+                                            TickFrequency="5"
+                                            Value="{Binding Path=MinSideSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBox
+                                            Width="30"
+                                            Text="{Binding ElementName=MinSideSize, Path=Value}"
+                                            TextAlignment="Center" />
+                                    </StackPanel>
+                                </BulletDecorator>
 
-                        </StackPanel>
-                    </Border>
+                            </StackPanel>
+                        </Border>
+                    </Expander>
                 </ListViewItem>
-
 
                 <!--  FamilySimbol data  -->
                 <ListViewItem>
-                    <Expander
-                        Grid.Row="3"
-                        Header="Family settings"
-                        IsExpanded="True">
+                    <Expander Grid.Row="3" Header="Family settings">
                         <Border Style="{StaticResource GroupBoxBorderStyle}">
                             <StackPanel>
 
@@ -262,7 +245,6 @@
                                     </CollectionViewSource>
                                 </StackPanel.Resources>
 
-
                                 <BulletDecorator Margin="5">
                                     <BulletDecorator.Bullet>
                                         <Label
@@ -270,8 +252,7 @@
                                             Content="Load family: "
                                             Foreground="DarkBlue" />
                                     </BulletDecorator.Bullet>
-                                    <Button Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}" Height="21" />
-
+                                    <Button Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}" Click="LoadFamily_Click" />
                                 </BulletDecorator>
 
                                 <BulletDecorator Margin="5">
@@ -284,7 +265,6 @@
                                     <ComboBox
                                         Name="ComboWallOpenning"
                                         Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
-                                        HorizontalContentAlignment="Center"
                                         IsSynchronizedWithCurrentItem="False"
                                         ItemTemplate="{Binding Source={StaticResource SymbolGroupTemplate}}"
                                         ItemsSource="{Binding Source={StaticResource symbols}}"
@@ -307,7 +287,6 @@
                                     <ComboBox
                                         Name="ComboFloorOpenning"
                                         Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
-                                        HorizontalContentAlignment="Center"
                                         IsSynchronizedWithCurrentItem="False"
                                         ItemTemplate="{Binding Source={StaticResource SymbolGroupTemplate}}"
                                         ItemsSource="{Binding Source={StaticResource symbols}}"
@@ -324,7 +303,6 @@
                         </Border>
                     </Expander>
                 </ListViewItem>
-
 
                 <!--  Parameter data  -->
                 <ListViewItem>
@@ -346,7 +324,6 @@
                                     <ComboBox
                                         Name="ComboWidthMark"
                                         Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
-                                        HorizontalContentAlignment="Center"
                                         DisplayMemberPath="Key"
                                         IsSynchronizedWithCurrentItem="False"
                                         ItemsSource="{Binding Source={StaticResource paramData}}"
@@ -364,7 +341,6 @@
                                     <ComboBox
                                         Name="ComboHeightMark"
                                         Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
-                                        HorizontalContentAlignment="Center"
                                         DisplayMemberPath="Key"
                                         IsSynchronizedWithCurrentItem="False"
                                         ItemsSource="{Binding Source={StaticResource paramData}}"
@@ -382,7 +358,6 @@
                                     <ComboBox
                                         Name="ComboElevMark"
                                         Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.45'}"
-                                        HorizontalContentAlignment="Center"
                                         DisplayMemberPath="Key"
                                         IsSynchronizedWithCurrentItem="False"
                                         ItemsSource="{Binding Source={StaticResource paramData}}"
@@ -420,7 +395,6 @@
                     SelectedValue="{Binding Path=SymbolTextFilter, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
 
             </WrapPanel>
-
 
             <!--  DataGridView  -->
             <ScrollViewer
@@ -524,7 +498,6 @@
                 </DataGrid>
 
             </ScrollViewer>
-
 
             <!--  ButtonPanel  -->
             <Border Grid.Row="4" Background="Silver">
