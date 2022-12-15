@@ -8,19 +8,33 @@ namespace RevitTimasBIMTools.Core
     {
         public static void Initialize(UIControlledApplication uicontrol)
         {
+            string appName = SmartToolHelper.ApplicationName;
+            string assemblyName = SmartToolHelper.AssemblyLocation;
+            string ribbonPanelName = SmartToolHelper.RibbonPanelName;
+
+            string cutVoidButtonText = SmartToolHelper.CutVoidToolName;
             string cutVoidCommand = CutVoidShowPanelCommand.GetPath();
+
+
             // Create ribbon tab and ribbon panels
-            try { uicontrol.CreateRibbonTab(SmartToolHelper.ApplicationName); } catch { }
-            RibbonPanel ribbonPanel = uicontrol.CreateRibbonPanel(SmartToolHelper.ApplicationName, SmartToolHelper.RibbonPanelName);
+            uicontrol.CreateRibbonTab(appName);
+            RibbonPanel ribbonPanel = uicontrol.CreateRibbonPanel(appName, ribbonPanelName);
+
+
             // Create Cut Opening PushButtonData 
-            PushButtonData buttonData = new(SmartToolHelper.CutVoidButtonName, SmartToolHelper.CutVoidToolName, SmartToolHelper.AssemblyLocation, cutVoidCommand)
+            PushButtonData CutVoidbuttonData = new("CutVoidButton", cutVoidButtonText, assemblyName, cutVoidCommand)
             {
-                ToolTip = "Подпись кнопки",
-                LargeImage = SmartToolHelper.GetImageSource(),
-                LongDescription = "Описание команды кнопки"
+                ToolTip = "Cut Openning panel",
+                LargeImage = SmartToolHelper.GetImageSource()
             };
 
-            PushButton showButton = ribbonPanel.AddItem(buttonData) as PushButton;
+            //PushButtonData RebarbuttonData = new("CutVoidButton", cutVoidButtonText, assemblyName, cutVoidCommand)
+            //{
+            //    ToolTip = "Cut Openning panel",
+            //    LargeImage = SmartToolHelper.GetImageSource()
+            //};
+
+            PushButton showButton = ribbonPanel.AddItem(CutVoidbuttonData) as PushButton;
             showButton.AvailabilityClassName = cutVoidCommand;
             if (showButton != null)
             {

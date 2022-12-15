@@ -15,8 +15,8 @@ namespace RevitTimasBIMTools.Core
 {
     public sealed class SmartToolApp : IExternalApplication
     {
-        private UIControlledApplication controller { get; set; }
         public static IHost Host { get; private set; }
+        private UIControlledApplication controller { get; set; }
         public Result OnStartup(UIControlledApplication controlledApp)
         {
             controller = controlledApp;
@@ -37,9 +37,6 @@ namespace RevitTimasBIMTools.Core
             SmartToolHelper toolHelper = Host.Services.GetRequiredService<SmartToolHelper>();
             IDockablePaneProvider paneProvider = Host.Services.GetRequiredService<IDockablePaneProvider>();
             CutVoidRegisterDockPane paneRegister = Host.Services.GetRequiredService<CutVoidRegisterDockPane>();
-            toolHelper = toolHelper ?? throw new ArgumentNullException(nameof(toolHelper));
-            paneProvider = paneProvider ?? throw new ArgumentNullException(nameof(paneProvider));
-            paneRegister = paneRegister ?? throw new ArgumentNullException(nameof(paneRegister));
             if (paneRegister.RegisterDockablePane(controller, toolHelper.CutVoidPaneId, paneProvider))
             {
                 if (RenderOptions.ProcessRenderMode.Equals(RenderMode.SoftwareOnly))
