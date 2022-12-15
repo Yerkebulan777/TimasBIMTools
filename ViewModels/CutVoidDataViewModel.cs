@@ -85,7 +85,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         GetMEPCategoriesToData();
                         GetCoreMaterialsToData();
-                        GetFamilySymbolsToData();
+                        GetFamilySymbolData();
                     }
                 }
             }
@@ -452,16 +452,17 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private async void GetFamilySymbolsToData()
+        private async void GetFamilySymbolData()
         {
             FamilySymbolList = await RevitTask.RunAsync(app =>
             {
                 List<FamilySymbol> output = new(15);
+                doc = app.ActiveUIDocument.Document;
                 FilteredElementCollector collector = null;
                 foreach (string familyPath in ProcessDirectory(localPath))
                 {
                     string fileName = Path.GetFileNameWithoutExtension(familyPath);
-                    collector = new FilteredElementCollector(app.ActiveUIDocument.Document).OfClass(typeof(Family));
+                    collector = new FilteredElementCollector(doc).OfClass(typeof(Family));
                     Element element = collector.FirstOrDefault(x => x.Name == fileName);
                     if (element is not null and Family family)
                     {
