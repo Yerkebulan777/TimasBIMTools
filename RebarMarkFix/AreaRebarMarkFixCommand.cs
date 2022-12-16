@@ -14,6 +14,12 @@ namespace RevitTimasBIMTools.RebarMarkFix
     [Regeneration(RegenerationOption.Manual)]
     internal sealed class AreaRebarMarkFixCommand : IExternalCommand, IExternalCommandAvailability
     {
+        private struct ParameterData
+        {
+            internal bool IsValid { get; set; }
+            internal object Value { get; set; }
+        }
+
         IDictionary<string, string> valueMap = null;
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -114,6 +120,8 @@ namespace RevitTimasBIMTools.RebarMarkFix
         {
             return typeof(AreaRebarMarkFixCommand).FullName;
         }
+
+
 
     }
 }
