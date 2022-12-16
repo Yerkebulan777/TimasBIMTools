@@ -59,20 +59,13 @@ namespace RevitTimasBIMTools.RebarMarkFix
                 valueMap = new Dictionary<string, string>(30);
                 if (element is AreaReinforcement reinforcement)
                 {
-                    if (invalid != reinforcement.GetHostId())
+                    rebarIds = reinforcement.GetRebarInSystemIds();
+                    for (int i = 0; i < rebarIds.Count; i++)
                     {
-                        rebarIds = reinforcement.GetRebarInSystemIds();
-                        for (int i = 0; i < rebarIds.Count; i++)
+                        Element elem = doc.GetElement(rebarIds[i]);
+                        if (elem is RebarInSystem rebar)
                         {
-                            Element elem = doc.GetElement(rebarIds[i]);
-                            if (elem is RebarInSystem rebar)
-                            {
-                                GetRebarValueData(rebar);
-                            }
-                        }
-                        for (int i = 0; i < rebarIds.Count; i++)
-                        {
-                            Element elem = doc.GetElement(rebarIds[i]);
+                            GetRebarValueData(rebar);
                             foreach (KeyValuePair<string, string> item in valueMap)
                             {
                                 foreach (Parameter param in elem.GetParameters(item.Key))
