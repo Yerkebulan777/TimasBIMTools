@@ -53,7 +53,6 @@ namespace RevitTimasBIMTools.RebarMarkFix
         IList<ElementId> GetAllAreaRebarIds(Document doc)
         {
             IList<ElementId> rebarIds = null;
-            ElementId invalid = ElementId.InvalidElementId;
             foreach (Element element in new FilteredElementCollector(doc).OfClass(typeof(AreaReinforcement)).WhereElementIsElementType())
             {
                 valueMap = new Dictionary<string, string>(30);
@@ -65,7 +64,7 @@ namespace RevitTimasBIMTools.RebarMarkFix
                         Element elem = doc.GetElement(rebarIds[i]);
                         if (elem is RebarInSystem rebar)
                         {
-                            GetRebarValueData(rebar);
+                            ValidateRebarValueData(rebar);
                             foreach (KeyValuePair<string, string> item in valueMap)
                             {
                                 foreach (Parameter param in elem.GetParameters(item.Key))
@@ -81,7 +80,7 @@ namespace RevitTimasBIMTools.RebarMarkFix
         }
 
 
-        void GetRebarValueData(RebarInSystem rebar)
+        void ValidateRebarValueData(RebarInSystem rebar)
         {
             foreach (Parameter param in rebar.GetOrderedParameters())
             {
