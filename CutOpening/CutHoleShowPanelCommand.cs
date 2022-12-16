@@ -15,7 +15,7 @@ namespace RevitTimasBIMTools.CutOpening
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
-    internal sealed class CutVoidShowPanelCommand : IExternalCommand, IExternalCommandAvailability
+    internal sealed class CutHoleShowPanelCommand : IExternalCommand, IExternalCommandAvailability
     {
         private readonly SmartToolHelper toolHelper = SmartToolApp.Host.Services.GetRequiredService<SmartToolHelper>();
         private readonly IDockablePaneProvider paneProvider = SmartToolApp.Host.Services.GetRequiredService<IDockablePaneProvider>();
@@ -73,7 +73,7 @@ namespace RevitTimasBIMTools.CutOpening
 
         public static string GetPath()
         {
-            return typeof(CutVoidShowPanelCommand).FullName;
+            return typeof(CutHoleShowPanelCommand).FullName;
         }
     }
 }

@@ -311,21 +311,21 @@
     <Compile Include="Core\ContainerConfig.cs" />
     <Compile Include="Core\RevitEventWrapper.cs" />
     <Compile Include="Core\SmartToolApp.cs" />
-    <Compile Include="RebarConteinerMark\AreaRebarMarkFixCommand.cs" />
+    <Compile Include="RebarMarkFix\AreaRebarMarkFixCommand.cs" />
     <Compile Include="RevitModel\PreviewControlModel.cs" />
     <Compile Include="RevitUtils\SmartBIMToolExtention.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
     <Compile Include="RevitUtils\CacheDataRepository.cs" />
     <Compile Include="Core\SmartToolHelper.cs" />
     <Compile Include="Core\SmartToolSetupUIPanel.cs" />
-    <Compile Include="CutOpening\CutVoidCollisionManager.cs" />
+    <Compile Include="CutOpening\CutHoleCollisionManager.cs" />
     <Compile Include="RevitUtils\ProjectLoctionManager.cs" />
     <Compile Include="RevitUtils\RevitViewManager.cs" />
     <Compile Include="Services\CustomSynchronizationContext.cs" />
     <Compile Include="Services\Logger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
-    <Compile Include="CutOpening\CutVoidRegisterDockPane.cs" />
-    <Compile Include="CutOpening\CutVoidShowPanelCommand.cs" />
+    <Compile Include="CutOpening\CutHoleRegisterDockPane.cs" />
+    <Compile Include="CutOpening\CutHoleShowPanelCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

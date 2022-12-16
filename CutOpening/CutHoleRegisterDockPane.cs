@@ -7,9 +7,9 @@ using System.Windows;
 
 namespace RevitTimasBIMTools.CutOpening
 {
-    internal sealed class CutVoidRegisterDockPane
+    internal sealed class CutHoleRegisterDockPane
     {
-        private readonly string cutVoidToolName = SmartToolHelper.CutOpenningButtonName;
+        private readonly string cutHoleToolName = SmartToolHelper.CutOpenningButtonName;
         public bool RegisterDockablePane(UIControlledApplication controller, DockablePaneId paneId, IDockablePaneProvider dockPane)
         {
             if (!DockablePane.PaneIsRegistered(paneId))
@@ -24,7 +24,7 @@ namespace RevitTimasBIMTools.CutOpening
                 data.VisibleByDefault = false;
                 try
                 {
-                    controller.RegisterDockablePane(paneId, cutVoidToolName, dockPane);
+                    controller.RegisterDockablePane(paneId, cutHoleToolName, dockPane);
                 }
                 catch (Exception exc)
                 {

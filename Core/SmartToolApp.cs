@@ -36,7 +36,7 @@ namespace RevitTimasBIMTools.Core
         {
             SmartToolHelper toolHelper = Host.Services.GetRequiredService<SmartToolHelper>();
             IDockablePaneProvider paneProvider = Host.Services.GetRequiredService<IDockablePaneProvider>();
-            CutVoidRegisterDockPane paneRegister = Host.Services.GetRequiredService<CutVoidRegisterDockPane>();
+            CutHoleRegisterDockPane paneRegister = Host.Services.GetRequiredService<CutHoleRegisterDockPane>();
             if (paneRegister.RegisterDockablePane(controller, toolHelper.CutVoidPaneId, paneProvider))
             {
                 if (RenderOptions.ProcessRenderMode.Equals(RenderMode.SoftwareOnly))

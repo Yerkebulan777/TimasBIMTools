@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.UI;
 using RevitTimasBIMTools.CutOpening;
-using RevitTimasBIMTools.RebarConteinerMark;
+using RevitTimasBIMTools.RebarMarkFix;
 
 namespace RevitTimasBIMTools.Core
 {
@@ -19,7 +19,7 @@ namespace RevitTimasBIMTools.Core
 
 
             // Create Cut Opening PushButtonData 
-            PushButtonData CutOpenningButton = new("CutOpenning", SmartToolHelper.CutOpenningButtonName, assemblyName, CutVoidShowPanelCommand.GetPath())
+            PushButtonData CutOpenningButton = new("CutOpenning", SmartToolHelper.CutOpenningButtonName, assemblyName, CutHoleShowPanelCommand.GetPath())
             {
                 ToolTip = "Cut Openning panel",
                 LargeImage = SmartToolHelper.GetImageSource()
@@ -35,14 +35,14 @@ namespace RevitTimasBIMTools.Core
             PushButton showButton01 = ribbonPanel.AddItem(CutOpenningButton) as PushButton;
             if (showButton01 != null && showButton01 is PushButton)
             {
-                showButton01.AvailabilityClassName = CutVoidShowPanelCommand.GetPath();
+                showButton01.AvailabilityClassName = CutHoleShowPanelCommand.GetPath();
                 ribbonPanel.AddSeparator();
             }
 
             PushButton showButton02 = ribbonPanel.AddItem(AreaRebarMarkFixButton) as PushButton;
             if (showButton02 != null && showButton02 is PushButton)
             {
-                showButton02.AvailabilityClassName = CutVoidShowPanelCommand.GetPath();
+                showButton02.AvailabilityClassName = CutHoleShowPanelCommand.GetPath();
                 ribbonPanel.AddSeparator();
             }
 

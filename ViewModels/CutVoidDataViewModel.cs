@@ -33,7 +33,7 @@ namespace RevitTimasBIMTools.ViewModels
         private readonly string localPath = SmartToolHelper.LocalPath;
         private readonly string docUniqueId = Properties.Settings.Default.ActiveDocumentUniqueId;
         private readonly TaskScheduler taskContext = TaskScheduler.FromCurrentSynchronizationContext();
-        private readonly CutVoidCollisionManager collisionMng = SmartToolApp.Host.Services.GetRequiredService<CutVoidCollisionManager>();
+        private readonly CutHoleCollisionManager collisionMng = SmartToolApp.Host.Services.GetRequiredService<CutHoleCollisionManager>();
 
 
         public CutVoidDataViewModel(APIEventHandler eventHandler)

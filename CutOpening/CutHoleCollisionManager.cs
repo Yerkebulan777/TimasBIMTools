@@ -13,7 +13,7 @@ using Plane = Autodesk.Revit.DB.Plane;
 
 namespace RevitTimasBIMTools.CutOpening
 {
-    public sealed class CutVoidCollisionManager
+    public sealed class CutHoleCollisionManager
     {
 
         #region Default Properties

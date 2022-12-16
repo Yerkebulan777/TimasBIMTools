@@ -1,8 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using GlobalParameter = Autodesk.Revit.DB.GlobalParameter;
 
 namespace RevitTimasBIMTools.RevitUtils
@@ -52,17 +50,17 @@ namespace RevitTimasBIMTools.RevitUtils
                     value = "None";
                     break;
                 default:
-                    Debug.Assert(false, "unexpected storage type"); value = string.Empty;
+                    Debug.Assert(false, "unexpected storage stype"); value = string.Empty;
                     break;
             }
             return value;
         }
 
         /// <summary>
-        /// SmartToolHelper to return parameter value as string, with additional
-        /// support for instance instanceId to display the instance type referred to.
+        /// SmartToolHelper to return param value as string, with additional
+        /// support for instance instanceId to display the instance stype referred to.
         /// </summary>
-        public static string GetParameterValue2(this Parameter param, Document doc)
+        public static string GetParameterValueByDocument(this Parameter param, Document doc)
         {
             if (param.StorageType == StorageType.ElementId)
             {
@@ -78,28 +76,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         /// <summary>
-        /// Return a description string for a given instance.
-        /// </summary>
-        public static string ElementDescription(Element e)
-        {
-            string description = null == e.Category ? e.GetType().Name : e.Category.Name;
-
-            if (e is FamilyInstance familyInstance)
-            {
-                description += " '" + familyInstance.Symbol.Family.Name + "'";
-            }
-
-            if (null != e.Name)
-            {
-                description += " '" + e.Name + "'";
-            }
-
-            return description;
-        }
-
-
-        /// <summary>
-        /// SmartToolHelper to return parameter value as string.
+        /// SmartToolHelper to return param value as string.
         /// One can also use param.AsValueString() to
         /// get the user interface representation.
         /// </summary>
@@ -118,20 +95,9 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         /// <summary>
-        /// Return Result of parameter share
-        /// </summary>
-        /// <param name="parameter">parameter</param>
-        /// <returns></returns>
-        public static string Shared(this Parameter parameter)
-        {
-            return parameter.IsShared ? "Shared" : "Non-parameters";
-        }
-
-
-        /// <summary>
         /// Return Guid Of Parameter Share
         /// </summary>
-        /// <param name="parameter">parameter</param>
+        /// <param name="parameter">param</param>
         /// <returns></returns>
         public static string Guid(this Parameter parameter)
         {
@@ -193,6 +159,83 @@ namespace RevitTimasBIMTools.RevitUtils
 
             return result;
         }
+
+
+        public static bool SetValue(this Parameter param, object value)
+        {
+            bool result = false;
+            StorageType stype = param.StorageType;
+            if (!param.IsReadOnly && value is not null)
+            {
+                if (stype == StorageType.None)
+                {
+                    result = false;
+                }
+                else if (stype == StorageType.String)
+                {
+                    if (value is string strVal)
+                    {
+                        result = param.Set(strVal);
+                    }
+                    else
+                    {
+                        result = param.Set(Convert.ToString(value));
+                    }
+                }
+                else if (stype == StorageType.Double)
+                {
+                    if (value is double val)
+                    {
+                        result = param.Set(val);
+                    }
+                    else if (value is string strVal)
+                    {
+                        if (double.TryParse(strVal, out double dblval))
+                        {
+                            result = param.Set(dblval);
+                        }
+                    }
+                    else
+                    {
+                        result = param.Set(Convert.ToDouble(value));
+                    }
+                }
+                else if (stype == StorageType.Integer)
+                {
+                    if (value is int val)
+                    {
+                        result = param.Set(val);
+                    }
+                    else if (value is string strVal)
+                    {
+                        if (int.TryParse(strVal, out int intval))
+                        {
+                            result = param.Set(intval);
+                        }
+                    }
+                    else
+                    {
+                        result = param.Set(Convert.ToInt16(value));
+                    }
+                }
+                else if (stype == StorageType.ElementId)
+                {
+                    if (value is ElementId val)
+                    {
+                        result = param.Set(val);
+                    }
+                    else if (value is string strVal)
+                    {
+                        if (int.TryParse(strVal, out int idval))
+                        {
+                            result = param.Set(new ElementId(idval));
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
 
         //var prm = SharedParameterElement.Lookup(doc, guid);
 
