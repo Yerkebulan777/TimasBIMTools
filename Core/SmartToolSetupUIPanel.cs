@@ -1,43 +1,48 @@
 ﻿using Autodesk.Revit.UI;
 using RevitTimasBIMTools.CutOpening;
-
+using RevitTimasBIMTools.RebarConteinerMark;
 
 namespace RevitTimasBIMTools.Core
 {
     public sealed class SmartToolSetupUIPanel
     {
+
+        static string appName = SmartToolHelper.ApplicationName;
+        static string assemblyName = SmartToolHelper.AssemblyLocation;
+        static string ribbonPanelName = SmartToolHelper.RibbonPanelName;
+
         public static void Initialize(UIControlledApplication uicontrol)
         {
-            string appName = SmartToolHelper.ApplicationName;
-            string assemblyName = SmartToolHelper.AssemblyLocation;
-            string ribbonPanelName = SmartToolHelper.RibbonPanelName;
-
-            string cutVoidButtonText = SmartToolHelper.CutVoidToolName;
-            string cutVoidCommand = CutVoidShowPanelCommand.GetPath();
-
-
             // Create ribbon tab and ribbon panels
             uicontrol.CreateRibbonTab(appName);
             RibbonPanel ribbonPanel = uicontrol.CreateRibbonPanel(appName, ribbonPanelName);
 
 
             // Create Cut Opening PushButtonData 
-            PushButtonData CutVoidbuttonData = new("CutVoidButton", cutVoidButtonText, assemblyName, cutVoidCommand)
+            PushButtonData CutOpenningButton = new("CutOpenning", SmartToolHelper.CutOpenningButtonName, assemblyName, CutVoidShowPanelCommand.GetPath())
             {
                 ToolTip = "Cut Openning panel",
                 LargeImage = SmartToolHelper.GetImageSource()
             };
 
-            //PushButtonData RebarbuttonData = new("CutVoidButton", cutVoidButtonText, assemblyName, cutVoidCommand)
-            //{
-            //    ToolTip = "Cut Openning panel",
-            //    LargeImage = SmartToolHelper.GetImageSource()
-            //};
-
-            PushButton showButton = ribbonPanel.AddItem(CutVoidbuttonData) as PushButton;
-            showButton.AvailabilityClassName = cutVoidCommand;
-            if (showButton != null)
+            PushButtonData AreaRebarMarkFixButton = new("AreaRebarMarkFix", SmartToolHelper.AreaRebarMarkFixButtonName, assemblyName, AreaRebarMarkFixCommand.GetPath())
             {
+                ToolTip = "Fix area rebar conteiner marks",
+                LargeImage = SmartToolHelper.GetImageSource()
+            };
+
+
+            PushButton showButton01 = ribbonPanel.AddItem(CutOpenningButton) as PushButton;
+            if (showButton01 != null && showButton01 is PushButton)
+            {
+                showButton01.AvailabilityClassName = CutVoidShowPanelCommand.GetPath();
+                ribbonPanel.AddSeparator();
+            }
+
+            PushButton showButton02 = ribbonPanel.AddItem(AreaRebarMarkFixButton) as PushButton;
+            if (showButton02 != null && showButton02 is PushButton)
+            {
+                showButton02.AvailabilityClassName = CutVoidShowPanelCommand.GetPath();
                 ribbonPanel.AddSeparator();
             }
         }

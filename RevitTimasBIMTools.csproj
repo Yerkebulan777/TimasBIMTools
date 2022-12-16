@@ -311,7 +311,7 @@
     <Compile Include="Core\ContainerConfig.cs" />
     <Compile Include="Core\RevitEventWrapper.cs" />
     <Compile Include="Core\SmartToolApp.cs" />
-    <Compile Include="RebarConteinerMark\RebarConteinerMarkCommand.cs" />
+    <Compile Include="RebarConteinerMark\AreaRebarMarkFixCommand.cs" />
     <Compile Include="RevitModel\PreviewControlModel.cs" />
     <Compile Include="RevitUtils\SmartBIMToolExtention.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
@@ -339,9 +339,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="RevitCommads\AutorizedCommand.cs" />
-    <Compile Include="RevitCommads\CmdChangeElementColor.cs" />
-    <Compile Include="RevitCommads\CmdParameterUnitConverter.cs" />
     <Compile Include="RevitUtils\GeometryExtension.cs" />
     <Compile Include="RevitModel\DocumentModel.cs" />
     <Compile Include="RevitModel\ElementModel.cs" />

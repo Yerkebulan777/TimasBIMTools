@@ -9,7 +9,7 @@ namespace RevitTimasBIMTools.CutOpening
 {
     internal sealed class CutVoidRegisterDockPane
     {
-        private readonly string cutVoidToolName = SmartToolHelper.CutVoidToolName;
+        private readonly string cutVoidToolName = SmartToolHelper.CutOpenningButtonName;
         public bool RegisterDockablePane(UIControlledApplication controller, DockablePaneId paneId, IDockablePaneProvider dockPane)
         {
             if (!DockablePane.PaneIsRegistered(paneId))
