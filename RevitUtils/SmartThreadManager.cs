@@ -11,7 +11,7 @@ namespace RevitTimasBIMTools.RevitUtils
         public void DoWork(object state)
         {
 
-            // create a STPStartInfo object and change the default values
+            // create a STPStartInfo object and change the default temp
             STPStartInfo stpStartInfo = new STPStartInfo
             {
                 MinWorkerThreads = 8,

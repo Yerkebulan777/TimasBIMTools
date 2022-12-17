@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using RevitTimasBIMTools.RevitUtils;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
@@ -14,13 +15,38 @@ namespace RevitTimasBIMTools.RebarMarkFix
     [Regeneration(RegenerationOption.Manual)]
     internal sealed class AreaRebarMarkFixCommand : IExternalCommand, IExternalCommandAvailability
     {
-        private struct ParameterData
+        IDictionary<string, StringValueData> valueMap = null;
+        private sealed class StringValueData
         {
-            internal bool IsValid { get; set; }
-            internal object Value { get; set; }
+            int stopper { get; set; } = 0;
+            internal bool IsValid { get; set; } = false;
+            internal string Content { get; set; } = string.Empty;
+            IDictionary<string, int> temp { get; set; } = null;
+
+            public StringValueData(string value, int limit)
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    if (temp.TryGetValue(value, out int count))
+                    {
+                        temp[value] = count++;
+                        if (stopper < count)
+                        {
+                            Content = value;
+                            stopper = count;
+                            IsValid = true;
+                        }
+                    }
+                    else
+                    {
+                        temp.Add(value, 0);
+                        stopper = limit;
+                    }
+                }
+            }
         }
 
-        IDictionary<string, string> valueMap = null;
+
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
@@ -61,21 +87,23 @@ namespace RevitTimasBIMTools.RebarMarkFix
             IList<ElementId> rebarIds = null;
             foreach (Element element in new FilteredElementCollector(doc).OfClass(typeof(AreaReinforcement)).WhereElementIsElementType())
             {
-                valueMap = new Dictionary<string, string>(30);
+                valueMap = new Dictionary<string, StringValueData>(30);
                 if (element is AreaReinforcement reinforcement)
                 {
                     rebarIds = reinforcement.GetRebarInSystemIds();
-                    for (int i = 0; i < rebarIds.Count; i++)
+                    int length = rebarIds.Count;
+                    for (int i = 0; i < length; i++)
                     {
                         Element elem = doc.GetElement(rebarIds[i]);
                         if (elem is RebarInSystem rebar)
                         {
-                            ValidateRebarValueData(rebar);
-                            foreach (KeyValuePair<string, string> item in valueMap)
+                            ValidateRebarValueData(rebar, length);
+                            foreach (KeyValuePair<string, StringValueData> item in valueMap)
                             {
                                 foreach (Parameter param in elem.GetParameters(item.Key))
                                 {
-                                    param.SetValue(item.Value);
+                                    StringValueData value = item.Value;
+                                    param.SetValue(value.Content);
                                 }
                             }
                         }
@@ -86,19 +114,30 @@ namespace RevitTimasBIMTools.RebarMarkFix
         }
 
 
-        void ValidateRebarValueData(RebarInSystem rebar)
+
+        void ValidateRebarValueData(Element element, int length)
         {
-            foreach (Parameter param in rebar.GetOrderedParameters())
+            int limit = length > 100 ? 10 : 5;
+            if (element is RebarInSystem rebar)
             {
-                if (!param.IsReadOnly && param.UserModifiable)
+                IList<Parameter> parameters = rebar.GetOrderedParameters();
+                IEnumerator enumerator = parameters.GetEnumerator();
+                enumerator.Reset();
+
+                while (enumerator.MoveNext())
                 {
-                    string name = param.Definition.Name;
-                    if (!valueMap.ContainsKey(name))
+                    Parameter param = enumerator.Current as Parameter;
+                    if (!param.IsReadOnly && param.UserModifiable)
                     {
-                        string newValue = param.GetValue();
-                        if (!string.IsNullOrEmpty(newValue))
+                        string name = param.Definition.Name;
+                        if (!valueMap.ContainsKey(name))
                         {
-                            valueMap[name] = newValue;
+                            string value = param.GetValue();
+                            StringValueData data = new(value, limit);
+                            if (data.IsValid)
+                            {
+                                valueMap.Add(name, data);
+                            }
                         }
                     }
                 }

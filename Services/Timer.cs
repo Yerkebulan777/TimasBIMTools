@@ -20,7 +20,7 @@ namespace RevitTimasBIMTools.Services
             startTime = 0; stopTime = 0;
             if (!QueryPerformanceFrequency(out freq))
             {
-                throw new Win32Exception("high-performance counter not supported");
+                throw new Win32Exception("high-performance stopper not supported");
             }
         }
 

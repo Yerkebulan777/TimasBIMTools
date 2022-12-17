@@ -79,7 +79,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         /// <summary>
         ///     Hard coded abbreviations for the first 26
-        ///     DisplayUnitType enumeration values.
+        ///     DisplayUnitType enumeration temp.
         /// </summary>
         public static string[] DisplayUnitTypeAbbreviation =
             {
