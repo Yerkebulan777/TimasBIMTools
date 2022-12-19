@@ -155,9 +155,13 @@ namespace RevitTimasBIMTools.RebarMarkFix
                     for (int i = 0; i < parameters.Count; i++)
                     {
                         Parameter param = parameters[i];
-                        if (param.StorageType is not StorageType.String || !param.IsShared || param.IsReadOnly)
+                        if (param.StorageType is not StorageType.String)
                         {
-                            if (parameters.Remove(param)) { continue; }
+                            parameters.Remove(param);
+                        }
+                        else if (!param.IsShared || param.IsReadOnly)
+                        {
+                            parameters.Remove(param);
                         }
                     }
                 }
@@ -176,7 +180,6 @@ namespace RevitTimasBIMTools.RebarMarkFix
         {
             return typeof(AreaRebarMarkFixCommand).FullName;
         }
-
 
 
     }
