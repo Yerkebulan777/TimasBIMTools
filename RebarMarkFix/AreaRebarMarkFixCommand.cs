@@ -22,17 +22,13 @@ namespace RevitTimasBIMTools.RebarMarkFix
 
         private sealed class StringValueData
         {
-            private int stopper { get; set; } = 0;
-            internal bool IsValid { get; private set; } = false;
-            internal string Content { get; private set; } = string.Empty;
+            internal int Counter { get; set; } = 0;
+            internal string Content { get; set; } = string.Empty;
+            private IDictionary<string, int> data { get; set; } = new Dictionary<string, int>();
 
-
-            private readonly IDictionary<string, int> data = new Dictionary<string, int>();
-
-            public StringValueData(string value, int limit)
+            public StringValueData(string value)
             {
                 data.Add(value, 0);
-                stopper = limit;
             }
 
 
@@ -41,11 +37,10 @@ namespace RevitTimasBIMTools.RebarMarkFix
                 if (data.TryGetValue(value, out int count))
                 {
                     data[value] = count++;
-                    if (stopper < count)
+                    if (Counter < count)
                     {
                         Content = value;
-                        stopper = count;
-                        IsValid = true;
+                        Counter = count;
                     }
                 }
                 else
@@ -53,8 +48,6 @@ namespace RevitTimasBIMTools.RebarMarkFix
                     data.Add(value, 0);
                 }
             }
-
-
         }
 
 
@@ -93,53 +86,60 @@ namespace RevitTimasBIMTools.RebarMarkFix
         }
 
 
-        private void RetrievAreaRebarParameters(Document doc, int percentage = 15)
+        private void RetrievAreaRebarParameters(Document doc)
         {
-
             FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(AreaReinforcement));
             foreach (Element item in collector.WhereElementIsNotElementType())
             {
                 if (item is AreaReinforcement reinforcement)
                 {
-                    map = new Dictionary<string, StringValueData>(percentage);
+                    map = new Dictionary<string, StringValueData>();
                     IList<ElementId> rebarIds = reinforcement.GetRebarInSystemIds();
                     ElementId rebarId = rebarIds.FirstOrDefault(rid => rid.IntegerValue > 0);
                     IList<Parameter> parameters = GetStringParameters(doc, rebarId);
-                    int limit = percentage / 100 * rebarIds.Count;
-                    bool AllFilled = false;
                     while (0 < rebarIds.Count)
                     {
-                        int counts = parameters.Count;
-                        AllFilled = counts == map.Count;
                         int num = rnd.Next(0, rebarIds.Count);
                         Element elem = doc.GetElement(rebarIds[num]);
                         if (elem is RebarInSystem rebar)
                         {
-                            for (int i = 0; i < counts; i++)
+                            if (ValidateParameters(rebar, parameters))
                             {
-                                Parameter param = parameters[i];
-                                string value = param.GetValue();
-                                string name = param.Definition.Name;
-                                if (AllFilled && map.Values.All(s => s.IsValid))
-                                {
-                                    if (string.IsNullOrWhiteSpace(value))
-                                    {
-
-                                    }
-                                }
-                                else if (map.TryGetValue(name, out StringValueData data))
-                                {
-                                    data.SetNewValue(value);
-                                }
-                                else if (!string.IsNullOrEmpty(value))
-                                {
-                                    map.Add(name, new StringValueData(value, limit));
-                                }
+                                rebarIds.Remove(rebarIds[num]);
                             }
                         }
                     }
                 }
             }
+        }
+
+
+        private bool ValidateParameters(RebarInSystem rebar, IList<Parameter> parameters, int limit = 3)
+        {
+            bool allValid = map.Values.All(s => s.Counter > limit);
+            bool allFilled = parameters.Count == map.Count;
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                Parameter param = parameters[i];
+                string value = param.GetValue();
+                string name = param.Definition.Name;
+                if (allFilled && allValid && string.IsNullOrEmpty(value))
+                {
+                    if (map.TryGetValue(name, out StringValueData result))
+                    {
+                        rebar.get_Parameter(param.GUID).SetValue(result.Content);
+                    }
+                }
+                else if (!map.TryGetValue(name, out StringValueData data))
+                {
+                    map.Add(name, new StringValueData(value));
+                }
+                else if (data != null)
+                {
+                    data.SetNewValue(value);
+                }
+            }
+            return allFilled && allValid;
         }
 
 
@@ -156,13 +156,9 @@ namespace RevitTimasBIMTools.RebarMarkFix
                     {
                         Parameter param = parameters[i];
                         StorageType storage = param.StorageType;
-                        if (param.IsReadOnly || storage is not StorageType.String)
+                        if (storage is not StorageType.String || !param.IsShared || param.IsReadOnly)
                         {
                             if (parameters.Remove(param)) { continue; }
-                        }
-                        else if (!param.UserModifiable)
-                        {
-                            _ = parameters.Remove(param);
                         }
                     }
                 }
