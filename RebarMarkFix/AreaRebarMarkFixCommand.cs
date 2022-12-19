@@ -155,8 +155,7 @@ namespace RevitTimasBIMTools.RebarMarkFix
                     for (int i = 0; i < parameters.Count; i++)
                     {
                         Parameter param = parameters[i];
-                        StorageType storage = param.StorageType;
-                        if (storage is not StorageType.String || !param.IsShared || param.IsReadOnly)
+                        if (param.StorageType is not StorageType.String || !param.IsShared || param.IsReadOnly)
                         {
                             if (parameters.Remove(param)) { continue; }
                         }
