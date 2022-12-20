@@ -18,12 +18,12 @@ namespace RevitTimasBIMTools.RebarMarkFix
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
-            Document doc = uidoc.Document;
+            _ = uidoc.Document;
 
             try
             {
-                var viewModel = new AreaRebarMarkFixViewModel();
-                var window = new AreaRebarMarkFixWindow(viewModel);
+                AreaRebarMarkFixViewModel viewModel = new();
+                AreaRebarMarkFixWindow window = new(viewModel);
                 window.Show();
             }
             catch (Exception ex)
@@ -37,7 +37,14 @@ namespace RevitTimasBIMTools.RebarMarkFix
 
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
         {
-            return uiapp.ActiveUIDocument?.ActiveGraphicalView is View view && view.ViewType is ViewType.FloorPlan;
+            if (uiapp.ActiveUIDocument?.ActiveGraphicalView is View view)
+            {
+                if (view.ViewType == ViewType.FloorPlan)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
 

@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
-using System;
+using RevitTimasBIMTools.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class AreaRebarMarkFixViewModel : ObservableObject
     {
-        private readonly Random rnd;
+
         private Document doc { get; set; }
         private IList<Element> areaReinforcements { get; set; }
         private IDictionary<string, ValueDataModel> map { get; set; }
@@ -44,7 +44,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         public AreaRebarMarkFixViewModel()
         {
-            rnd = new Random();
+
         }
 
 
@@ -123,18 +123,18 @@ namespace RevitTimasBIMTools.ViewModels
                         IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
                         TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
-                            int counter = 0;
+                            int index = 0;
                             while (0 < rebarIds.Count)
                             {
-                                counter++;
-                                int num = rnd.Next(0, rebarIds.Count);
-                                if (counter > rebarIds.Count * 10) { break; }
-                                Element elem = doc.GetElement(rebarIds[num]);
+                                if (index > rebarIds.Count - 1) { index = 0; }
+                                Element elem = doc.GetElement(rebarIds[index]);
                                 if (elem is RebarInSystem rebarIn)
                                 {
+                                    ++index;
+                                    Logger.Log("Count: " + index.ToString());
                                     if (ValidateParameter(rebarIn, param))
                                     {
-                                        if (rebarIds.Remove(rebarIds[num]))
+                                        if (rebarIds.Remove(rebarIds[index]))
                                         {
 
                                         }
@@ -171,4 +171,6 @@ namespace RevitTimasBIMTools.ViewModels
             return IsValid;
         }
     }
+
+
 }
