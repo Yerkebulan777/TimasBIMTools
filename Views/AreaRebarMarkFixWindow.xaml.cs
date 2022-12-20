@@ -2,6 +2,7 @@
 using RevitTimasBIMTools.ViewModels;
 using System.Windows;
 
+
 namespace RevitTimasBIMTools.Views
 {
     /// <summary>
@@ -15,6 +16,7 @@ namespace RevitTimasBIMTools.Views
             InitializeComponent();
             this.SetOwnerWindow();
         }
+
 
         private readonly AreaRebarMarkFixViewModel viewModel;
         public AreaRebarMarkFixWindow(AreaRebarMarkFixViewModel viewModel) : this()
@@ -42,6 +44,7 @@ namespace RevitTimasBIMTools.Views
         {
             this.Close();
         }
+
 
     }
 }
