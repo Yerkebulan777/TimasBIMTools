@@ -39,7 +39,7 @@ namespace RevitTimasBIMTools.RebarMarkFix
         {
             if (uiapp.ActiveUIDocument?.ActiveGraphicalView is View view)
             {
-                if (view.ViewType == ViewType.FloorPlan)
+                if (view.ViewType.Equals(ViewType.FloorPlan))
                 {
                     return true;
                 }

@@ -42,10 +42,9 @@ namespace RevitTimasBIMTools.Core
             PushButton showButton02 = ribbonPanel.AddItem(AreaRebarMarkFixButton) as PushButton;
             if (showButton02 != null && showButton02 is PushButton)
             {
-                showButton02.AvailabilityClassName = CutHoleShowPanelCommand.GetPath();
+                showButton02.AvailabilityClassName = AreaRebarMarkFixCommand.GetPath();
                 ribbonPanel.AddSeparator();
             }
-
 
         }
     }
