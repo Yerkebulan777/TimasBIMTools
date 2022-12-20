@@ -126,11 +126,11 @@ namespace RevitTimasBIMTools.ViewModels
                             int index = 0;
                             while (0 < rebarIds.Count)
                             {
+                                index++;
                                 if (index > rebarIds.Count - 1) { index = 0; }
                                 Element elem = doc.GetElement(rebarIds[index]);
                                 if (elem is RebarInSystem rebarIn)
                                 {
-                                    ++index;
                                     Logger.Log("Count: " + index.ToString());
                                     if (ValidateParameter(rebarIn, param))
                                     {
