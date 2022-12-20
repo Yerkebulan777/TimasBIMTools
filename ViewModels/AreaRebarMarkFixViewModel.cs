@@ -1,13 +1,16 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using CommunityToolkit.Mvvm.ComponentModel;
+using log4net.Repository.Hierarchy;
 using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Logger = RevitTimasBIMTools.Services.Logger;
 
 namespace RevitTimasBIMTools.ViewModels
 {
@@ -21,10 +24,16 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         private Parameter param;
-        public Parameter Parameter
+        public Parameter SelectedParameter
         {
             get => param;
-            set => SetProperty(ref param, value);
+            set
+            {
+                if (SetProperty(ref param, value))
+                {
+                    string name = param.Definition.Name;
+                } 
+            }
         }
 
 
@@ -46,7 +55,7 @@ namespace RevitTimasBIMTools.ViewModels
         {
             AllParameters = await RevitTask.RunAsync(app =>
             {
-                Document doc = app.ActiveUIDocument.Document;
+                doc = app.ActiveUIDocument.Document;
                 areaReinforcements = GetAllAreaReinforcement(doc);
                 Element reinforcement = areaReinforcements.FirstOrDefault();
                 IDictionary<string, Parameter> result = new SortedList<string, Parameter>();
@@ -85,14 +94,14 @@ namespace RevitTimasBIMTools.ViewModels
                 Element element = doc.GetElement(rebarId);
                 if (element is RebarInSystem rebar)
                 {
-                    IList<Parameter> prms = rebar.GetOrderedParameters();
-                    for (int i = 0; i < prms.Count; i++)
+                    IList<Parameter> prmList = rebar.GetOrderedParameters();
+                    for (int i = 0; i < prmList.Count; i++)
                     {
-                        Parameter param = prms[i];
-                        StorageType storageType = param.StorageType;
-                        if (storageType is StorageType.String || !param.IsReadOnly)
+                        Parameter param = prmList[i];
+                        if (param.UserModifiable || param.IsShared || !param.IsReadOnly)
                         {
-                            if (param.UserModifiable || param.IsShared)
+                            ParameterType paramType = param.Definition.ParameterType;
+                            if (paramType == ParameterType.Text)
                             {
                                 result.Add(param);
                             }
@@ -104,32 +113,38 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal async void RetrievAreaRebarParameters()
+        internal async void FixAreaRebarParameter()
         {
-            Task task = Task.WhenAll();
-            await task.ContinueWith(_ =>
+            await RevitTask.RunAsync(app =>
             {
-                foreach (Element item in areaReinforcements)
+                doc = app.ActiveUIDocument.Document;
+                foreach (Element element in areaReinforcements)
                 {
-                    if (item is AreaReinforcement reinforcement)
+                    if (param is not null && element is AreaReinforcement areaReinforce)
                     {
-                        IList<ElementId> rebarIds = reinforcement.GetRebarInSystemIds();
                         map = new Dictionary<string, ValueDataModel>();
-                        while (0 < rebarIds.Count)
+                        IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
+                        TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
-                            int num = rnd.Next(0, rebarIds.Count);
-                            Element elem = doc.GetElement(rebarIds[num]);
-                            if (elem is RebarInSystem)
+                            while (0 < rebarIds.Count)
                             {
-                                //if (ValidateParameters(rebar, result))
-                                //{
-                                //    _ = rebarIds.Remove(rebarIds[num]);
-                                //}
+                                int num = rnd.Next(0, rebarIds.Count);
+                                Element elem = doc.GetElement(rebarIds[num]);
+                                if (elem is RebarInSystem rebarIn)
+                                {
+                                    if (ValidateParameter(rebarIn, param))
+                                    {
+                                        if (rebarIds.Remove(rebarIds[num]))
+                                        {
+                                            
+                                        }
+                                    }
+                                }
                             }
-                        }
+                        });
                     }
                 }
-            }, taskContext);
+            });
         }
 
 
@@ -142,7 +157,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (map.TryGetValue(name, out ValueDataModel result))
                 {
-                    _ = rebar.get_Parameter(param.GUID).SetValue(result.Content);
+                    rebar.get_Parameter(param.GUID).SetValue(result.Content);
                 }
             }
             else if (!map.TryGetValue(name, out ValueDataModel data))

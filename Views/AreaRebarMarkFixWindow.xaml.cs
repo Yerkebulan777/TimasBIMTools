@@ -1,7 +1,9 @@
 ﻿using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
+using System.Collections.Generic;
 using System.Windows;
-
+using System.Windows.Controls;
 
 namespace RevitTimasBIMTools.Views
 {
@@ -36,7 +38,7 @@ namespace RevitTimasBIMTools.Views
 
         private void Apply_Click(object sender, RoutedEventArgs e)
         {
-            viewModel.RetrievAreaRebarParameters();
+            viewModel.FixAreaRebarParameter();
         }
 
 

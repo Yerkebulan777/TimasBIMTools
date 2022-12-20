@@ -48,7 +48,8 @@
                     Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
                     DisplayMemberPath="Key"
                     ItemsSource="{Binding Path=AllParameters, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                    SelectedValue="Value" SelectedValuePath="{Binding Path=Parameter}" />
+                    SelectedValue="{Binding Path=SelectedParameter, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedValuePath="Value" />
             </BulletDecorator>
         </StackPanel>
 
