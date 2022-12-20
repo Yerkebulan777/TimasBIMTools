@@ -1,12 +1,10 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
-using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.ViewModels;
+using RevitTimasBIMTools.Views;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading;
 
 
@@ -16,9 +14,6 @@ namespace RevitTimasBIMTools.RebarMarkFix
     [Regeneration(RegenerationOption.Manual)]
     internal sealed partial class AreaRebarMarkFixCommand : IExternalCommand, IExternalCommandAvailability
     {
-
-
-
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
@@ -27,7 +22,9 @@ namespace RevitTimasBIMTools.RebarMarkFix
 
             try
             {
-                
+                var viewModel = new AreaRebarMarkFixViewModel();
+                var window = new AreaRebarMarkFixWindow(viewModel);
+                window.Show();
             }
             catch (Exception ex)
             {
@@ -36,7 +33,6 @@ namespace RevitTimasBIMTools.RebarMarkFix
 
             return Result.Succeeded;
         }
-
 
 
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)

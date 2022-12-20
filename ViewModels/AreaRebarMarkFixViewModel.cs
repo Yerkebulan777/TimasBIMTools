@@ -1,22 +1,23 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
-using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class AreaRebarMarkFixViewModel : ObservableObject
     {
-
         private readonly Random rnd;
-        public UIDocument uidoc { get; set; }
+        private Document doc { get; set; }
         private IList<Element> areaReinforcements { get; set; }
         private IDictionary<string, ValueDataModel> map { get; set; }
+        private TaskScheduler taskContext { get; set; } = TaskScheduler.FromCurrentSynchronizationContext();
 
 
         private Parameter param;
@@ -28,35 +29,42 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         private IDictionary<string, Parameter> parameters;
-        public IDictionary<string, Parameter> Parameters
+        public IDictionary<string, Parameter> AllParameters
         {
             get => parameters;
             set => SetProperty(ref parameters, value);
         }
 
 
-        public AreaRebarMarkFixViewModel(UIDocument uidocument)
+        public AreaRebarMarkFixViewModel()
         {
-            uidoc = uidocument;
             rnd = new Random();
         }
 
 
-        private void RetrieveParameterData()
+        public async void RetrieveParameterData()
         {
-            Document doc = uidoc.Document;
-            areaReinforcements = GetAllAreaReinforcement(doc);
-            Element reinforcement = areaReinforcements.FirstOrDefault();
-            if (reinforcement is not null and AreaReinforcement areaReinforcement)
+            AllParameters = await RevitTask.RunAsync(app =>
             {
-                IList<ElementId> rebarIds = areaReinforcement.GetRebarInSystemIds();
-                ElementId rebarId = rebarIds.FirstOrDefault(i => i.IntegerValue > 0);
-                foreach (Parameter param in GetAllStringParameters(doc, rebarId))
+                Document doc = app.ActiveUIDocument.Document;
+                areaReinforcements = GetAllAreaReinforcement(doc);
+                Element reinforcement = areaReinforcements.FirstOrDefault();
+                IDictionary<string, Parameter> result = new SortedList<string, Parameter>();
+                if (reinforcement is not null and AreaReinforcement areaReinforcement)
                 {
-                    string name = param.Definition.Name;
-                    parameters[name] = param;
+                    IList<ElementId> rebarIds = areaReinforcement.GetRebarInSystemIds();
+                    ElementId rebarId = rebarIds.FirstOrDefault(i => i.IntegerValue > 0);
+                    foreach (Parameter param in GetAllStringParameters(doc, rebarId))
+                    {
+                        string name = param.Definition.Name;
+                        if (5 < name.Length)
+                        {
+                            result[name] = param;
+                        }
+                    }
                 }
-            }
+                return result;
+            });
         }
 
 
@@ -71,50 +79,57 @@ namespace RevitTimasBIMTools.ViewModels
 
         private IList<Parameter> GetAllStringParameters(Document doc, ElementId rebarId)
         {
-            IList<Parameter> parameters = null;
+            IList<Parameter> result = new List<Parameter>();
             if (rebarId is not null and ElementId)
             {
                 Element element = doc.GetElement(rebarId);
                 if (element is RebarInSystem rebar)
                 {
-                    parameters = rebar.GetOrderedParameters();
-                    for (int i = 0; i < parameters.Count; i++)
+                    IList<Parameter> prms = rebar.GetOrderedParameters();
+                    for (int i = 0; i < prms.Count; i++)
                     {
-                        Parameter param = parameters[i];
-                        if (param.StorageType is not StorageType.String || !param.IsShared || param.IsReadOnly)
+                        Parameter param = prms[i];
+                        StorageType storageType = param.StorageType;
+                        if (storageType is StorageType.String || !param.IsReadOnly)
                         {
-                            _ = parameters.Remove(param);
+                            if (param.UserModifiable || param.IsShared)
+                            {
+                                result.Add(param);
+                            }
                         }
                     }
                 }
             }
-            return parameters;
+            return result;
         }
 
 
-        internal void RetrievAreaRebarParameters()
+        internal async void RetrievAreaRebarParameters()
         {
-            Document doc = uidoc.Document;
-            foreach (Element item in areaReinforcements)
+            Task task = Task.WhenAll();
+            await task.ContinueWith(_ =>
             {
-                if (item is AreaReinforcement reinforcement)
+                foreach (Element item in areaReinforcements)
                 {
-                    IList<ElementId> rebarIds = reinforcement.GetRebarInSystemIds();
-                    map = new Dictionary<string, ValueDataModel>();
-                    while (0 < rebarIds.Count)
+                    if (item is AreaReinforcement reinforcement)
                     {
-                        int num = rnd.Next(0, rebarIds.Count);
-                        Element elem = doc.GetElement(rebarIds[num]);
-                        if (elem is RebarInSystem)
+                        IList<ElementId> rebarIds = reinforcement.GetRebarInSystemIds();
+                        map = new Dictionary<string, ValueDataModel>();
+                        while (0 < rebarIds.Count)
                         {
-                            //if (ValidateParameters(rebar, parameters))
-                            //{
-                            //    _ = rebarIds.Remove(rebarIds[num]);
-                            //}
+                            int num = rnd.Next(0, rebarIds.Count);
+                            Element elem = doc.GetElement(rebarIds[num]);
+                            if (elem is RebarInSystem)
+                            {
+                                //if (ValidateParameters(rebar, result))
+                                //{
+                                //    _ = rebarIds.Remove(rebarIds[num]);
+                                //}
+                            }
                         }
                     }
                 }
-            }
+            }, taskContext);
         }
 
 

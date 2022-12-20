@@ -43,9 +43,12 @@
                         Content="Parameter: "
                         Foreground="DarkBlue" />
                 </BulletDecorator.Bullet>
-                <ComboBox Name="ComboMark"
-                          
-                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}" />
+                <ComboBox
+                    Name="ComboMark"
+                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
+                    DisplayMemberPath="Key"
+                    ItemsSource="{Binding Path=AllParameters, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                    SelectedValue="Value" SelectedValuePath="{Binding Path=Parameter}" />
             </BulletDecorator>
         </StackPanel>
 

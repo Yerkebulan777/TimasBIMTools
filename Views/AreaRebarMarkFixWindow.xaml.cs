@@ -29,8 +29,8 @@ namespace RevitTimasBIMTools.Views
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //this.viewModel.GetAllAreaReinforcement();
-            Loaded-= Window_Loaded;
+            this.viewModel.RetrieveParameterData();
+            Loaded -= Window_Loaded;
         }
 
 
