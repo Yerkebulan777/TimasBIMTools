@@ -312,6 +312,7 @@
     <Compile Include="Core\RevitEventWrapper.cs" />
     <Compile Include="Core\SmartToolApp.cs" />
     <Compile Include="RebarMarkFix\AreaRebarMarkFixCommand.cs" />
+    <Compile Include="RevitModel\ValueDataModel.cs" />
     <Compile Include="RevitModel\PreviewControlModel.cs" />
     <Compile Include="RevitUtils\SmartBIMToolExtention.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
@@ -353,6 +354,9 @@
     <Compile Include="ViewConverters\NullVisibilityConverter.cs" />
     <Compile Include="ViewConverters\PercentageConverter.cs" />
     <Compile Include="ViewModels\CutVoidDataViewModel.cs" />
+    <Compile Include="Views\AreaRebarMarkFix.xaml.cs">
+      <DependentUpon>AreaRebarMarkFix.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CutVoidDockPaneView.xaml.cs">
       <DependentUpon>CutVoidDockPaneView.xaml</DependentUpon>
     </Compile>
@@ -386,6 +390,10 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AreaRebarMarkFix.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\CutVoidDockPaneView.xaml">
       <Generator>MSBuild:Compile</Generator>

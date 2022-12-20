@@ -14,41 +14,10 @@ namespace RevitTimasBIMTools.RebarMarkFix
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
-    internal sealed class AreaRebarMarkFixCommand : IExternalCommand, IExternalCommandAvailability
+    internal sealed partial class AreaRebarMarkFixCommand : IExternalCommand, IExternalCommandAvailability
     {
         private readonly Random rnd = new();
-        private IDictionary<string, StringValueData> map = new Dictionary<string, StringValueData>();
-
-
-        private sealed class StringValueData
-        {
-            internal int Counter { get; set; } = 0;
-            internal string Content { get; set; } = string.Empty;
-            private IDictionary<string, int> data { get; set; } = new Dictionary<string, int>();
-
-            public StringValueData(string value)
-            {
-                data.Add(value, 0);
-            }
-
-
-            internal void SetNewValue(string value)
-            {
-                if (data.TryGetValue(value, out int count))
-                {
-                    data[value] = count++;
-                    if (Counter < count)
-                    {
-                        Content = value;
-                        Counter = count;
-                    }
-                }
-                else
-                {
-                    data.Add(value, 0);
-                }
-            }
-        }
+        private IDictionary<string, ValueDataModel> map = new Dictionary<string, ValueDataModel>();
 
 
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
@@ -93,7 +62,7 @@ namespace RevitTimasBIMTools.RebarMarkFix
             {
                 if (item is AreaReinforcement reinforcement)
                 {
-                    map = new Dictionary<string, StringValueData>();
+                    map = new Dictionary<string, ValueDataModel>();
                     IList<ElementId> rebarIds = reinforcement.GetRebarInSystemIds();
                     ElementId rebarId = rebarIds.FirstOrDefault(rid => rid.IntegerValue > 0);
                     IList<Parameter> parameters = GetStringParameters(doc, rebarId);
@@ -125,14 +94,14 @@ namespace RevitTimasBIMTools.RebarMarkFix
                 string name = param.Definition.Name;
                 if (allFilled && allValid && string.IsNullOrEmpty(value))
                 {
-                    if (map.TryGetValue(name, out StringValueData result))
+                    if (map.TryGetValue(name, out ValueDataModel result))
                     {
                         rebar.get_Parameter(param.GUID).SetValue(result.Content);
                     }
                 }
-                else if (!map.TryGetValue(name, out StringValueData data))
+                else if (!map.TryGetValue(name, out ValueDataModel data))
                 {
-                    map.Add(name, new StringValueData(value));
+                    map.Add(name, new ValueDataModel(value));
                 }
                 else if (data != null)
                 {
