@@ -1,16 +1,13 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using CommunityToolkit.Mvvm.ComponentModel;
-using log4net.Repository.Hierarchy;
 using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Logger = RevitTimasBIMTools.Services.Logger;
 
 namespace RevitTimasBIMTools.ViewModels
 {
@@ -31,8 +28,8 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref param, value))
                 {
-                    string name = param.Definition.Name;
-                } 
+                    _ = param.Definition.Name;
+                }
             }
         }
 
@@ -126,9 +123,12 @@ namespace RevitTimasBIMTools.ViewModels
                         IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
                         TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
+                            int counter = 0;
                             while (0 < rebarIds.Count)
                             {
+                                counter++;
                                 int num = rnd.Next(0, rebarIds.Count);
+                                if (counter > rebarIds.Count * 10) { break; }
                                 Element elem = doc.GetElement(rebarIds[num]);
                                 if (elem is RebarInSystem rebarIn)
                                 {
@@ -136,7 +136,7 @@ namespace RevitTimasBIMTools.ViewModels
                                     {
                                         if (rebarIds.Remove(rebarIds[num]))
                                         {
-                                            
+
                                         }
                                     }
                                 }
@@ -148,28 +148,27 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool ValidateParameter(RebarInSystem rebar, Parameter param, int limit = 3)
+        private bool ValidateParameter(RebarInSystem rebar, Parameter param)
         {
             string value = param.GetValue();
             string name = param.Definition.Name;
-            bool IsValid = map.Values.All(s => s.Counter > limit);
-            if (IsValid && string.IsNullOrEmpty(value))
+            bool IsValid = map.Values.All(s => s.Counter > 3);
+            if (IsValid && map.TryGetValue(name, out ValueDataModel result))
             {
-                if (map.TryGetValue(name, out ValueDataModel result))
+                _ = rebar.get_Parameter(param.GUID).SetValue(result.Content);
+            }
+            else if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
+            {
+                if (!map.TryGetValue(name, out ValueDataModel data))
                 {
-                    rebar.get_Parameter(param.GUID).SetValue(result.Content);
+                    map.Add(name, new ValueDataModel(value));
                 }
-            }
-            else if (!map.TryGetValue(name, out ValueDataModel data))
-            {
-                map.Add(name, new ValueDataModel(value));
-            }
-            else
-            {
-                data?.SetNewValue(value);
+                else
+                {
+                    data?.SetNewValue(value);
+                }
             }
             return IsValid;
         }
-
     }
 }

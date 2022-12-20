@@ -18,11 +18,12 @@ internal sealed class ValueDataModel
     {
         if (data.TryGetValue(value, out int count))
         {
-            data[value] = count++;
-            if (Counter < count)
+            int number = count++;
+            data[value] = number;
+            if (Counter < number)
             {
+                Counter = number;
                 Content = value;
-                Counter = count;
             }
         }
         else
