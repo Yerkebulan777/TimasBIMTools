@@ -95,7 +95,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         /// <summary>
-        /// Return Guid Of Parameter Share
+        /// Return Guid Of SelectedParameter Share
         /// </summary>
         /// <param name="parameter">param</param>
         /// <returns></returns>
@@ -106,7 +106,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         /// <summary>
-        /// Return Global Parameter SymbolName
+        /// Return Global SelectedParameter SymbolName
         /// </summary>
         /// <param name="parameter"></param>
         /// <param name="doc"></param>
@@ -126,7 +126,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         /// <summary>
-        /// Return Global Parameter Content
+        /// Return Global SelectedParameter Content
         /// </summary>
         /// <param name="parameter"></param>
         /// <param name="doc"></param>
