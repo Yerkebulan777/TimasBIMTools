@@ -367,7 +367,7 @@ namespace RevitTimasBIMTools.CutOpening
         //    double value = invalidInt;
         //    int minDistance = int.MaxValue;
         //    char[] delimiters = new[] { ' ', '_', '-' };
-        //    foreach (SelectedParameter param in floor.GetOrderedParameters())
+        //    foreach (Parameter param in floor.GetOrderedParameters())
         //    {
         //        Definition highMark = param.Definition;
         //        if (param.HasValue && highMark.ParameterType == lenParamType)
@@ -447,7 +447,7 @@ namespace RevitTimasBIMTools.CutOpening
         //                }
         //            case BuiltInCategory.OST_DuctCurves:
         //                {
-        //                    SelectedParameter diameterParam = floor.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM);
+        //                    Parameter diameterParam = floor.get_Parameter(BuiltInParameter.RBS_CURVE_DIAMETER_PARAM);
         //                    if (diameterParam != null && diameterParam.HasValue)
         //                    {
         //                        diameter = diameterParam.AsDouble();

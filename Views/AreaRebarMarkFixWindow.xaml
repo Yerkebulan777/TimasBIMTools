@@ -5,11 +5,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     Title="AreaRebarMarkFix"
     Width="300"
     Height="Auto"
     MinWidth="300"
     MinHeight="150"
+    d:DataContext="{d:DesignInstance Type=vm:AreaRebarMarkFixViewModel}"
     ResizeMode="CanResizeWithGrip"
     SizeToContent="Height"
     WindowStartupLocation="CenterOwner"
@@ -41,7 +43,9 @@
                         Content="Parameter: "
                         Foreground="DarkBlue" />
                 </BulletDecorator.Bullet>
-                <ComboBox Name="ComboMark" Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}" />
+                <ComboBox Name="ComboMark"
+                          
+                          Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}" />
             </BulletDecorator>
         </StackPanel>
 

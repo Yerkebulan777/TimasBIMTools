@@ -20,10 +20,18 @@ namespace RevitTimasBIMTools.ViewModels
 
 
         private Parameter param;
-        public Parameter SelectedParameter
+        public Parameter Parameter
         {
             get => param;
             set => SetProperty(ref param, value);
+        }
+
+
+        private IDictionary<string, Parameter> parameters;
+        public IDictionary<string, Parameter> Parameters
+        {
+            get => parameters;
+            set => SetProperty(ref parameters, value);
         }
 
 
@@ -43,7 +51,11 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 IList<ElementId> rebarIds = areaReinforcement.GetRebarInSystemIds();
                 ElementId rebarId = rebarIds.FirstOrDefault(i => i.IntegerValue > 0);
-                IList<Parameter> parameters = GetAllStringParameters(doc, rebarId);
+                foreach (Parameter param in GetAllStringParameters(doc, rebarId))
+                {
+                    string name = param.Definition.Name;
+                    parameters[name] = param;
+                }
             }
         }
 
