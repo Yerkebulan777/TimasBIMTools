@@ -25,7 +25,7 @@ namespace RevitTimasBIMTools.Core
                 LargeImage = SmartToolHelper.GetImageSource()
             };
 
-            PushButtonData AreaRebarMarkFixButton = new("AreaRebarMarkFix", SmartToolHelper.AreaRebarMarkFixButtonName, assemblyName, AreaRebarMarkFixCommand.GetPath())
+            PushButtonData AreaRebarMarkFixButton = new("AreaRebarMarkFixWindow", SmartToolHelper.AreaRebarMarkFixButtonName, assemblyName, AreaRebarMarkFixCommand.GetPath())
             {
                 ToolTip = "Fix area rebar conteiner marks",
                 LargeImage = SmartToolHelper.GetImageSource()
