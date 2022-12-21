@@ -7,10 +7,8 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+
 
 namespace RevitTimasBIMTools.ViewModels
 {
@@ -20,8 +18,6 @@ namespace RevitTimasBIMTools.ViewModels
         private Document doc { get; set; }
         private IList<Element> areaReinforcements { get; set; }
         private static IDictionary<string, ValueDataModel> ParamData { get; set; }
-        private TaskScheduler taskContext { get; set; } = TaskScheduler.FromCurrentSynchronizationContext();
-        TimeSpan timeSpan { get; } = TimeSpan.FromSeconds(90);
 
         private Parameter param;
         public Parameter SelectedParameter
@@ -31,23 +27,16 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (SetProperty(ref param, value))
                 {
-                    _ = param.Definition.Name;
+
                 }
             }
         }
-
 
         private IDictionary<string, Parameter> parameters;
         public IDictionary<string, Parameter> AllParameters
         {
             get => parameters;
             set => SetProperty(ref parameters, value);
-        }
-
-
-        public AreaRebarMarkFixViewModel()
-        {
-
         }
 
 
@@ -120,6 +109,7 @@ namespace RevitTimasBIMTools.ViewModels
                 doc = app.ActiveUIDocument.Document;
                 foreach (Element element in areaReinforcements)
                 {
+                    //app.ActiveUIDocument.Selection.SetElementIds(new List<ElementId> { element.Id });
                     if (param is not null && element is AreaReinforcement areaReinforce)
                     {
                         IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
@@ -130,13 +120,13 @@ namespace RevitTimasBIMTools.ViewModels
                             while (0 < rebarIds.Count)
                             {
                                 counter++;
-                                Task.Delay(timeSpan);
                                 int index = rnd.Next(0, rebarIds.Count);
                                 Element elem = doc.GetElement(rebarIds[index]);
                                 if (elem is RebarInSystem rebarIn)
                                 {
+                                    Parameter local = rebarIn.get_Parameter(param.GUID);
                                     Logger.Log($"All: {rebarIds.Count} Counter: {counter} Index: {index} IsStarted: {counter > limit}");
-                                    if (ValidateParameter(param, rebarIn, counter > limit))
+                                    if (ValidateParameter(local, rebarIn, counter > limit))
                                     {
                                         if (rebarIds.Remove(rebarIds[index]))
                                         {
@@ -156,39 +146,32 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool ValidateParameter(Parameter param, RebarInSystem rebar, bool start)
+        private bool ValidateParameter(Parameter param, RebarInSystem rebarIn, bool start)
         {
-            Task.Delay(timeSpan);
             Logger.Log("Start validate...");
             string value = param.GetValue();
             string name = param.Definition.Name;
             Logger.Log($"Parameter: {name} Value: {value}");
+            ParamData ??= new Dictionary<string, ValueDataModel>();
             bool IsValid = start && ParamData.Values.All(val => val.Counter > 0);
             Logger.Log($"IsValid: {IsValid}\tParameter: {name}\tValue: {value}");
             if (IsValid && ParamData.TryGetValue(name, out ValueDataModel result))
             {
-                IsValid = rebar.get_Parameter(param.GUID).SetValue(result.Content);
+                IsValid = rebarIn.get_Parameter(param.GUID).SetValue(result.Content);
             }
             else if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
             {
-                ParamData ??= new Dictionary<string, ValueDataModel>();
                 if (!ParamData.TryGetValue(name, out ValueDataModel data))
                 {
-                    Task.Delay(timeSpan);
-                    Logger.Log("Set new parameter...");
                     ParamData.Add(name, new ValueDataModel(value));
                 }
                 else
                 {
-                    Task.Delay(timeSpan);
-                    Logger.Log("Update parameter...");
                     data?.SetNewValue(value);
                 }
             }
             return IsValid;
         }
-
-
     }
 
 }
