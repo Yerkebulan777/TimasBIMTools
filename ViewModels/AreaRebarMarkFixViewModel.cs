@@ -150,7 +150,7 @@ namespace RevitTimasBIMTools.ViewModels
             string value = param.GetValue();
             string name = param.Definition.Name;
             ParamData ??= new Dictionary<string, ValueDataModel>();
-            bool IsValid = start && ParamData.Values.Any(val => val.Counter > 0);
+            bool IsValid = start && ParamData.Values.Any(val => val.Counter > 3);
             if (IsValid && ParamData.TryGetValue(name, out ValueDataModel result))
             {
                 IsValid = rebarIn.get_Parameter(param.GUID).SetValue(result.Content);
@@ -169,6 +169,4 @@ namespace RevitTimasBIMTools.ViewModels
             return IsValid;
         }
     }
-
-
 }

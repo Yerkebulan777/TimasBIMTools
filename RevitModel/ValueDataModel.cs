@@ -16,7 +16,6 @@ internal sealed class ValueDataModel
         };
     }
 
-
     internal void SetNewValue(string value)
     {
         if (data is not null && !string.IsNullOrWhiteSpace(value))
