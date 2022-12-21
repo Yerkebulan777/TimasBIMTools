@@ -17,10 +17,10 @@ namespace RevitTimasBIMTools.ViewModels
     {
 
         private Document doc { get; set; }
-        Guid paramGuid { get; set; }
-        private IList<Element> areaReinforcements { get; set; }
-        private static IDictionary<string, ValueDataModel> paramData { get; set; }
-        
+        private IList<Element> areaReinforcements { get; set; } = null;
+        private static IDictionary<string, ValueDataModel> paramData { get; set; } = null;
+        private Guid paramGuid { get; set; }
+
         private Parameter param;
         public Parameter SelectedParameter
         {
@@ -33,6 +33,7 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
         }
+
 
         private IDictionary<string, Parameter> parameters;
         public IDictionary<string, Parameter> AllParameters
@@ -161,7 +162,7 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 isValidate = rebar.get_Parameter(paramGuid).SetValue(result.Content);
                 Debug.Assert(!string.IsNullOrEmpty(result.Content), "Value is null!");
-                Debug.Assert(isValidate, "Parameter value is not set! " );
+                Debug.Assert(isValidate, "Parameter value is not set! ");
             }
             else if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
             {
