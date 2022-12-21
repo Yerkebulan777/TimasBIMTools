@@ -171,18 +171,15 @@ namespace RevitTimasBIMTools.ViewModels
                 Debug.Assert(!string.IsNullOrEmpty(model.Content), "Value can't be null\t" + msg);
                 isValidated = rebar.get_Parameter(paramGuid).SetValue(model.Content);
             }
-            else
+            if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
             {
-                if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
+                if (!paramData.TryGetValue(name, out ValueDataModel data))
                 {
-                    if (!paramData.TryGetValue(name, out ValueDataModel data))
-                    {
-                        paramData.Add(name, new ValueDataModel(value));
-                    }
-                    else
-                    {
-                        data?.SetNewValue(value);
-                    }
+                    paramData.Add(name, new ValueDataModel(value));
+                }
+                else
+                {
+                    data?.SetNewValue(value);
                 }
             }
 
