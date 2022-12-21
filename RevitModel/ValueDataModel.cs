@@ -19,11 +19,8 @@ internal sealed class ValueDataModel
     {
         if (data.TryGetValue(value, out int count))
         {
-            int number = count++;
+            int number = count + 1;
             data[value] = number;
-            Logger.Log("Set New value...");
-            Logger.Log("Value: " + value.ToString());
-            Logger.Log("Count: " + number.ToString());
             if (Counter < number)
             {
                 Counter = number;
@@ -36,4 +33,5 @@ internal sealed class ValueDataModel
         }
     }
 }
+
 
