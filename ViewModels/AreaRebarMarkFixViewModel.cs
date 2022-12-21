@@ -7,7 +7,9 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace RevitTimasBIMTools.ViewModels
@@ -19,7 +21,7 @@ namespace RevitTimasBIMTools.ViewModels
         private IList<Element> areaReinforcements { get; set; }
         private IDictionary<string, ValueDataModel> map { get; set; }
         private TaskScheduler taskContext { get; set; } = TaskScheduler.FromCurrentSynchronizationContext();
-
+        TimeSpan timeSpan { get; } = TimeSpan.FromSeconds(90);
 
         private Parameter param;
         public Parameter SelectedParameter
@@ -111,7 +113,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal async void FixAreaRebarParameter(int percentage = 30)
+        internal async void FixAreaRebarParameter(int limit = 5)
         {
             await RevitTask.RunAsync(app =>
             {
@@ -120,26 +122,26 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     if (param is not null && element is AreaReinforcement areaReinforce)
                     {
-                        map = new Dictionary<string, ValueDataModel>();
                         IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
-
                         TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
                             int counter = 0;
                             Random rnd = new();
-                            int limit = percentage / 100 * rebarIds.Count;
+                            map = new Dictionary<string, ValueDataModel>();
                             while (0 < rebarIds.Count)
                             {
                                 counter++;
+                                Task.Delay(timeSpan);
                                 int index = rnd.Next(0, rebarIds.Count);
                                 Element elem = doc.GetElement(rebarIds[index]);
                                 if (elem is RebarInSystem rebarIn)
                                 {
+                                    Logger.Log($"All: {rebarIds.Count} Counter: {counter} Index: {index} IsStarted: {counter > limit}");
                                     if (ValidateParameter(param, rebarIn, counter > limit))
                                     {
                                         if (rebarIds.Remove(rebarIds[index]))
                                         {
-                                            Logger.Info("Started!");
+                                            
                                         }
                                     }
                                 }
@@ -153,9 +155,13 @@ namespace RevitTimasBIMTools.ViewModels
 
         private bool ValidateParameter(Parameter param, RebarInSystem rebar, bool start)
         {
+            Task.Delay(timeSpan);
+            Logger.Log("Start validate...");
             string value = param.GetValue();
             string name = param.Definition.Name;
-            bool IsValid = start && !string.IsNullOrEmpty(map[name].Content);
+            Logger.Log($"Parameter: {name} Value: {value}");
+            bool IsValid = start && map.Values.All(val => val.Counter > 0);
+            Logger.Log($"IsValid: {IsValid}\tParameter: {name}\tValue: {value}");
             if (IsValid && map.TryGetValue(name, out ValueDataModel result))
             {
                 IsValid = rebar.get_Parameter(param.GUID).SetValue(result.Content);
@@ -164,16 +170,19 @@ namespace RevitTimasBIMTools.ViewModels
             {
                 if (!map.TryGetValue(name, out ValueDataModel data))
                 {
+                    Task.Delay(timeSpan);
+                    Logger.Log("Set new parameter...");
                     map.Add(name, new ValueDataModel(value));
                 }
                 else
                 {
+                    Task.Delay(timeSpan);
+                    Logger.Log("Update parameter...");
                     data?.SetNewValue(value);
                 }
             }
             return IsValid;
         }
     }
-
 
 }
