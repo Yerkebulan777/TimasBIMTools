@@ -7,6 +7,7 @@ using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 
@@ -16,18 +17,19 @@ namespace RevitTimasBIMTools.ViewModels
     {
 
         private Document doc { get; set; }
+        Guid paramGuid { get; set; }
         private IList<Element> areaReinforcements { get; set; }
-        private static IDictionary<string, ValueDataModel> ParamData { get; set; }
-
+        private static IDictionary<string, ValueDataModel> paramData { get; set; }
+        
         private Parameter param;
         public Parameter SelectedParameter
         {
             get => param;
             set
             {
-                if (SetProperty(ref param, value))
+                if (SetProperty(ref param, value) && param is not null)
                 {
-
+                    paramGuid = param.GUID;
                 }
             }
         }
@@ -102,38 +104,39 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal async void FixAreaRebarParameter(int limit = 5)
+        internal async void FixAreaRebarParameter()
         {
             await RevitTask.RunAsync(app =>
             {
                 doc = app.ActiveUIDocument.Document;
-                foreach (Element element in areaReinforcements)
+                foreach (Element current in areaReinforcements)
                 {
-                    //app.ActiveUIDocument.Selection.SetElementIds(new List<ElementId> { element.Id });
-                    if (param is not null && element is AreaReinforcement areaReinforce)
+                    //app.ActiveUIDocument.Selection.SetElementIds(new List<ElementId> { current.Id });
+                    if (param is not null && current is AreaReinforcement areaReinforce)
                     {
                         IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
                         TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
                             int counter = 0;
+                            paramData = null;
                             Random rnd = new();
-                            while (0 < rebarIds.Count)
+                            int amount = rebarIds.Count;
+                            while (0 < amount)
                             {
                                 counter++;
-                                int index = rnd.Next(0, rebarIds.Count);
-                                Element elem = doc.GetElement(rebarIds[index]);
-                                Parameter local = elem.get_Parameter(param.GUID);
-                                if (elem is RebarInSystem rebarIn && local is not null)
+                                int idx = rnd.Next(0, amount);
+                                Element element = doc.GetElement(rebarIds[idx]);
+                                Parameter local = element.get_Parameter(paramGuid);
+                                if (element is RebarInSystem rebarIn && local is not null)
                                 {
-                                    if (ValidateParameter(local, rebarIn, counter > limit))
+                                    Logger.Log($"Count: " + counter.ToString());
+                                    if (ValidateParameter(local, rebarIn, counter > amount))
                                     {
-                                        if (rebarIds.Remove(rebarIds[index]))
+                                        Logger.Log($"\n <<< VALIDATED >>> \n");
+                                        if (rebarIds.Remove(rebarIds[idx]))
                                         {
-                                            if (rebarIds.Count == 0)
-                                            {
-                                                ParamData.Clear();
-                                                ParamData = null;
-                                            }
+                                            amount = rebarIds.Count;
+                                            Logger.Log($"\nAmount: {amount}");
                                         }
                                     }
                                 }
@@ -145,28 +148,36 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool ValidateParameter(Parameter param, RebarInSystem rebarIn, bool start)
+        private bool ValidateParameter(Parameter local, RebarInSystem rebar, bool isLimited)
         {
-            string value = param.GetValue();
-            string name = param.Definition.Name;
-            ParamData ??= new Dictionary<string, ValueDataModel>();
-            bool IsValid = start && ParamData.Values.Any(val => val.Counter > 3);
-            if (IsValid && ParamData.TryGetValue(name, out ValueDataModel result))
+            string value = local.GetValue();
+            string name = local.Definition.Name;
+
+            paramData ??= new Dictionary<string, ValueDataModel>();
+
+            bool isValidate = isLimited || paramData.Values.Any(val => val.Counter > 3);
+
+            if (isValidate && paramData.TryGetValue(name, out ValueDataModel result))
             {
-                IsValid = rebarIn.get_Parameter(param.GUID).SetValue(result.Content);
+                isValidate = rebar.get_Parameter(paramGuid).SetValue(result.Content);
+                Debug.Assert(!string.IsNullOrEmpty(result.Content), "Value is null!");
+                Debug.Assert(isValidate, "Parameter value is not set! " );
             }
             else if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
             {
-                if (!ParamData.TryGetValue(name, out ValueDataModel data))
+                if (!paramData.TryGetValue(name, out ValueDataModel data))
                 {
-                    ParamData.Add(name, new ValueDataModel(value));
+                    paramData.Add(name, new ValueDataModel(value));
                 }
                 else
                 {
                     data?.SetNewValue(value);
                 }
             }
-            return IsValid;
+
+            return isValidate;
         }
     }
+
+
 }

@@ -18,22 +18,19 @@ internal sealed class ValueDataModel
 
     internal void SetNewValue(string value)
     {
-        if (data is not null && !string.IsNullOrWhiteSpace(value))
+        if (data.TryGetValue(value, out int count))
         {
-            if (data.TryGetValue(value, out int count))
+            int number = count + 1;
+            data[value] = number;
+            if (Counter < number)
             {
-                int number = count + 1;
-                data[value] = number;
-                if (Counter < number)
-                {
-                    Counter = number;
-                    Content = value;
-                }
+                Counter = number;
+                Content = value;
             }
-            else
-            {
-                data.Add(value, 0);
-            }
+        }
+        else
+        {
+            data.Add(value, 0);
         }
     }
 
