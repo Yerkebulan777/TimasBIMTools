@@ -129,7 +129,6 @@ namespace RevitTimasBIMTools.ViewModels
                                 Parameter local = element.get_Parameter(paramGuid);
                                 if (element is RebarInSystem rebarIn && local is not null)
                                 {
-                                    Logger.Log($"Count: " + counter.ToString());
                                     if (ValidateParameter(local, rebarIn, counter > amount))
                                     {
                                         Logger.Log($"\n <<< VALIDATED >>> \n");
@@ -138,7 +137,7 @@ namespace RevitTimasBIMTools.ViewModels
                                             amount = rebarIds.Count;
                                             if (amount.Equals(0))
                                             {
-                                                paramData.Clear();
+                                                paramData?.Clear();
                                                 paramData = null;
                                             }
                                         }
@@ -164,8 +163,8 @@ namespace RevitTimasBIMTools.ViewModels
             if (isValidate && paramData.TryGetValue(name, out ValueDataModel result))
             {
                 isValidate = rebar.get_Parameter(paramGuid).SetValue(result.Content);
-                Debug.Assert(!string.IsNullOrEmpty(result.Content), "Value is null!");
-                Debug.Assert(isValidate, "Parameter value is not set! ");
+                string msg = $"Value is null! Parameter: {name} Current: {value}";
+                Debug.Assert(!string.IsNullOrEmpty(result.Content), msg);
             }
             else if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
             {

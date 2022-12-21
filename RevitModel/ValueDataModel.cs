@@ -1,25 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 
 namespace RevitTimasBIMTools.RevitModel;
 
 internal sealed class ValueDataModel
 {
-    internal int Counter { get; private set; } = 0;
-    internal string Content { get; private set; } = null;
+    public int Counter { get; private set; } = 0;
+    public string Content { get; private set; } = null;
     private IDictionary<string, int> data { get; set; } = null;
 
     public ValueDataModel(string value)
     {
-        data = new Dictionary<string, int>
+
+        if (string.IsNullOrEmpty(value))
         {
-            { value, 0 }
-        };
+            throw new ArgumentNullException(nameof(value), "Can't be null.");
+        }
+
+        data = new Dictionary<string, int> { { value, 0 } };
+
     }
 
-    internal void SetNewValue(string value)
+    public void SetNewValue(string value)
     {
-        if (data.TryGetValue(value, out int count))
+        if (string.IsNullOrEmpty(value))
+        {
+            throw new ArgumentNullException(nameof(value), "Can't be null.");
+        }
+        else if (data.TryGetValue(value, out int count))
         {
             int number = count + 1;
             data[value] = number;
@@ -34,5 +43,4 @@ internal sealed class ValueDataModel
             data.Add(value, 0);
         }
     }
-
 }
