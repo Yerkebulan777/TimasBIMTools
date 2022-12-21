@@ -24,11 +24,7 @@ internal sealed class ValueDataModel
 
     public void SetNewValue(string value)
     {
-        if (string.IsNullOrEmpty(value))
-        {
-            throw new ArgumentNullException(nameof(value), "Can't be null.");
-        }
-        else if (data.TryGetValue(value, out int count))
+        if (data.TryGetValue(value, out int count))
         {
             int number = count + 1;
             data[value] = number;
