@@ -161,13 +161,15 @@ namespace RevitTimasBIMTools.ViewModels
 
             paramData ??= new Dictionary<string, ValueDataModel>();
 
-            bool isValidate = isLimited || paramData.Values.Any(val => val.Counter > 3);
+            bool validCount = paramData.Values.Any(v => v.Counter > 3);
+            bool validValue = paramData.Values.Any(v => v.Content is not null);
+            bool isValidate = isLimited || (validCount && validValue && paramData.Count > 0);
 
             if (isValidate && paramData.TryGetValue(name, out ValueDataModel model))
             {
-                string msg = $"\tParameter: {name} Current value: {value}";
-                Debug.Assert(model is not null, "Dictionary value can't be null" + msg);
-                Debug.Assert(!string.IsNullOrEmpty(model.Content), "Value can't be null" + msg);
+                string msg = $"Parameter: {name} Current value: {value}";
+                Debug.Assert(model is not null, "Dictionary value can't be null\t" + msg);
+                Debug.Assert(!string.IsNullOrEmpty(model.Content), "Value can't be null\t" + msg);
                 isValidate = rebar.get_Parameter(paramGuid).SetValue(model.Content);
             }
             else if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
