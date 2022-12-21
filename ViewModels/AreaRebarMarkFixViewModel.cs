@@ -5,6 +5,7 @@ using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
 using RevitTimasBIMTools.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -110,7 +111,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal async void FixAreaRebarParameter()
+        internal async void FixAreaRebarParameter(int percentage = 30)
         {
             await RevitTask.RunAsync(app =>
             {
@@ -121,22 +122,24 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         map = new Dictionary<string, ValueDataModel>();
                         IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
+
                         TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
-                            int index = 0;
+                            int counter = 0;
+                            Random rnd = new();
+                            int limit = percentage / 100 * rebarIds.Count;
                             while (0 < rebarIds.Count)
                             {
-                                index++;
-                                if (index > rebarIds.Count - 1) { index = 0; }
+                                counter++;
+                                int index = rnd.Next(0, rebarIds.Count);
                                 Element elem = doc.GetElement(rebarIds[index]);
                                 if (elem is RebarInSystem rebarIn)
                                 {
-                                    Logger.Log("Count: " + index.ToString());
-                                    if (ValidateParameter(rebarIn, param))
+                                    if (ValidateParameter(param, rebarIn, counter > limit))
                                     {
                                         if (rebarIds.Remove(rebarIds[index]))
                                         {
-
+                                            Logger.Info("Started!");
                                         }
                                     }
                                 }
@@ -148,14 +151,14 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool ValidateParameter(RebarInSystem rebar, Parameter param)
+        private bool ValidateParameter(Parameter param, RebarInSystem rebar, bool start)
         {
             string value = param.GetValue();
             string name = param.Definition.Name;
-            bool IsValid = map.Values.All(s => s.Counter > 3);
+            bool IsValid = start && !string.IsNullOrEmpty(map[name].Content);
             if (IsValid && map.TryGetValue(name, out ValueDataModel result))
             {
-                _ = rebar.get_Parameter(param.GUID).SetValue(result.Content);
+                IsValid = rebar.get_Parameter(param.GUID).SetValue(result.Content);
             }
             else if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
             {
