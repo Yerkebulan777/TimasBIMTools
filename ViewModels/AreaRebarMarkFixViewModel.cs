@@ -52,7 +52,7 @@ namespace RevitTimasBIMTools.ViewModels
                 {
                     IList<ElementId> rebarIds = areaReinforcement.GetRebarInSystemIds();
                     ElementId rebarId = rebarIds.FirstOrDefault(i => i.IntegerValue > 0);
-                    foreach (Parameter param in GetAllStringParameters(doc, rebarId))
+                    foreach (Parameter param in GetAllTextParameters(doc, rebarId))
                     {
                         string name = param.Definition.Name;
                         if (5 < name.Length)
@@ -75,7 +75,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IList<Parameter> GetAllStringParameters(Document doc, ElementId rebarId)
+        private IList<Parameter> GetAllTextParameters(Document doc, ElementId rebarId)
         {
             IList<Parameter> result = new List<Parameter>();
             if (rebarId is not null and ElementId)
@@ -122,10 +122,9 @@ namespace RevitTimasBIMTools.ViewModels
                                 counter++;
                                 int index = rnd.Next(0, rebarIds.Count);
                                 Element elem = doc.GetElement(rebarIds[index]);
-                                if (elem is RebarInSystem rebarIn)
+                                Parameter local = elem.get_Parameter(param.GUID);
+                                if (elem is RebarInSystem rebarIn && local is not null)
                                 {
-                                    Parameter local = rebarIn.get_Parameter(param.GUID);
-                                    Logger.Log($"All: {rebarIds.Count} Counter: {counter} Index: {index} IsStarted: {counter > limit}");
                                     if (ValidateParameter(local, rebarIn, counter > limit))
                                     {
                                         if (rebarIds.Remove(rebarIds[index]))
@@ -148,13 +147,10 @@ namespace RevitTimasBIMTools.ViewModels
 
         private bool ValidateParameter(Parameter param, RebarInSystem rebarIn, bool start)
         {
-            Logger.Log("Start validate...");
             string value = param.GetValue();
             string name = param.Definition.Name;
-            Logger.Log($"Parameter: {name} Value: {value}");
             ParamData ??= new Dictionary<string, ValueDataModel>();
-            bool IsValid = start && ParamData.Values.All(val => val.Counter > 0);
-            Logger.Log($"IsValid: {IsValid}\tParameter: {name}\tValue: {value}");
+            bool IsValid = start && ParamData.Values.Any(val => val.Counter > 0);
             if (IsValid && ParamData.TryGetValue(name, out ValueDataModel result))
             {
                 IsValid = rebarIn.get_Parameter(param.GUID).SetValue(result.Content);
@@ -173,5 +169,6 @@ namespace RevitTimasBIMTools.ViewModels
             return IsValid;
         }
     }
+
 
 }
