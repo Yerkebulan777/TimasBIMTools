@@ -163,14 +163,13 @@ namespace RevitTimasBIMTools.ViewModels
 
             bool validCount = paramData.Values.Any(v => v.Counter > 3);
             bool validValue = paramData.Values.Any(v => v.Content is not null);
-            bool isValidate = (isLimited && validValue) || (validCount && validValue);
+            bool isValidated = (isLimited && validValue) || (validCount && validValue);
 
-            if (paramData.TryGetValue(name, out ValueDataModel model) && isValidate)
+            if (paramData.TryGetValue(name, out ValueDataModel model) && isValidated)
             {
-                string msg = $"Parameter: {name} Is: {validCount}/{validValue}/{isLimited}";
-                Debug.Assert(model is not null, "Dictionary value can't be null\t" + msg);
+                string msg = $"Booleans: {validCount}/{validValue}/{isLimited}";
                 Debug.Assert(!string.IsNullOrEmpty(model.Content), "Value can't be null\t" + msg);
-                isValidate = rebar.get_Parameter(paramGuid).SetValue(model.Content);
+                isValidated = rebar.get_Parameter(paramGuid).SetValue(model.Content);
             }
             else if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
             {
@@ -184,9 +183,8 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
 
-            return isValidate;
+            return isValidated;
         }
-
 
     }
 
