@@ -19,7 +19,7 @@ namespace RevitTimasBIMTools.ViewModels
 
         private Document doc { get; set; }
         private IList<Element> areaReinforcements { get; set; }
-        private IDictionary<string, ValueDataModel> map { get; set; }
+        private static IDictionary<string, ValueDataModel> ParamData { get; set; }
         private TaskScheduler taskContext { get; set; } = TaskScheduler.FromCurrentSynchronizationContext();
         TimeSpan timeSpan { get; } = TimeSpan.FromSeconds(90);
 
@@ -125,7 +125,6 @@ namespace RevitTimasBIMTools.ViewModels
                         IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
                         TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
-                            map = null;
                             int counter = 0;
                             Random rnd = new();
                             while (0 < rebarIds.Count)
@@ -141,7 +140,11 @@ namespace RevitTimasBIMTools.ViewModels
                                     {
                                         if (rebarIds.Remove(rebarIds[index]))
                                         {
-                                            
+                                            if (rebarIds.Count == 0)
+                                            {
+                                                ParamData.Clear();
+                                                ParamData = null;
+                                            }
                                         }
                                     }
                                 }
@@ -160,20 +163,20 @@ namespace RevitTimasBIMTools.ViewModels
             string value = param.GetValue();
             string name = param.Definition.Name;
             Logger.Log($"Parameter: {name} Value: {value}");
-            bool IsValid = start && map.Values.All(val => val.Counter > 0);
+            bool IsValid = start && ParamData.Values.All(val => val.Counter > 0);
             Logger.Log($"IsValid: {IsValid}\tParameter: {name}\tValue: {value}");
-            if (IsValid && map.TryGetValue(name, out ValueDataModel result))
+            if (IsValid && ParamData.TryGetValue(name, out ValueDataModel result))
             {
                 IsValid = rebar.get_Parameter(param.GUID).SetValue(result.Content);
             }
             else if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
             {
-                if (!map.TryGetValue(name, out ValueDataModel data))
+                ParamData ??= new Dictionary<string, ValueDataModel>();
+                if (!ParamData.TryGetValue(name, out ValueDataModel data))
                 {
                     Task.Delay(timeSpan);
                     Logger.Log("Set new parameter...");
-                    map ??= new Dictionary<string, ValueDataModel>();
-                    map.Add(name, new ValueDataModel(value));
+                    ParamData.Add(name, new ValueDataModel(value));
                 }
                 else
                 {
@@ -184,6 +187,8 @@ namespace RevitTimasBIMTools.ViewModels
             }
             return IsValid;
         }
+
+
     }
 
 }
