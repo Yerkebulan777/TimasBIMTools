@@ -163,9 +163,9 @@ namespace RevitTimasBIMTools.ViewModels
 
             bool validCount = paramData.Values.Any(v => v.Counter > 3);
             bool validValue = paramData.Values.Any(v => v.Content is not null);
-            bool isValidate = isLimited || (validCount && validValue && paramData.Count > 0);
+            bool isValidate = (isLimited && validValue) || (validCount && validValue);
 
-            if (isValidate && paramData.TryGetValue(name, out ValueDataModel model))
+            if (paramData.TryGetValue(name, out ValueDataModel model) && isValidate)
             {
                 string msg = $"Parameter: {name} Is: {validCount}/{validValue}/{isLimited}";
                 Debug.Assert(model is not null, "Dictionary value can't be null\t" + msg);
