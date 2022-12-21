@@ -135,11 +135,11 @@ namespace RevitTimasBIMTools.ViewModels
                                         Logger.Log($"\n <<< VALIDATED >>> \n");
                                         if (rebarIds.Remove(rebarIds[idx]))
                                         {
-                                            Logger.Log($"\nAmount: {amount}");
                                             amount = rebarIds.Count;
                                             if (amount.Equals(0))
                                             {
                                                 paramData.Clear();
+                                                paramData = null;
                                             }
                                         }
                                     }
