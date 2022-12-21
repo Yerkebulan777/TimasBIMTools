@@ -40,7 +40,7 @@ internal sealed class ValueDataModel
         }
         else
         {
-            data.Add(value, 0);
+            data?.Add(value, 0);
         }
     }
 }
