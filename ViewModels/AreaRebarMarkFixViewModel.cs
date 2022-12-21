@@ -117,15 +117,15 @@ namespace RevitTimasBIMTools.ViewModels
         {
             await RevitTask.RunAsync(app =>
             {
-                map = null;
                 doc = app.ActiveUIDocument.Document;
                 foreach (Element element in areaReinforcements)
                 {
-                    if (map is null && element is AreaReinforcement areaReinforce)
+                    if (param is not null && element is AreaReinforcement areaReinforce)
                     {
                         IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
                         TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
+                            map = null;
                             int counter = 0;
                             Random rnd = new();
                             while (0 < rebarIds.Count)
@@ -134,7 +134,7 @@ namespace RevitTimasBIMTools.ViewModels
                                 Task.Delay(timeSpan);
                                 int index = rnd.Next(0, rebarIds.Count);
                                 Element elem = doc.GetElement(rebarIds[index]);
-                                if (param is not null && elem is RebarInSystem rebarIn)
+                                if (elem is RebarInSystem rebarIn)
                                 {
                                     Logger.Log($"All: {rebarIds.Count} Counter: {counter} Index: {index} IsStarted: {counter > limit}");
                                     if (ValidateParameter(param, rebarIn, counter > limit))
