@@ -90,7 +90,7 @@ namespace RevitTimasBIMTools.ViewModels
                     for (int i = 0; i < prmList.Count; i++)
                     {
                         Parameter param = prmList[i];
-                        if (param.UserModifiable || param.IsShared || !param.IsReadOnly)
+                        if (param.UserModifiable && param.IsShared && !param.IsReadOnly)
                         {
                             ParameterType paramType = param.Definition.ParameterType;
                             if (paramType == ParameterType.Text)
@@ -119,7 +119,6 @@ namespace RevitTimasBIMTools.ViewModels
                         TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
                             int counter = 0;
-                            paramData = null;
                             Random rnd = new();
                             int amount = rebarIds.Count;
                             while (0 < amount)
@@ -136,8 +135,12 @@ namespace RevitTimasBIMTools.ViewModels
                                         Logger.Log($"\n <<< VALIDATED >>> \n");
                                         if (rebarIds.Remove(rebarIds[idx]))
                                         {
-                                            amount = rebarIds.Count;
                                             Logger.Log($"\nAmount: {amount}");
+                                            amount = rebarIds.Count;
+                                            if (amount.Equals(0))
+                                            {
+                                                paramData.Clear();
+                                            }
                                         }
                                     }
                                 }
@@ -149,10 +152,10 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool ValidateParameter(Parameter local, RebarInSystem rebar, bool isLimited)
+        private bool ValidateParameter(Parameter sparam, RebarInSystem rebar, bool isLimited)
         {
-            string value = local.GetValue();
-            string name = local.Definition.Name;
+            string value = sparam.GetValue();
+            string name = sparam.Definition.Name;
 
             paramData ??= new Dictionary<string, ValueDataModel>();
 
