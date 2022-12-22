@@ -11,7 +11,7 @@ using System.Globalization;
 using System.Threading;
 
 
-namespace RevitTimasBIMTools.CutOpening
+namespace RevitTimasBIMTools.Commands
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]

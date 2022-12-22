@@ -311,7 +311,7 @@
     <Compile Include="Core\ContainerConfig.cs" />
     <Compile Include="Core\RevitEventWrapper.cs" />
     <Compile Include="Core\SmartToolApp.cs" />
-    <Compile Include="RebarMarkFix\AreaRebarMarkFixCommand.cs" />
+    <Compile Include="Commands\AreaRebarMarkFixCommand.cs" />
     <Compile Include="RevitModel\PreviewControlModel.cs" />
     <Compile Include="RevitModel\ValueDataModel.cs" />
     <Compile Include="RevitUtils\ProcessManager.cs" />
@@ -327,7 +327,7 @@
     <Compile Include="Services\Logger.cs" />
     <Compile Include="RevitUtils\UnitManager.cs" />
     <Compile Include="CutOpening\CutHoleRegisterDockPane.cs" />
-    <Compile Include="CutOpening\CutHoleShowPanelCommand.cs" />
+    <Compile Include="Commands\CutHoleShowPanelCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

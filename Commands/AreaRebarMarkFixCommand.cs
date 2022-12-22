@@ -8,7 +8,7 @@ using System.Globalization;
 using System.Threading;
 
 
-namespace RevitTimasBIMTools.RebarMarkFix
+namespace RevitTimasBIMTools.Commands
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
