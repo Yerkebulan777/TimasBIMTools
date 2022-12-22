@@ -175,15 +175,15 @@ namespace RevitTimasBIMTools.ViewModels
             get => symbols;
             set
             {
-                IList<FamilySymbol> tempSymbols = symbols;
-                if (SetProperty(ref symbols, value) && tempSymbols != null)
+                IList<FamilySymbol> tempList = symbols ?? new List<FamilySymbol>();
+                if (SetProperty(ref symbols, value) && symbols is not null)
                 {
-                    string[] uids = symbols?.Select(s => s.UniqueId).ToArray();
-                    foreach (FamilySymbol symbol in tempSymbols)
+                    string[] nuids = symbols.Select(s => s.UniqueId).ToArray();
+                    foreach (FamilySymbol symbol in tempList)
                     {
                         if (symbol.IsValidObject && symbol.IsActive)
                         {
-                            if (!uids.Contains(symbol.UniqueId))
+                            if (!nuids.Contains(symbol.UniqueId))
                             {
                                 symbols.Add(symbol);
                             }
@@ -303,7 +303,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void GetFamilySymbolSharedParameterData(FamilySymbol symbol)
+        internal void GetFamilySymbolParameterData(FamilySymbol symbol)
         {
             Document familyDoc = doc.EditFamily(symbol.Family);
             if (null != familyDoc && familyDoc.IsFamilyDocument)

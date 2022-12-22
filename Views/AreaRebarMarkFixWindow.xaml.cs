@@ -39,6 +39,7 @@ namespace RevitTimasBIMTools.Views
         private void Apply_Click(object sender, RoutedEventArgs e)
         {
             viewModel.FixAreaRebarParameter();
+            this.Close();
         }
 
 
@@ -46,7 +47,6 @@ namespace RevitTimasBIMTools.Views
         {
             this.Close();
         }
-
 
     }
 }

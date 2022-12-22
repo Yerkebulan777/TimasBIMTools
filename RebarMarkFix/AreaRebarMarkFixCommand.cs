@@ -17,9 +17,6 @@ namespace RevitTimasBIMTools.RebarMarkFix
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            UIDocument uidoc = commandData.Application.ActiveUIDocument;
-            _ = uidoc.Document;
-
             try
             {
                 AreaRebarMarkFixViewModel viewModel = new();
@@ -37,11 +34,8 @@ namespace RevitTimasBIMTools.RebarMarkFix
 
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
         {
-            if (uiapp.ActiveUIDocument?.ActiveGraphicalView is View view)
-            {
-                return view.ViewType.Equals(ViewType.Schedule);
-            }
-            return false;
+            View view = uiapp.ActiveUIDocument?.ActiveGraphicalView;
+            return view is ViewPlan or ViewSchedule;
         }
 
 
