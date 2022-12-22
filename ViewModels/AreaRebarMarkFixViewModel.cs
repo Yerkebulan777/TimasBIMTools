@@ -103,12 +103,11 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal async void FixAreaRebarParameter(int percent = 15)
+        internal async void FixAreaRebarParameter(double factor = 1.25)
         {
             await RevitTask.RunAsync(app =>
             {
                 Random rnd = new();
-                int factor = 1 + (percent / 100);
                 doc = app.ActiveUIDocument.Document;
                 foreach (Element current in areaReinforcements)
                 {
@@ -124,12 +123,11 @@ namespace RevitTimasBIMTools.ViewModels
                             {
                                 counter++;
                                 int idx = rnd.Next(num);
-                                bool limited = counter > (num * factor);
                                 Element element = doc.GetElement(rebarIds[idx]);
                                 Parameter param = element.get_Parameter(paramGuid);
                                 if (element is RebarInSystem rebarIn && param is not null)
                                 {
-                                    if (ValidateParameter(param, rebarIn, limited))
+                                    if (ValidateParameter(param, rebarIn, counter > (num * factor)))
                                     {
                                         rebarIds.RemoveAt(idx);
                                         num = rebarIds.Count;
@@ -155,16 +153,16 @@ namespace RevitTimasBIMTools.ViewModels
             ICollection<ValueDataModel> values = paramData.Values;
             bool founded = values.Any(v => v.Counter > 0);
             bool refined = values.Any(v => v.Counter > 3);
-            bool isvalid = limited && founded || refined;
+            bool IsValid = limited && founded || refined;
 
-            if (isvalid && paramData.TryGetValue(name, out ValueDataModel model))
+            if (IsValid && paramData.TryGetValue(name, out ValueDataModel model))
             {
                 Debug.Assert(!string.IsNullOrEmpty(model.Content), "Value can't be null");
-                isvalid = rebar.get_Parameter(paramGuid).SetValue(model.Content);
+                IsValid = rebar.get_Parameter(paramGuid).SetValue(model.Content);
             }
-            else if (limited && !founded && string.IsNullOrWhiteSpace(value))
+            else if (!IsValid && limited && string.IsNullOrWhiteSpace(value))
             {
-                isvalid = rebar.get_Parameter(paramGuid).SetValue(string.Empty);
+                IsValid = rebar.get_Parameter(paramGuid).SetValue(string.Empty);
             }
             else if (!string.IsNullOrWhiteSpace(value))
             {
@@ -178,8 +176,9 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
 
-            return isvalid;
+            return IsValid;
         }
+
 
     }
 
