@@ -64,7 +64,7 @@
                 Margin="5"
                 Name="CheckAll"
                 Height="25"
-                Content="In View " 
+                Content="All in View " 
                 VerticalContentAlignment="Center"
                 IsChecked="{Binding CollectInView, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
 
@@ -74,7 +74,7 @@
                 Height="25"
                 Margin="5"
                 Click="Apply_Click"
-                Content="Apply"
+                Content="Ok"
                 IsDefault="True"
                 TabIndex="1" />
             
@@ -84,7 +84,7 @@
                 Height="25"
                 Margin="5"
                 Click="Close_Click"
-                Content="Close"
+                Content="Cancel"
                 IsDefault="False"
                 TabIndex="1" />
         </StackPanel>
