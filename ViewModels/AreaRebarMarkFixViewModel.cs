@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
+using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
@@ -14,8 +15,7 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class AreaRebarMarkFixViewModel : ObservableObject
     {
-        private Document doc { get; set; }
-        private IList<Element> areaReinforcements { get; set; } = null;
+        private IList<Element> reinforcements { get; set; } = null;
         private static IDictionary<string, ValueDataModel> paramData { get; set; } = null;
         private Guid paramGuid { get; set; }
 
@@ -32,6 +32,13 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
+        private bool inView = false;
+        public bool CollectInView
+        {
+            get => inView;
+            set => SetProperty(ref inView, value);
+        }
+
 
         private IDictionary<string, Parameter> parameters;
         public IDictionary<string, Parameter> AllParameters
@@ -45,9 +52,10 @@ namespace RevitTimasBIMTools.ViewModels
         {
             AllParameters = await RevitTask.RunAsync(app =>
             {
-                doc = app.ActiveUIDocument.Document;
-                areaReinforcements = GetAllAreaReinforcement(doc);
-                Element reinforcement = areaReinforcements.FirstOrDefault();
+                UIDocument uidoc = app.ActiveUIDocument;
+                Document doc = app.ActiveUIDocument.Document;
+                reinforcements = SelectAreaReinforcement(uidoc);
+                Element reinforcement = reinforcements.FirstOrDefault();
                 IDictionary<string, Parameter> result = new SortedList<string, Parameter>();
                 if (reinforcement is not null and AreaReinforcement areaReinforcement)
                 {
@@ -67,12 +75,39 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private IList<Element> GetAllAreaReinforcement(Document doc)
+        private IList<Element> GetInViewAreaReinforcement(UIDocument uidoc)
         {
-            return new FilteredElementCollector(doc)
+            View view = uidoc.ActiveView;
+            return new FilteredElementCollector(uidoc.Document, view.Id)
             .OfClass(typeof(AreaReinforcement))
             .WhereElementIsNotElementType()
             .ToElements();
+        }
+
+
+        private IList<Element> SelectAreaReinforcement(UIDocument uidoc)
+        {
+            IList<Element> elements = GetInViewAreaReinforcement(uidoc);
+            if (!inView && elements is not null)
+            {
+                List<Element> result = new();
+                ICollection<ElementId> selectIds = uidoc.Selection.GetElementIds();
+                int[] selectInts = selectIds.Select(id => id.IntegerValue).ToArray();
+                foreach (Element element in elements)
+                {
+                    if (element is not null and AreaReinforcement rein)
+                    {
+                        ElementId hostid = rein.GetHostId();
+                        if (hostid.Equals(element.Id)) { result.Add(element); }
+                        else if (selectInts.Contains(element.Id.IntegerValue))
+                        {
+                            result.Add(element);
+                        }
+                    }
+                }
+                return result;
+            }
+            return elements;
         }
 
 
@@ -84,14 +119,14 @@ namespace RevitTimasBIMTools.ViewModels
                 Element element = doc.GetElement(rebarId);
                 if (element is RebarInSystem rebar)
                 {
-                    IList<Parameter> prmList = rebar.GetOrderedParameters();
-                    for (int i = 0; i < prmList.Count; i++)
+                    IList<Parameter> plist = rebar.GetOrderedParameters();
+                    for (int i = 0; i < plist.Count; i++)
                     {
-                        Parameter param = prmList[i];
+                        Parameter param = plist[i];
                         if (param.UserModifiable && param.IsShared && !param.IsReadOnly)
                         {
-                            ParameterType paramType = param.Definition.ParameterType;
-                            if (paramType == ParameterType.Text)
+                            ParameterType prmType = param.Definition.ParameterType;
+                            if (prmType == ParameterType.Text)
                             {
                                 result.Add(param);
                             }
@@ -108,8 +143,8 @@ namespace RevitTimasBIMTools.ViewModels
             await RevitTask.RunAsync(app =>
             {
                 Random rnd = new();
-                doc = app.ActiveUIDocument.Document;
-                foreach (Element current in areaReinforcements)
+                Document doc = app.ActiveUIDocument.Document;
+                foreach (Element current in reinforcements)
                 {
                     if (selectedParam is not null && current is AreaReinforcement areaReinforce)
                     {
@@ -153,7 +188,7 @@ namespace RevitTimasBIMTools.ViewModels
             ICollection<ValueDataModel> values = paramData.Values;
             bool founded = values.Any(v => v.Counter > 0);
             bool refined = values.Any(v => v.Counter > 3);
-            bool IsValid = limited && founded || refined;
+            bool IsValid = (limited && founded) || refined;
 
             if (IsValid && paramData.TryGetValue(name, out ValueDataModel model))
             {

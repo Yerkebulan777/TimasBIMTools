@@ -4,6 +4,8 @@ using Autodesk.Revit.UI;
 using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 
@@ -35,7 +37,24 @@ namespace RevitTimasBIMTools.Commands
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
         {
             View view = uiapp.ActiveUIDocument?.ActiveGraphicalView;
-            return view is ViewPlan or ViewSchedule;
+            if (view is ViewPlan or ViewSchedule)
+            {
+                IList catList = new List<int>
+                {
+                    (int)BuiltInCategory.OST_Walls,
+                    (int)BuiltInCategory.OST_Floors,
+                    (int)BuiltInCategory.OST_AreaRein
+                };
+                foreach (Category cat in selectedCategories)
+                {
+                    if (catList.Contains(cat.Id.IntegerValue))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
 

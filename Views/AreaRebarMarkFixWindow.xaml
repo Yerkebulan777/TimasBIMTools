@@ -59,6 +59,15 @@
             HorizontalAlignment="Right"
             VerticalAlignment="Center"
             Orientation="Horizontal">
+
+            <CheckBox
+                Margin="5"
+                Name="CheckAll"
+                Height="25"
+                Content="In View " 
+                VerticalContentAlignment="Center"
+                IsChecked="{Binding CollectInView}"/>
+
             <Button
                 Name="ApplyMark"
                 Width="75"
@@ -68,6 +77,7 @@
                 Content="Apply"
                 IsDefault="True"
                 TabIndex="1" />
+            
             <Button
                 Name="CloseWindow"
                 Width="75"
