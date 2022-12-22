@@ -66,7 +66,7 @@
                 Height="25"
                 Content="In View " 
                 VerticalContentAlignment="Center"
-                IsChecked="{Binding CollectInView}"/>
+                IsChecked="{Binding CollectInView, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
 
             <Button
                 Name="ApplyMark"

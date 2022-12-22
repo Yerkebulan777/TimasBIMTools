@@ -32,6 +32,7 @@ namespace RevitTimasBIMTools.ViewModels
             }
         }
 
+
         private bool inView = false;
         public bool CollectInView
         {
