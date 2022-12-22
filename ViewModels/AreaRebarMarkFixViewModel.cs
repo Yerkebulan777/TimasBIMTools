@@ -99,7 +99,10 @@ namespace RevitTimasBIMTools.ViewModels
                     if (element is not null and AreaReinforcement rein)
                     {
                         ElementId hostid = rein.GetHostId();
-                        if (hostid.Equals(element.Id)) { result.Add(element); }
+                        if (selectInts.Contains(hostid.IntegerValue))
+                        { 
+                            result.Add(element); 
+                        }
                         else if (selectInts.Contains(element.Id.IntegerValue))
                         {
                             result.Add(element);
