@@ -367,17 +367,17 @@ namespace RevitTimasBIMTools.CutOpening
         //    double value = invalidInt;
         //    int minDistance = int.MaxValue;
         //    char[] delimiters = new[] { ' ', '_', '-' };
-        //    foreach (SelectedParameter param in floor.GetOrderedParameters())
+        //    foreach (SelectedParameter selectedParam in floor.GetOrderedParameters())
         //    {
-        //        Definition highMark = param.Definition;
-        //        if (param.HasValue && highMark.ParameterType == lenParamType)
+        //        Definition highMark = selectedParam.Definition;
+        //        if (selectedParam.HasValue && highMark.ParameterType == lenParamType)
         //        {
         //            string name = highMark.Name;
         //            string[] strArray = name.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
         //            if (strArray.Contains(paramName, StringComparer.CurrentCultureIgnoreCase))
         //            {
-        //                int tmp = param.IsShared ? name.Length : name.Length + strArray.Length;
-        //                if (minDistance > tmp && UnitFormatUtils.TryParse(revitUnits, UnitType.UT_Length, param.AsValueString(), out value))
+        //                int tmp = selectedParam.IsShared ? name.Length : name.Length + strArray.Length;
+        //                if (minDistance > tmp && UnitFormatUtils.TryParse(revitUnits, UnitType.UT_Length, selectedParam.AsValueString(), out value))
         //                {
         //                    minDistance = tmp;
         //                }

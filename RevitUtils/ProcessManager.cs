@@ -38,7 +38,7 @@ namespace RevitTimasBIMTools.RevitUtils
         /// <summary>
         /// set owner form show inside revit
         /// </summary>
-        /// <param name="window"></param>
+        /// <selectedParam name="window"></selectedParam>
         public static void SetOwnerWindow(this Window window)
         {
             var windowInteropHelper = new WindowInteropHelper(window);

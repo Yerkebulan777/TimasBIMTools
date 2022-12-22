@@ -15,27 +15,24 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class AreaRebarMarkFixViewModel : ObservableObject
     {
-
+        private static bool? findValue = null;
         private Document doc { get; set; }
         private IList<Element> areaReinforcements { get; set; } = null;
         private static IDictionary<string, ValueDataModel> paramData { get; set; } = null;
         private Guid paramGuid { get; set; }
 
-        private Parameter param;
+        private Parameter selectedParam;
         public Parameter SelectedParameter
         {
-            get => param;
+            get => selectedParam;
             set
             {
-                if (SetProperty(ref param, value) && param is not null)
+                if (SetProperty(ref selectedParam, value) && selectedParam is not null)
                 {
-                    paramGuid = param.GUID;
+                    paramGuid = selectedParam.GUID;
                 }
             }
         }
-
-
-
 
 
         private IDictionary<string, Parameter> parameters;
@@ -108,41 +105,52 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal async void FixAreaRebarParameter()
+        internal async void FixAreaRebarParameter(int percent = 15)
         {
             await RevitTask.RunAsync(app =>
             {
+                Random rnd = new();
+                int factor = 1 + (percent / 100);
                 doc = app.ActiveUIDocument.Document;
                 foreach (Element current in areaReinforcements)
                 {
-                    //app.ActiveUIDocument.Selection.SetElementIds(new List<ElementId> { current.Id });
-                    if (param is not null && current is AreaReinforcement areaReinforce)
+                    if (selectedParam is not null && current is AreaReinforcement areaReinforce)
                     {
+                        paramData = new Dictionary<string, ValueDataModel>(100);
                         IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
+                        rebarIds = rebarIds.OrderBy(item => rnd.Next()).ToList();
                         TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
-                            int counter = 0;
-                            Random rnd = new();
                             int amount = rebarIds.Count;
-                            while (0 < amount)
+                            findValue = null;
+                            int counter = 0;
+                            while (true)
                             {
                                 counter++;
-                                int idx = rnd.Next(0, amount);
+                                int idx = rnd.Next(amount);
+                                bool limited = counter > (amount * factor);
                                 Element element = doc.GetElement(rebarIds[idx]);
-                                Parameter local = element.get_Parameter(paramGuid);
-                                if (element is RebarInSystem rebarIn && local is not null)
+                                Parameter param = element.get_Parameter(paramGuid);
+                                if (element is RebarInSystem rebarIn && param is not null)
                                 {
-                                    if (ValidateParameter(local, rebarIn, counter > amount))
+                                    bool isValid = ValidateParameter(param, rebarIn, limited);
+                                    if (limited && !isValid && !findValue.HasValue)
                                     {
-                                        Logger.Log($"\n <<< VALIDATED >>> \n");
-                                        if (rebarIds.Remove(rebarIds[idx]))
+                                        if (!paramData.Values.Any(v => v.Counter > 0))
                                         {
-                                            amount = rebarIds.Count;
-                                            if (amount.Equals(0))
-                                            {
-                                                paramData?.Clear();
-                                                paramData = null;
-                                            }
+                                            Logger.Info("Break and counter: " + counter.ToString());
+                                            break;
+                                        }
+                                    }
+                                    else if (isValid && rebarIds.Remove(rebarIds[idx]))
+                                    {
+                                        findValue = true;
+                                        amount = rebarIds.Count;
+                                        if (amount.Equals(0))
+                                        {
+                                            paramData?.Clear();
+                                            paramData = null;
+                                            break;
                                         }
                                     }
                                 }
@@ -154,38 +162,33 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private bool ValidateParameter(Parameter sparam, RebarInSystem rebar, bool isLimited)
+        private bool ValidateParameter(Parameter param, RebarInSystem rebar, bool limited)
         {
-            string value = sparam.GetValue();
-            string name = sparam.Definition.Name;
+            string value = param.GetValue();
+            string name = param.Definition.Name;
 
-            paramData ??= new Dictionary<string, ValueDataModel>();
+            bool valid = limited && paramData.Values.Any(v => v.Counter > 3);
 
-            bool validCount = paramData.Values.Any(v => v.Counter > 3);
-            bool validValue = paramData.Values.Any(v => v.Content is not null);
-            bool isValidated = (isLimited && validValue) || (validCount && validValue);
-
-            if (paramData.TryGetValue(name, out ValueDataModel model) && isValidated)
+            if (valid && paramData.TryGetValue(name, out ValueDataModel model))
             {
-                string msg = $"Booleans: {validCount}/{validValue}/{isLimited}";
-                Debug.Assert(!string.IsNullOrEmpty(model.Content), "Value can't be null\t" + msg);
-                isValidated = rebar.get_Parameter(paramGuid).SetValue(model.Content);
+                Debug.Assert(!string.IsNullOrEmpty(model.Content), "Value can't be null");
+                valid = rebar.get_Parameter(paramGuid).SetValue(model.Content);
             }
-            if (!string.IsNullOrEmpty(value) && !string.IsNullOrWhiteSpace(value))
+            else if (!string.IsNullOrWhiteSpace(value))
             {
-                if (!paramData.TryGetValue(name, out ValueDataModel data))
+                if (!paramData.TryGetValue(name, out ValueDataModel dataModel))
                 {
                     paramData.Add(name, new ValueDataModel(value));
                 }
                 else
                 {
-                    data?.SetNewValue(value);
+                    dataModel.SetNewValue(value);
+                    valid = dataModel.Content.Equals(value);
                 }
             }
 
-            return isValidated;
+            return valid;
         }
-
 
     }
 

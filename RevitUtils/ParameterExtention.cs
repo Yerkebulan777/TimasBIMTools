@@ -57,7 +57,7 @@ namespace RevitTimasBIMTools.RevitUtils
         }
 
         /// <summary>
-        /// SmartToolHelper to return param value as string, with additional
+        /// SmartToolHelper to return selectedParam value as string, with additional
         /// support for instance instanceId to display the instance stype referred to.
         /// </summary>
         public static string GetParameterValueByDocument(this Parameter param, Document doc)
@@ -76,8 +76,8 @@ namespace RevitTimasBIMTools.RevitUtils
 
 
         /// <summary>
-        /// SmartToolHelper to return param value as string.
-        /// One can also use param.AsValueString() to
+        /// SmartToolHelper to return selectedParam value as string.
+        /// One can also use selectedParam.AsValueString() to
         /// get the user interface representation.
         /// </summary>
         public static string GetParameterValue(Parameter param)
@@ -97,7 +97,7 @@ namespace RevitTimasBIMTools.RevitUtils
         /// <summary>
         /// Return Guid Of SelectedParameter Share
         /// </summary>
-        /// <param name="parameter">param</param>
+        /// <selectedParam name="parameter">selectedParam</selectedParam>
         /// <returns></returns>
         public static string Guid(this Parameter parameter)
         {
@@ -108,8 +108,8 @@ namespace RevitTimasBIMTools.RevitUtils
         /// <summary>
         /// Return Global SelectedParameter SymbolName
         /// </summary>
-        /// <param name="parameter"></param>
-        /// <param name="doc"></param>
+        /// <selectedParam name="parameter"></selectedParam>
+        /// <selectedParam name="doc"></selectedParam>
         /// <returns></returns>
         public static string GetAssGlobalParameter(this Parameter parameter, Document doc)
         {
@@ -128,8 +128,8 @@ namespace RevitTimasBIMTools.RevitUtils
         /// <summary>
         /// Return Global SelectedParameter Content
         /// </summary>
-        /// <param name="parameter"></param>
-        /// <param name="doc"></param>
+        /// <selectedParam name="parameter"></selectedParam>
+        /// <selectedParam name="doc"></selectedParam>
         /// <returns></returns>
         public static string GetAssGlobalParameterValue(this Parameter parameter, Document doc)
         {

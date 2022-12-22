@@ -351,6 +351,7 @@
     <Compile Include="RevitUtils\RevitWPFViewer.cs" />
     <Compile Include="Services\MutexServise.cs" />
     <Compile Include="RevitUtils\WindowExtesion.cs" />
+    <Compile Include="Services\RandomUtils.cs" />
     <Compile Include="Services\Timer.cs" />
     <Compile Include="ViewConverters\NullVisibilityConverter.cs" />
     <Compile Include="ViewConverters\PercentageConverter.cs" />
