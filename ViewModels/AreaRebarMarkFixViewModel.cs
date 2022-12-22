@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +14,6 @@ namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class AreaRebarMarkFixViewModel : ObservableObject
     {
-        private static bool? findValue = null;
         private Document doc { get; set; }
         private IList<Element> areaReinforcements { get; set; } = null;
         private static IDictionary<string, ValueDataModel> paramData { get; set; } = null;
@@ -118,38 +116,25 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         paramData = new Dictionary<string, ValueDataModel>(100);
                         IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
-                        rebarIds = rebarIds.OrderBy(item => rnd.Next()).ToList();
                         TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
-                            int amount = rebarIds.Count;
-                            findValue = null;
+                            int num = rebarIds.Count;
                             int counter = 0;
                             while (true)
                             {
                                 counter++;
-                                int idx = rnd.Next(amount);
-                                bool limited = counter > (amount * factor);
+                                int idx = rnd.Next(num);
+                                bool limited = counter > (num * factor);
                                 Element element = doc.GetElement(rebarIds[idx]);
                                 Parameter param = element.get_Parameter(paramGuid);
                                 if (element is RebarInSystem rebarIn && param is not null)
                                 {
-                                    bool isValid = ValidateParameter(param, rebarIn, limited);
-                                    if (limited && !isValid && !findValue.HasValue)
+                                    if (ValidateParameter(param, rebarIn, limited))
                                     {
-                                        if (!paramData.Values.Any(v => v.Counter > 0))
+                                        rebarIds.RemoveAt(idx);
+                                        num = rebarIds.Count;
+                                        if (num.Equals(0))
                                         {
-                                            Logger.Info("Break and counter: " + counter.ToString());
-                                            break;
-                                        }
-                                    }
-                                    else if (isValid && rebarIds.Remove(rebarIds[idx]))
-                                    {
-                                        findValue = true;
-                                        amount = rebarIds.Count;
-                                        if (amount.Equals(0))
-                                        {
-                                            paramData?.Clear();
-                                            paramData = null;
                                             break;
                                         }
                                     }
@@ -167,12 +152,19 @@ namespace RevitTimasBIMTools.ViewModels
             string value = param.GetValue();
             string name = param.Definition.Name;
 
-            bool valid = limited && paramData.Values.Any(v => v.Counter > 3);
+            ICollection<ValueDataModel> values = paramData.Values;
+            bool founded = values.Any(v => v.Counter > 0);
+            bool refined = values.Any(v => v.Counter > 3);
+            bool isvalid = limited && founded || refined;
 
-            if (valid && paramData.TryGetValue(name, out ValueDataModel model))
+            if (isvalid && paramData.TryGetValue(name, out ValueDataModel model))
             {
                 Debug.Assert(!string.IsNullOrEmpty(model.Content), "Value can't be null");
-                valid = rebar.get_Parameter(paramGuid).SetValue(model.Content);
+                isvalid = rebar.get_Parameter(paramGuid).SetValue(model.Content);
+            }
+            else if (limited && !founded && string.IsNullOrWhiteSpace(value))
+            {
+                isvalid = rebar.get_Parameter(paramGuid).SetValue(string.Empty);
             }
             else if (!string.IsNullOrWhiteSpace(value))
             {
@@ -183,11 +175,10 @@ namespace RevitTimasBIMTools.ViewModels
                 else
                 {
                     dataModel.SetNewValue(value);
-                    valid = dataModel.Content.Equals(value);
                 }
             }
 
-            return valid;
+            return isvalid;
         }
 
     }
