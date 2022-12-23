@@ -49,6 +49,14 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        private IDictionary<string, AreaReinforcement> sourceData;
+        public IDictionary<string, AreaReinforcement> SourceData
+        {
+            get => sourceData;
+            set => SetProperty(ref sourceData, value);
+        }
+
+
         public async void RetrieveParameterData()
         {
             AllParameters = await RevitTask.RunAsync(app =>
