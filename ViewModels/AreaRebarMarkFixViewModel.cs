@@ -100,8 +100,8 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         ElementId hostid = rein.GetHostId();
                         if (selectInts.Contains(hostid.IntegerValue))
-                        { 
-                            result.Add(element); 
+                        {
+                            result.Add(element);
                         }
                         else if (selectInts.Contains(element.Id.IntegerValue))
                         {
@@ -142,7 +142,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        internal async void FixAreaRebarParameter(double factor = 1.25)
+        internal async void FixAreaRebarParameter()
         {
             await RevitTask.RunAsync(app =>
             {
@@ -154,6 +154,7 @@ namespace RevitTimasBIMTools.ViewModels
                     {
                         paramData = new Dictionary<string, ValueDataModel>(100);
                         IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
+                        ISet<int> uniqueNumbers = new HashSet<int>(rebarIds.Count);
                         TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                         {
                             int num = rebarIds.Count;
@@ -161,18 +162,24 @@ namespace RevitTimasBIMTools.ViewModels
                             while (true)
                             {
                                 counter++;
-                                int idx = rnd.Next(num);
-                                Element element = doc.GetElement(rebarIds[idx]);
-                                Parameter param = element.get_Parameter(paramGuid);
-                                if (element is RebarInSystem rebarIn && param is not null)
+                                int rndIdx = rnd.Next(num);
+                                if (uniqueNumbers.Add(rndIdx))
                                 {
-                                    if (ValidateParameter(param, rebarIn, counter > (num * factor)))
+                                    Element element = doc.GetElement(rebarIds[rndIdx]);
+                                    Parameter param = element.get_Parameter(paramGuid);
+                                    if (element is RebarInSystem rebarIn && param is not null)
                                     {
-                                        rebarIds.RemoveAt(idx);
-                                        num = rebarIds.Count;
-                                        if (num.Equals(0))
+                                        if (ValidateParameter(param, rebarIn, counter > num))
                                         {
-                                            break;
+                                            if (uniqueNumbers.Remove(rndIdx))
+                                            {
+                                                rebarIds.RemoveAt(rndIdx);
+                                                num = rebarIds.Count;
+                                                if (num.Equals(0))
+                                                {
+                                                    break;
+                                                }
+                                            }
                                         }
                                     }
                                 }
