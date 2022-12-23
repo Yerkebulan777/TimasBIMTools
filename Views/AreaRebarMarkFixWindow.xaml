@@ -85,11 +85,11 @@
 
                         <GridViewColumn CellTemplate="{StaticResource FirstCell}" Width="30"/>
 
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Mark"/>
+
                         <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Host element"  />
 
                         <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Host Mark"/>
-
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Mark"/>
 
                     </GridView>
                 </ListView.View>
