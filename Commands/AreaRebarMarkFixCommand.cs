@@ -37,7 +37,7 @@ namespace RevitTimasBIMTools.Commands
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
         {
             View view = uiapp.ActiveUIDocument?.ActiveGraphicalView;
-            if (view is ViewPlan or ViewSection or View3D)
+            if (view is ViewPlan or ViewSchedule or ViewSection or View3D)
             {
                 IList catList = new List<int>
                 {

@@ -64,8 +64,8 @@ namespace RevitTimasBIMTools.ViewModels
                     ElementId rebarId = rebarIds.FirstOrDefault(i => i.IntegerValue > 0);
                     foreach (Parameter param in GetAllTextParameters(doc, rebarId))
                     {
-                        string name = param.Definition.Name;
-                        if (5 < name.Length)
+                        string name = param.Definition.Name.Trim();
+                        if (3 < name.Length)
                         {
                             result[name] = param;
                         }
@@ -171,15 +171,14 @@ namespace RevitTimasBIMTools.ViewModels
                                     {
                                         if (ValidateParameter(param, rebarIn, counter > num))
                                         {
-                                            if (uniqueNumbers.Remove(rndIdx))
+                                            rebarIds.RemoveAt(rndIdx);
+                                            uniqueNumbers.Clear();
+                                            num = rebarIds.Count;
+                                            if (num.Equals(0))
                                             {
-                                                rebarIds.RemoveAt(rndIdx);
-                                                num = rebarIds.Count;
-                                                if (num.Equals(0))
-                                                {
-                                                    break;
-                                                }
+                                                break;
                                             }
+
                                         }
                                     }
                                 }
@@ -201,15 +200,19 @@ namespace RevitTimasBIMTools.ViewModels
             bool refined = values.Any(v => v.Counter > 3);
             bool IsValid = (limited && founded) || refined;
 
+            // Set value if dictionary data is refined value
             if (IsValid && paramData.TryGetValue(name, out ValueDataModel model))
             {
                 Debug.Assert(!string.IsNullOrEmpty(model.Content), "Value can't be null");
                 IsValid = rebar.get_Parameter(paramGuid).SetValue(model.Content);
             }
-            else if (!IsValid && limited && string.IsNullOrWhiteSpace(value))
+            // Set empty to item in not found value
+            else if (limited && !founded && string.IsNullOrWhiteSpace(value))
             {
                 IsValid = rebar.get_Parameter(paramGuid).SetValue(string.Empty);
+                Debug.Assert(IsValid, "Value must be set");
             }
+            // Set value to dictionary data
             else if (!string.IsNullOrWhiteSpace(value))
             {
                 if (!paramData.TryGetValue(name, out ValueDataModel dataModel))
