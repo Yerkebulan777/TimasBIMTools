@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     Title="AreaRebarMarkFix"
     Width="300"
@@ -28,8 +29,9 @@
     <Grid x:Name="ParentGrid" Margin="2.5">
 
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <StackPanel
@@ -53,40 +55,87 @@
             </BulletDecorator>
         </StackPanel>
 
+
+
+        <StackPanel Grid.Row="1" Margin="5">
+
+            <StackPanel.Resources>
+
+                <DataTemplate x:Key="FirstCell">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding Path=IsSelected, 
+                        RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}}"/>
+                    </StackPanel>
+                </DataTemplate>
+
+                <CollectionViewSource x:Key="reinData" Source="{Binding Path=SourceElementData, Mode=OneWay}">
+                    <CollectionViewSource.SortDescriptions>
+                        <scm:SortDescription Direction="Ascending" PropertyName="Name" />
+                    </CollectionViewSource.SortDescriptions>
+                    <CollectionViewSource.GroupDescriptions>
+                        <PropertyGroupDescription PropertyName="Name" />
+                    </CollectionViewSource.GroupDescriptions>
+                </CollectionViewSource>
+            </StackPanel.Resources>
+
+            <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource reinData}}">
+
+                <ListView.View>
+                    <GridView AllowsColumnReorder="False"  ColumnHeaderToolTip="Information" >
+
+                        <GridViewColumn CellTemplate="{StaticResource FirstCell}" Width="30"/>
+
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Host element"  />
+
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Host Mark"/>
+
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Mark"/>
+
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+        </StackPanel>
+        
+        
+        
+
         <StackPanel
-            Grid.Row="1"
+            Grid.Row="2"
             Margin="10"
-            HorizontalAlignment="Right"
+            HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Orientation="Horizontal">
 
-            <CheckBox
-                Margin="5"
-                Name="CheckAll"
-                Height="25"
-                Content="All in View " 
-                VerticalContentAlignment="Center"
-                IsChecked="{Binding CollectInView, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
-
             <Button
-                Name="ApplyMark"
-                Width="75"
-                Height="25"
+                Name="Select"
+                Width="70"
+                Height="23"
                 Margin="5"
-                Click="Apply_Click"
-                Content="Ok"
-                IsDefault="True"
-                TabIndex="1" />
-            
-            <Button
-                Name="CloseWindow"
-                Width="75"
-                Height="25"
-                Margin="5"
-                Click="Close_Click"
-                Content="Cancel"
+                Click="Select_Click"
+                Content="Select"
                 IsDefault="False"
                 TabIndex="1" />
+
+            <Button
+                Name="GetAll"
+                Width="70"
+                Height="23"
+                Margin="5"
+                Click="Apply_Click"
+                Content="Get All"
+                IsDefault="True"
+                TabIndex="2" />
+            
+            <Button
+                Name="Apply"
+                Width="70"
+                Height="23"
+                Margin="5"
+                Click="Close_Click"
+                Content="Apply"
+                IsDefault="False"
+                TabIndex="3" />
         </StackPanel>
     </Grid>
 

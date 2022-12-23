@@ -36,10 +36,17 @@ namespace RevitTimasBIMTools.Views
         }
 
 
+        private void Select_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.SelectAreaReinElement();
+            viewModel.RetrieveParameterData();
+        }
+
+
         private void Apply_Click(object sender, RoutedEventArgs e)
         {
-            viewModel.FixAreaRebarParameter();
-            this.Close();
+            viewModel.GetAllAreaReinforceses();
+            viewModel.RetrieveParameterData();
         }
 
 
@@ -47,6 +54,7 @@ namespace RevitTimasBIMTools.Views
         {
             this.Close();
         }
+
 
     }
 }

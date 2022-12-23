@@ -128,5 +128,9 @@
         <Setter Property="Margin" Value="2.5" />
     </Style>
 
+    <Style TargetType="ListViewItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    </Style>
+
 
 </ResourceDictionary>
