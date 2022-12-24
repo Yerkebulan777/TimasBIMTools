@@ -10,8 +10,6 @@
     Title="AreaRebarMarkFix"
     Width="300"
     Height="Auto"
-    MinWidth="300"
-    MinHeight="150"
     d:DataContext="{d:DesignInstance Type=vm:AreaRebarMarkFixViewModel}"
     ResizeMode="CanResizeWithGrip"
     SizeToContent="Height"
@@ -63,8 +61,7 @@
 
                 <DataTemplate x:Key="FirstCell">
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding Path=IsSelected, 
-                        RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}}"/>
+                        <CheckBox IsChecked="{Binding Path=IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}}"/>
                     </StackPanel>
                 </DataTemplate>
 
@@ -80,10 +77,26 @@
 
             <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource reinData}}">
 
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox IsChecked="{Binding Path=IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}}"/>
+                            <TextBlock Grid.Column="1" Text="Some Text"/>
+                            <Button Grid.Column="2" Margin="0" Content="No Press Me"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+
                 <ListView.View>
+
                     <GridView AllowsColumnReorder="False"  ColumnHeaderToolTip="Information" >
 
-                        <GridViewColumn CellTemplate="{StaticResource FirstCell}" Width="30"/>
+                        <!--<GridViewColumn CellTemplate="{StaticResource FirstCell}" Width="30"/>-->
 
                         <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Mark"/>
 
@@ -92,14 +105,15 @@
                         <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Host Mark"/>
 
                     </GridView>
+                    
                 </ListView.View>
+                
+                
             </ListView>
 
         </StackPanel>
         
         
-        
-
         <StackPanel
             Grid.Row="2"
             Margin="10"
