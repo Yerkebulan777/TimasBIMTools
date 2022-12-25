@@ -53,8 +53,6 @@
             </BulletDecorator>
         </StackPanel>
 
-
-
         <StackPanel Grid.Row="1" Margin="5">
 
             <StackPanel.Resources>
@@ -75,19 +73,21 @@
                 </CollectionViewSource>
             </StackPanel.Resources>
 
-            <ListView Grid.Row="1" ItemsSource="{Binding Source={StaticResource reinData}}">
+            <ListView x:Name="DataListView" Grid.Row="1" ItemsSource="{Binding Source={StaticResource reinData}}" d:ItemsSource="{d:SampleData ItemCount=5}">
 
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="30" />
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto"  />
+                                <ColumnDefinition Width="*"  />
+                                <ColumnDefinition Width="*"  />
                             </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding Path=IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}}"/>
-                            <TextBlock Grid.Column="1" Text="Some Text"/>
-                            <Button Grid.Column="2" Margin="0" Content="No Press Me"/>
+                            <CheckBox Grid.Column="0" IsChecked="{Binding Path=IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}}"/>
+                            <TextBlock Grid.Column="1" Text="Name: " />
+                            <TextBlock Grid.Column="2" Text="{Binding Path=Name}" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Mail}" TextDecorations="Underline" Foreground="Blue" Cursor="Hand" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -98,11 +98,11 @@
 
                         <!--<GridViewColumn CellTemplate="{StaticResource FirstCell}" Width="30"/>-->
 
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Mark"/>
+                        <!--<GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Mark"/>
 
                         <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Host element"  />
 
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Host Mark"/>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="Host Mark"/>-->
 
                     </GridView>
                     
