@@ -155,7 +155,12 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
             {
                 Document doc = instance.Document;
                 Element host = doc.GetElement(instance.GetHostId());
-                models.Add(new ElementModel(instance, host));
+                string mark = GetAreaRebarMark(doc, instance);
+                ElementModel model = new(instance, host)
+                {
+                    Mark = mark
+                };
+                models.Add(model);
             }
         }
         return models;
@@ -214,48 +219,35 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
     }
 
 
-    private async void GetAreaRebarMarkHandler()
+    private string GetAreaRebarMark(Document doc, AreaReinforcement areaRein)
     {
-        await RevitTask.RunAsync(app =>
+        int counter = 0;
+        string result = null;
+        Dictionary<string, int> data = new();
+        IList<ElementId> rebarIds = areaRein.GetRebarInSystemIds();
+        for (int i = 0; i < rebarIds.Count; i++)
         {
-            int counter = 0;
-            string result = null;
-            Dictionary<string, int> data = new();
-            foreach (ElementModel current in modelData)
-            {
-                if (current.Instanse is AreaReinforcement areaReinforce)
-                {
-                    Document doc = app.ActiveUIDocument.Document;
-                    IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
-                    for (int i = 0; i < rebarIds.Count; i++)
-                    {
-                        int number = 0;
-                        Element element = doc.GetElement(rebarIds[i]);
-                        Parameter param = element.get_Parameter(paramGuid);
-                        if (param is not null && param.GetValue() is string value)
-                        {
-                            if (string.IsNullOrWhiteSpace(value)) { continue; }
-                            else if (data.TryGetValue(value, out int count))
-                            {
-                                number = count + 1;
-                                data[value] = number;
-                                if (counter < number)
-                                {
-                                    counter = number;
-                                    result = value;
-                                }
-                            }
-                            else
-                            {
-                                data.Add(value, number);
-                            }
-                        }
+            Element element = doc.GetElement(rebarIds[i]);
+            Parameter param = element.get_Parameter(paramGuid);
+            string value = param?.GetValue();
 
-                    }
-                    current.Mark = result;
+            if (string.IsNullOrWhiteSpace(value)) { continue; }
+            else if (data.TryGetValue(value, out int count))
+            {
+                int number = count + 1;
+                data[value] = number;
+                if (counter < number)
+                {
+                    counter = number;
+                    result = value;
                 }
             }
-        });
+            else
+            {
+                data.Add(value, 0);
+            }
+        }
+        return result;
     }
 
 

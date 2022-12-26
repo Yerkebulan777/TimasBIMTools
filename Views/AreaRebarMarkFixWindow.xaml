@@ -9,9 +9,8 @@
     xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     Title="AreaRebarMarkFix"
     Height="Auto"
-    MinWidth="300"
+    Width="300"
     MinHeight="150"
-    MaxWidth="500"
     MaxHeight="1000"
     d:DataContext="{d:DesignInstance Type=vm:AreaRebarMarkFixViewModel}"
     ResizeMode="CanResizeWithGrip"
@@ -63,15 +62,16 @@
 
                         <GridViewColumn DisplayMemberBinding="{Binding HostMark}" Header="Host mark" />
 
-                        <GridViewColumn Header="Mark">
+                        <GridViewColumn Header="Mark" Width="Auto" >
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Margin="1.5" Orientation="Horizontal">
-                                        <CheckBox Name="opt" Content="New: " />
                                         <TextBox
                                             Width="75"
+                                            Margin="5,0"
                                             IsEnabled="{Binding IsChecked, ElementName=opt}"
-                                            Text="{Binding Mark, Mode=TwoWay}" />
+                                            Text="{Binding Mark, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <CheckBox Name="opt" Content="Edit" />
                                     </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>

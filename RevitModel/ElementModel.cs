@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using CommunityToolkit.Mvvm.ComponentModel;
+using RevitTimasBIMTools.Services;
 using System;
 
 namespace RevitTimasBIMTools.RevitModel
@@ -55,7 +56,13 @@ namespace RevitTimasBIMTools.RevitModel
         public string Mark
         {
             get => mark;
-            set => SetProperty(ref mark, value);
+            set
+            {
+                if (SetProperty(ref mark, value))
+                {
+                    Logger.Log("Mark: " + mark);
+                }
+            }
         }
 
 
