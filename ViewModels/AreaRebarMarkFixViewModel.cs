@@ -5,100 +5,171 @@ using Autodesk.Revit.UI.Selection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
+using RevitTimasBIMTools.RevitSelectionFilter;
 using RevitTimasBIMTools.RevitUtils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Data;
+using Parameter = Autodesk.Revit.DB.Parameter;
+using Reference = Autodesk.Revit.DB.Reference;
 
 namespace RevitTimasBIMTools.ViewModels;
 
 public sealed class AreaRebarMarkFixViewModel : ObservableObject
 {
-    private IList<Element> reinforcements { get; set; } = null;
-    private static IDictionary<string, ValueDataModel> paramData { get; set; } = null;
+
     private Guid paramGuid { get; set; }
 
-    private Parameter selectedParam;
+    private bool ready;
+    public bool IsReady
+    {
+        get => ready;
+        set => SetProperty(ref ready, value);
+    }
+
+
+    private Parameter parameter;
     public Parameter SelectedParameter
     {
-        get => selectedParam;
+        get => parameter;
         set
         {
-            if (SetProperty(ref selectedParam, value) && selectedParam is not null)
+            if (SetProperty(ref parameter, value))
             {
-                paramGuid = selectedParam.GUID;
+                if (parameter is not null)
+                {
+                    paramGuid = parameter.GUID;
+                    IsReady = true;
+                }
+                else
+                {
+                    IsReady = false;
+                }
             }
         }
     }
 
 
-    private bool inView = false;
-    public bool CollectInView
-    {
-        get => inView;
-        set => SetProperty(ref inView, value);
-    }
-
-
-    private IDictionary<string, Parameter> parameters;
+    private IDictionary<string, Parameter> allParameters;
     public IDictionary<string, Parameter> AllParameters
     {
-        get => parameters;
-        set => SetProperty(ref parameters, value);
+        get => allParameters;
+        set => SetProperty(ref allParameters, value);
     }
 
 
-    private IList<Element> sourceData;
-    public IList<Element> SourceElementData
+    private ObservableCollection<ElementModel> modelData = null;
+    public ObservableCollection<ElementModel> ElementModelData
     {
-        get => sourceData;
-        set => SetProperty(ref sourceData, value);
+        get => modelData;
+        set
+        {
+            if (SetProperty(ref modelData, value) && modelData != null)
+            {
+                ViewDataCollection = new ListCollectionView(modelData);
+                ElementModel model = modelData.FirstOrDefault();
+                if (model != null && model.IsValidModel())
+                {
+                    RetrieveParameterData(model.Instanse);
+                }
+            }
+        }
+    }
+
+
+    private ListCollectionView viewData = null;
+    public ListCollectionView ViewDataCollection
+    {
+        get => viewData;
+        set
+        {
+            if (SetProperty(ref viewData, value))
+            {
+                using (viewData.DeferRefresh())
+                {
+                    viewData.SortDescriptions.Clear();
+                    viewData.GroupDescriptions.Clear();
+                    viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.HostCategoryIntId)));
+                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.HostCategoryIntId), ListSortDirection.Ascending));
+                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.HostMark), ListSortDirection.Ascending));
+                }
+            }
+        }
     }
 
 
     public async void SelectAreaReinElement()
     {
-        SourceElementData = await RevitTask.RunAsync(app =>
+        ElementModelData = await RevitTask.RunAsync(app =>
         {
-            IList<Element> elements = null;
+            Reference pickReference = null;
+            IList<Element> list = new List<Element>();
             try
             {
                 SelectionFilterAreaRein filter = new();
                 string prompt = "Select Area Reinforcement";
-                elements = app.ActiveUIDocument.Selection.PickElementsByRectangle(filter, prompt);
+                Selection choices = app.ActiveUIDocument.Selection;
+                pickReference = choices.PickObject(ObjectType.Element, filter, prompt);
+            }
+            catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
+            {
+                Debug.Print(ex.Message);
             }
             finally
             {
-                //handler
+                if (pickReference is not null)
+                {
+                    Document doc = app.ActiveUIDocument.Document;
+                    list.Add(doc.GetElement(pickReference));
+                }
             }
-            return elements;
+            return ConvertToModelData(list);
         });
     }
 
 
     public async void GetAllAreaReinforceses()
     {
-        SourceElementData = await RevitTask.RunAsync(app =>
+        ElementModelData = await RevitTask.RunAsync(app =>
         {
             Document doc = app.ActiveUIDocument.Document;
-            return new FilteredElementCollector(doc)
+            IList<Element> elements = new FilteredElementCollector(doc)
             .OfClass(typeof(AreaReinforcement))
             .WhereElementIsNotElementType()
             .ToElements();
+            return ConvertToModelData(elements);
         });
     }
 
 
-    public async void RetrieveParameterData()
+    private ObservableCollection<ElementModel> ConvertToModelData(in IList<Element> source)
+    {
+        ObservableCollection<ElementModel> models = new();
+        foreach (Element elem in source)
+        {
+            if (elem is AreaReinforcement instance)
+            {
+                Document doc = instance.Document;
+                Element host = doc.GetElement(instance.GetHostId());
+                models.Add(new ElementModel(instance, host));
+            }
+        }
+        return models;
+    }
+
+
+    public async void RetrieveParameterData(Element element)
     {
         AllParameters = await RevitTask.RunAsync(app =>
         {
             UIDocument uidoc = app.ActiveUIDocument;
             Document doc = app.ActiveUIDocument.Document;
-            Element reinforcement = sourceData.FirstOrDefault();
             IDictionary<string, Parameter> result = new SortedList<string, Parameter>();
-            if (reinforcement is not null and AreaReinforcement areaReinforcement)
+            if (element is not null and AreaReinforcement areaReinforcement)
             {
                 IList<ElementId> rebarIds = areaReinforcement.GetRebarInSystemIds();
                 ElementId rebarId = rebarIds.FirstOrDefault(i => i.IntegerValue > 0);
@@ -143,45 +214,73 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
     }
 
 
-    internal async void FixAreaRebarParameter()
+    private async void GetAreaRebarMarkHandler()
     {
         await RevitTask.RunAsync(app =>
         {
-            Random rnd = new();
-            Document doc = app.ActiveUIDocument.Document;
-            foreach (Element current in reinforcements)
+            int counter = 0;
+            string result = null;
+            Dictionary<string, int> data = new();
+            foreach (ElementModel current in modelData)
             {
-                if (selectedParam is not null && current is AreaReinforcement areaReinforce)
+                if (current.Instanse is AreaReinforcement areaReinforce)
                 {
-                    paramData = new Dictionary<string, ValueDataModel>(100);
+                    Document doc = app.ActiveUIDocument.Document;
                     IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
-                    ISet<int> uniqueNumbers = new HashSet<int>(rebarIds.Count);
+                    for (int i = 0; i < rebarIds.Count; i++)
+                    {
+                        int number = 0;
+                        Element element = doc.GetElement(rebarIds[i]);
+                        Parameter param = element.get_Parameter(paramGuid);
+                        if (param is not null && param.GetValue() is string value)
+                        {
+                            if (string.IsNullOrWhiteSpace(value)) { continue; }
+                            else if (data.TryGetValue(value, out int count))
+                            {
+                                number = count + 1;
+                                data[value] = number;
+                                if (counter < number)
+                                {
+                                    counter = number;
+                                    result = value;
+                                }
+                            }
+                            else
+                            {
+                                data.Add(value, number);
+                            }
+                        }
+
+                    }
+                    current.Mark = result;
+                }
+            }
+        });
+    }
+
+
+    internal async void SetAreaRebarMarkHandler()
+    {
+        if (modelData is null || parameter is null) { return; }
+        await RevitTask.RunAsync(app =>
+        {
+            Document doc = app.ActiveUIDocument.Document;
+            foreach (ElementModel current in modelData)
+            {
+                string mark = current.Mark;
+                if (!current.IsSelected) { continue; }
+                if (current.Instanse is AreaReinforcement areaReinforce)
+                {
+                    IList<ElementId> rebarIds = areaReinforce.GetRebarInSystemIds();
                     TransactionManager.CreateTransaction(doc, "Set Mark", () =>
                     {
-                        int num = rebarIds.Count;
-                        int counter = 0;
-                        while (true)
+                        for (int i = 0; i < rebarIds.Count; i++)
                         {
-                            counter++;
-                            int rndIdx = rnd.Next(num);
-                            if (uniqueNumbers.Add(rndIdx))
+                            Element element = doc.GetElement(rebarIds[i]);
+                            Parameter param = element.get_Parameter(paramGuid);
+                            if (param is not null && param.SetValue(mark))
                             {
-                                Element element = doc.GetElement(rebarIds[rndIdx]);
-                                Parameter param = element.get_Parameter(paramGuid);
-                                if (element is RebarInSystem rebarIn && param is not null)
-                                {
-                                    if (ValidateParameter(param, rebarIn, counter > num))
-                                    {
-                                        rebarIds.RemoveAt(rndIdx);
-                                        uniqueNumbers.Clear();
-                                        num = rebarIds.Count;
-                                        if (num.Equals(0))
-                                        {
-                                            break;
-                                        }
-
-                                    }
-                                }
+                                continue;
                             }
                         }
                     });
@@ -190,72 +289,4 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
         });
     }
 
-
-    private bool ValidateParameter(Parameter param, RebarInSystem rebar, bool limited)
-    {
-        string value = param.GetValue();
-        string name = param.Definition.Name;
-
-        ICollection<ValueDataModel> values = paramData.Values;
-        bool founded = values.Any(v => v.Counter > 0);
-        bool refined = values.Any(v => v.Counter > 3);
-        bool IsValid = (limited && founded) || refined;
-
-        // Set value if dictionary data is refined value
-        if (IsValid && paramData.TryGetValue(name, out ValueDataModel model))
-        {
-            Debug.Assert(!string.IsNullOrEmpty(model.Content), "Value can't be null");
-            IsValid = rebar.get_Parameter(paramGuid).SetValue(model.Content);
-        }
-        // Set empty to item in not found value
-        else if (limited && !founded && string.IsNullOrWhiteSpace(value))
-        {
-            IsValid = rebar.get_Parameter(paramGuid).SetValue(string.Empty);
-            Debug.Assert(IsValid, "Value must be set");
-        }
-        // Set value to dictionary data
-        else if (!string.IsNullOrWhiteSpace(value))
-        {
-            if (!paramData.TryGetValue(name, out ValueDataModel dataModel))
-            {
-                paramData.Add(name, new ValueDataModel(value));
-            }
-            else
-            {
-                dataModel.SetNewValue(value);
-            }
-        }
-
-        return IsValid;
-    }
-
-
-}
-
-
-internal sealed class SelectionFilterAreaRein : ISelectionFilter
-{
-    public bool AllowElement(Element elem)
-    {
-        if (elem is null)
-        {
-            return false;
-        }
-
-        if (elem is not FamilyInstance)
-        {
-            return false;
-        }
-
-        BuiltInCategory builtInCategory = (BuiltInCategory)GetCategoryIdAsInteger(elem);
-        return builtInCategory == BuiltInCategory.OST_AreaRein;
-    }
-    public bool AllowReference(Reference reference, XYZ position)
-    {
-        return false;
-    }
-    private int GetCategoryIdAsInteger(Element element)
-    {
-        return element?.Category?.Id?.IntegerValue ?? -1;
-    }
 }

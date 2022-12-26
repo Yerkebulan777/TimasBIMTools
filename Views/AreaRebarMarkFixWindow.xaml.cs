@@ -1,9 +1,7 @@
 ﻿using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
-using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
+
 
 namespace RevitTimasBIMTools.Views
 {
@@ -13,6 +11,7 @@ namespace RevitTimasBIMTools.Views
 
     public partial class AreaRebarMarkFixWindow : Window
     {
+
         public AreaRebarMarkFixWindow()
         {
             InitializeComponent();
@@ -31,7 +30,6 @@ namespace RevitTimasBIMTools.Views
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.viewModel.RetrieveParameterData();
             Loaded -= Window_Loaded;
         }
 
@@ -39,22 +37,30 @@ namespace RevitTimasBIMTools.Views
         private void Select_Click(object sender, RoutedEventArgs e)
         {
             viewModel.SelectAreaReinElement();
-            viewModel.RetrieveParameterData();
+        }
+
+
+        private void GetAll_Click(object sender, RoutedEventArgs e)
+        {
+            viewModel.GetAllAreaReinforceses();
         }
 
 
         private void Apply_Click(object sender, RoutedEventArgs e)
         {
-            viewModel.GetAllAreaReinforceses();
-            viewModel.RetrieveParameterData();
-        }
-
-
-        private void Close_Click(object sender, RoutedEventArgs e)
-        {
+            viewModel.SetAreaRebarMarkHandler();
             this.Close();
         }
 
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
 
+        }
+
+        private void newMark_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+ 
     }
 }

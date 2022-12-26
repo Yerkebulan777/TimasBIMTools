@@ -313,7 +313,6 @@
     <Compile Include="Core\SmartToolApp.cs" />
     <Compile Include="Commands\AreaRebarMarkFixCommand.cs" />
     <Compile Include="RevitModel\PreviewControlModel.cs" />
-    <Compile Include="RevitModel\ValueDataModel.cs" />
     <Compile Include="RevitUtils\ProcessManager.cs" />
     <Compile Include="RevitUtils\SmartBIMToolExtention.cs" />
     <Compile Include="RevitUtils\SmartThreadManager.cs" />
@@ -356,6 +355,7 @@
     <Compile Include="ViewConverters\PercentageConverter.cs" />
     <Compile Include="ViewModels\AreaRebarMarkFixViewModel.cs" />
     <Compile Include="ViewModels\CutVoidDataViewModel.cs" />
+    <Compile Include="RevitSelectionFilter\SelectionFilterAreaRein.cs" />
     <Compile Include="Views\AreaRebarMarkFixWindow.xaml.cs">
       <DependentUpon>AreaRebarMarkFixWindow.xaml</DependentUpon>
     </Compile>

@@ -148,13 +148,13 @@ namespace RevitTimasBIMTools.RevitUtils
 
         #region Parameter Filter Factory
 
-        /// <summary>Contains functions that create appropriate FilterRule objects based on the parameters given </summary>
-        /// <selectedParam name="ruleSwitch"> 
+        /// <summary>Contains functions that create appropriate FilterRule objects based on the allParameters given </summary>
+        /// <parameter name="ruleSwitch"> 
         /// 0 = CreateEqualsRule;
         /// 1 = CreateGreaterOrEqualRule;
         /// 2 = CreateGreaterOrEqualRule;
         /// 3 = CreateNotEqualsRule;
-        /// </selectedParam>
+        /// </parameter>
         /// <returns> FilteredElementCollector </returns>
         public static FilteredElementCollector ParamFilterFactory(FilteredElementCollector collector, ElementId paramId, int value, int ruleSwitch = 0)
         {

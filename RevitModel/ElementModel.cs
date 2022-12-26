@@ -11,7 +11,9 @@ namespace RevitTimasBIMTools.RevitModel
         public string LevelName { get; private set; }
         public string SymbolName { get; private set; }
         public string FamilyName { get; private set; }
+        public string HostMark { get; private set; }
         public int HostCategoryIntId { get; private set; }
+
 
         public ElementModel(Element instanse, Element host)
         {
@@ -25,18 +27,21 @@ namespace RevitTimasBIMTools.RevitModel
                 SymbolName = elementType.Name;
                 FamilyName = elementType.FamilyName;
                 HostCategoryIntId = host.Category.Id.IntegerValue;
+                HostMark = host.get_Parameter(BuiltInParameter.ALL_MODEL_MARK).AsString();
             }
         }
 
 
         public Plane SectionPlane { get; internal set; }
         public BoundingBoxUV SectionBox { get; internal set; }
-        
+
+
         public string Description { get; internal set; }
         public int SizeInMm { get; internal set; }
         public double Height { get; internal set; }
         public double Width { get; internal set; }
         public double Depth { get; internal set; }
+
 
         private bool selected = false;
         public bool IsSelected
@@ -46,9 +51,17 @@ namespace RevitTimasBIMTools.RevitModel
         }
 
 
+        private string mark;
+        public string Mark
+        {
+            get => mark;
+            set => SetProperty(ref mark, value);
+        }
+
+
         public bool IsValidModel()
         {
-            return Instanse != null && Instanse.IsValidObject && IsSelected;
+            return Instanse != null && Instanse.IsValidObject;
         }
 
 
