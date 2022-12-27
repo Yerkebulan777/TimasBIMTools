@@ -15,6 +15,7 @@
     d:DataContext="{d:DesignInstance Type=vm:AreaRebarMarkFixViewModel}"
     ResizeMode="CanResizeWithGrip"
     SizeToContent="Height"
+    Topmost="True"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
