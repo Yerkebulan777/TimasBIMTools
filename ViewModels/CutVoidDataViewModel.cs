@@ -98,13 +98,12 @@ namespace RevitTimasBIMTools.ViewModels
             get => refresh;
             set
             {
-                if (SetProperty(ref refresh, value) && refresh)
+                if (SetProperty(ref refresh, value) && started && refresh)
                 {
                     SnoopIntersectionByInputData();
                 }
             }
         }
-
 
         #endregion
 
@@ -392,6 +391,7 @@ namespace RevitTimasBIMTools.ViewModels
                     DockPanelView.ActiveDocTitle.Content = doc.Title;
                     return RevitFilterManager.GetDocumentCollection(doc);
                 }
+                IsStarted = false;
                 return null;
             });
         }
