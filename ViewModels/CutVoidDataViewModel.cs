@@ -470,7 +470,11 @@ namespace RevitTimasBIMTools.ViewModels
                     }
                     else
                     {
-                        output.AddRange(LoadSymbols(doc, familyPath));
+                        IList<FamilySymbol> syms = LoadSymbols(doc, familyPath);
+                        if (syms is not null && 0 < syms.Count)
+                        {
+                            output.AddRange(syms);
+                        }
                     }
                 }
                 return output;
@@ -723,13 +727,14 @@ namespace RevitTimasBIMTools.ViewModels
                     currentItem = ViewDataCollection.GetItemAt(0);
                     if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
                     {
-                        patternId ??= RevitViewManager.GetSolidFillPatternId(doc);
-                        if (previewControl is null && currentItem is ElementModel model && model.IsValidModel())
+                        if (currentItem is ElementModel model && model.IsValidModel())
                         {
-                            if (RevitViewManager.SetCustomSectionBox(uidoc, model.SectionPlane.Origin, view3d))
+                            if (!model.IsSelected) { return; }
+                            XYZ origin = model.SectionPlane.Origin;
+                            if (RevitViewManager.SetCustomSectionBox(uidoc, origin, view3d))
                             {
+                                RevitViewManager.SetCustomColor(uidoc, view3d, model.Instanse);
                                 uidoc.Selection.SetElementIds(new List<ElementId> { model.Instanse.Id });
-                                RevitViewManager.SetCustomColor(uidoc, view3d, patternId, model.Instanse);
                                 RevitViewManager.ShowModelInPlanView(uidoc, model, ViewDiscipline.Mechanical);
                                 previewControl = SmartToolApp.Host.Services.GetRequiredService<PreviewControlModel>();
                                 previewControl.ShowPreviewControl(app, view3d);
