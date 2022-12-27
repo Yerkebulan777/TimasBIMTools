@@ -22,7 +22,7 @@ namespace RevitTimasBIMTools.ViewModels;
 public sealed class AreaRebarMarkFixViewModel : ObservableObject
 {
 
-    public AreaRebarMarkFixWindow PresentView { get; internal set; }
+    public AreaRebarMarkFixWindow RepresentedView { get; internal set; }
     private Guid paramGuid { get; set; }
 
     private bool selected;
@@ -68,7 +68,7 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
             if (SetProperty(ref modelData, value) && modelData != null)
             {
                 ViewDataCollection = new ListCollectionView(modelData);
-                PresentView.InfoPanel.Visibility = 0;
+                RepresentedView.InfoPanel.Visibility = 0;
             }
         }
     }
