@@ -30,6 +30,7 @@ namespace RevitTimasBIMTools.Views
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            viewModel.GetAllParameterData();
             Loaded -= Window_Loaded;
         }
 
@@ -37,12 +38,14 @@ namespace RevitTimasBIMTools.Views
         private void Select_Click(object sender, RoutedEventArgs e)
         {
             viewModel.SelectAreaReinElement();
+            InfoPanel.Visibility = Visibility.Visible;
         }
 
 
         private void GetAll_Click(object sender, RoutedEventArgs e)
         {
             viewModel.GetAllAreaReinforceses();
+            InfoPanel.Visibility = Visibility.Visible;
         }
 
 
@@ -52,15 +55,6 @@ namespace RevitTimasBIMTools.Views
             this.Close();
         }
 
-        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
 
-        }
-
-        private void newMark_Checked(object sender, RoutedEventArgs e)
-        {
-
-        }
- 
     }
 }

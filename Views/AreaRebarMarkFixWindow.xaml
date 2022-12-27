@@ -8,8 +8,8 @@
     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     Title="AreaRebarMarkFix"
-    Height="Auto"
     Width="300"
+    Height="Auto"
     MinHeight="150"
     MaxHeight="1000"
     d:DataContext="{d:DesignInstance Type=vm:AreaRebarMarkFixViewModel}"
@@ -34,7 +34,35 @@
             <RowDefinition Height="75" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="10">
+
+        <StackPanel
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+            <BulletDecorator Margin="5">
+                <BulletDecorator.Bullet>
+                    <Label
+                        Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                        Content="Parameter: "
+                        Foreground="DarkBlue" />
+                </BulletDecorator.Bullet>
+                <ComboBox
+                    Name="ComboMark"
+                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
+                    DisplayMemberPath="Key"
+                    ItemsSource="{Binding Path=AllParameters, Mode=OneWay, UpdateSourceTrigger=Explicit}"
+                    SelectedValue="{Binding Path=SelectedParameter, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedValuePath="Value" />
+            </BulletDecorator>
+        </StackPanel>
+
+
+        <StackPanel
+            Name="InfoPanel"
+            Grid.Row="1"
+            Margin="10"
+            Style="{StaticResource VisibleAnimation}"
+            Visibility="Collapsed">
 
             <ListView
                 Name="DataListView"
@@ -62,16 +90,14 @@
 
                         <GridViewColumn DisplayMemberBinding="{Binding HostMark}" Header="Host mark" />
 
-                        <GridViewColumn Header="Mark" Width="Auto" >
+                        <GridViewColumn Width="Auto" Header="Mark">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Margin="1.5" Orientation="Horizontal">
                                         <TextBox
-                                            Width="75"
+                                            MinWidth="100"
                                             Margin="5,0"
-                                            IsEnabled="{Binding IsChecked, ElementName=opt}"
                                             Text="{Binding Mark, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                        <CheckBox Name="opt" Content="Edit" />
                                     </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
@@ -87,32 +113,11 @@
 
 
         <StackPanel
-            Grid.Row="1"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center">
-            <BulletDecorator Margin="5">
-                <BulletDecorator.Bullet>
-                    <Label
-                        Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
-                        Content="Parameter: "
-                        Foreground="DarkBlue" />
-                </BulletDecorator.Bullet>
-                <ComboBox
-                    Name="ComboMark"
-                    Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.5'}"
-                    DisplayMemberPath="Key"
-                    ItemsSource="{Binding Path=AllParameters, Mode=OneWay, UpdateSourceTrigger=Explicit}"
-                    SelectedValue="{Binding Path=SelectedParameter, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedValuePath="Value" />
-            </BulletDecorator>
-        </StackPanel>
-
-
-        <StackPanel
             Grid.Row="2"
             Margin="10"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
+            IsEnabled="{Binding Path=IsSelected}"
             Orientation="Horizontal">
 
             <Button
@@ -146,6 +151,8 @@
                 IsEnabled="{Binding Path=IsReady}"
                 TabIndex="3" />
         </StackPanel>
+
+
     </Grid>
 
 </Window>

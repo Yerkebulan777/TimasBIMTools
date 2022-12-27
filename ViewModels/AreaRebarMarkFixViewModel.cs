@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
-using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Revit.Async;
@@ -24,11 +23,11 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
 
     private Guid paramGuid { get; set; }
 
-    private bool ready;
-    public bool IsReady
+    private bool selected;
+    public bool IsSelected
     {
-        get => ready;
-        set => SetProperty(ref ready, value);
+        get => selected;
+        set => SetProperty(ref selected, value);
     }
 
 
@@ -40,14 +39,10 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
         {
             if (SetProperty(ref parameter, value))
             {
-                if (parameter is not null)
+                IsSelected = parameter is not null;
+                if (IsSelected)
                 {
                     paramGuid = parameter.GUID;
-                    IsReady = true;
-                }
-                else
-                {
-                    IsReady = false;
                 }
             }
         }
@@ -71,11 +66,6 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
             if (SetProperty(ref modelData, value) && modelData != null)
             {
                 ViewDataCollection = new ListCollectionView(modelData);
-                ElementModel model = modelData.FirstOrDefault();
-                if (model != null && model.IsValidModel())
-                {
-                    RetrieveParameterData(model.Instanse);
-                }
             }
         }
     }
@@ -102,77 +92,12 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
     }
 
 
-    public async void SelectAreaReinElement()
-    {
-        ElementModelData = await RevitTask.RunAsync(app =>
-        {
-            Reference pickReference = null;
-            IList<Element> list = new List<Element>();
-            try
-            {
-                SelectionFilterAreaRein filter = new();
-                string prompt = "Select Area Reinforcement";
-                Selection choices = app.ActiveUIDocument.Selection;
-                pickReference = choices.PickObject(ObjectType.Element, filter, prompt);
-            }
-            catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
-            {
-                Debug.Print(ex.Message);
-            }
-            finally
-            {
-                if (pickReference is not null)
-                {
-                    Document doc = app.ActiveUIDocument.Document;
-                    list.Add(doc.GetElement(pickReference));
-                }
-            }
-            return ConvertToModelData(list);
-        });
-    }
-
-
-    public async void GetAllAreaReinforceses()
-    {
-        ElementModelData = await RevitTask.RunAsync(app =>
-        {
-            Document doc = app.ActiveUIDocument.Document;
-            IList<Element> elements = new FilteredElementCollector(doc)
-            .OfClass(typeof(AreaReinforcement))
-            .WhereElementIsNotElementType()
-            .ToElements();
-            return ConvertToModelData(elements);
-        });
-    }
-
-
-    private ObservableCollection<ElementModel> ConvertToModelData(in IList<Element> source)
-    {
-        ObservableCollection<ElementModel> models = new();
-        foreach (Element elem in source)
-        {
-            if (elem is AreaReinforcement instance)
-            {
-                Document doc = instance.Document;
-                Element host = doc.GetElement(instance.GetHostId());
-                string mark = GetAreaRebarMark(doc, instance);
-                ElementModel model = new(instance, host)
-                {
-                    Mark = mark
-                };
-                models.Add(model);
-            }
-        }
-        return models;
-    }
-
-
-    public async void RetrieveParameterData(Element element)
+    internal async void GetAllParameterData()
     {
         AllParameters = await RevitTask.RunAsync(app =>
         {
-            UIDocument uidoc = app.ActiveUIDocument;
             Document doc = app.ActiveUIDocument.Document;
+            Element element = new FilteredElementCollector(doc).OfClass(typeof(AreaReinforcement)).WhereElementIsNotElementType().FirstElement();
             IDictionary<string, Parameter> result = new SortedList<string, Parameter>();
             if (element is not null and AreaReinforcement areaReinforcement)
             {
@@ -216,6 +141,71 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
             }
         }
         return result;
+    }
+
+
+    internal async void SelectAreaReinElement()
+    {
+        ElementModelData = await RevitTask.RunAsync(app =>
+        {
+            Reference pickReference = null;
+            IList<Element> list = new List<Element>();
+            try
+            {
+                SelectionFilterAreaRein filter = new();
+                string prompt = "Select Area Reinforcement";
+                Selection choices = app.ActiveUIDocument.Selection;
+                pickReference = choices.PickObject(ObjectType.Element, filter, prompt);
+            }
+            catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
+            {
+                Debug.Print(ex.Message);
+            }
+            finally
+            {
+                if (pickReference is not null)
+                {
+                    Document doc = app.ActiveUIDocument.Document;
+                    list.Add(doc.GetElement(pickReference));
+                }
+            }
+            return ConvertToModelData(list);
+        });
+    }
+
+
+    internal async void GetAllAreaReinforceses()
+    {
+        ElementModelData = await RevitTask.RunAsync(app =>
+        {
+            Document doc = app.ActiveUIDocument.Document;
+            IList<Element> elements = new FilteredElementCollector(doc)
+            .OfClass(typeof(AreaReinforcement))
+            .WhereElementIsNotElementType()
+            .ToElements();
+            return ConvertToModelData(elements);
+        });
+    }
+
+
+    private ObservableCollection<ElementModel> ConvertToModelData(in IList<Element> source)
+    {
+        ObservableCollection<ElementModel> models = new();
+        foreach (Element elem in source)
+        {
+            if (elem is AreaReinforcement instance)
+            {
+                Document doc = instance.Document;
+                Element host = doc.GetElement(instance.GetHostId());
+                string mark = GetAreaRebarMark(doc, instance);
+                ElementModel model = new(instance, host)
+                {
+                    Mark = mark
+                };
+                models.Add(model);
+            }
+        }
+        return models;
     }
 
 
