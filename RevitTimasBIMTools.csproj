@@ -98,12 +98,6 @@
     <Reference Include="CommunityToolkit.Mvvm, Version=8.0.0.0, Culture=neutral, PublicKeyToken=4aff67a105548ee2, processorArchitecture=MSIL">
       <HintPath>packages\CommunityToolkit.Mvvm.8.0.0\lib\netstandard2.0\CommunityToolkit.Mvvm.dll</HintPath>
     </Reference>
-    <Reference Include="LazyProxy, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\LazyProxy.1.0.2\lib\netstandard2.0\LazyProxy.dll</HintPath>
-    </Reference>
-    <Reference Include="LazyProxy.ServiceProvider, Version=0.1.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\LazyProxy.ServiceProvider.0.1.3\lib\netstandard2.0\LazyProxy.ServiceProvider.dll</HintPath>
-    </Reference>
     <Reference Include="log4net">
       <HintPath>C:\Program Files\Autodesk\Revit 2019\log4net.dll</HintPath>
       <Private>False</Private>
