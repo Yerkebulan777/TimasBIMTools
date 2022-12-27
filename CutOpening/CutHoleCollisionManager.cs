@@ -331,7 +331,7 @@ namespace RevitTimasBIMTools.CutOpening
         }
 
 
-        //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ vector, View view)
+        //private bool CheckSizeOpenning(Document doc, BoundingBoxXYZ bbox, XYZ vector, PresentView view)
         //{
         //    Outline outline = new(bbox.Min -= offsetPnt, bbox.Max += offsetPnt);
         //    collector = new FilteredElementCollector(doc, view.Id).Excluding(idsExclude);

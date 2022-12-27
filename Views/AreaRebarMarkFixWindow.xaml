@@ -68,6 +68,7 @@
                 Name="DataListView"
                 Grid.Row="1"
                 d:ItemsSource="{d:SampleData ItemCount=3}"
+                BorderBrush="Transparent"
                 ItemsSource="{Binding Path=ViewDataCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
 
                 <ListView.View>
@@ -90,7 +91,7 @@
 
                         <GridViewColumn DisplayMemberBinding="{Binding HostMark}" Header="Host mark" />
 
-                        <GridViewColumn Width="Auto" Header="Mark">
+                        <GridViewColumn Width="Auto" Header="Content">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Margin="1.5" Orientation="Horizontal">

@@ -6,6 +6,7 @@ using Revit.Async;
 using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.RevitSelectionFilter;
 using RevitTimasBIMTools.RevitUtils;
+using RevitTimasBIMTools.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,6 +22,7 @@ namespace RevitTimasBIMTools.ViewModels;
 public sealed class AreaRebarMarkFixViewModel : ObservableObject
 {
 
+    public AreaRebarMarkFixWindow PresentView { get; internal set; }
     private Guid paramGuid { get; set; }
 
     private bool selected;
@@ -66,6 +68,7 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
             if (SetProperty(ref modelData, value) && modelData != null)
             {
                 ViewDataCollection = new ListCollectionView(modelData);
+                PresentView.InfoPanel.Visibility = 0;
             }
         }
     }
@@ -200,7 +203,8 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
                 string mark = GetAreaRebarMark(doc, instance);
                 ElementModel model = new(instance, host)
                 {
-                    Mark = mark
+                    IsSelected = true,
+                    Mark = mark,
                 };
                 models.Add(model);
             }

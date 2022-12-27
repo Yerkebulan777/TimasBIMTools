@@ -20,10 +20,11 @@ namespace RevitTimasBIMTools.Views
 
 
         private readonly AreaRebarMarkFixViewModel viewModel;
-        public AreaRebarMarkFixWindow(AreaRebarMarkFixViewModel viewModel) : this()
+        public AreaRebarMarkFixWindow(AreaRebarMarkFixViewModel vm) : this()
         {
-            this.viewModel = viewModel;
-            this.DataContext = viewModel;
+            this.viewModel = vm;
+            viewModel.PresentView = this;
+            this.DataContext = vm;
             Loaded += Window_Loaded;
         }
 
@@ -38,14 +39,12 @@ namespace RevitTimasBIMTools.Views
         private void Select_Click(object sender, RoutedEventArgs e)
         {
             viewModel.SelectAreaReinElement();
-            InfoPanel.Visibility = Visibility.Visible;
         }
 
 
         private void GetAll_Click(object sender, RoutedEventArgs e)
         {
             viewModel.GetAllAreaReinforceses();
-            InfoPanel.Visibility = Visibility.Visible;
         }
 
 
