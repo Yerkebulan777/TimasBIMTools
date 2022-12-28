@@ -23,8 +23,8 @@ namespace RevitTimasBIMTools.Views
         public AreaRebarMarkFixWindow(AreaRebarMarkFixViewModel vm) : this()
         {
             this.viewModel = vm;
-            viewModel.RepresentedView = this;
             this.DataContext = vm;
+            viewModel.RepresentedView = this;
             Loaded += Window_Loaded;
         }
 

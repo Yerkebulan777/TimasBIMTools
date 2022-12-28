@@ -25,7 +25,7 @@ using Document = Autodesk.Revit.DB.Document;
 
 namespace RevitTimasBIMTools.ViewModels;
 
-public sealed class CutVoidDataViewModel : ObservableObject
+public sealed class CutHoleDataViewModel : ObservableObject
 {
     public CutVoidDockPaneView DockPanelView { get; set; }
     public static ExternalEvent RevitExternalEvent { get; set; }
@@ -36,7 +36,7 @@ public sealed class CutVoidDataViewModel : ObservableObject
     private readonly CutHoleCollisionManager collisionMng = SmartToolApp.Host.Services.GetRequiredService<CutHoleCollisionManager>();
 
 
-    public CutVoidDataViewModel(APIEventHandler eventHandler)
+    public CutHoleDataViewModel(APIEventHandler eventHandler)
     {
         RevitExternalEvent = ExternalEvent.Create(eventHandler);
         RefreshDataCommand = new RelayCommand(RefreshActiveDataHandler);

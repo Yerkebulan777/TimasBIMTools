@@ -13,9 +13,9 @@ namespace RevitTimasBIMTools.Views
     /// </summary>
     public partial class PreviewDialogBox : Window
     {
-        private readonly CutVoidDataViewModel DataContextHandler;
-        private static readonly ExternalEvent externalEvent = CutVoidDataViewModel.RevitExternalEvent;
-        public PreviewDialogBox(CutVoidDataViewModel viewModel)
+        private readonly CutHoleDataViewModel DataContextHandler;
+        private static readonly ExternalEvent externalEvent = CutHoleDataViewModel.RevitExternalEvent;
+        public PreviewDialogBox(CutHoleDataViewModel viewModel)
         {
             InitializeComponent();
             Loaded += DialogBox_Loaded;

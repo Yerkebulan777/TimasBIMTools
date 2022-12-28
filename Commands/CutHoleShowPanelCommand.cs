@@ -2,7 +2,6 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
-using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.Views;
@@ -30,31 +29,29 @@ namespace RevitTimasBIMTools.Commands
         public Result Execute(UIApplication uiapp, ref string message)
         {
             Result result = Result.Succeeded;
-            RevitTask.RunAsync(app =>
+            try
             {
-                try
+                DockablePane pane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);
+                if (paneProvider is CutVoidDockPaneView view && pane.IsValidObject)
                 {
-                    DockablePane pane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);
-                    if (paneProvider is CutVoidDockPaneView view && pane.IsValidObject)
+                    if (pane.IsShown())
                     {
-                        if (pane.IsShown())
-                        {
-                            pane.Hide();
-                            view.Dispose();
-                        }
-                        else
-                        {
-                            pane.Show();
-                            view.RaiseExternalEvent();
-                        }
+                        pane.Hide();
+                        view.Dispose();
+                    }
+                    else
+                    {
+                        pane.Show();
+                        view.RaiseExternalEvent();
                     }
                 }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex.Message);
-                    result = Result.Failed;
-                }
-            }).Wait(1000);
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+                Logger.Error(message);
+                result = Result.Failed;
+            }
 
             return result;
         }
@@ -63,11 +60,8 @@ namespace RevitTimasBIMTools.Commands
         [STAThread]
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet catSet)
         {
-            if (uiapp.ActiveUIDocument?.ActiveGraphicalView is View view)
-            {
-                return view.ViewType is ViewType.FloorPlan or ViewType.ThreeD or ViewType.Section;
-            }
-            return false;
+            View view = uiapp.ActiveUIDocument?.ActiveGraphicalView;
+            return view is ViewPlan or ViewSchedule or ViewSection or View3D;
         }
 
 

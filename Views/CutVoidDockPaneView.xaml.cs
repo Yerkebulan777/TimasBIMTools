@@ -18,11 +18,11 @@ namespace RevitTimasBIMTools.Views
     public partial class CutVoidDockPaneView : Page, IDockablePaneProvider
     {
         private bool Disposed { get; set; } = false;
-        private readonly CutVoidDataViewModel DataContextHandler;
+        private readonly CutHoleDataViewModel DataContextHandler;
         private readonly string docPath = SmartToolHelper.DocumentPath;
-        private static readonly ExternalEvent externalEvent = CutVoidDataViewModel.RevitExternalEvent;
+        private static readonly ExternalEvent externalEvent = CutHoleDataViewModel.RevitExternalEvent;
 
-        public CutVoidDockPaneView(CutVoidDataViewModel viewModel)
+        public CutVoidDockPaneView(CutHoleDataViewModel viewModel)
         {
             InitializeComponent();
             Loaded += CutVoidDockPaneView_Loaded;

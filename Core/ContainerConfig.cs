@@ -20,18 +20,21 @@ namespace RevitTimasBIMTools.Core
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddSingleton<RevitTask>();
-                services.AddSingleton<SmartToolHelper>();
-                services.AddSingleton<APIEventHandler>();
-                services.AddSingleton<CutVoidDataViewModel>();
-                services.AddSingleton<CutHoleRegisterDockPane>();
-                services.AddSingleton<CutHoleShowPanelCommand>();
-
                 services.AddSingleton<IDockablePaneProvider, CutVoidDockPaneView>();
 
+                // CutOpenningManager
+                services.AddTransient<APIEventHandler>();
+                services.AddTransient<CutHoleDataViewModel>();
+                services.AddTransient<CutHoleRegisterDockPane>();
+                services.AddTransient<CutHoleShowPanelCommand>();
                 services.AddTransient<CutHoleCollisionManager>();
                 services.AddTransient<RevitPurginqManager>();
                 services.AddTransient<PreviewControlModel>();
                 services.AddTransient<PreviewDialogBox>();
+
+                // AreaRebarMarkFix
+                services.AddTransient<AreaRebarMarkFixViewModel>();
+                services.AddTransient<AreaRebarMarkFixWindow>();
 
             }).Build();
 

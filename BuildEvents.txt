@@ -1,5 +1,6 @@
 ﻿
+
 mkdir "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"
 
-copy /Y $(SolutionDir)$(TargetName).addin "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\"
-copy /Y $(TargetDir) "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"
+copy /Y $(SolutionDir)$(TargetName).addin   "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\"
+copy /Y $(TargetDir)\*$(TargetExt)   "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)\"

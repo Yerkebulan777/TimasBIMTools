@@ -341,7 +341,7 @@
     <Compile Include="ViewConverters\NullVisibilityConverter.cs" />
     <Compile Include="ViewConverters\PercentageConverter.cs" />
     <Compile Include="ViewModels\AreaRebarMarkFixViewModel.cs" />
-    <Compile Include="ViewModels\CutVoidDataViewModel.cs" />
+    <Compile Include="ViewModels\CutHoleDataViewModel.cs" />
     <Compile Include="RevitSelectionFilter\SelectionFilterAreaRein.cs" />
     <Compile Include="Views\AreaRebarMarkFixWindow.xaml.cs">
       <DependentUpon>AreaRebarMarkFixWindow.xaml</DependentUpon>
@@ -404,7 +404,7 @@
 mkdir "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"
 
 copy /Y $(SolutionDir)$(TargetName).addin   "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\"
-copy /Y $(TargetDir)$(TargetFileName)   "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)"
+copy /Y $(TargetDir)\*$(TargetExt)   "C:\ProgramData\Autodesk\Revit\Addins\$(Configuration)\$(TargetName)\"
 </PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

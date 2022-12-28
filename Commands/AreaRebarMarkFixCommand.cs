@@ -1,6 +1,8 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Microsoft.Extensions.DependencyInjection;
+using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
 using System;
@@ -14,13 +16,12 @@ namespace RevitTimasBIMTools.Commands
     [Regeneration(RegenerationOption.Manual)]
     internal sealed partial class AreaRebarMarkFixCommand : IExternalCommand, IExternalCommandAvailability
     {
+        private readonly AreaRebarMarkFixWindow window = SmartToolApp.Host.Services.GetRequiredService<AreaRebarMarkFixWindow>();
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             try
             {
-                AreaRebarMarkFixViewModel viewModel = new();
-                AreaRebarMarkFixWindow window = new(viewModel);
                 window.Show();
             }
             catch (Exception ex)
