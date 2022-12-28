@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitTimasBIMTools", "RevitTimasBIMTools.csproj", "{41093622-EED0-4117-B66C-BAF1B6B94DEE}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Revit.Async.Shared", "..\..\RevitAddingTemplate\Revit.Async-master\Revit.Async.Shared\Revit.Async.Shared.shproj", "{26214B67-5134-4C0A-86A6-51128E71AFE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		2019|Any CPU = 2019|Any CPU
@@ -42,5 +44,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D2E3A7D9-CD23-4231-8B89-8F78975EE1CE}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\..\RevitAddingTemplate\Revit.Async-master\Revit.Async.Shared\Revit.Async.Shared.projitems*{26214b67-5134-4c0a-86a6-51128e71afe2}*SharedItemsImports = 13
+		..\..\RevitAddingTemplate\Revit.Async-master\Revit.Async.Shared\Revit.Async.Shared.projitems*{41093622-eed0-4117-b66c-baf1b6b94dee}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal

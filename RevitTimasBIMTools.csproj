@@ -183,9 +183,6 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Revit.Async, Version=2.0.1.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>packages\Revit.Async.2.0.1\lib\net45\Revit.Async.dll</HintPath>
-    </Reference>
     <Reference Include="RevitAddInUtility">
       <HintPath>C:\Program Files\Autodesk\Revit 2019\RevitAddInUtility.dll</HintPath>
       <Private>False</Private>
@@ -400,6 +397,7 @@
     <None Include="Properties\baseIcon.ico" />
   </ItemGroup>
   <ItemGroup />
+  <Import Project="..\..\RevitAddingTemplate\Revit.Async-master\Revit.Async.Shared\Revit.Async.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
