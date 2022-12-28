@@ -3,7 +3,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.ViewModels;
 using RevitTimasBIMTools.Views;
 using System;
 using System.Globalization;
