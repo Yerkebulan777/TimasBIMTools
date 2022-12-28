@@ -11,7 +11,6 @@ namespace RevitTimasBIMTools.Views
 
     public partial class AreaRebarMarkFixWindow : Window
     {
-
         public AreaRebarMarkFixWindow()
         {
             InitializeComponent();
