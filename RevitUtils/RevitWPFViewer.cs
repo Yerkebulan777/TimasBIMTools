@@ -9,7 +9,7 @@ namespace RevitTimasBIMTools.RevitUtils
 {
     public sealed class RevitContentViewer
     {
-        private readonly Document curdoc; 
+        private readonly Document curdoc;
         public Dispatcher dispatch = Dispatcher.CurrentDispatcher;
         public RevitContentViewer(Document curdoc)
         {
