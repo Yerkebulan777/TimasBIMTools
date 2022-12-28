@@ -20,6 +20,7 @@ namespace RevitTimasBIMTools.Views
         private bool Disposed { get; set; } = false;
         private readonly CutHoleDataViewModel DataContextHandler;
         private readonly string docPath = SmartToolHelper.DocumentPath;
+        private readonly UIControlledApplication uicontrolapp = SmartToolApp.UIControllApp;
         private static readonly ExternalEvent externalEvent = CutHoleDataViewModel.RevitExternalEvent;
 
         public CutVoidDockPaneView(CutHoleDataViewModel viewModel)
@@ -66,6 +67,7 @@ namespace RevitTimasBIMTools.Views
                             DataContextHandler.IsStarted = true;
                             DataContextHandler.IsOptionEnabled = false;
                             DataContextHandler.IsDataRefresh = false;
+                            uicontrolapp.DockableFrameVisibilityChanged += OnDockableFrameVisibilityChanged;
                             Loaded -= CutVoidDockPaneView_Loaded;
                         }
                     });
@@ -74,6 +76,19 @@ namespace RevitTimasBIMTools.Views
                 {
                     Logger.Error(ex.Message);
                 }
+            }
+        }
+
+
+        private void OnDockableFrameVisibilityChanged(object sender, Autodesk.Revit.UI.Events.DockableFrameVisibilityChangedEventArgs e)
+        {
+            if (sender is CutVoidDockPaneView paneView)
+            {
+                Dispatcher.CurrentDispatcher.InvokeAsync(() =>
+                {
+                    if (!paneView.IsVisible) { Dispose(); }
+
+                }, DispatcherPriority.Background);
             }
         }
 
