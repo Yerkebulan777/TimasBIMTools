@@ -380,29 +380,12 @@ public sealed class CutHoleDataViewModel : ObservableObject
 
     #region Methods
 
-    public async void StartHandler()
-    {
-        DocumentCollection = await RevitTask.RunAsync(app =>
-        {
-            doc = app.ActiveUIDocument.Document;
-            if (docUniqueId.Equals(doc.ProjectInformation.UniqueId))
-            {
-                collisionMng.InitializeElementTypeIdData(doc);
-                DockPanelView.ActiveDocTitle.Content = doc.Title;
-                return RevitFilterManager.GetDocumentCollection(doc);
-            }
-            IsStarted = false;
-            return null;
-        });
-    }
-
-
-    private async void ClearAndResetData()
+    private void ClearAndResetData()
     {
         if (IsStarted)
         {
-            await Task.Delay(1000)
-            .ContinueWith(_ =>
+            Task task = Task.Delay(1000)
+            .ContinueWith(task =>
             {
                 IsStarted = false;
                 IsDataRefresh = false;
@@ -419,6 +402,18 @@ public sealed class CutHoleDataViewModel : ObservableObject
                 view3d = null;
             }, taskContext);
         }
+    }
+
+
+    public async void StartHandler()
+    {
+        DocumentCollection = await RevitTask.RunAsync(app =>
+        {
+            doc = app.ActiveUIDocument.Document;
+            collisionMng.InitializeElementTypeIdData(doc);
+            DockPanelView.ActiveDocTitle.Content = doc.Title;
+            return RevitFilterManager.GetDocumentCollection(doc);
+        });
     }
 
 

@@ -26,6 +26,7 @@ namespace RevitTimasBIMTools.Views
         {
             InitializeComponent();
             Loaded += CutVoidDockPaneView_Loaded;
+            DataContextHandler.DockPanelView = this;
             DataContext = DataContextHandler = viewModel;
             DataContextHandler = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         }
@@ -63,7 +64,6 @@ namespace RevitTimasBIMTools.Views
                         {
                             Disposed = false;
                             DataContextHandler.IsStarted = true;
-                            DataContextHandler.DockPanelView = this;
                             DataContextHandler.IsOptionEnabled = false;
                             DataContextHandler.IsDataRefresh = false;
                             Loaded -= CutVoidDockPaneView_Loaded;
