@@ -19,7 +19,9 @@ namespace RevitTimasBIMTools.Core
             IHost host = new HostBuilder()
             .ConfigureServices((hostContext, services) =>
             {
+                // Singleton
                 services.AddSingleton<RevitTask>();
+                services.AddSingleton<SmartToolHelper>();
                 services.AddSingleton<IDockablePaneProvider, CutVoidDockPaneView>();
 
                 // CutOpenningManager
