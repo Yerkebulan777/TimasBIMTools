@@ -207,7 +207,7 @@ public sealed class CutHoleDataViewModel : ObservableObject
     {
         if (!Directory.Exists(directory))
         {
-            Logger.Error("Not found directory path: " + directory);
+            SBTLogger.Error("Not found directory path: " + directory);
         }
         return Directory.GetFiles(directory, "*.rfa", SearchOption.TopDirectoryOnly);
     }

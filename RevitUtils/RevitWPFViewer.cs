@@ -18,7 +18,7 @@ namespace RevitTimasBIMTools.RevitUtils
 
         public void Show()
         {
-            dispatch.Invoke(() =>
+            dispatch.Invoke((Delegate)(() =>
             {
                 UserControl presenter;
                 PreviewControl preview;
@@ -52,7 +52,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(exc.Message);
+                    SBTLogger.Error(exc.Message);
                 }
                 finally
                 {
@@ -67,7 +67,7 @@ namespace RevitTimasBIMTools.RevitUtils
                     dispatcherTimer.Start();
                     viewCollector.Dispose();
                 }
-            });
+            }));
         }
     }
 }

@@ -49,7 +49,7 @@ namespace RevitTimasBIMTools.Commands
             catch (Exception ex)
             {
                 message = ex.Message;
-                Logger.Error(message);
+                SBTLogger.Error(message);
                 result = Result.Failed;
             }
 

@@ -25,7 +25,7 @@ namespace RevitTimasBIMTools.Core
             }
             catch (Exception ex)
             {
-                Logger.Error(ex.Message + GetName());
+                SBTLogger.Error(ex.Message + GetName());
             }
         }
 

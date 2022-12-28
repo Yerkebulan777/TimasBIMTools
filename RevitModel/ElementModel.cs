@@ -61,7 +61,7 @@ namespace RevitTimasBIMTools.RevitModel
             {
                 if (SetProperty(ref mark, value))
                 {
-                    Logger.Log("Mark: " + mark);
+                    SBTLogger.Log("Mark: " + mark);
                 }
             }
         }

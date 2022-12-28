@@ -74,7 +74,7 @@ namespace RevitTimasBIMTools.Views
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex.Message);
+                    SBTLogger.Error(ex.Message);
                 }
             }
         }
@@ -82,9 +82,10 @@ namespace RevitTimasBIMTools.Views
 
         private void OnDockableFrameVisibilityChanged(object sender, Autodesk.Revit.UI.Events.DockableFrameVisibilityChangedEventArgs e)
         {
+            SBTLogger.Info(sender.GetType().Name);
             if (sender is CutVoidDockPaneView paneView)
             {
-                Dispatcher.CurrentDispatcher.InvokeAsync(() =>
+                _ = Dispatcher.CurrentDispatcher.InvokeAsync(() =>
                 {
                     if (!paneView.IsVisible) { Dispose(); }
 

@@ -59,7 +59,7 @@ namespace RevitTimasBIMTools.RevitUtils
                         }
                         catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
                         {
-                            Logger.Error(ex.Message);
+                            SBTLogger.Error(ex.Message);
                         }
                     }
                 }
@@ -359,7 +359,7 @@ namespace RevitTimasBIMTools.RevitUtils
             }
             catch (Exception exc)
             {
-                Logger.Error(exc.Message);
+                SBTLogger.Error(exc.Message);
             }
         }
 

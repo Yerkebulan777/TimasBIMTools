@@ -38,7 +38,7 @@ internal sealed class RevitViewManager
                 catch (Exception ex)
                 {
                     status = t.RollBack();
-                    Logger.Error($"Error 3Dview {ex.Message} flag => {flag}");
+                    SBTLogger.Error($"Error 3Dview {ex.Message} flag => {flag}");
                 }
                 finally
                 {
@@ -98,7 +98,7 @@ internal sealed class RevitViewManager
     public static ViewPlan CreatePlanView(Document doc, Level level, string name)
     {
         using Transaction tx = new(doc);
-        Logger.Log("ViewPlan name: " + name);
+        SBTLogger.Log("ViewPlan name: " + name);
         TransactionStatus status = tx.Start("CreateFloorPlan");
         ViewFamilyType vft = new FilteredElementCollector(doc)
             .OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>()
@@ -138,7 +138,7 @@ internal sealed class RevitViewManager
             catch (Exception ex)
             {
                 status = t.RollBack();
-                Logger.Error(ex.Message);
+                SBTLogger.Error(ex.Message);
             }
         }
     }
@@ -228,7 +228,7 @@ internal sealed class RevitViewManager
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error(ex.Message);
+                        SBTLogger.Error(ex.Message);
                     }
                 }
             }
@@ -274,7 +274,7 @@ internal sealed class RevitViewManager
                 catch (Exception ex)
                 {
                     status = tx.RollBack();
-                    Logger.Error(ex.Message);
+                    SBTLogger.Error(ex.Message);
                 }
             }
         }
@@ -331,7 +331,7 @@ internal sealed class RevitViewManager
             }
             catch (Exception exc)
             {
-                Logger.Error(exc.Message);
+                SBTLogger.Error(exc.Message);
                 if (!tx.HasEnded())
                 {
                     status = tx.RollBack();
@@ -368,7 +368,7 @@ internal sealed class RevitViewManager
         ElementId patternId = GetSolidFillPatternId(uidoc.Document);
         if (!view.AreGraphicsOverridesAllowed())
         {
-            Logger.Error($"Graphic overrides are not alowed for the '{view.Name}' View3d");
+            SBTLogger.Error($"Graphic overrides are not alowed for the '{view.Name}' View3d");
         }
         else
         {
@@ -392,7 +392,7 @@ internal sealed class RevitViewManager
                 if (!tx.HasEnded())
                 {
                     status = tx.RollBack();
-                    Logger.Error(exc.Message);
+                    SBTLogger.Error(exc.Message);
                 }
             }
         }
@@ -420,7 +420,7 @@ internal sealed class RevitViewManager
         {
             _ = builder.AppendLine(LabelUtils.GetLabelFor((BuiltInParameter)prmId.IntegerValue));
         }
-        Logger.Info(builder.ToString());
+        SBTLogger.Info(builder.ToString());
         builder.Clear();
     }
 

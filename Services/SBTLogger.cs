@@ -12,7 +12,7 @@ using System.Threading;
 
 namespace RevitTimasBIMTools.Services
 {
-    public sealed class Logger
+    public sealed class SBTLogger
     {
         private static ILog mainlogger;
         private const string caption = "Timas BIM Tools";
@@ -55,11 +55,6 @@ namespace RevitTimasBIMTools.Services
         }
 
 
-        public static void Log(Exception ex)
-        {
-            mainlogger?.Error("Error", ex);
-            Debug.WriteLine($"\n{ex.Message}");
-        }
 
         public static void Log(string text)
         {

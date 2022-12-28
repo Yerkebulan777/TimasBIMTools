@@ -28,7 +28,7 @@ namespace RevitTimasBIMTools.CutOpening
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error($"ERROR:\nguid={paneId.Guid}\n{exc.Message}");
+                    SBTLogger.Error($"ERROR:\nguid={paneId.Guid}\n{exc.Message}");
                     return false;
                 }
             }

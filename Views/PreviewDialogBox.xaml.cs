@@ -42,7 +42,7 @@ namespace RevitTimasBIMTools.Views
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex.Message);
+                    SBTLogger.Error(ex.Message);
                 }
             }
         }

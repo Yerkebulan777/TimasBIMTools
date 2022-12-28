@@ -35,7 +35,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(nameof(SerializeData) + ":\t" + exc.Message);
+                    SBTLogger.Error(nameof(SerializeData) + ":\t" + exc.Message);
                 }
             }
         }
@@ -51,7 +51,7 @@ namespace RevitTimasBIMTools.RevitUtils
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(nameof(DeserialiseSizeData) + exc.Message);
+                    SBTLogger.Error(nameof(DeserialiseSizeData) + exc.Message);
                 }
                 finally { Task.Delay(100).Wait(); }
             }
