@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Revit.Async;
 using RevitTimasBIMTools.Commands;
 using RevitTimasBIMTools.CutOpening;
 using RevitTimasBIMTools.RevitModel;
@@ -18,6 +19,7 @@ namespace RevitTimasBIMTools.Core
             IHost host = new HostBuilder()
             .ConfigureServices((hostContext, services) =>
             {
+                services.AddSingleton<RevitTask>();
                 services.AddSingleton<SmartToolHelper>();
                 services.AddSingleton<APIEventHandler>();
                 services.AddSingleton<CutVoidDataViewModel>();

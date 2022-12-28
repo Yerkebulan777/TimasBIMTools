@@ -26,7 +26,6 @@ namespace RevitTimasBIMTools.Core
             SmartToolSetupUIPanel.Initialize(controlledApp);
             Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
             controlledApp.ControlledApplication.ApplicationInitialized += OnApplicationInitialized;
-
             return Result.Succeeded;
         }
 
