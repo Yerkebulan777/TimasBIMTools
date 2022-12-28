@@ -12,168 +12,167 @@ using System.Windows.Threading;
 using ComboBox = System.Windows.Controls.ComboBox;
 
 
-namespace RevitTimasBIMTools.Views
+namespace RevitTimasBIMTools.Views;
+
+/// <summary> Логика взаимодействия для CutVoidDockPaneView.xaml </summary>
+public partial class CutVoidDockPaneView : Page, IDockablePaneProvider
 {
-    /// <summary> Логика взаимодействия для CutVoidDockPaneView.xaml </summary>
-    public partial class CutVoidDockPaneView : Page, IDockablePaneProvider
+    private bool Disposed { get; set; } = false;
+    private readonly CutHoleDataViewModel DataContextHandler;
+    private readonly string docPath = SmartToolHelper.DocumentPath;
+    private static readonly ExternalEvent externalEvent = CutHoleDataViewModel.RevitExternalEvent;
+
+    public CutVoidDockPaneView(CutHoleDataViewModel viewModel)
     {
-        private bool Disposed { get; set; } = false;
-        private readonly CutHoleDataViewModel DataContextHandler;
-        private readonly string docPath = SmartToolHelper.DocumentPath;
-        private static readonly ExternalEvent externalEvent = CutHoleDataViewModel.RevitExternalEvent;
+        InitializeComponent();
+        Loaded += CutVoidDockPaneView_Loaded;
+        DataContext = DataContextHandler = viewModel;
+        DataContextHandler = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
+        DataContextHandler.DockPanelView = this;
+    }
 
-        public CutVoidDockPaneView(CutHoleDataViewModel viewModel)
+
+    private void CutVoidDockPaneView_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+        RaiseExternalEvent();
+    }
+
+
+    [STAThread]
+    public void SetupDockablePane(DockablePaneProviderData data)
+    {
+        data.FrameworkElement = this;
+        data.VisibleByDefault = false;
+        data.InitialState = new DockablePaneState
         {
-            InitializeComponent();
-            Loaded += CutVoidDockPaneView_Loaded;
-            DataContext = DataContextHandler = viewModel;
-            DataContextHandler = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
-            DataContextHandler.DockPanelView = this;
-        }
+            DockPosition = DockPosition.Right,
+            TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser
+        };
+    }
 
 
-        private void CutVoidDockPaneView_Loaded(object sender, System.Windows.RoutedEventArgs e)
+    [STAThread]
+    internal void RaiseExternalEvent()
+    {
+        if (!DataContextHandler.IsStarted)
         {
-            RaiseExternalEvent();
-        }
-
-
-        [STAThread]
-        public void SetupDockablePane(DockablePaneProviderData data)
-        {
-            data.FrameworkElement = this;
-            data.VisibleByDefault = false;
-            data.InitialState = new DockablePaneState
+            try
             {
-                DockPosition = DockPosition.Right,
-                TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser
-            };
-        }
-
-
-        [STAThread]
-        internal void RaiseExternalEvent()
-        {
-            if (!DataContextHandler.IsStarted)
-            {
-                try
+                Dispatcher.CurrentDispatcher.Invoke(() =>
                 {
-                    Dispatcher.CurrentDispatcher.Invoke(() =>
+                    if (ExternalEventRequest.Accepted == externalEvent.Raise())
                     {
-                        if (ExternalEventRequest.Accepted == externalEvent.Raise())
-                        {
-                            Disposed = false;
-                            DataContextHandler.IsStarted = true;
-                            DataContextHandler.IsOptionEnabled = false;
-                            DataContextHandler.IsDataRefresh = false;
-                            Loaded -= CutVoidDockPaneView_Loaded;
-                        }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    SBTLogger.Error("Start Raise ExternalEvent:\n" + ex.ToString());
-                }
+                        Disposed = false;
+                        DataContextHandler.IsStarted = true;
+                        DataContextHandler.IsOptionEnabled = false;
+                        DataContextHandler.IsDataRefresh = false;
+                        Loaded -= CutVoidDockPaneView_Loaded;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                SBTLogger.Error("Start Raise ExternalEvent:\n" + ex.ToString());
             }
         }
+    }
 
 
-        private void ShowModelButton_Click(object sender, System.Windows.RoutedEventArgs e)
+    private void ShowModelButton_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        if (sender is System.Windows.Controls.Button btn && btn.DataContext is ElementModel model)
         {
-            if (sender is System.Windows.Controls.Button btn && btn.DataContext is ElementModel model)
+            if (model != null && model.Instanse.IsValidObject)
             {
-                if (model != null && model.Instanse.IsValidObject)
-                {
-                    DataContextHandler.ShowElementModelView(model);
-                }
+                DataContextHandler.ShowElementModelView(model);
             }
         }
+    }
 
 
-        private void CheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
+    private void CheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        DataContextHandler.ViewDataCollection.Refresh();
+        Dispatcher.CurrentDispatcher.Invoke(DataContextHandler.VerifySelectDataViewCollection);
+    }
+
+
+    private void LoadFamily_Click(object sender, RoutedEventArgs e)
+    {
+        OpenFileDialog openDialog = new()
         {
-            DataContextHandler.ViewDataCollection.Refresh();
-            Dispatcher.CurrentDispatcher.Invoke(DataContextHandler.VerifySelectDataViewCollection);
-        }
+            Filter = "Family Files (*.rfa)|*.rfa",
+            Title = "Open opening family",
+            InitialDirectory = docPath,
+            AutoUpgradeEnabled = true,
+            CheckFileExists = true,
+            ValidateNames = true,
+            Multiselect = false,
+        };
 
-
-        private void LoadFamily_Click(object sender, RoutedEventArgs e)
+        if (DialogResult.OK == openDialog.ShowDialog())
         {
-            OpenFileDialog openDialog = new()
+            string path = openDialog.FileName;
+            if (!string.IsNullOrEmpty(path))
             {
-                Filter = "Family Files (*.rfa)|*.rfa",
-                Title = "Open opening family",
-                InitialDirectory = docPath,
-                AutoUpgradeEnabled = true,
-                CheckFileExists = true,
-                ValidateNames = true,
-                Multiselect = false,
-            };
-
-            if (DialogResult.OK == openDialog.ShowDialog())
-            {
-                string path = openDialog.FileName;
-                if (!string.IsNullOrEmpty(path))
-                {
-                    DataContextHandler.LoadFamilyAsync(path);
-                }
+                DataContextHandler.LoadFamilyAsync(path);
             }
         }
+    }
 
 
-        private void ComboOpenning_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void ComboOpenning_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ComboBox comboBox && comboBox.SelectedValue is FamilySymbol symbol)
         {
-            if (sender is ComboBox comboBox && comboBox.SelectedValue is FamilySymbol symbol)
+            if (comboBox.Name.Equals(ComboWallOpenning.Name))
             {
-                if (comboBox.Name.Equals(ComboWallOpenning.Name))
-                {
-                    Properties.Settings.Default.WallOpeningUId = symbol.UniqueId;
-                    DataContextHandler.GetFamilySymbolParameterData(symbol);
-                    DataContextHandler.ActivateFamilySimbol(symbol);
-                    Properties.Settings.Default.Save();
-                }
-                if (comboBox.Name.Equals(ComboFloorOpenning.Name))
-                {
-                    Properties.Settings.Default.FloorOpeningUId = symbol.UniqueId;
-                    DataContextHandler.GetFamilySymbolParameterData(symbol);
-                    DataContextHandler.ActivateFamilySimbol(symbol);
-                    Properties.Settings.Default.Save();
-                }
+                Properties.Settings.Default.WallOpeningUId = symbol.UniqueId;
+                DataContextHandler.GetFamilySymbolParameterData(symbol);
+                DataContextHandler.ActivateFamilySimbol(symbol);
+                Properties.Settings.Default.Save();
+            }
+            if (comboBox.Name.Equals(ComboFloorOpenning.Name))
+            {
+                Properties.Settings.Default.FloorOpeningUId = symbol.UniqueId;
+                DataContextHandler.GetFamilySymbolParameterData(symbol);
+                DataContextHandler.ActivateFamilySimbol(symbol);
+                Properties.Settings.Default.Save();
             }
         }
+    }
 
 
-        private void ComboMark_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void ComboMark_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ComboBox comboBox && comboBox.SelectedValue is Guid guid)
         {
-            if (sender is ComboBox comboBox && comboBox.SelectedValue is Guid guid)
+            if (comboBox.Name.Equals(ComboWidthMark.Name))
             {
-                if (comboBox.Name.Equals(ComboWidthMark.Name))
-                {
-                    Properties.Settings.Default.WidthMarkGuid = guid;
-                    Properties.Settings.Default.Save();
-                }
-                if (comboBox.Name.Equals(ComboHeightMark.Name))
-                {
-                    Properties.Settings.Default.HeightMarkGuid = guid;
-                    Properties.Settings.Default.Save();
-                }
-                if (comboBox.Name.Equals(ComboElevMark.Name))
-                {
-                    Properties.Settings.Default.ElevatMarkGuid = guid;
-                    Properties.Settings.Default.Save();
-                }
+                Properties.Settings.Default.WidthMarkGuid = guid;
+                Properties.Settings.Default.Save();
+            }
+            if (comboBox.Name.Equals(ComboHeightMark.Name))
+            {
+                Properties.Settings.Default.HeightMarkGuid = guid;
+                Properties.Settings.Default.Save();
+            }
+            if (comboBox.Name.Equals(ComboElevMark.Name))
+            {
+                Properties.Settings.Default.ElevatMarkGuid = guid;
+                Properties.Settings.Default.Save();
             }
         }
+    }
 
 
-        public void Dispose()
+    public void Dispose()
+    {
+        if (!Disposed)
         {
-            if (!Disposed)
-            {
-                Disposed = true;
-                ActiveDocTitle.Content = null;
-                DataContextHandler?.Dispose();
-            }
+            Disposed = true;
+            ActiveDocTitle.Content = null;
+            DataContextHandler?.Dispose();
         }
     }
 }

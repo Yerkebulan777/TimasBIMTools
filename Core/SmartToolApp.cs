@@ -68,4 +68,5 @@ public sealed class SmartToolApp : IExternalApplication
         return Result.Succeeded;
     }
 
+
 }
