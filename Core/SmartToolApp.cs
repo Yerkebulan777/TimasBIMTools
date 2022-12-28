@@ -19,7 +19,8 @@ public sealed class SmartToolApp : IExternalApplication
     private static SmartToolHelper toolHelper { get; set; }
     private static UIControlledApplication uicontrol { get; set; }
     private static IDockablePaneProvider paneProvider { get; set; }
-    private CutHoleRegisterDockPane paneRegister { get; set; }
+
+    private CutHoleRegisterDockPane paneRegister = null;
 
     public Result OnStartup(UIControlledApplication controlledApp)
     {
@@ -60,9 +61,10 @@ public sealed class SmartToolApp : IExternalApplication
     }
 
 
-    public Result OnShutdown(UIControlledApplication cntrapp)
+    public Result OnShutdown(UIControlledApplication uicontrol)
     {
-        cntrapp.ControlledApplication.ApplicationInitialized -= OnApplicationInitialized;
+        uicontrol.DockableFrameVisibilityChanged -= OnDockableFrameVisibilityChanged;
+        uicontrol.ControlledApplication.ApplicationInitialized -= OnApplicationInitialized;
         return Result.Succeeded;
     }
 
