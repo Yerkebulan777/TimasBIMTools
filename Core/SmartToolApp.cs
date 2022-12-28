@@ -20,12 +20,12 @@ namespace RevitTimasBIMTools.Core
         public Result OnStartup(UIControlledApplication controlledApp)
         {
             controller = controlledApp;
-            RevitTask.Initialize(controlledApp);
             Host = ContainerConfig.ConfigureServices();
             Logger.InitMainLogger(typeof(SmartToolApp));
             SmartToolSetupUIPanel.Initialize(controlledApp);
             Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
             controlledApp.ControlledApplication.ApplicationInitialized += OnApplicationInitialized;
+            RevitTask.Initialize(controlledApp);
             return Result.Succeeded;
         }
 
