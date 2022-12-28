@@ -11,61 +11,59 @@ using System.Windows.Media;
 using System.Windows.Threading;
 
 
-namespace RevitTimasBIMTools.Core
+namespace RevitTimasBIMTools.Core;
+
+public sealed class SmartToolApp : IExternalApplication
 {
-    public sealed class SmartToolApp : IExternalApplication
+    public static IHost Host { get; private set; }
+    private static SmartToolHelper toolHelper { get; set; }
+    private static UIControlledApplication uicontrol { get; set; }
+    private static IDockablePaneProvider paneProvider { get; set; }
+    private CutHoleRegisterDockPane paneRegister { get; set; }
+
+    public Result OnStartup(UIControlledApplication controlledApp)
     {
-        public static IHost Host { get; private set; }
-        private static SmartToolHelper toolHelper { get; set; }
-        private static UIControlledApplication uicontrol { get; set; }
-        private static IDockablePaneProvider paneProvider { get; set; }
-
-        CutHoleRegisterDockPane paneRegister{ get; set; }
-
-        public Result OnStartup(UIControlledApplication controlledApp)
-        {
-            uicontrol = controlledApp;
-            Host = ContainerConfig.ConfigureServices();
-            SBTLogger.InitMainLogger(typeof(SmartToolApp));
-            SmartToolSetupUIPanel.Initialize(controlledApp);
-            Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
-            controlledApp.ControlledApplication.ApplicationInitialized += OnApplicationInitialized;
-            RevitTask.Initialize(controlledApp);
-            return Result.Succeeded;
-        }
-
-
-        [STAThread]
-        private void OnApplicationInitialized(object sender, ApplicationInitializedEventArgs e)
-        {
-            toolHelper = Host.Services.GetRequiredService<SmartToolHelper>();
-            paneProvider = Host.Services.GetRequiredService<IDockablePaneProvider>();
-            paneRegister = Host.Services.GetRequiredService<CutHoleRegisterDockPane>();
-            if (paneRegister.RegisterDockablePane(uicontrol, toolHelper.CutVoidPaneId, paneProvider))
-            {
-                uicontrol.DockableFrameVisibilityChanged += OnDockableFrameVisibilityChanged;
-                if (RenderOptions.ProcessRenderMode.Equals(RenderMode.SoftwareOnly))
-                {
-                    RenderOptions.ProcessRenderMode = RenderMode.Default;
-                }
-            }
-        }
-
-
-        private void OnDockableFrameVisibilityChanged(object sender, Autodesk.Revit.UI.Events.DockableFrameVisibilityChangedEventArgs e)
-        {
-            if (e.PaneId is DockablePaneId dockablePaneId && dockablePaneId.Guid.Equals(toolHelper.CutVoidPaneId.Guid))
-            {
-                SBTLogger.Info("OnDockableFrameVisibilityChanged");
-            }
-        }
-
-
-        public Result OnShutdown(UIControlledApplication cntrapp)
-        {
-            cntrapp.ControlledApplication.ApplicationInitialized -= OnApplicationInitialized;
-            return Result.Succeeded;
-        }
-
+        uicontrol = controlledApp;
+        Host = ContainerConfig.ConfigureServices();
+        SBTLogger.InitMainLogger(typeof(SmartToolApp));
+        SmartToolSetupUIPanel.Initialize(controlledApp);
+        Dispatcher.CurrentDispatcher.Thread.Name = "RevitGeneralThread";
+        controlledApp.ControlledApplication.ApplicationInitialized += OnApplicationInitialized;
+        RevitTask.Initialize(controlledApp);
+        return Result.Succeeded;
     }
+
+
+    [STAThread]
+    private void OnApplicationInitialized(object sender, ApplicationInitializedEventArgs e)
+    {
+        toolHelper = Host.Services.GetRequiredService<SmartToolHelper>();
+        paneProvider = Host.Services.GetRequiredService<IDockablePaneProvider>();
+        paneRegister = Host.Services.GetRequiredService<CutHoleRegisterDockPane>();
+        if (paneRegister.RegisterDockablePane(uicontrol, toolHelper.CutVoidPaneId, paneProvider))
+        {
+            uicontrol.DockableFrameVisibilityChanged += OnDockableFrameVisibilityChanged;
+            if (RenderOptions.ProcessRenderMode.Equals(RenderMode.SoftwareOnly))
+            {
+                RenderOptions.ProcessRenderMode = RenderMode.Default;
+            }
+        }
+    }
+
+
+    private void OnDockableFrameVisibilityChanged(object sender, Autodesk.Revit.UI.Events.DockableFrameVisibilityChangedEventArgs e)
+    {
+        if (e.PaneId is DockablePaneId dockablePaneId && dockablePaneId.Guid.Equals(toolHelper.CutVoidPaneId.Guid))
+        {
+            SBTLogger.Info("OnDockableFrameVisibilityChanged");
+        }
+    }
+
+
+    public Result OnShutdown(UIControlledApplication cntrapp)
+    {
+        cntrapp.ControlledApplication.ApplicationInitialized -= OnApplicationInitialized;
+        return Result.Succeeded;
+    }
+
 }
