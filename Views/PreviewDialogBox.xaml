@@ -20,6 +20,7 @@
         </Grid.RowDefinitions>
 
         <Grid Name="GridControl" Grid.Row="0" Margin="5" >
+            
         </Grid>
 
         <StackPanel Name="OkCanselPanel" Grid.Row="1" Orientation="Horizontal" 
