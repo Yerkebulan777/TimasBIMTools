@@ -8,7 +8,7 @@
     xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     Title="AreaRebarMarkFix"
-    Width="300"
+    Width="400"
     Height="Auto"
     MinHeight="150"
     MaxHeight="1000"
@@ -16,6 +16,7 @@
     ResizeMode="CanResizeWithGrip"
     SizeToContent="Height"
     Topmost="True"
+    Background="WhiteSmoke"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
@@ -68,6 +69,9 @@
             <ListView
                 Name="DataListView"
                 Grid.Row="1"
+                HorizontalAlignment="Center"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
                 d:ItemsSource="{d:SampleData ItemCount=3}"
                 BorderBrush="Transparent"
                 ItemsSource="{Binding Path=ViewDataCollection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
@@ -90,15 +94,28 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn DisplayMemberBinding="{Binding HostMark}" Header="Host mark" />
+                        <GridViewColumn
+                            Width="100"
+                            DisplayMemberBinding="{Binding LevelName}"
+                            Header="Level" />
 
-                        <GridViewColumn Width="Auto" Header="Content">
+                        <GridViewColumn
+                            Width="75"
+                            DisplayMemberBinding="{Binding HostMark}"
+                            Header="Host" />
+
+                        <GridViewColumn Width="100" Header="Content">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Margin="1.5" Orientation="Horizontal">
+                                    <StackPanel
+                                        Margin="1.5"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal">
                                         <TextBox
-                                            MinWidth="100"
-                                            Margin="5,0"
+                                            Width="75"
+                                            MinWidth="50"
+                                            Margin="5"
                                             Text="{Binding Mark, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     </StackPanel>
                                 </DataTemplate>

@@ -88,6 +88,7 @@ public sealed class AreaRebarMarkFixViewModel : ObservableObject
                     viewData.GroupDescriptions.Clear();
                     viewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ElementModel.HostCategoryIntId)));
                     viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.HostCategoryIntId), ListSortDirection.Ascending));
+                    viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.LevelName), ListSortDirection.Ascending));
                     viewData.SortDescriptions.Add(new SortDescription(nameof(ElementModel.HostMark), ListSortDirection.Ascending));
                 }
             }
