@@ -18,30 +18,44 @@ namespace RevitTimasBIMTools.Core
 
 
             // Create Cut Opening PushButtonData 
-            PushButtonData CutOpenningButton = new("CutOpenning", SmartToolHelper.CutOpenningButtonName, assemblyName, CutHoleShowPanelCommand.GetPath())
+            PushButtonData cutOpenningBtn = new("CutOpenning", SmartToolHelper.CutOpenningButtonName, assemblyName, CutHoleShowPanelCommand.GetPath())
             {
                 ToolTip = "Cut Openning panel",
                 LargeImage = SmartToolHelper.GetImageSource()
             };
 
-            PushButtonData AreaRebarMarkFixButton = new("AreaRebarMarkFixWindow", SmartToolHelper.AreaRebarMarkFixButtonName, assemblyName, AreaRebarMarkFixCommand.GetPath())
+            PushButtonData areaRebarMarkFixBtn = new("AreaRebarMarkFix", SmartToolHelper.AreaRebarMarkFixButtonName, assemblyName, AreaRebarMarkFixCommand.GetPath())
             {
-                ToolTip = "Fix area rebar conteiner marks",
+                ToolTip = "Fix area rebars marks",
+                LargeImage = SmartToolHelper.GetImageSource()
+            };
+
+            PushButtonData autoJoinButton = new("AutoJoin", SmartToolHelper.AutoJoinButtonName, assemblyName, AutoJoinGeometryCommand.GetPath())
+            {
+                ToolTip = "Fix area rebars marks",
                 LargeImage = SmartToolHelper.GetImageSource()
             };
 
 
-            PushButton showButton01 = ribbonPanel.AddItem(CutOpenningButton) as PushButton;
-            if (showButton01 != null && showButton01 is PushButton)
+            //Add buttons to ribbon panel
+            PushButton btn01 = ribbonPanel.AddItem(cutOpenningBtn) as PushButton;
+            if (btn01 != null && btn01 is PushButton)
             {
-                showButton01.AvailabilityClassName = CutHoleShowPanelCommand.GetPath();
+                btn01.AvailabilityClassName = CutHoleShowPanelCommand.GetPath();
                 ribbonPanel.AddSeparator();
             }
 
-            PushButton showButton02 = ribbonPanel.AddItem(AreaRebarMarkFixButton) as PushButton;
-            if (showButton02 != null && showButton02 is PushButton)
+            PushButton btn02 = ribbonPanel.AddItem(areaRebarMarkFixBtn) as PushButton;
+            if (btn02 != null && btn02 is PushButton)
             {
-                showButton02.AvailabilityClassName = AreaRebarMarkFixCommand.GetPath();
+                btn02.AvailabilityClassName = AreaRebarMarkFixCommand.GetPath();
+                ribbonPanel.AddSeparator();
+            }
+
+            PushButton btn03 = ribbonPanel.AddItem(autoJoinButton) as PushButton;
+            if (btn03 != null && btn03 is PushButton)
+            {
+                btn03.AvailabilityClassName = AutoJoinGeometryCommand.GetPath();
                 ribbonPanel.AddSeparator();
             }
 

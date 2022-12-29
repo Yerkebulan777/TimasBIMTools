@@ -20,6 +20,7 @@ namespace RevitTimasBIMTools.Core
 
         public static string CutOpenningButtonName = "Cut Opening Manager";
         public static string AreaRebarMarkFixButtonName = "Area Rebar Mark";
+        public static string AutoJoinButtonName = "AutoJoin";
 
         public static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
         public static readonly string AssemblyLocation = Path.GetFullPath(Assembly.Location);

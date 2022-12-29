@@ -11,12 +11,12 @@ namespace RevitTimasBIMTools.RevitUtils
         private static TransactionStatus status = TransactionStatus.Uninitialized;
 
         /// <summary> The method used to create a single strx </summary>
-        public static void CreateTransaction(Document document, string transactionName, Action action)
+        public static void CreateTransaction(Document document, string trxName, Action action)
         {
             lock (SingleLocker)
             {
                 using Transaction trx = new(document);
-                status = trx.Start(transactionName);
+                status = trx.Start(trxName);
                 if (status == TransactionStatus.Started)
                 {
                     try
@@ -29,7 +29,8 @@ namespace RevitTimasBIMTools.RevitUtils
                         if (!trx.HasEnded())
                         {
                             status = trx.RollBack();
-                            SBTLogger.Error(ex.ToString());
+                            string msg = "Transaction: " + trxName;
+                            SBTLogger.Error(msg + ex.ToString());
                         }
                     }
                 }
