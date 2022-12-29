@@ -13,10 +13,10 @@
     MinHeight="150"
     MaxHeight="1000"
     d:DataContext="{d:DesignInstance Type=vm:AreaRebarMarkFixViewModel}"
+    Background="WhiteSmoke"
     ResizeMode="CanResizeWithGrip"
     SizeToContent="Height"
     Topmost="True"
-    Background="WhiteSmoke"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
 
