@@ -295,6 +295,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\AutoJoinGeometryCommand.cs" />
     <Compile Include="Core\APIEventHandler.cs" />
     <Compile Include="Core\ContainerConfig.cs" />
     <Compile Include="Core\RevitEventWrapper.cs" />

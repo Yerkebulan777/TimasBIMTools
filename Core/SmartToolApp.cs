@@ -13,6 +13,7 @@ using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Core;
 
+
 public sealed class SmartToolApp : IExternalApplication
 {
     public static IHost Host { get; private set; }
