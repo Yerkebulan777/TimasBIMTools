@@ -26,34 +26,38 @@ namespace RevitTimasBIMTools.Commands
             BuiltInCategory bip = BuiltInCategory.OST_Walls;
             collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(Wall), bip, true);
             ICollection<ElementId> exclusionIds = new List<ElementId>(collector.GetElementCount());
-            TransactionManager.CreateTransaction(doc, "AutoJoin", () => 
+
+            foreach (Wall wall1 in collector)
             {
-                foreach (Wall wall in collector)
+                if (wall1.FindInserts(true, true, true, true).Any())
                 {
-                    if (wall.FindInserts(true, true, true, true).Any())
+                    exclusionIds.Add(wall1.Id);
+                    ExclusionFilter exfilter = new(exclusionIds);
+                    BoundingBoxXYZ bb = wall1.get_BoundingBox(null);
+                    BoundingBoxIntersectsFilter bbfilter = new(new Outline(bb.Min, bb.Max));
+                    collector ??= RevitFilterManager.GetElementsOfCategory(doc, typeof(Wall), bip, true);
+                    foreach (Wall wall2 in collector.WherePasses(bbfilter).WherePasses(exfilter))
                     {
-                        exclusionIds.Add(wall.Id);
-                        BoundingBoxXYZ bb = wall.get_BoundingBox(null);
-                        ExclusionFilter exfilter = new ExclusionFilter(exclusionIds);
-                        BoundingBoxIntersectsFilter bbfilter = new(new Outline(bb.Min, bb.Max));
-                        collector ??= RevitFilterManager.GetElementsOfCategory(doc, typeof(Wall), bip, true);
-                        foreach (Element itm in collector.WherePasses(bbfilter).WherePasses(exfilter))
+                        if (!JoinGeometryUtils.AreElementsJoined(doc, wall1, wall2))
                         {
-                            if (!JoinGeometryUtils.IsCuttingElementInJoin(doc, wall, itm))
+                            XYZ normal1 = XYZ.BasisZ.CrossProduct(wall1.Orientation);
+                            XYZ normal2 = XYZ.BasisZ.CrossProduct(wall2.Orientation);
+
+                            if (!normal1.IsParallel(normal2)) { continue; }
+
+                            TransactionManager.CreateTransaction(doc, "AutoJoin", () =>
                             {
                                 try
                                 {
-                                    JoinGeometryUtils.JoinGeometry(doc, wall, itm);
+                                    JoinGeometryUtils.JoinGeometry(doc, wall1, wall2);
                                 }
-                                finally
-                                {
-                                    counter++;
-                                }
-                            }
+                                catch { counter--; }
+                                finally { counter++; }
+                            });
                         }
                     }
                 }
-            });
+            }
 
             SBTLogger.Info($"Successfully Completed!\n Joined walls: {counter} count");
             return Result.Succeeded;

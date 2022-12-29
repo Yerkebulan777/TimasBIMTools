@@ -29,7 +29,7 @@ namespace RevitTimasBIMTools.RevitUtils
                         if (!trx.HasEnded())
                         {
                             status = trx.RollBack();
-                            string msg = "Transaction: " + trxName;
+                            string msg = $"Transaction: {trxName}\n";
                             SBTLogger.Error(msg + ex.ToString());
                         }
                     }
