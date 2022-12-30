@@ -47,8 +47,8 @@ internal sealed class AutoJoinGeometryCommand : IExternalCommand, IExternalComma
                     Line line1 = (wall1.Location as LocationCurve).Curve as Line;
                     Line line2 = (wall2.Location as LocationCurve).Curve as Line;
 
-                    XYZ normal1 = line1.Direction.Normalize().ToPositive();
-                    XYZ normal2 = line2.Direction.Normalize().ToPositive();
+                    XYZ normal1 = line1.Direction.ToPositive();
+                    XYZ normal2 = line2.Direction.ToPositive();
 
                     if (normal1.IsAlmostEqualTo(normal2))
                     {
