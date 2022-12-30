@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
-
+using Line = Autodesk.Revit.DB.Line;
 
 namespace RevitTimasBIMTools.Commands;
 
@@ -34,24 +34,28 @@ internal sealed class AutoJoinGeometryCommand : IExternalCommand, IExternalComma
                 exclusionIds.Add(wall1.Id);
                 ExclusionFilter exfilter = new(exclusionIds);
                 BoundingBoxXYZ bb = wall1.get_BoundingBox(null);
+                ElementLevelFilter level1Filter = new(wall1.LevelId);
                 BoundingBoxIntersectsFilter bbfilter = new(new Outline(bb.Min, bb.Max));
                 collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(Wall), bip, true);
-                foreach (Wall wall2 in collector.WherePasses(bbfilter).WherePasses(exfilter).ToElements())
+                foreach (Wall wall2 in collector.WherePasses(bbfilter).WherePasses(level1Filter).WherePasses(exfilter))
                 {
-                    if (!JoinGeometryUtils.AreElementsJoined(doc, wall1, wall2))
+                    if (JoinGeometryUtils.AreElementsJoined(doc, wall1, wall2)) { continue; }
+
+                    Line line1 = (wall1.Location as LocationCurve).Curve as Line;
+                    Line line2 = (wall2.Location as LocationCurve).Curve as Line;
+
+                    XYZ normal1 = line1.Direction.Normalize().ToPositive();
+                    XYZ normal2 = line2.Direction.Normalize().ToPositive();
+
+                    if (normal1.IsAlmostEqualTo(normal2) && !line1.IsCollinear(line2))
                     {
-                        XYZ normal1 = XYZ.BasisZ.CrossProduct(wall1.Orientation);
-                        XYZ normal2 = XYZ.BasisZ.CrossProduct(wall2.Orientation);
-
-                        if (!normal1.IsParallel(normal2)) { continue; }
-
+                        uidoc.Selection.SetElementIds(new List<ElementId>() {wall2.Id});
                         TransactionManager.CreateTransaction(doc, "AutoJoin", () =>
                         {
                             try
                             {
                                 JoinGeometryUtils.JoinGeometry(doc, wall1, wall2);
                             }
-                            catch { counter--; }
                             finally { counter++; }
                         });
                     }
@@ -68,7 +72,7 @@ internal sealed class AutoJoinGeometryCommand : IExternalCommand, IExternalComma
     bool IExternalCommandAvailability.IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
     {
         View view = uiapp.ActiveUIDocument?.ActiveGraphicalView;
-        return view is ViewPlan or ViewSchedule or ViewSection or View3D;
+        return view is ViewPlan or View3D;
     }
 
 

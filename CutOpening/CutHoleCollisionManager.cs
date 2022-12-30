@@ -228,7 +228,7 @@ public sealed class CutHoleCollisionManager
         height = 0;
         if (size != null)
         {
-            normal = normal.ConvertToPositive();
+            normal = normal.ToPositive();
             if (normal.IsAlmostEqualTo(XYZ.BasisX, 0.5))
             {
                 width = Math.Round(size.Max.U - size.Min.U, 5);

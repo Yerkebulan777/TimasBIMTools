@@ -5,6 +5,7 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Shapes;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 using Options = Autodesk.Revit.DB.Options;
@@ -389,16 +390,43 @@ internal static class GeometryExtension
     }
 
 
-    public static XYZ ConvertToPositive(this XYZ vector)
+    public static XYZ ToPositive(this XYZ vector)
     {
-        bool isPositive = vector.IsAlmostEqualTo(XYZ.BasisZ, 0.5) || vector.IsAlmostEqualTo(XYZ.BasisX, 0.5) || vector.IsAlmostEqualTo(XYZ.BasisY, 0.5);
-        return isPositive ? vector : vector.Negate();
+        if (vector.IsAlmostEqualTo(XYZ.BasisZ, 0.5))
+        {
+            return vector;
+        }
+        else if (vector.IsAlmostEqualTo(XYZ.BasisX, 0.5))
+        {
+            return vector;
+        }
+        else if (vector.IsAlmostEqualTo(XYZ.BasisY, 0.5))
+        {
+            return vector;
+        }
+        return vector.Negate();
     }
 
 
     public static bool IsParallel(this XYZ normal, in XYZ direction)
     {
         return normal.CrossProduct(direction).IsZeroLength();
+    }
+
+
+    public static bool IsCollinear(this Line line1, Line line2)
+    {
+        double slope1 = GetSlope(line1);
+        double slope2 = GetSlope(line2);
+        return slope1 == slope2;
+    }
+
+
+    private static double GetSlope(in Line line)
+    {
+        XYZ strPt = line.GetEndPoint(0);
+        XYZ endPt = line.GetEndPoint(1);
+        return (endPt.Y - strPt.Y) / (endPt.X - strPt.X);
     }
 
 
