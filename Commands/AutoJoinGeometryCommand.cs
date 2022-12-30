@@ -51,7 +51,7 @@ internal sealed class AutoJoinGeometryCommand : IExternalCommand, IExternalComma
                     if (normal1.IsAlmostEqualTo(normal2))
                     {
                         using Transaction trx = new(doc);
-                        var status = trx.Start("JoinWall");
+                        TransactionStatus status = trx.Start("JoinWall");
                         if (status == TransactionStatus.Started)
                         {
                             try
