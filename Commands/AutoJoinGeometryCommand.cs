@@ -37,7 +37,8 @@ internal sealed class AutoJoinGeometryCommand : IExternalCommand, IExternalComma
                 ElementLevelFilter level1Filter = new(wall1.LevelId);
                 BoundingBoxIntersectsFilter bbfilter = new(new Outline(bb.Min, bb.Max));
                 collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(Wall), bip, true);
-                foreach (Wall wall2 in collector.WherePasses(bbfilter).WherePasses(level1Filter).WherePasses(exfilter))
+                collector = collector.WherePasses(bbfilter).WherePasses(level1Filter).WherePasses(exfilter);
+                foreach (Wall wall2 in collector.ToElements())
                 {
                     if (JoinGeometryUtils.AreElementsJoined(doc, wall1, wall2)) { continue; }
 
@@ -47,17 +48,29 @@ internal sealed class AutoJoinGeometryCommand : IExternalCommand, IExternalComma
                     XYZ normal1 = line1.Direction.Normalize().ToPositive();
                     XYZ normal2 = line2.Direction.Normalize().ToPositive();
 
-                    if (normal1.IsAlmostEqualTo(normal2) && !line1.IsCollinear(line2))
+                    if (normal1.IsAlmostEqualTo(normal2))
                     {
-                        uidoc.Selection.SetElementIds(new List<ElementId>() {wall2.Id});
-                        TransactionManager.CreateTransaction(doc, "AutoJoin", () =>
+                        using Transaction trx = new(doc);
+                        var status = trx.Start("JoinWall");
+                        if (status == TransactionStatus.Started)
                         {
                             try
                             {
+                                //uidoc.Selection.SetElementIds(new List<ElementId>() { wall2.Id });
                                 JoinGeometryUtils.JoinGeometry(doc, wall1, wall2);
+                                status = trx.Commit();
+                                counter++;
                             }
-                            finally { counter++; }
-                        });
+                            catch (Exception ex)
+                            {
+                                if (!trx.HasEnded())
+                                {
+                                    status = trx.RollBack();
+                                    SBTLogger.Log(ex.Message);
+                                    continue;
+                                }
+                            }
+                        }
                     }
                 }
             }

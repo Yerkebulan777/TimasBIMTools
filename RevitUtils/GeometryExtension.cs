@@ -5,7 +5,6 @@ using RevitTimasBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Shapes;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 using Options = Autodesk.Revit.DB.Options;
@@ -414,27 +413,10 @@ internal static class GeometryExtension
     }
 
 
-    public static bool IsCollinear(this Line line1, Line line2)
-    {
-        double slope1 = GetSlope(line1);
-        double slope2 = GetSlope(line2);
-        return slope1 == slope2;
-    }
-
-
-    private static double GetSlope(in Line line)
-    {
-        XYZ strPt = line.GetEndPoint(0);
-        XYZ endPt = line.GetEndPoint(1);
-        return (endPt.Y - strPt.Y) / (endPt.X - strPt.X);
-    }
-
-
     public static double ConvertToDegrees(this double radians, int digit = 3)
     {
         return Math.Round(180 / Math.PI * radians, digit);
     }
-
 
 }
 
