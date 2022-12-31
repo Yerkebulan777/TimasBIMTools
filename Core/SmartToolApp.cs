@@ -44,7 +44,6 @@ public sealed class SmartToolApp : IExternalApplication
         paneRegister = Host.Services.GetRequiredService<CutHoleRegisterDockPane>();
         if (paneRegister.RegisterDockablePane(uicontrol, toolHelper.CutVoidPaneId, paneProvider))
         {
-            uicontrol.DockableFrameVisibilityChanged += OnDockableFrameVisibilityChanged;
             if (RenderOptions.ProcessRenderMode.Equals(RenderMode.SoftwareOnly))
             {
                 RenderOptions.ProcessRenderMode = RenderMode.Default;
@@ -53,18 +52,8 @@ public sealed class SmartToolApp : IExternalApplication
     }
 
 
-    private void OnDockableFrameVisibilityChanged(object sender, Autodesk.Revit.UI.Events.DockableFrameVisibilityChangedEventArgs e)
-    {
-        if (e.PaneId is DockablePaneId dockablePaneId && dockablePaneId.Guid.Equals(toolHelper.CutVoidPaneId.Guid))
-        {
-            SBTLogger.Info("OnDockableFrameVisibilityChanged");
-        }
-    }
-
-
     public Result OnShutdown(UIControlledApplication uicontrol)
     {
-        uicontrol.DockableFrameVisibilityChanged -= OnDockableFrameVisibilityChanged;
         uicontrol.ControlledApplication.ApplicationInitialized -= OnApplicationInitialized;
         return Result.Succeeded;
     }

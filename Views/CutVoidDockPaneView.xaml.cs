@@ -5,10 +5,12 @@ using RevitTimasBIMTools.RevitModel;
 using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Threading;
+using Button = System.Windows.Controls.Button;
 using ComboBox = System.Windows.Controls.ComboBox;
 
 
@@ -25,16 +27,9 @@ public partial class CutVoidDockPaneView : Page, IDockablePaneProvider
     public CutVoidDockPaneView(CutHoleDataViewModel viewModel)
     {
         InitializeComponent();
-        Loaded += CutVoidDockPaneView_Loaded;
         DataContext = DataContextHandler = viewModel;
         DataContextHandler = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         DataContextHandler.DockPanelView = this;
-    }
-
-
-    private void CutVoidDockPaneView_Loaded(object sender, System.Windows.RoutedEventArgs e)
-    {
-        RaiseExternalEvent();
     }
 
 
@@ -60,15 +55,15 @@ public partial class CutVoidDockPaneView : Page, IDockablePaneProvider
             {
                 Dispatcher.CurrentDispatcher.Invoke(() =>
                 {
+                    DataContextHandler.Dispose();
                     if (ExternalEventRequest.Accepted == externalEvent.Raise())
                     {
                         Disposed = false;
                         DataContextHandler.IsStarted = true;
                         DataContextHandler.IsOptionEnabled = false;
                         DataContextHandler.IsDataRefresh = false;
-                        Loaded -= CutVoidDockPaneView_Loaded;
                     }
-                });
+                }, DispatcherPriority.Background);
             }
             catch (Exception ex)
             {
@@ -80,7 +75,7 @@ public partial class CutVoidDockPaneView : Page, IDockablePaneProvider
 
     private void ShowModelButton_Click(object sender, System.Windows.RoutedEventArgs e)
     {
-        if (sender is System.Windows.Controls.Button btn && btn.DataContext is ElementModel model)
+        if (sender is Button btn && btn.DataContext is ElementModel model)
         {
             if (model != null && model.Instanse.IsValidObject)
             {

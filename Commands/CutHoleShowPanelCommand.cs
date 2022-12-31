@@ -32,7 +32,7 @@ namespace RevitTimasBIMTools.Commands
             try
             {
                 DockablePane pane = uiapp.GetDockablePane(toolHelper.CutVoidPaneId);
-                if (paneProvider is CutVoidDockPaneView view && pane.IsValidObject)
+                if (paneProvider is CutVoidDockPaneView view && pane is not null)
                 {
                     if (pane.IsShown())
                     {

@@ -384,8 +384,8 @@ public sealed class CutHoleDataViewModel : ObservableObject
     {
         if (IsStarted)
         {
-            Task task = Task.Delay(1000)
-            .ContinueWith(task =>
+            Task task = Task.WhenAll();
+            task.ContinueWith(task =>
             {
                 IsStarted = false;
                 IsDataRefresh = false;
