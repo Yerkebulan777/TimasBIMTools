@@ -350,6 +350,9 @@
     <Compile Include="Views\CutVoidDockPaneView.xaml.cs">
       <DependentUpon>CutVoidDockPaneView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\FinishingWindow.xaml.cs">
+      <DependentUpon>FinishingWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PreviewDialogBox.xaml.cs">
       <DependentUpon>PreviewDialogBox.xaml</DependentUpon>
     </Compile>
@@ -388,6 +391,10 @@
     <Page Include="Views\CutVoidDockPaneView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\FinishingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\PreviewDialogBox.xaml">
       <SubType>Designer</SubType>

@@ -44,7 +44,7 @@
             <BulletDecorator Margin="5">
                 <BulletDecorator.Bullet>
                     <Label
-                        Width="{Binding ElementName=ParentGrid, Path=ActualWidth, Converter={StaticResource SizeConverter}, ConverterParameter='0.35'}"
+                        Width="Auto"
                         Content="Parameter: "
                         Foreground="DarkBlue" />
                 </BulletDecorator.Bullet>

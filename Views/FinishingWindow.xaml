@@ -1,0 +1,85 @@
+﻿<Window
+    x:Class="RevitTimasBIMTools.Views.FinishingWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="FinishingWindow"
+    Width="800"
+    Height="450"
+    mc:Ignorable="d">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Name="ParentGrid">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="45" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.58*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!--  Header  -->
+        <Border
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Background="{DynamicResource FloralGradientBrush}">
+            <Grid VerticalAlignment="Center">
+                <Label
+                    Name="ActiveDocTitle"
+                    VerticalAlignment="Center"
+                    TextElement.FontSize="13">
+                    <Label.BitmapEffect>
+                        <DropShadowBitmapEffect />
+                    </Label.BitmapEffect>
+                </Label>
+            </Grid>
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            Grid.Column="0"
+            Margin="5"
+            Style="{StaticResource GroupBoxBorderStyle}">
+            <StackPanel Name="OptionPanel">
+                <TreeView
+                    Margin="10"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    d:ItemsSource="{d:SampleData ItemCount=7}"
+                    ItemsSource="{Binding AllLevels}" >
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding StreetList}">
+                            <TextBlock Text="{Binding LevelName}" />
+                            <HierarchicalDataTemplate.ItemTemplate>
+                                <HierarchicalDataTemplate ItemsSource="{Binding AllRooms}">
+                                    <TextBlock Text="{Binding RoomName}" />
+                                    <HierarchicalDataTemplate.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding RoomNumber}" />
+                                        </DataTemplate>
+                                    </HierarchicalDataTemplate.ItemTemplate>
+                                </HierarchicalDataTemplate>
+                            </HierarchicalDataTemplate.ItemTemplate>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+
+</Window>

@@ -38,7 +38,7 @@
 
             <!--  Header  -->
             <Border Grid.Row="0" Background="{DynamicResource FloralGradientBrush}">
-                <Grid Grid.Row="0" VerticalAlignment="Center">
+                <Grid VerticalAlignment="Center">
                     <Label
                         Name="ActiveDocTitle"
                         VerticalAlignment="Center"
