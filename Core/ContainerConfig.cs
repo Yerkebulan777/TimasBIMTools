@@ -35,7 +35,7 @@ namespace RevitTimasBIMTools.Core
                 services.AddTransient<PreviewDialogBox>();
 
                 // AreaRebarMarkFix
-                services.AddTransient<AreaRebarMarkFixViewModel>();
+                services.AddTransient<AreaRebarMarkViewModel>();
                 services.AddTransient<AreaRebarMarkFixWindow>();
 
             }).Build();

@@ -5,9 +5,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:RevitTimasBIMTools.ViewModels"
     Title="FinishingWindow"
     Width="800"
     Height="450"
+    d:DataContext="{d:DesignInstance Type=vm:RoomFinishingViewModel}"
     mc:Ignorable="d">
 
     <Window.Resources>
@@ -23,12 +25,12 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="45" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="75" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1.58*" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="1.5*" />
         </Grid.ColumnDefinitions>
 
         <!--  Header  -->
@@ -49,6 +51,7 @@
             </Grid>
         </Border>
 
+
         <Border
             Grid.Row="1"
             Grid.Column="0"
@@ -60,16 +63,16 @@
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     d:ItemsSource="{d:SampleData ItemCount=7}"
-                    ItemsSource="{Binding AllLevels}" >
+                    ItemsSource="{Binding Path=RoomCollection}">
                     <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding StreetList}">
-                            <TextBlock Text="{Binding LevelName}" />
+                        <HierarchicalDataTemplate ItemsSource="{Binding}">
+                            <TextBlock Text="{Binding Level.Name}" />
                             <HierarchicalDataTemplate.ItemTemplate>
-                                <HierarchicalDataTemplate ItemsSource="{Binding AllRooms}">
-                                    <TextBlock Text="{Binding RoomName}" />
+                                <HierarchicalDataTemplate ItemsSource="{Binding}">
+                                    <TextBlock Text="{Binding Name}" />
                                     <HierarchicalDataTemplate.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding RoomNumber}" />
+                                            <TextBlock Text="{Binding Number}" />
                                         </DataTemplate>
                                     </HierarchicalDataTemplate.ItemTemplate>
                                 </HierarchicalDataTemplate>
@@ -79,6 +82,7 @@
                 </TreeView>
             </StackPanel>
         </Border>
+
 
     </Grid>
 

@@ -18,8 +18,8 @@ namespace RevitTimasBIMTools.Views
         }
 
 
-        private readonly AreaRebarMarkFixViewModel viewModel;
-        public AreaRebarMarkFixWindow(AreaRebarMarkFixViewModel vm) : this()
+        private readonly AreaRebarMarkViewModel viewModel;
+        public AreaRebarMarkFixWindow(AreaRebarMarkViewModel vm) : this()
         {
             this.viewModel = vm;
             this.DataContext = vm;

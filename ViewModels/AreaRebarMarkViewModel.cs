@@ -19,7 +19,7 @@ using Reference = Autodesk.Revit.DB.Reference;
 
 namespace RevitTimasBIMTools.ViewModels;
 
-public sealed class AreaRebarMarkFixViewModel : ObservableObject
+public sealed class AreaRebarMarkViewModel : ObservableObject
 {
 
     public AreaRebarMarkFixWindow RepresentedView { get; internal set; }

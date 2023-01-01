@@ -341,9 +341,10 @@
     <Compile Include="Services\Timer.cs" />
     <Compile Include="ViewConverters\NullVisibilityConverter.cs" />
     <Compile Include="ViewConverters\PercentageConverter.cs" />
-    <Compile Include="ViewModels\AreaRebarMarkFixViewModel.cs" />
+    <Compile Include="ViewModels\AreaRebarMarkViewModel.cs" />
     <Compile Include="ViewModels\CutHoleDataViewModel.cs" />
     <Compile Include="RevitSelectionFilter\SelectionFilterAreaRein.cs" />
+    <Compile Include="ViewModels\RoomFinishingViewModel.cs" />
     <Compile Include="Views\AreaRebarMarkFixWindow.xaml.cs">
       <DependentUpon>AreaRebarMarkFixWindow.xaml</DependentUpon>
     </Compile>
