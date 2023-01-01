@@ -1,5 +1,5 @@
 ﻿<Window
-    x:Class="RevitTimasBIMTools.Views.FinishingWindow"
+    x:Class="RevitTimasBIMTools.Views.RoomFinishingWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -57,13 +57,13 @@
             Grid.Column="0"
             Margin="5"
             Style="{StaticResource GroupBoxBorderStyle}">
-            <StackPanel Name="OptionPanel">
+            <StackPanel Name="TreeViewPanel">
                 <TreeView
                     Margin="10"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     d:ItemsSource="{d:SampleData ItemCount=7}"
-                    ItemsSource="{Binding Path=RoomCollection}">
+                    ItemsSource="{Binding Path=RoomViewCollection}">
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding}">
                             <TextBlock Text="{Binding Level.Name}" />
@@ -82,6 +82,45 @@
                 </TreeView>
             </StackPanel>
         </Border>
+
+
+        <TabControl
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="5">
+            <TabItem x:Name="wallFinishing">
+                <TabItem.Header>
+                    <StackPanel Width="100" Orientation="Horizontal">
+                        <Ellipse
+                            Width="10"
+                            Height="10"
+                            Fill="AntiqueWhite" />
+                        <TextBlock Margin="3" Text=" Walls " />
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Margin="3" Text=" IS DEMO VERSION " />
+                    </StackPanel>
+                </TabItem.Content>
+            </TabItem>
+            <TabItem x:Name="tabletsTab">
+                <TabItem.Header>
+                    <StackPanel Width="100" Orientation="Horizontal">
+                        <Ellipse
+                            Width="10"
+                            Height="10"
+                            Fill="AntiqueWhite" />
+                        <TextBlock Margin="3" Text=" Floors " />
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.Content>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Margin="3" Text=" IS DEMO VERSION " />
+                    </StackPanel>
+                </TabItem.Content>
+            </TabItem>
+        </TabControl>
 
 
     </Grid>

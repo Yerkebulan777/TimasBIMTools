@@ -296,6 +296,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\AutoJoinGeometryCommand.cs" />
+    <Compile Include="Commands\RoomFinishingCommand.cs" />
     <Compile Include="Core\APIEventHandler.cs" />
     <Compile Include="Core\ContainerConfig.cs" />
     <Compile Include="Core\RevitEventWrapper.cs" />
@@ -348,11 +349,11 @@
     <Compile Include="Views\AreaRebarMarkFixWindow.xaml.cs">
       <DependentUpon>AreaRebarMarkFixWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\CutVoidDockPaneView.xaml.cs">
-      <DependentUpon>CutVoidDockPaneView.xaml</DependentUpon>
+    <Compile Include="Views\CutHoleDockPaneView.xaml.cs">
+      <DependentUpon>CutHoleDockPaneView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\FinishingWindow.xaml.cs">
-      <DependentUpon>FinishingWindow.xaml</DependentUpon>
+    <Compile Include="Views\RoomFinishingWindow.xaml.cs">
+      <DependentUpon>RoomFinishingWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PreviewDialogBox.xaml.cs">
       <DependentUpon>PreviewDialogBox.xaml</DependentUpon>
@@ -389,11 +390,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\CutVoidDockPaneView.xaml">
+    <Page Include="Views\CutHoleDockPaneView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\FinishingWindow.xaml">
+    <Page Include="Views\RoomFinishingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

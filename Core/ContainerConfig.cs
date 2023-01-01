@@ -22,7 +22,7 @@ namespace RevitTimasBIMTools.Core
                 // Singleton
                 services.AddSingleton<RevitTask>();
                 services.AddSingleton<SmartToolHelper>();
-                services.AddSingleton<IDockablePaneProvider, CutVoidDockPaneView>();
+                services.AddSingleton<IDockablePaneProvider, CutHoleDockPaneView>();
 
                 // CutOpenningManager
                 services.AddTransient<APIEventHandler>();
@@ -33,6 +33,10 @@ namespace RevitTimasBIMTools.Core
                 services.AddTransient<RevitPurginqManager>();
                 services.AddTransient<PreviewControlModel>();
                 services.AddTransient<PreviewDialogBox>();
+
+                // RoomFinishing
+                services.AddTransient<RoomFinishingViewModel>();
+                services.AddTransient<RoomFinishingWindow>();
 
                 // AreaRebarMarkFix
                 services.AddTransient<AreaRebarMarkViewModel>();

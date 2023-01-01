@@ -27,7 +27,7 @@ namespace RevitTimasBIMTools.ViewModels;
 
 public sealed class CutHoleDataViewModel : ObservableObject
 {
-    public CutVoidDockPaneView DockPanelView { get; set; }
+    public CutHoleDockPaneView DockPanelView { get; set; }
     public static ExternalEvent RevitExternalEvent { get; set; }
 
     private readonly string localPath = SmartToolHelper.LocalPath;

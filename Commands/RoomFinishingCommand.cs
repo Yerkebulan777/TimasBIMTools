@@ -10,13 +10,12 @@ using System.Threading;
 
 
 namespace RevitTimasBIMTools.Commands;
-
 [Transaction(TransactionMode.Manual)]
 [Regeneration(RegenerationOption.Manual)]
-internal sealed partial class AreaRebarMarkFixCommand : IExternalCommand, IExternalCommandAvailability
+internal class RoomFinishingCommand : IExternalCommand, IExternalCommandAvailability
 {
-    private readonly AreaRebarMarkFixWindow window = SmartToolApp.Host.Services.GetRequiredService<AreaRebarMarkFixWindow>();
-    Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+    private readonly RoomFinishingWindow window = SmartToolApp.Host.Services.GetRequiredService<RoomFinishingWindow>();
+    public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
     {
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
         try
@@ -36,14 +35,7 @@ internal sealed partial class AreaRebarMarkFixCommand : IExternalCommand, IExter
     public bool IsCommandAvailable(UIApplication uiapp, CategorySet selectedCategories)
     {
         View view = uiapp.ActiveUIDocument?.ActiveGraphicalView;
-        return view is ViewPlan or ViewSchedule or ViewSection or View3D;
+        return view is ViewPlan;
     }
-
-
-    public static string GetPath()
-    {
-        return typeof(AreaRebarMarkFixCommand).FullName;
-    }
-
 
 }

@@ -16,15 +16,15 @@ using ComboBox = System.Windows.Controls.ComboBox;
 
 namespace RevitTimasBIMTools.Views;
 
-/// <summary> Логика взаимодействия для CutVoidDockPaneView.xaml </summary>
-public partial class CutVoidDockPaneView : Page, IDockablePaneProvider
+/// <summary> Логика взаимодействия для CutHoleDockPaneView.xaml </summary>
+public partial class CutHoleDockPaneView : Page, IDockablePaneProvider
 {
     private bool Disposed { get; set; } = false;
     private readonly CutHoleDataViewModel DataContextHandler;
     private readonly string docPath = SmartToolHelper.DocumentPath;
     private static readonly ExternalEvent externalEvent = CutHoleDataViewModel.RevitExternalEvent;
 
-    public CutVoidDockPaneView(CutHoleDataViewModel viewModel)
+    public CutHoleDockPaneView(CutHoleDataViewModel viewModel)
     {
         InitializeComponent();
         DataContext = DataContextHandler = viewModel;
