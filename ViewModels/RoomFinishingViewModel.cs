@@ -17,11 +17,17 @@ namespace RevitTimasBIMTools.ViewModels
         public RoomFinishingViewModel(APIEventHandler eventHandler)
         {
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
-            RoomViewCollection = CollectionViewSource.GetDefaultView(collection);
         }
 
 
-        private ObservableCollection<Room> collection;
+        private int myVar;
+        public int MyProperty
+        {
+            get { return myVar; }
+            set { myVar = value; }
+        }
+
+
         private ICollectionView roomViewData = null;
         public ICollectionView RoomViewCollection
         {
@@ -35,10 +41,8 @@ namespace RevitTimasBIMTools.ViewModels
                         roomViewData.SortDescriptions.Clear();
                         roomViewData.GroupDescriptions.Clear();
                         roomViewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Room.Name)));
-                        roomViewData.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Room.Level.Elevation)));
-                        roomViewData.SortDescriptions.Add(new SortDescription(nameof(Room.Level.Elevation), ListSortDirection.Ascending));
-                        roomViewData.SortDescriptions.Add(new SortDescription(nameof(Room.Number), ListSortDirection.Ascending));
                         roomViewData.SortDescriptions.Add(new SortDescription(nameof(Room.Name), ListSortDirection.Ascending));
+                        roomViewData.SortDescriptions.Add(new SortDescription(nameof(Room.Number), ListSortDirection.Ascending));
                     }
                 }
             }
@@ -47,24 +51,24 @@ namespace RevitTimasBIMTools.ViewModels
 
         public async void GetValidRooms()
         {
-            await RevitTask.RunAsync(app =>
+            RoomViewCollection = await RevitTask.RunAsync(app =>
             {
                 Document doc = app.ActiveUIDocument.Document;
-                collection = new ObservableCollection<Room>();
                 ElementId paramId = new(BuiltInParameter.ROOM_AREA);
-                FilteredElementCollector collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(Room), BuiltInCategory.OST_Rooms);
+                FilteredElementCollector collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(SpatialElement), BuiltInCategory.OST_Rooms);
                 collector = RevitFilterManager.ParamFilterFactory(collector, paramId, 0.5, 1);
-                foreach (Room room in collector)
+                ObservableCollection<Room> collection = new();
+                foreach (Room room in collector.ToElements())
                 {
-                    if (0 < room.Volume)
+                    if (room is not null && 0 < room.Volume)
                     {
                         collection.Add(room);
                     }
                 }
+                return CollectionViewSource.GetDefaultView(collection);
             });
         }
     }
-
 
 
 }

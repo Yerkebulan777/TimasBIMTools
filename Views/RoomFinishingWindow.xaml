@@ -57,29 +57,13 @@
             Grid.Column="0"
             Margin="5"
             Style="{StaticResource GroupBoxBorderStyle}">
-            <StackPanel Name="TreeViewPanel">
+            <StackPanel>
+
                 <TreeView
-                    Margin="10"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    d:ItemsSource="{d:SampleData ItemCount=7}"
-                    ItemsSource="{Binding Path=RoomViewCollection}">
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding}">
-                            <TextBlock Text="{Binding Level.Name}" />
-                            <HierarchicalDataTemplate.ItemTemplate>
-                                <HierarchicalDataTemplate ItemsSource="{Binding}">
-                                    <TextBlock Text="{Binding Name}" />
-                                    <HierarchicalDataTemplate.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding Number}" />
-                                        </DataTemplate>
-                                    </HierarchicalDataTemplate.ItemTemplate>
-                                </HierarchicalDataTemplate>
-                            </HierarchicalDataTemplate.ItemTemplate>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>
+                    Name="treeview"
+                    Height="280"
+                    Margin="5,5,5,5" />
+
             </StackPanel>
         </Border>
 
