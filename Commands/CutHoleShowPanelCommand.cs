@@ -57,7 +57,6 @@ namespace RevitTimasBIMTools.Commands
         }
 
 
-        [STAThread]
         public bool IsCommandAvailable(UIApplication uiapp, CategorySet catSet)
         {
             View view = uiapp.ActiveUIDocument?.ActiveGraphicalView;

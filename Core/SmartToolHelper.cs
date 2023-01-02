@@ -18,9 +18,11 @@ namespace RevitTimasBIMTools.Core
         public static string RibbonPanelName = "Automation";
         public static string ApplicationName = "SmartBIMTools";
 
-        public static string CutOpenningButtonName = "CutOpeningManager";
-        public static string AreaRebarMarkFixButtonName = "AreaRebarMark";
         public static string AutoJoinButtonName = "AutoJoin";
+        public static string FinishingButtonName = "Finishing";
+        public static string CutOpenningButtonName = "CutOpeningManager";
+        public static string AreaRebarMarkButtonName = "AreaRebarMark";
+        
 
         public static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
         public static readonly string AssemblyLocation = Path.GetFullPath(Assembly.Location);

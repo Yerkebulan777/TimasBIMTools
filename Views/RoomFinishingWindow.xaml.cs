@@ -30,7 +30,7 @@ public partial class RoomFinishingWindow : Window
             ExternalEventRequest request = externalEvent.Raise();
             if (ExternalEventRequest.Accepted == request)
             {
-                //viewModel.GetValidRooms();
+                viewModel.GetValidRooms();
             }
         }, DispatcherPriority.Background);
     }

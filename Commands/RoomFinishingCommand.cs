@@ -38,4 +38,9 @@ internal class RoomFinishingCommand : IExternalCommand, IExternalCommandAvailabi
         return view is ViewPlan;
     }
 
+
+    public static string GetPath()
+    {
+        return typeof(RoomFinishingCommand).FullName;
+    }
 }

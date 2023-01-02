@@ -2,11 +2,11 @@
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Revit.Async;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitUtils;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Net;
 using System.Windows.Data;
 
 namespace RevitTimasBIMTools.ViewModels
@@ -17,6 +17,7 @@ namespace RevitTimasBIMTools.ViewModels
         public RoomFinishingViewModel(APIEventHandler eventHandler)
         {
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
+            RoomViewCollection = CollectionViewSource.GetDefaultView(collection);
         }
 
 
@@ -44,20 +45,23 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        public void GetValidRooms(Document doc)
+        public async void GetValidRooms()
         {
-            ElementId paramId = new(BuiltInParameter.ROOM_AREA);
-            FilteredElementCollector collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(Room), BuiltInCategory.OST_Rooms);
-            collector = RevitFilterManager.ParamFilterFactory(collector, paramId, 0.5, 1);
-            RoomViewCollection = CollectionViewSource.GetDefaultView(collection);
-            collection = new ObservableCollection<Room>();
-            foreach (Room room in collector)
+            await RevitTask.RunAsync(app =>
             {
-                if (0 < room.Volume)
+                Document doc = app.ActiveUIDocument.Document;
+                collection = new ObservableCollection<Room>();
+                ElementId paramId = new(BuiltInParameter.ROOM_AREA);
+                FilteredElementCollector collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(Room), BuiltInCategory.OST_Rooms);
+                collector = RevitFilterManager.ParamFilterFactory(collector, paramId, 0.5, 1);
+                foreach (Room room in collector)
                 {
-                    collection.Add(room);
+                    if (0 < room.Volume)
+                    {
+                        collection.Add(room);
+                    }
                 }
-            }
+            });
         }
     }
 
