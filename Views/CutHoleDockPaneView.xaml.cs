@@ -2,10 +2,8 @@
 using Autodesk.Revit.UI;
 using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitModel;
-using RevitTimasBIMTools.Services;
 using RevitTimasBIMTools.ViewModels;
 using System;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -20,16 +18,18 @@ namespace RevitTimasBIMTools.Views;
 public partial class CutHoleDockPaneView : Page, IDockablePaneProvider
 {
     private bool Disposed { get; set; } = false;
-    private readonly CutHoleDataViewModel DataContextHandler;
+    private readonly ExternalEvent externalEvent;
+    private readonly CutHoleDataViewModel viewModel;
     private readonly string docPath = SmartToolHelper.DocumentPath;
-    private static readonly ExternalEvent externalEvent = CutHoleDataViewModel.RevitExternalEvent;
+    
 
-    public CutHoleDockPaneView(CutHoleDataViewModel viewModel)
+    public CutHoleDockPaneView(CutHoleDataViewModel vm)
     {
         InitializeComponent();
-        DataContext = DataContextHandler = viewModel;
-        DataContextHandler = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
-        DataContextHandler.DockPanelView = this;
+        DataContext = viewModel = vm;
+        viewModel.DockPanelView = this;
+        externalEvent = CutHoleDataViewModel.RevitExternalEvent;
+        viewModel = vm ?? throw new ArgumentNullException(nameof(vm));
     }
 
 
@@ -49,46 +49,37 @@ public partial class CutHoleDockPaneView : Page, IDockablePaneProvider
     [STAThread]
     internal void RaiseExternalEvent()
     {
-        if (!DataContextHandler.IsStarted)
+        Dispatcher.CurrentDispatcher.Invoke(() =>
         {
-            try
+            viewModel.Dispose();
+            ExternalEventRequest request = externalEvent.Raise();
+            if (ExternalEventRequest.Accepted == request)
             {
-                Dispatcher.CurrentDispatcher.Invoke(() =>
-                {
-                    DataContextHandler.Dispose();
-                    if (ExternalEventRequest.Accepted == externalEvent.Raise())
-                    {
-                        Disposed = false;
-                        DataContextHandler.IsStarted = true;
-                        DataContextHandler.IsOptionEnabled = false;
-                        DataContextHandler.IsDataRefresh = false;
-                    }
-                }, DispatcherPriority.Background);
+                Disposed = false;
+                viewModel.IsStarted = true;
+                viewModel.IsOptionEnabled = false;
+                viewModel.IsDataRefresh = false;
             }
-            catch (Exception ex)
-            {
-                SBTLogger.Error("Start Raise ExternalEvent:\n" + ex.ToString());
-            }
-        }
+        }, DispatcherPriority.Background);
     }
 
 
-    private void ShowModelButton_Click(object sender, System.Windows.RoutedEventArgs e)
+    private void ShowModelButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.DataContext is ElementModel model)
         {
-            if (model != null && model.Instanse.IsValidObject)
+            if (model != null && model.IsValidModel())
             {
-                DataContextHandler.ShowElementModelView(model);
+                viewModel.ShowElementModelView(model);
             }
         }
     }
 
 
-    private void CheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
+    private void CheckBox_Click(object sender, RoutedEventArgs e)
     {
-        DataContextHandler.ViewDataCollection.Refresh();
-        Dispatcher.CurrentDispatcher.Invoke(DataContextHandler.VerifySelectDataViewCollection);
+        viewModel.ViewDataCollection.Refresh();
+        Dispatcher.CurrentDispatcher.Invoke(viewModel.VerifySelectDataViewCollection);
     }
 
 
@@ -110,7 +101,7 @@ public partial class CutHoleDockPaneView : Page, IDockablePaneProvider
             string path = openDialog.FileName;
             if (!string.IsNullOrEmpty(path))
             {
-                DataContextHandler.LoadFamilyAsync(path);
+                viewModel.LoadFamilyAsync(path);
             }
         }
     }
@@ -123,15 +114,15 @@ public partial class CutHoleDockPaneView : Page, IDockablePaneProvider
             if (comboBox.Name.Equals(ComboWallOpenning.Name))
             {
                 Properties.Settings.Default.WallOpeningUId = symbol.UniqueId;
-                DataContextHandler.GetFamilySymbolParameterData(symbol);
-                DataContextHandler.ActivateFamilySimbol(symbol);
+                viewModel.GetFamilySymbolParameterData(symbol);
+                viewModel.ActivateFamilySimbol(symbol);
                 Properties.Settings.Default.Save();
             }
             if (comboBox.Name.Equals(ComboFloorOpenning.Name))
             {
                 Properties.Settings.Default.FloorOpeningUId = symbol.UniqueId;
-                DataContextHandler.GetFamilySymbolParameterData(symbol);
-                DataContextHandler.ActivateFamilySimbol(symbol);
+                viewModel.GetFamilySymbolParameterData(symbol);
+                viewModel.ActivateFamilySimbol(symbol);
                 Properties.Settings.Default.Save();
             }
         }
@@ -167,7 +158,7 @@ public partial class CutHoleDockPaneView : Page, IDockablePaneProvider
         {
             Disposed = true;
             ActiveDocTitle.Content = null;
-            DataContextHandler?.Dispose();
+            viewModel?.Dispose();
         }
     }
 }

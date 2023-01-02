@@ -1,18 +1,8 @@
-﻿using RevitTimasBIMTools.ViewModels;
+﻿using Autodesk.Revit.UI;
+using RevitTimasBIMTools.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-
+using System.Windows.Threading;
 
 namespace RevitTimasBIMTools.Views;
 
@@ -21,11 +11,27 @@ namespace RevitTimasBIMTools.Views;
 /// </summary>
 public partial class RoomFinishingWindow : Window
 {
-    readonly RoomFinishingViewModel viewModel;
+    private readonly ExternalEvent externalEvent;
+    private readonly RoomFinishingViewModel viewModel;
     public RoomFinishingWindow(RoomFinishingViewModel vm)
     {
-        viewModel = vm;
-        DataContext= viewModel;
         InitializeComponent();
+        DataContext = viewModel = vm;
+        externalEvent = RoomFinishingViewModel.RevitExternalEvent;
+        viewModel = vm ?? throw new ArgumentNullException(nameof(viewModel));
+        Loaded += OnWindow_Loaded;
+    }
+
+
+    private void OnWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        Dispatcher.CurrentDispatcher.Invoke(() =>
+        {
+            ExternalEventRequest request = externalEvent.Raise();
+            if (ExternalEventRequest.Accepted == request)
+            {
+                //viewModel.GetValidRooms();
+            }
+        }, DispatcherPriority.Background);
     }
 }

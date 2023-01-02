@@ -6,6 +6,7 @@ using RevitTimasBIMTools.Core;
 using RevitTimasBIMTools.RevitUtils;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Net;
 using System.Windows.Data;
 
 namespace RevitTimasBIMTools.ViewModels
@@ -43,7 +44,7 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
-        private void GetValidRooms(Document doc)
+        public void GetValidRooms(Document doc)
         {
             ElementId paramId = new(BuiltInParameter.ROOM_AREA);
             FilteredElementCollector collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(Room), BuiltInCategory.OST_Rooms);
@@ -58,9 +59,8 @@ namespace RevitTimasBIMTools.ViewModels
                 }
             }
         }
-
-
-
-
     }
+
+
+
 }
