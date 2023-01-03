@@ -57,14 +57,22 @@
             Grid.Column="0"
             Margin="5"
             Style="{StaticResource GroupBoxBorderStyle}">
-            <StackPanel>
+            <ScrollViewer>
 
-                <TreeView
-                    Name="treeview"
-                    Height="280"
-                    Margin="5,5,5,5" />
+                <TreeView ItemsSource="{Binding Path=RoomCollectionView}">
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Value}">
+                            <TextBlock Text="{Binding Key}" />
+                            <HierarchicalDataTemplate.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Number}" />
+                                </DataTemplate>
+                            </HierarchicalDataTemplate.ItemTemplate>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
 
-            </StackPanel>
+            </ScrollViewer>
         </Border>
 
 
