@@ -25,22 +25,20 @@ internal sealed class AutoJoinGeometryCommand : IExternalCommand, IExternalComma
         Document doc = uidoc.Document;
 
         int counter = 0;
+        XYZ offset = new(0.1, 0.1, 0.1);
         FilteredElementCollector collector;
         BuiltInCategory bip = BuiltInCategory.OST_Walls;
         IList<Element> allWalls = RevitFilterManager.GetElementsOfCategory(doc, typeof(Wall), bip, true).ToElements();
-        ICollection<ElementId> exclusionIds = new List<ElementId>(allWalls.Count);
         foreach (Wall wall1 in allWalls)
         {
             if (wall1.FindInserts(true, true, true, true).Any())
             {
-                exclusionIds.Add(wall1.Id);
-                ExclusionFilter exfilter = new(exclusionIds);
                 BoundingBoxXYZ bb = wall1.get_BoundingBox(null);
                 ElementLevelFilter level1Filter = new(wall1.LevelId);
-                BoundingBoxIntersectsFilter bbfilter = new(new Outline(bb.Min, bb.Max));
+                Outline outline = new Outline(bb.Min -= offset, bb.Max += offset);
                 collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(Wall), bip, true);
-                collector = collector.WherePasses(bbfilter).WherePasses(level1Filter).WherePasses(exfilter);
-                foreach (Wall wall2 in collector.ToElements())
+                collector = collector.WherePasses(new BoundingBoxIntersectsFilter(outline));
+                foreach (Wall wall2 in collector.WherePasses(level1Filter).ToElements())
                 {
                     if (JoinGeometryUtils.AreElementsJoined(doc, wall1, wall2)) { continue; }
 
@@ -53,28 +51,32 @@ internal sealed class AutoJoinGeometryCommand : IExternalCommand, IExternalComma
                     if (normal1.IsAlmostEqualTo(normal2))
                     {
                         using Transaction trx = new(doc);
-                        IntersectionResult result = null;
                         TransactionStatus status = trx.Start("JoinWall");
                         if (status == TransactionStatus.Started)
                         {
                             try
                             {
-                                double width = wall1.Width + wall2.Width;
-                                result = line1.Project(line2.Evaluate(0.5, false));
-                                if (result is not null && result.Distance < width)
+                                XYZ point1 = line1.Evaluate(0.5, false);
+                                XYZ point2 = line2.Evaluate(0.5, false);
+                                double distance = point1.DistanceTo(point2);
+                                double maximum = (line1.Length + line2.Length) / 3;
+                                if (distance != 0 && distance < maximum)
                                 {
                                     JoinGeometryUtils.JoinGeometry(doc, wall1, wall2);
+                                    status = trx.Commit();
+                                    counter++;
                                 }
-                                status = trx.Commit();
-                                counter++;
                             }
                             catch (Exception ex)
+                            {
+                                SBTLogger.Log(ex.Message);
+                            }
+                            finally
                             {
                                 if (!trx.HasEnded())
                                 {
                                     status = trx.RollBack();
-                                    SBTLogger.Log(ex.Message);
-                                    continue;
+                                    trx.Dispose();
                                 }
                             }
                         }
