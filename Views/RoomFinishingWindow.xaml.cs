@@ -65,7 +65,7 @@ public partial class RoomFinishingWindow : Window
     //        // store in dict
     //        ViewTypeDictionary[viewTypename] = viewTypeItem;
     //        // add to treeview
-    //        treeview.Items.Add(viewTypeItem);
+    //        treeview.Rooms.Add(viewTypeItem);
     //    }
 
     //    foreach (Element element in elements)
@@ -79,7 +79,7 @@ public partial class RoomFinishingWindow : Window
     //        // create view treeviewitem 
     //        TreeViewItem viewItem = new TreeViewItem() { Header = viewName };
     //        // view item add to view type
-    //        ViewTypeDictionary[viewTypename].Items.Add(viewItem);
+    //        ViewTypeDictionary[viewTypename].Rooms.Add(viewItem);
     //    }
     //}
 

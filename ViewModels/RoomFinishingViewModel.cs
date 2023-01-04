@@ -8,6 +8,7 @@ using RevitTimasBIMTools.RevitUtils;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Data;
 
 namespace RevitTimasBIMTools.ViewModels
@@ -20,21 +21,19 @@ namespace RevitTimasBIMTools.ViewModels
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
         }
 
-        private SortedList<string, ObservableCollection<Room>> roomData { get; set; }
-        private ICollectionView roomViewData = null;
+        private ICollectionView roomView = null;
         public ICollectionView RoomCollectionView
         {
-            get => roomViewData;
+            get => roomView;
             set
             {
-                if (SetProperty(ref roomViewData, value))
+                if (SetProperty(ref roomView, value))
                 {
-                    using (roomViewData.DeferRefresh())
+                    using (roomView.DeferRefresh())
                     {
-                        roomViewData.SortDescriptions.Clear();
-                        roomViewData.GroupDescriptions.Clear();
-                        roomViewData.SortDescriptions.Add(new SortDescription("Key", ListSortDirection.Ascending));
-                        roomViewData.SortDescriptions.Add(new SortDescription("Value.Number", ListSortDirection.Ascending));
+                        roomView.SortDescriptions.Clear();
+                        roomView.GroupDescriptions.Clear();
+                        roomView.SortDescriptions.Add(new SortDescription(nameof(RoomGroup.Name), ListSortDirection.Ascending));
                     }
                 }
             }
@@ -46,29 +45,34 @@ namespace RevitTimasBIMTools.ViewModels
             RoomCollectionView = await RevitTask.RunAsync(app =>
             {
                 Document doc = app.ActiveUIDocument.Document;
+                BuiltInCategory bip = BuiltInCategory.OST_Rooms;
                 ElementId paramId = new(BuiltInParameter.ROOM_AREA);
-                roomData = new SortedList<string, ObservableCollection<Room>>();
-                FilteredElementCollector collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(SpatialElement), BuiltInCategory.OST_Rooms);
-                collector = RevitFilterManager.ParamFilterFactory(collector, paramId, 0.5, 1);
-                foreach (Room room in collector.ToElements())
+                ObservableCollection<RoomGroup> roomGroupData = new();
+                FilteredElementCollector collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(SpatialElement), bip);
+                foreach (Room room in RevitFilterManager.ParamFilterFactory(collector, paramId, 0.5, 1))
                 {
                     string name = room.Name;
                     double volume = room.Volume;
                     Location location = room.Location;
                     if (location is not null && 0 < volume)
                     {
-                        if (roomData.TryGetValue(name, out ObservableCollection<Room> data))
+                        RoomGroup group = roomGroupData.FirstOrDefault(s => s.Name == name);
+                        if (group is not null and RoomGroup roomGroup)
                         {
-                            data.Add(room);
-                            roomData[name] = data;
+                            if (roomGroupData.Remove(group))
+                            {
+                                roomGroup.Rooms.Add(room);
+                                roomGroupData.Add(roomGroup);
+                            }
                         }
                         else
                         {
-                            roomData.Add(name, new ObservableCollection<Room> { room });
+                            List<Room> rooms = new() { room };
+                            roomGroupData.Add(new RoomGroup(name, rooms));
                         }
                     }
                 }
-                return CollectionViewSource.GetDefaultView(roomData);
+                return CollectionViewSource.GetDefaultView(roomGroupData);
             });
         }
     }

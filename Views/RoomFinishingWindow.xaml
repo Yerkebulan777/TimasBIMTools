@@ -23,7 +23,6 @@
     <Grid Name="ParentGrid">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="45" />
             <RowDefinition Height="*" />
             <RowDefinition Height="75" />
         </Grid.RowDefinitions>
@@ -33,48 +32,35 @@
             <ColumnDefinition Width="1.5*" />
         </Grid.ColumnDefinitions>
 
-        <!--  Header  -->
         <Border
             Grid.Row="0"
-            Grid.Column="0"
-            Grid.ColumnSpan="3"
-            Background="{DynamicResource FloralGradientBrush}">
-            <Grid VerticalAlignment="Center">
-                <Label
-                    Name="ActiveDocTitle"
-                    VerticalAlignment="Center"
-                    TextElement.FontSize="13">
-                    <Label.BitmapEffect>
-                        <DropShadowBitmapEffect />
-                    </Label.BitmapEffect>
-                </Label>
-            </Grid>
-        </Border>
-
-
-        <Border
-            Grid.Row="1"
             Grid.Column="0"
             Margin="5"
             Style="{StaticResource GroupBoxBorderStyle}">
             <ScrollViewer>
 
-                <TreeView ItemsSource="{Binding Path=RoomCollectionView}">
+                <TreeView Name="trv" ItemsSource="{Binding Path=RoomCollectionView}">
                     <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Value}">
-                            <TextBlock Text="{Binding Key}" />
-                            <HierarchicalDataTemplate.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Number}" />
-                                </DataTemplate>
-                            </HierarchicalDataTemplate.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Rooms}">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse
+                                    Width="10"
+                                    Height="10"
+                                    Fill="Red" />
+                                <TextBlock Margin="3" Text="{Binding Number}" />
+                            </StackPanel>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
                 </TreeView>
 
             </ScrollViewer>
         </Border>
-
 
         <TabControl
             Grid.Row="1"
@@ -113,7 +99,6 @@
                 </TabItem.Content>
             </TabItem>
         </TabControl>
-
 
     </Grid>
 

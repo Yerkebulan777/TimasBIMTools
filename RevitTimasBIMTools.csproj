@@ -346,6 +346,7 @@
     <Compile Include="ViewModels\CutHoleDataViewModel.cs" />
     <Compile Include="RevitSelectionFilter\SelectionFilterAreaRein.cs" />
     <Compile Include="ViewModels\RoomFinishingViewModel.cs" />
+    <Compile Include="ViewModels\RoomGroup.cs" />
     <Compile Include="Views\AreaRebarMarkFixWindow.xaml.cs">
       <DependentUpon>AreaRebarMarkFixWindow.xaml</DependentUpon>
     </Compile>
