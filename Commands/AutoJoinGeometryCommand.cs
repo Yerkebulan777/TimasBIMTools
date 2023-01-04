@@ -53,13 +53,18 @@ internal sealed class AutoJoinGeometryCommand : IExternalCommand, IExternalComma
                     if (normal1.IsAlmostEqualTo(normal2))
                     {
                         using Transaction trx = new(doc);
+                        IntersectionResult result = null;
                         TransactionStatus status = trx.Start("JoinWall");
                         if (status == TransactionStatus.Started)
                         {
                             try
                             {
-                                //uidoc.Selection.SetElementIds(new List<ElementId>() { wall2.Id });
-                                JoinGeometryUtils.JoinGeometry(doc, wall1, wall2);
+                                double width = wall1.Width + wall2.Width;
+                                result = line1.Project(line2.Evaluate(0.5, false));
+                                if (result is not null && result.Distance < width)
+                                {
+                                    JoinGeometryUtils.JoinGeometry(doc, wall1, wall2);
+                                }
                                 status = trx.Commit();
                                 counter++;
                             }
