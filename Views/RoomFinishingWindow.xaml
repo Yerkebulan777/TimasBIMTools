@@ -21,7 +21,7 @@
 
             <!--  Define the HierarchicalDataTemplates  -->
             <HierarchicalDataTemplate x:Key="TopLevelTemplate" ItemsSource="{Binding Key}">
-                <TextBlock Text="{Binding }" />
+                <TextBlock Text="{Binding}" />
             </HierarchicalDataTemplate>
             <HierarchicalDataTemplate x:Key="SecondLevelTemplate" DataType="{x:Type System:String}">
                 <TextBlock Text="{Binding}" />
@@ -55,7 +55,7 @@
             Style="{StaticResource GroupBoxBorderStyle}">
             <ScrollViewer>
 
-                <TreeView ItemsSource="{Binding MyDictionary}" ItemTemplateSelector="{StaticResource TemplateSelector}" />
+                <TreeView ItemTemplateSelector="{StaticResource TemplateSelector}" ItemsSource="{Binding MyDictionary}" />
 
             </ScrollViewer>
         </Border>
