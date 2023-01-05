@@ -2,6 +2,7 @@
     x:Class="RevitTimasBIMTools.Views.RoomFinishingWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:System="clr-namespace:System;assembly=mscorlib"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:RevitTimasBIMTools.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -17,7 +18,23 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Generic.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!--  Define the HierarchicalDataTemplates  -->
+            <HierarchicalDataTemplate x:Key="TopLevelTemplate" ItemsSource="{Binding Key}">
+                <TextBlock Text="{Binding }" />
+            </HierarchicalDataTemplate>
+            <HierarchicalDataTemplate x:Key="SecondLevelTemplate" DataType="{x:Type System:String}">
+                <TextBlock Text="{Binding}" />
+            </HierarchicalDataTemplate>
+
+            <!--  Define the DataTemplateSelector  -->
+            <vm:RoomTemplateSelector
+                x:Key="TemplateSelector"
+                SecondLevelTemplate="{StaticResource SecondLevelTemplate}"
+                TopLevelTemplate="{StaticResource TopLevelTemplate}" />
+
         </ResourceDictionary>
+
     </Window.Resources>
 
     <Grid Name="ParentGrid">
@@ -35,35 +52,16 @@
         <Border
             Grid.Row="0"
             Grid.Column="0"
-            Margin="5"
             Style="{StaticResource GroupBoxBorderStyle}">
             <ScrollViewer>
 
-                <TreeView Name="trv" ItemsSource="{Binding Path=RoomCollectionView}">
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Rooms}">
-                            <StackPanel Orientation="Horizontal">
-                                <Ellipse
-                                    Width="10"
-                                    Height="10"
-                                    Fill="Red" />
-                                <TextBlock Margin="3" Text="{Binding Number}" />
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                    <TreeView.ItemContainerStyle>
-                        <Style TargetType="TreeViewItem">
-                            <Setter Property="IsSelected" Value="{Binding IsSelected}" />
-                            <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
-                        </Style>
-                    </TreeView.ItemContainerStyle>
-                </TreeView>
+                <TreeView ItemsSource="{Binding MyDictionary}" ItemTemplateSelector="{StaticResource TemplateSelector}" />
 
             </ScrollViewer>
         </Border>
 
         <TabControl
-            Grid.Row="1"
+            Grid.Row="0"
             Grid.Column="1"
             Margin="5">
             <TabItem x:Name="wallFinishing">

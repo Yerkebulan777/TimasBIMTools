@@ -19,7 +19,13 @@ namespace RevitTimasBIMTools.ViewModels
         public RoomFinishingViewModel(APIEventHandler eventHandler)
         {
             RevitExternalEvent = ExternalEvent.Create(eventHandler);
+            MyDictionary = new SortedList<string, ObservableCollection<string>>
+            {
+                { "Fruits", new ObservableCollection<string> { "Apple", "Banana", "Orange" } },
+                { "Vegetables", new ObservableCollection<string> { "Carrot", "Potato", "Tomato" } },
+            };
         }
+
 
         private ICollectionView roomView = null;
         public ICollectionView RoomCollectionView
@@ -40,6 +46,14 @@ namespace RevitTimasBIMTools.ViewModels
         }
 
 
+        private IDictionary<string, ObservableCollection<string>> myDictionary;
+        public IDictionary<string, ObservableCollection<string>> MyDictionary 
+        { 
+            get => myDictionary; 
+            set => myDictionary = value; 
+        }
+
+
         public async void GetValidRooms()
         {
             RoomCollectionView = await RevitTask.RunAsync(app =>
@@ -47,7 +61,7 @@ namespace RevitTimasBIMTools.ViewModels
                 Document doc = app.ActiveUIDocument.Document;
                 BuiltInCategory bip = BuiltInCategory.OST_Rooms;
                 ElementId paramId = new(BuiltInParameter.ROOM_AREA);
-                ObservableCollection<RoomGroup> roomGroupData = new();
+                ObservableCollection<RoomGroup> collection = new();
                 FilteredElementCollector collector = RevitFilterManager.GetElementsOfCategory(doc, typeof(SpatialElement), bip);
                 foreach (Room room in RevitFilterManager.ParamFilterFactory(collector, paramId, 0.5, 1))
                 {
@@ -56,23 +70,28 @@ namespace RevitTimasBIMTools.ViewModels
                     Location location = room.Location;
                     if (location is not null && 0 < volume)
                     {
-                        RoomGroup group = roomGroupData.FirstOrDefault(s => s.Name == name);
-                        if (group is not null and RoomGroup roomGroup)
+                        for (int i = 0; i < collection.Count; i++)
                         {
-                            if (roomGroupData.Remove(group))
+                            RoomGroup roomGroup = collection[i];
+                            if (roomGroup.Name == name)
                             {
-                                roomGroup.Rooms.Add(room);
-                                roomGroupData.Add(roomGroup);
+                                roomGroup.Group.Add(new RoomGroup(room));
                             }
+                        }
+                        RoomGroup group = collection.FirstOrDefault(s => s.Name == name);
+                        if (group is not null)
+                        {
+                            group.Group.Add(new RoomGroup(room));
                         }
                         else
                         {
-                            List<Room> rooms = new() { room };
-                            roomGroupData.Add(new RoomGroup(name, rooms));
+                            group = new RoomGroup(name);
+                            group.Group.Add(new RoomGroup(room));
+                            collection.Add(group);
                         }
                     }
                 }
-                return CollectionViewSource.GetDefaultView(roomGroupData);
+                return CollectionViewSource.GetDefaultView(collection);
             });
         }
     }

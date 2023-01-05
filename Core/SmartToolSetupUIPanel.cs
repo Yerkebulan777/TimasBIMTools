@@ -41,7 +41,7 @@ public sealed class SmartToolSetupUIPanel
 
         PushButtonData finishingButton = new("Finishing", SmartToolHelper.FinishingButtonName, assemblyName, RoomFinishingCommand.GetPath())
         {
-            ToolTip = "Room finishing command",
+            ToolTip = "Instance finishing command",
             LargeImage = SmartToolHelper.GetImageSource()
         };
 

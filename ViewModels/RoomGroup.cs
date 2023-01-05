@@ -1,17 +1,21 @@
 ﻿using Autodesk.Revit.DB.Architecture;
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
 
 namespace RevitTimasBIMTools.ViewModels
 {
     public sealed class RoomGroup : ObservableObject
     {
-        public RoomGroup(string name, List<Room> rooms)
+        public RoomGroup(string name)
         {
-            Rooms = new ObservableCollection<Room>(rooms);
+            Group = new ObservableCollection<RoomGroup>();
             Name = name;
+        }
+
+        public RoomGroup(Room room)
+        {
+            Number = room.Number;
+            Instance = room;
         }
 
         private bool selected;
@@ -28,7 +32,10 @@ namespace RevitTimasBIMTools.ViewModels
             set => SetProperty(ref expanded, value);
         }
 
+
         public string Name { get; set; }
-        public ObservableCollection<Room> Rooms { get; set; }
+        public string Number { get; set; }
+        public Room Instance { get; set; }
+        public ObservableCollection<RoomGroup> Group { get; set; }
     }
 }
