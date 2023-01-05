@@ -91,7 +91,7 @@ internal sealed class AutoJoinGeometryCommand : IExternalCommand, IExternalComma
             }
         }
 
-        SBTLogger.Info($"Successfully Completed!\n Joined wallsrs: {counter} count");
+        SBTLogger.Info($"Successfully Completed!\n Joined walls: {counter} count");
         return Result.Succeeded;
     }
 
