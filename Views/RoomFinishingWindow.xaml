@@ -18,23 +18,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Generic.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <!--  Define the HierarchicalDataTemplates  -->
-            <HierarchicalDataTemplate x:Key="TopLevelTemplate" ItemsSource="{Binding Key}">
-                <TextBlock Text="{Binding}" />
-            </HierarchicalDataTemplate>
-            <HierarchicalDataTemplate x:Key="SecondLevelTemplate" DataType="{x:Type System:String}">
-                <TextBlock Text="{Binding}" />
-            </HierarchicalDataTemplate>
-
-            <!--  Define the DataTemplateSelector  -->
-            <vm:RoomTemplateSelector
-                x:Key="TemplateSelector"
-                SecondLevelTemplate="{StaticResource SecondLevelTemplate}"
-                TopLevelTemplate="{StaticResource TopLevelTemplate}" />
-
         </ResourceDictionary>
-
     </Window.Resources>
 
     <Grid Name="ParentGrid">
@@ -54,8 +38,6 @@
             Grid.Column="0"
             Style="{StaticResource GroupBoxBorderStyle}">
             <ScrollViewer>
-
-                <TreeView ItemTemplateSelector="{StaticResource TemplateSelector}" ItemsSource="{Binding MyDictionary}" />
 
             </ScrollViewer>
         </Border>
