@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
 
-namespace RevitTimasBIMTools.RevitUtils
+namespace SmartBIMTools.RevitUtils
 {
     internal sealed class RevitPurginqManager
     {

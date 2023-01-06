@@ -1,14 +1,11 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using RevitTimasBIMTools.ViewModels;
+﻿using Autodesk.Revit.UI;
+using SmartBIMTools.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Threading;
 
-namespace RevitTimasBIMTools.Views;
+
+namespace SmartBIMTools.Views;
 
 /// <summary>
 /// Логика взаимодействия для RoomFinishingWindow.xaml
@@ -16,12 +13,12 @@ namespace RevitTimasBIMTools.Views;
 public partial class RoomFinishingWindow : Window
 {
     private readonly ExternalEvent externalEvent;
-    private readonly RoomFinishingViewModel viewModel;
-    public RoomFinishingWindow(RoomFinishingViewModel vm)
+    private readonly FinishingViewModel viewModel;
+    public RoomFinishingWindow(FinishingViewModel vm)
     {
         InitializeComponent();
         DataContext = viewModel = vm;
-        externalEvent = RoomFinishingViewModel.RevitExternalEvent;
+        externalEvent = FinishingViewModel.RevitExternalEvent;
         viewModel = vm ?? throw new ArgumentNullException(nameof(viewModel));
         Loaded += OnWindow_Loaded;
     }
@@ -38,50 +35,5 @@ public partial class RoomFinishingWindow : Window
             }
         }, DispatcherPriority.Background);
     }
-
-    //public void DisplayTreeViewItem(Document document)
-    //{
-    //    // viewtypename and treeviewitem dictionary
-    //    SortedDictionary<string, TreeViewItem> ViewTypeDictionary = new SortedDictionary<string, TreeViewItem>();
-    //    // viewtypename
-    //    List<string> viewTypenames = new List<string>();
-
-    //    // collect view type
-    //    List<Element> elements = new FilteredElementCollector(document).OfClass(typeof(View)).ToList();
-
-    //    foreach (Element element in elements)
-    //    {
-    //        // view
-    //        View view = element as View;
-    //        // view typename
-    //        viewTypenames.Add(view.ViewType.ToString());
-    //    }
-
-    //    // create treeviewitem for viewtype
-    //    foreach (string viewTypename in viewTypenames.Distinct().OrderBy(name => name).ToList())
-    //    {
-    //        // create viewtype treeviewitem
-    //        TreeViewItem viewTypeItem = new TreeViewItem() { Header = viewTypename };
-    //        // store in dict
-    //        ViewTypeDictionary[viewTypename] = viewTypeItem;
-    //        // add to treeview
-    //        treeview.Group.Add(viewTypeItem);
-    //    }
-
-    //    foreach (Element element in elements)
-    //    {
-    //        // view
-    //        View view = element as View;
-    //        // viewname
-    //        string viewName = view.Name;
-    //        // view typename
-    //        string viewTypename = view.ViewType.ToString();
-    //        // create view treeviewitem 
-    //        TreeViewItem viewItem = new TreeViewItem() { Header = viewName };
-    //        // view item add to view type
-    //        ViewTypeDictionary[viewTypename].Group.Add(viewItem);
-    //    }
-    //}
-
 
 }

@@ -2,15 +2,15 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
-using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.Services;
-using RevitTimasBIMTools.Views;
+using SmartBIMTools.Core;
+using SmartBIMTools.Services;
+using SmartBIMTools.Views;
 using System;
 using System.Globalization;
 using System.Threading;
 
 
-namespace RevitTimasBIMTools.Commands
+namespace SmartBIMTools.Commands
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]

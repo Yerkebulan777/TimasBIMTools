@@ -7,8 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{41093622-EED0-4117-B66C-BAF1B6B94DEE}</ProjectGuid>
     <OutputType>library</OutputType>
-    <RootNamespace>RevitTimasBIMTools</RootNamespace>
-    <AssemblyName>RevitTimasBIMTools</AssemblyName>
+    <RootNamespace>SmartBIMTools</RootNamespace>
+    <AssemblyName>SmartBIMTools</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -345,9 +345,7 @@
     <Compile Include="ViewModels\AreaRebarMarkViewModel.cs" />
     <Compile Include="ViewModels\CutHoleDataViewModel.cs" />
     <Compile Include="RevitSelectionFilter\SelectionFilterAreaRein.cs" />
-    <Compile Include="ViewModels\RoomFinishingViewModel.cs" />
-    <Compile Include="ViewModels\RoomGroup.cs" />
-    <Compile Include="ViewModels\RoomTemplateSelector.cs" />
+    <Compile Include="ViewModels\FinishingViewModel.cs" />
     <Compile Include="Views\AreaRebarMarkFixWindow.xaml.cs">
       <DependentUpon>AreaRebarMarkFixWindow.xaml</DependentUpon>
     </Compile>
@@ -375,18 +373,22 @@
     <Page Include="Themes\Animation.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Page>
     <Page Include="Themes\Colors.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Page>
     <Page Include="Themes\DataTemplate.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Page>
     <Page Include="Views\AreaRebarMarkFixWindow.xaml">
       <SubType>Designer</SubType>

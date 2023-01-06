@@ -3,15 +3,15 @@ using Autodesk.Revit.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Revit.Async;
-using RevitTimasBIMTools.CutOpening;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.CutOpening;
+using SmartBIMTools.Services;
 using System;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 
 
-namespace RevitTimasBIMTools.Core;
+namespace SmartBIMTools.Core;
 
 
 public sealed class SmartToolApp : IExternalApplication

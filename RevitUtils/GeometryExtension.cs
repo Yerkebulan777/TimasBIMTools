@@ -1,7 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
-using RevitTimasBIMTools.RevitModel;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.RevitModel;
+using SmartBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ using Options = Autodesk.Revit.DB.Options;
 using Plane = Autodesk.Revit.DB.Plane;
 
 
-namespace RevitTimasBIMTools.RevitUtils;
+namespace SmartBIMTools.RevitUtils;
 
 internal static class GeometryExtension
 {

@@ -2,7 +2,7 @@
 using System.Security.AccessControl;
 using System.Threading;
 
-namespace RevitTimasBIMTools.Services
+namespace SmartBIMTools.Services
 {
     class MutexServise : IDisposable
     {

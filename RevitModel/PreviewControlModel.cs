@@ -1,11 +1,11 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Views;
+using SmartBIMTools.RevitUtils;
+using SmartBIMTools.Views;
 using System;
 using System.Windows;
 
-namespace RevitTimasBIMTools.RevitModel
+namespace SmartBIMTools.RevitModel
 {
     public sealed class PreviewControlModel
     {

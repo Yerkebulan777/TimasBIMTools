@@ -4,12 +4,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Revit.Async;
-using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.CutOpening;
-using RevitTimasBIMTools.RevitModel;
-using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
-using RevitTimasBIMTools.Views;
+using SmartBIMTools.Core;
+using SmartBIMTools.CutOpening;
+using SmartBIMTools.RevitModel;
+using SmartBIMTools.RevitUtils;
+using SmartBIMTools.Services;
+using SmartBIMTools.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,7 +23,7 @@ using System.Windows.Input;
 using Document = Autodesk.Revit.DB.Document;
 
 
-namespace RevitTimasBIMTools.ViewModels;
+namespace SmartBIMTools.ViewModels;
 
 public sealed class CutHoleDataViewModel : ObservableObject
 {

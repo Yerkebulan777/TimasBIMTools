@@ -1,11 +1,11 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.Services;
 using System;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
-namespace RevitTimasBIMTools.RevitUtils
+namespace SmartBIMTools.RevitUtils
 {
     public sealed class RevitContentViewer
     {

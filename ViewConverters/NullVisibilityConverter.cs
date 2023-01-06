@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Data;
 
 
-namespace RevitTimasBIMTools.ViewConverters
+namespace SmartBIMTools.ViewConverters
 {
     public class NullVisibilityConverter : IValueConverter
     {

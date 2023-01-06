@@ -1,5 +1,5 @@
 ﻿using Autodesk.Revit.DB;
-using RevitTimasBIMTools.RevitModel;
+using SmartBIMTools.RevitModel;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,7 +7,7 @@ using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
 using Level = Autodesk.Revit.DB.Level;
 
-namespace RevitTimasBIMTools.RevitUtils
+namespace SmartBIMTools.RevitUtils
 {
     internal sealed class RevitFilterManager
     {

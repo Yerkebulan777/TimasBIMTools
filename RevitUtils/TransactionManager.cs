@@ -1,9 +1,9 @@
 ﻿using Autodesk.Revit.DB;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.Services;
 using System;
 
 
-namespace RevitTimasBIMTools.RevitUtils
+namespace SmartBIMTools.RevitUtils
 {
     public static class TransactionManager
     {

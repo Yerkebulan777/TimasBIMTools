@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 
 
-namespace RevitTimasBIMTools.ViewConverters
+namespace SmartBIMTools.ViewConverters
 {
     public class PercentageConverter : IValueConverter
     {

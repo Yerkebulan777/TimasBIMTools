@@ -3,7 +3,7 @@ using Autodesk.Revit.UI.Selection;
 using Reference = Autodesk.Revit.DB.Reference;
 
 
-namespace RevitTimasBIMTools.RevitSelectionFilter;
+namespace SmartBIMTools.RevitSelectionFilter;
 
 internal sealed class SelectionFilterAreaRein : ISelectionFilter
 {

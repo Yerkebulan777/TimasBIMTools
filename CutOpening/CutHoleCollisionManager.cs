@@ -1,8 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
-using RevitTimasBIMTools.RevitModel;
-using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.RevitModel;
+using SmartBIMTools.RevitUtils;
+using SmartBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using Document = Autodesk.Revit.DB.Document;
@@ -12,7 +12,7 @@ using Material = Autodesk.Revit.DB.Material;
 using Plane = Autodesk.Revit.DB.Plane;
 
 
-namespace RevitTimasBIMTools.CutOpening;
+namespace SmartBIMTools.CutOpening;
 
 public sealed class CutHoleCollisionManager
 {

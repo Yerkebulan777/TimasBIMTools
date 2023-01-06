@@ -1,10 +1,10 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.Services;
 using System;
 using System.IO;
 
-namespace RevitTimasBIMTools.Core
+namespace SmartBIMTools.Core
 {
     public class APIEventHandler : IExternalEventHandler
     {

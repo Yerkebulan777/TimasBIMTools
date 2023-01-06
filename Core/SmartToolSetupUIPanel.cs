@@ -1,8 +1,8 @@
 ﻿using Autodesk.Revit.UI;
-using RevitTimasBIMTools.Commands;
+using SmartBIMTools.Commands;
 
 
-namespace RevitTimasBIMTools.Core;
+namespace SmartBIMTools.Core;
 
 public sealed class SmartToolSetupUIPanel
 {

@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using GlobalParameter = Autodesk.Revit.DB.GlobalParameter;
 
-namespace RevitTimasBIMTools.RevitUtils
+namespace SmartBIMTools.RevitUtils
 {
     public static class ParameterExtention
     {

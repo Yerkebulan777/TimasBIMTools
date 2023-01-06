@@ -1,9 +1,9 @@
-﻿using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.ViewModels;
+﻿using SmartBIMTools.RevitUtils;
+using SmartBIMTools.ViewModels;
 using System.Windows;
 
 
-namespace RevitTimasBIMTools.Views
+namespace SmartBIMTools.Views
 {
     /// <summary>
     /// Interaction logic for AreaRebarMarkFixWindow.xaml

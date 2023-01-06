@@ -2,15 +2,15 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Revit.Async;
-using RevitTimasBIMTools.Commands;
-using RevitTimasBIMTools.CutOpening;
-using RevitTimasBIMTools.RevitModel;
-using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.ViewModels;
-using RevitTimasBIMTools.Views;
+using SmartBIMTools.Commands;
+using SmartBIMTools.CutOpening;
+using SmartBIMTools.RevitModel;
+using SmartBIMTools.RevitUtils;
+using SmartBIMTools.ViewModels;
+using SmartBIMTools.Views;
 
 
-namespace RevitTimasBIMTools.Core
+namespace SmartBIMTools.Core
 {
     public sealed class ContainerConfig
     {
@@ -35,7 +35,7 @@ namespace RevitTimasBIMTools.Core
                 services.AddTransient<PreviewDialogBox>();
 
                 // RoomFinishing
-                services.AddTransient<RoomFinishingViewModel>();
+                services.AddTransient<FinishingViewModel>();
                 services.AddTransient<RoomFinishingWindow>();
 
                 // AreaRebarMarkFix

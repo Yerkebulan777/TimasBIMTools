@@ -1,8 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.RevitModel;
-using RevitTimasBIMTools.ViewModels;
+using SmartBIMTools.Core;
+using SmartBIMTools.RevitModel;
+using SmartBIMTools.ViewModels;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +12,7 @@ using Button = System.Windows.Controls.Button;
 using ComboBox = System.Windows.Controls.ComboBox;
 
 
-namespace RevitTimasBIMTools.Views;
+namespace SmartBIMTools.Views;
 
 /// <summary> Логика взаимодействия для CutHoleDockPaneView.xaml </summary>
 public partial class CutHoleDockPaneView : Page, IDockablePaneProvider

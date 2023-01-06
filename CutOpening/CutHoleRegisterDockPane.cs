@@ -1,11 +1,11 @@
 ﻿using Autodesk.Revit.UI;
-using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.Core;
+using SmartBIMTools.Services;
 using System;
 using System.Windows;
 
 
-namespace RevitTimasBIMTools.CutOpening
+namespace SmartBIMTools.CutOpening
 {
     internal sealed class CutHoleRegisterDockPane
     {

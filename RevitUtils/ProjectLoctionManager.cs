@@ -1,10 +1,10 @@
 ﻿using Autodesk.Revit.DB;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.Services;
 using System;
 using System.Collections.Generic;
 
 
-namespace RevitTimasBIMTools.RevitUtils
+namespace SmartBIMTools.RevitUtils
 {
     internal class ProjectLoctionManager
     {

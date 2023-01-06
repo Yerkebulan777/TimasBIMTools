@@ -1,15 +1,15 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.RevitUtils;
+using SmartBIMTools.Services;
 using System;
 using System.Linq;
 using Document = Autodesk.Revit.DB.Document;
 using Line = Autodesk.Revit.DB.Line;
 
 
-namespace RevitTimasBIMTools.Commands;
+namespace SmartBIMTools.Commands;
 
 
 [Transaction(TransactionMode.Manual)]

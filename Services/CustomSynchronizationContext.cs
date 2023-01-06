@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace RevitTimasBIMTools.Services
+namespace SmartBIMTools.Services
 {
     public class CustomSynchronizationContext : SynchronizationContext
     {

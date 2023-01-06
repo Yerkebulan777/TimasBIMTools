@@ -1,10 +1,10 @@
 ﻿using Autodesk.Revit.DB;
 using CommunityToolkit.Mvvm.ComponentModel;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.Services;
 using System;
 
 
-namespace RevitTimasBIMTools.RevitModel
+namespace SmartBIMTools.RevitModel
 {
     public sealed class ElementModel : ObservableObject
     {

@@ -1,5 +1,5 @@
 ﻿using Autodesk.Revit.UI;
-using RevitTimasBIMTools.Properties;
+using SmartBIMTools.Properties;
 using System;
 using System.Drawing;
 using System.IO;
@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 
-namespace RevitTimasBIMTools.Core
+namespace SmartBIMTools.Core
 {
     public sealed class SmartToolHelper
     {
@@ -30,7 +30,7 @@ namespace RevitTimasBIMTools.Core
         public static readonly string AssemblyName = Path.GetFileNameWithoutExtension(AssemblyLocation);
         public static readonly string DocumentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         public static readonly string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-        public static readonly string AppDirPath = Path.Combine(AppDataPath, @"Autodesk\Revit\Addins\2019\RevitTimasBIMTools");
+        public static readonly string AppDirPath = Path.Combine(AppDataPath, @"Autodesk\Revit\Addins\2019\SmartBIMTools");
         public static readonly string LocalPath = Path.Combine(DocumentPath, ApplicationName);
         public static readonly string LogPath = Path.Combine(LocalPath, "RevitAsync.log");
 

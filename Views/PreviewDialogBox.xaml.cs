@@ -1,12 +1,12 @@
 ﻿using Autodesk.Revit.UI;
-using RevitTimasBIMTools.Services;
-using RevitTimasBIMTools.ViewModels;
+using SmartBIMTools.Services;
+using SmartBIMTools.ViewModels;
 using System;
 using System.Windows;
 using System.Windows.Threading;
 
 
-namespace RevitTimasBIMTools.Views
+namespace SmartBIMTools.Views
 {
     /// <summary>
     /// Логика взаимодействия для PreviewDialogBox.xaml

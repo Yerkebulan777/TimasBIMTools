@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace RevitTimasBIMTools.RevitModel
+namespace SmartBIMTools.RevitModel
 {
     public sealed class DocumentModel : IDisposable
     {

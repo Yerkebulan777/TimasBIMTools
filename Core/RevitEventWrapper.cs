@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.UI;
 
-namespace RevitTimasBIMTools.Core
+namespace SmartBIMTools.Core
 {
     public abstract class RevitEventWrapper<TType> : IExternalEventHandler
     {

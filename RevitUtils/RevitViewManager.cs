@@ -1,7 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using RevitTimasBIMTools.RevitModel;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.RevitModel;
+using SmartBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using Color = Autodesk.Revit.DB.Color;
 using Level = Autodesk.Revit.DB.Level;
 using View = Autodesk.Revit.DB.View;
 
-namespace RevitTimasBIMTools.RevitUtils;
+namespace SmartBIMTools.RevitUtils;
 
 internal sealed class RevitViewManager
 {

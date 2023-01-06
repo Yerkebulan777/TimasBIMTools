@@ -1,7 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using System;
 
-namespace RevitTimasBIMTools.RevitUtils
+namespace SmartBIMTools.RevitUtils
 {
     internal sealed class UnitManager
     {

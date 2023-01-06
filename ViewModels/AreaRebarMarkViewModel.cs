@@ -3,10 +3,10 @@ using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI.Selection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Revit.Async;
-using RevitTimasBIMTools.RevitModel;
-using RevitTimasBIMTools.RevitSelectionFilter;
-using RevitTimasBIMTools.RevitUtils;
-using RevitTimasBIMTools.Views;
+using SmartBIMTools.RevitModel;
+using SmartBIMTools.RevitSelectionFilter;
+using SmartBIMTools.RevitUtils;
+using SmartBIMTools.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +17,7 @@ using System.Windows.Data;
 using Parameter = Autodesk.Revit.DB.Parameter;
 using Reference = Autodesk.Revit.DB.Reference;
 
-namespace RevitTimasBIMTools.ViewModels;
+namespace SmartBIMTools.ViewModels;
 
 public sealed class AreaRebarMarkViewModel : ObservableObject
 {

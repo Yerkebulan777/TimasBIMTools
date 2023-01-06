@@ -1,12 +1,12 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converters="clr-namespace:RevitTimasBIMTools.ViewConverters">
+    xmlns:converters="clr-namespace:SmartBIMTools.ViewConverters">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/DataTemplate.xaml" />
-        <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Animation.xaml" />
-        <ResourceDictionary Source="/RevitTimasBIMTools;component/Themes/Colors.xaml" />
+        <ResourceDictionary Source="/SmartTimasBIMTools;component/Themes/DataTemplate.xaml" />
+        <ResourceDictionary Source="/SmartTimasBIMTools;component/Themes/Animation.xaml" />
+        <ResourceDictionary Source="/SmartTimasBIMTools;component/Themes/Colors.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <converters:NullVisibilityConverter x:Key="NullBoolToVis" />

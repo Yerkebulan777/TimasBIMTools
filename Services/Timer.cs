@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace RevitTimasBIMTools.Services
+namespace SmartBIMTools.Services
 {
     public class Timer
     {

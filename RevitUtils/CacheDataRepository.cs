@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
-using RevitTimasBIMTools.Core;
-using RevitTimasBIMTools.Services;
+using SmartBIMTools.Core;
+using SmartBIMTools.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Path = System.IO.Path;
 
-namespace RevitTimasBIMTools.RevitUtils
+namespace SmartBIMTools.RevitUtils
 {
     internal static class CacheDataRepository
     {

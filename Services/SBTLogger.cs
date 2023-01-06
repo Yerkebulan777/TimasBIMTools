@@ -3,7 +3,7 @@ using Autodesk.Revit.UI;
 using log4net;
 using log4net.Appender;
 using log4net.Config;
-using RevitTimasBIMTools.Core;
+using SmartBIMTools.Core;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
-namespace RevitTimasBIMTools.Services;
+namespace SmartBIMTools.Services;
 
 public sealed class SBTLogger
 {
