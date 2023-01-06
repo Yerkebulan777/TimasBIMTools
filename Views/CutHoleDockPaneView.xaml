@@ -10,7 +10,8 @@
     x:Name="viewPage"
     MinWidth="250"
     MinHeight="500"
-    d:DataContext="{d:DesignInstance Type=vm:CutHoleDataViewModel}"
+    d:DataContext="{d:DesignInstance Type=vm:CutHoleDataViewModel,
+                                     IsDesignTimeCreatable=True}"
     d:Height="Auto"
     d:Width="300"
     Background="WhiteSmoke"

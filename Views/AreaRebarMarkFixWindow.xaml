@@ -12,7 +12,8 @@
     Height="Auto"
     MinHeight="150"
     MaxHeight="1000"
-    d:DataContext="{d:DesignInstance Type=vm:AreaRebarMarkViewModel}"
+    d:DataContext="{d:DesignInstance Type=vm:AreaRebarMarkViewModel,
+                                     IsDesignTimeCreatable=True}"
     Background="WhiteSmoke"
     ResizeMode="CanResizeWithGrip"
     SizeToContent="Height"

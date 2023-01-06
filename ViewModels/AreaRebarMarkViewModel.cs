@@ -17,7 +17,9 @@ using System.Windows.Data;
 using Parameter = Autodesk.Revit.DB.Parameter;
 using Reference = Autodesk.Revit.DB.Reference;
 
+
 namespace SmartBIMTools.ViewModels;
+
 
 public sealed class AreaRebarMarkViewModel : ObservableObject
 {
